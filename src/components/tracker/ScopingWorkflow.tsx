@@ -266,7 +266,7 @@ const ScopingWorkflow = () => {
                         <SelectValue placeholder="Target timeline" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="rush">< 4 weeks (Rush)</SelectItem>
+                        <SelectItem value="rush">&lt; 4 weeks (Rush)</SelectItem>
                         <SelectItem value="standard">4-12 weeks (Standard)</SelectItem>
                         <SelectItem value="extended">12+ weeks (Phased)</SelectItem>
                       </SelectContent>
