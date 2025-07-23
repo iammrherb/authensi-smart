@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -82,6 +82,9 @@ const ProjectOverview = () => {
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Create New Project</DialogTitle>
+              <DialogDescription>
+                Create a new project to manage NAC deployment activities and track progress.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>

@@ -15,6 +15,7 @@ const Header = () => {
     { path: "/questionnaires", label: "Scoping", icon: "📋" },
     { path: "/tracker", label: "Project Tracker", icon: "📊" },
     { path: "/vendors", label: "Vendors", icon: "🏭" },
+    { path: "/users", label: "Users", icon: "👥" },
     { path: "/requirements", label: "Requirements", icon: "📄" },
     { path: "/designer", label: "Architecture", icon: "🏗️" },
   ];

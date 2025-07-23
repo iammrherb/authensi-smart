@@ -1,4 +1,5 @@
 import React from "react";
+import NotFound from "./pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,10 +13,10 @@ import Designer from "./pages/Designer";
 import Tracker from "./pages/Tracker";
 import Dashboard from "./pages/Dashboard";
 import Sites from "./pages/Sites";
-import Questionnaires from "./pages/Questionnaires";
-import Vendors from "./pages/Vendors";
 import Requirements from "./pages/Requirements";
-import NotFound from "./pages/NotFound";
+import Vendors from "./pages/Vendors";
+import Users from "./pages/Users";
+import Questionnaires from "./pages/Questionnaires";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +67,11 @@ const App = () => (
             <Route path="/requirements" element={
               <ProtectedRoute>
                 <Requirements />
+              </ProtectedRoute>
+            } />
+            <Route path="/users" element={
+              <ProtectedRoute>
+                <Users />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />

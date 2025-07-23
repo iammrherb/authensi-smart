@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { CheckCircle, XCircle, AlertCircle, Plus, Search, ExternalLink } from "lucide-react";
 
 interface Vendor {
@@ -257,6 +257,9 @@ const VendorManagement = () => {
                           {vendor.name}
                           {getStatusIcon(vendor.status)}
                         </DialogTitle>
+                        <DialogDescription>
+                          Complete vendor details including capabilities, certifications, and integration status.
+                        </DialogDescription>
                       </DialogHeader>
                       
                       {selectedVendor && (

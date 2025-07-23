@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { MapPin, User, Phone, Mail, Network, Monitor, Calendar, Building } from "lucide-react";
@@ -35,6 +35,9 @@ const SiteDetailsDialog = ({ site, isOpen, onClose }: SiteDetailsDialogProps) =>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl">{site.name}</DialogTitle>
+          <DialogDescription>
+            Complete site information including location, network details, and contact information.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">

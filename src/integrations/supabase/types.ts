@@ -290,11 +290,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          scope_id: string | null
+          scope_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          scope_id?: string | null
+          scope_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          scope_id?: string | null
+          scope_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      can_manage_roles: {
+        Args: { _user_id: string; _scope_type?: string; _scope_id?: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _scope_type?: string
+          _scope_id?: string
+        }
+        Returns: boolean
+      }
       user_owns_project: {
         Args: { project_uuid: string }
         Returns: boolean
@@ -305,7 +354,12 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role:
+        | "project_owner"
+        | "project_manager"
+        | "lead_engineer"
+        | "engineer"
+        | "viewer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -432,6 +486,14 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: [
+        "project_owner",
+        "project_manager",
+        "lead_engineer",
+        "engineer",
+        "viewer",
+      ],
+    },
   },
 } as const

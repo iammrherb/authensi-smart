@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { CheckCircle, AlertTriangle, Clock, Plus, Search, FileText, Link as LinkIcon } from "lucide-react";
@@ -346,6 +346,9 @@ const RequirementsManagement = () => {
                           {req.title}
                           {getStatusIcon(req.status)}
                         </DialogTitle>
+                        <DialogDescription>
+                          Detailed requirement information including acceptance criteria, test cases, and compliance details.
+                        </DialogDescription>
                       </DialogHeader>
                       
                       <div className="space-y-6">
@@ -512,6 +515,9 @@ const RequirementsManagement = () => {
                     <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle>{useCase.name}</DialogTitle>
+                        <DialogDescription>
+                          Comprehensive use case details including technical requirements, test scenarios, and vendor support information.
+                        </DialogDescription>
                       </DialogHeader>
                       
                       <div className="space-y-6">
