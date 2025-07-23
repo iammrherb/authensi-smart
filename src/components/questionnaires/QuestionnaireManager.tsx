@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { useQuestionnaires, useDeleteQuestionnaire } from "@/hooks/useQuestionnaires";
@@ -231,6 +231,11 @@ const QuestionnaireManager = () => {
               {viewMode === 'view' && 'View Questionnaire'}
               {viewMode === 'edit' && 'Edit Questionnaire'}
             </DialogTitle>
+            <DialogDescription>
+              {viewMode === 'create' && 'Create a comprehensive scoping questionnaire for a site deployment.'}
+              {viewMode === 'view' && 'Review the completed questionnaire details and responses.'}
+              {viewMode === 'edit' && 'Edit and update the questionnaire responses and requirements.'}
+            </DialogDescription>
           </DialogHeader>
           <QuestionnaireForm
             questionnaire={selectedQuestionnaire}

@@ -190,7 +190,7 @@ const QuestionnaireForm = ({ questionnaire, sites, projects, mode, onSuccess, on
 
     const questionnaireData = {
       site_id: selectedSite,
-      project_id: selectedProject || undefined,
+      project_id: selectedProject === 'no-project' ? undefined : selectedProject,
       questionnaire_data: formData,
       status: calculateProgress() === 100 ? 'completed' : 'in-progress'
     };
@@ -336,7 +336,7 @@ const QuestionnaireForm = ({ questionnaire, sites, projects, mode, onSuccess, on
                     <SelectValue placeholder="Select project" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No Project</SelectItem>
+                    <SelectItem value="no-project">No Project</SelectItem>
                     {projects.map(project => (
                       <SelectItem key={project.id} value={project.id}>
                         {project.name}
