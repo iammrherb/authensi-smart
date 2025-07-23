@@ -1,49 +1,228 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { useProjects } from "@/hooks/useProjects";
+import { useSites } from "@/hooks/useSites";
+import { useQuestionnaires } from "@/hooks/useQuestionnaires";
+import { useSeedDemoData, useClearDemoData } from "@/hooks/useDemoData";
+import { TrendingUp, TrendingDown, Users, Building, FileText, Target, Database, Trash2 } from "lucide-react";
+import { useMemo } from "react";
 
 const ProjectDashboard = () => {
-  const stats = [
-    { label: "Active Projects", value: "8", change: "+2", trend: "up" },
-    { label: "Completed Deployments", value: "24", change: "+4", trend: "up" },
-    { label: "Success Rate", value: "96%", change: "+2%", trend: "up" },
-    { label: "Avg. Deployment Time", value: "6.2 weeks", change: "-0.8", trend: "down" },
-  ];
+  const { data: projects } = useProjects();
+  const { data: sites } = useSites();
+  const { data: questionnaires } = useQuestionnaires();
+  const seedDemoData = useSeedDemoData();
+  const clearDemoData = useClearDemoData();
+
+  const stats = useMemo(() => {
+    const activeProjects = projects?.filter(p => ['planning', 'scoping', 'designing', 'implementing'].includes(p.status)).length || 0;
+    const completedProjects = projects?.filter(p => p.status === 'deployed').length || 0;
+    const totalSites = sites?.length || 0;
+    const completedQuestionnaires = questionnaires?.filter(q => q.status === 'completed').length || 0;
+    const totalQuestionnaires = questionnaires?.length || 0;
+    
+    const completionRate = totalQuestionnaires > 0 ? Math.round((completedQuestionnaires / totalQuestionnaires) * 100) : 0;
+    
+    return [
+      { 
+        label: "Active Projects", 
+        value: activeProjects.toString(), 
+        change: activeProjects > 5 ? "+2" : "0", 
+        trend: activeProjects > 5 ? "up" : "neutral",
+        icon: Target,
+        color: "text-blue-600"
+      },
+      { 
+        label: "Total Sites", 
+        value: totalSites.toString(), 
+        change: totalSites > 3 ? "+1" : "0", 
+        trend: totalSites > 3 ? "up" : "neutral",
+        icon: Building,
+        color: "text-green-600"
+      },
+      { 
+        label: "Questionnaire Completion", 
+        value: `${completionRate}%`, 
+        change: completionRate > 80 ? "+5%" : "0%", 
+        trend: completionRate > 80 ? "up" : "neutral",
+        icon: FileText,
+        color: "text-purple-600"
+      },
+      { 
+        label: "Deployed Projects", 
+        value: completedProjects.toString(), 
+        change: completedProjects > 0 ? "+1" : "0", 
+        trend: completedProjects > 0 ? "up" : "neutral",
+        icon: Users,
+        color: "text-orange-600"
+      },
+    ];
+  }, [projects, sites, questionnaires]);
+
+  const recentProjects = useMemo(() => {
+    return projects?.slice(0, 5) || [];
+  }, [projects]);
+
+  const handleSeedDemoData = () => {
+    if (window.confirm('This will create demo data including sites, projects, and questionnaires. Continue?')) {
+      seedDemoData.mutate();
+    }
+  };
+
+  const handleClearDemoData = () => {
+    if (window.confirm('This will delete ALL your data including sites, projects, and questionnaires. This action cannot be undone. Continue?')) {
+      clearDemoData.mutate();
+    }
+  };
 
   return (
     <div className="space-y-6">
+      {/* Demo Data Controls */}
+      <Card className="bg-gradient-glow border-primary/20">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="flex items-center space-x-2">
+                <Database className="h-5 w-5" />
+                <span>Demo Data Management</span>
+              </CardTitle>
+              <p className="text-muted-foreground mt-1">
+                Quickly populate your workspace with comprehensive demo data
+              </p>
+            </div>
+            <div className="flex space-x-2">
+              <Button 
+                onClick={handleSeedDemoData}
+                disabled={seedDemoData.isPending}
+                className="bg-gradient-primary hover:opacity-90"
+              >
+                <Database className="h-4 w-4 mr-2" />
+                {seedDemoData.isPending ? 'Creating...' : 'Seed Demo Data'}
+              </Button>
+              <Button 
+                onClick={handleClearDemoData}
+                disabled={clearDemoData.isPending}
+                variant="outline"
+                className="text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                {clearDemoData.isPending ? 'Clearing...' : 'Clear All Data'}
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <Card key={index}>
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-center">
-                <div className="text-sm font-medium text-muted-foreground">
-                  {stat.label}
+        {stats.map((stat, index) => {
+          const IconComponent = stat.icon;
+          return (
+            <Card key={index} className="bg-card/50 backdrop-blur-sm border-border/50 hover:shadow-glow transition-all duration-300">
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-2">
+                    <IconComponent className={`h-4 w-4 ${stat.color}`} />
+                    <div className="text-sm font-medium text-muted-foreground">
+                      {stat.label}
+                    </div>
+                  </div>
+                  <Badge variant={stat.trend === "up" ? "default" : "secondary"} className="flex items-center space-x-1">
+                    {stat.trend === "up" && <TrendingUp className="h-3 w-3" />}
+                    {stat.trend === "down" && <TrendingDown className="h-3 w-3" />}
+                    <span>{stat.change}</span>
+                  </Badge>
                 </div>
-                <Badge variant={stat.trend === "up" ? "default" : "secondary"}>
-                  {stat.change}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-primary">{stat.value}</div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-primary">{stat.value}</div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Project Overview</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-10">
-            <p className="text-muted-foreground">
-              Comprehensive project dashboard with real-time metrics and analytics
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Recent Projects */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Projects</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {recentProjects.length > 0 ? (
+              <div className="space-y-4">
+                {recentProjects.map((project) => (
+                  <div key={project.id} className="flex items-center justify-between p-3 bg-accent/50 rounded-lg">
+                    <div>
+                      <div className="font-medium">{project.name}</div>
+                      <div className="text-sm text-muted-foreground">{project.client_name}</div>
+                    </div>
+                    <div className="text-right">
+                      <Badge variant={
+                        project.status === 'deployed' ? 'default' :
+                        project.status === 'implementing' ? 'secondary' : 'outline'
+                      }>
+                        {project.status}
+                      </Badge>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <Progress value={project.progress_percentage} className="w-16" />
+                        <span className="text-xs text-muted-foreground">
+                          {project.progress_percentage}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No projects found. Create your first project to get started.
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Questionnaire Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {questionnaires && questionnaires.length > 0 ? (
+              <div className="space-y-4">
+                {questionnaires.slice(0, 5).map((questionnaire) => (
+                  <div key={questionnaire.id} className="flex items-center justify-between p-3 bg-accent/50 rounded-lg">
+                    <div>
+                      <div className="font-medium">{questionnaire.sites?.name}</div>
+                      <div className="text-sm text-muted-foreground">{questionnaire.sites?.location}</div>
+                    </div>
+                    <div className="text-right">
+                      <Badge variant={
+                        questionnaire.status === 'completed' ? 'default' :
+                        questionnaire.status === 'in-progress' ? 'secondary' : 'outline'
+                      }>
+                        {questionnaire.status}
+                      </Badge>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <Progress value={questionnaire.completion_percentage} className="w-16" />
+                        <span className="text-xs text-muted-foreground">
+                          {questionnaire.completion_percentage}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No questionnaires found. Create your first questionnaire to get started.
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

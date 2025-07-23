@@ -2,14 +2,12 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import QuestionnaireManager from "@/components/questionnaires/QuestionnaireManager";
+import { ExternalLink } from "lucide-react";
 
 const ScopingWorkflow = () => {
-  const [selectedScope, setSelectedScope] = useState("enterprise");
+  const [showQuestionnaireManager, setShowQuestionnaireManager] = useState(false);
 
   const useCases = [
     {
@@ -117,223 +115,70 @@ const ScopingWorkflow = () => {
             Comprehensive scoping workflow for Portnox deployments
           </p>
         </div>
-        <Button className="bg-gradient-primary hover:opacity-90">
-          Export Scoping Report
+        <Button 
+          onClick={() => setShowQuestionnaireManager(true)}
+          className="bg-gradient-primary hover:opacity-90"
+        >
+          <ExternalLink className="h-4 w-4 mr-2" />
+          Manage Questionnaires
         </Button>
       </div>
 
-      <Tabs defaultValue="deployment-type" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="deployment-type">Deployment Type</TabsTrigger>
-          <TabsTrigger value="use-cases">Use Cases</TabsTrigger>
-          <TabsTrigger value="requirements">Requirements</TabsTrigger>
-          <TabsTrigger value="questionnaire">Discovery</TabsTrigger>
-          <TabsTrigger value="sizing">Sizing & Scope</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="deployment-type" className="space-y-6">
-          <div className="grid gap-6">
-            {deploymentTypes.map((deployment, index) => (
-              <Card 
-                key={index}
-                className={`cursor-pointer transition-all duration-300 hover:shadow-glow ${
-                  selectedScope === deployment.type.toLowerCase().replace(/\s+/g, '-') 
-                    ? "border-primary bg-gradient-glow" 
-                    : "hover:border-primary/30"
-                }`}
-                onClick={() => setSelectedScope(deployment.type.toLowerCase().replace(/\s+/g, '-'))}
-              >
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-xl">{deployment.type}</CardTitle>
-                      <p className="text-muted-foreground mt-1">{deployment.description}</p>
-                    </div>
-                    <div className="text-right space-y-2">
-                      <Badge variant="outline">{deployment.complexity} Complexity</Badge>
-                      <div className="text-sm text-muted-foreground">{deployment.timeline}</div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {deployment.features.map((feature, idx) => (
-                      <Badge key={idx} variant="secondary">
-                        {feature}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="use-cases" className="space-y-6">
-          <div className="grid gap-6">
-            {useCases.map((category, index) => (
-              <Card key={index}>
-                <CardHeader>
-                  <CardTitle className="text-lg text-primary">{category.category}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {category.cases.map((useCase, idx) => (
-                      <div key={idx} className="flex items-center space-x-3">
-                        <Checkbox id={`use-case-${index}-${idx}`} />
-                        <label 
-                          htmlFor={`use-case-${index}-${idx}`}
-                          className="text-sm cursor-pointer hover:text-primary transition-colors"
-                        >
-                          {useCase}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="requirements" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Technical Requirements Gathering</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium">Total Endpoints</label>
-                    <Input placeholder="e.g., 1500" type="number" />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Number of Sites</label>
-                    <Input placeholder="e.g., 5" type="number" />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Network Infrastructure</label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select primary vendor" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cisco">Cisco</SelectItem>
-                        <SelectItem value="aruba">Aruba/HPE</SelectItem>
-                        <SelectItem value="juniper">Juniper</SelectItem>
-                        <SelectItem value="extreme">Extreme Networks</SelectItem>
-                        <SelectItem value="mixed">Mixed Environment</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium">Authentication Method</label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Primary authentication" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ad">Active Directory</SelectItem>
-                        <SelectItem value="ldap">LDAP</SelectItem>
-                        <SelectItem value="saml">SAML/SSO</SelectItem>
-                        <SelectItem value="certificate">Certificate-based</SelectItem>
-                        <SelectItem value="multi">Multi-method</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Compliance Requirements</label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select compliance" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pci">PCI-DSS</SelectItem>
-                        <SelectItem value="hipaa">HIPAA</SelectItem>
-                        <SelectItem value="sox">SOX</SelectItem>
-                        <SelectItem value="iso">ISO 27001</SelectItem>
-                        <SelectItem value="multiple">Multiple Standards</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Deployment Timeline</label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Target timeline" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="rush">&lt; 4 weeks (Rush)</SelectItem>
-                        <SelectItem value="standard">4-12 weeks (Standard)</SelectItem>
-                        <SelectItem value="extended">12+ weeks (Phased)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="questionnaire" className="space-y-6">
-          {Object.entries(scopingQuestions).map(([category, questions]) => (
-            <Card key={category}>
-              <CardHeader>
-                <CardTitle className="text-lg capitalize text-primary">
-                  {category} Discovery
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {questions.map((question, index) => (
-                  <div key={index} className="space-y-2">
-                    <label className="text-sm font-medium">{question}</label>
-                    <Textarea 
-                      placeholder="Enter detailed response..."
-                      className="min-h-[80px]"
-                    />
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="sizing" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Deployment Sizing Calculator</CardTitle>
-              <p className="text-muted-foreground">
-                Automatic sizing based on your requirements
+      <Card className="bg-gradient-glow border-primary/20">
+        <CardHeader>
+          <CardTitle className="text-center">
+            Enhanced Scoping Questionnaire System
+          </CardTitle>
+          <p className="text-center text-muted-foreground">
+            Use the comprehensive questionnaire manager for detailed scoping, use case validation, 
+            test case management, and requirements gathering.
+          </p>
+        </CardHeader>
+        <CardContent className="text-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="text-center">
+              <div className="text-2xl mb-2">📋</div>
+              <h3 className="font-semibold">Comprehensive Forms</h3>
+              <p className="text-sm text-muted-foreground">
+                Detailed questionnaires with deployment types, use cases, and requirements
               </p>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="bg-gradient-glow border-primary/30">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl font-bold text-primary mb-2">2,500</div>
-                    <div className="text-sm text-muted-foreground">Estimated Endpoints</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-gradient-glow border-primary/30">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl font-bold text-primary mb-2">8</div>
-                    <div className="text-sm text-muted-foreground">Required Appliances</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-gradient-glow border-primary/30">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-3xl font-bold text-primary mb-2">12 weeks</div>
-                    <div className="text-sm text-muted-foreground">Estimated Timeline</div>
-                  </CardContent>
-                </Card>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl mb-2">🧪</div>
+              <h3 className="font-semibold">Test Case Management</h3>
+              <p className="text-sm text-muted-foreground">
+                Create and track test cases for validating use case implementations
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl mb-2">📊</div>
+              <h3 className="font-semibold">Sizing & Analytics</h3>
+              <p className="text-sm text-muted-foreground">
+                Automatic sizing calculations and progress tracking
+              </p>
+            </div>
+          </div>
+          
+          <Button 
+            onClick={() => setShowQuestionnaireManager(true)}
+            size="lg"
+            className="bg-gradient-primary hover:opacity-90"
+          >
+            <ExternalLink className="h-5 w-5 mr-2" />
+            Open Questionnaire Manager
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Questionnaire Manager Dialog */}
+      <Dialog open={showQuestionnaireManager} onOpenChange={setShowQuestionnaireManager}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Scoping Questionnaire Manager</DialogTitle>
+          </DialogHeader>
+          <QuestionnaireManager />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
