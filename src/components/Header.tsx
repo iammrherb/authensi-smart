@@ -9,15 +9,13 @@ const Header = () => {
   const { user, signOut } = useAuth();
 
   const navItems = [
-    { path: "/", label: "Home", icon: "🏠" },
-    { path: "/dashboard", label: "Dashboard", icon: "📈" },
-    { path: "/sites", label: "Site Manager", icon: "🏢" },
+    { path: "/sites", label: "Sites", icon: "🏢" },
+    { path: "/", label: "Progress", icon: "📈" },
+    { path: "/tracker", label: "Implementation", icon: "⚙️" },
     { path: "/questionnaires", label: "Scoping", icon: "📋" },
-    { path: "/tracker", label: "Project Tracker", icon: "📊" },
-    { path: "/vendors", label: "Vendors", icon: "🏭" },
-    { path: "/users", label: "Users", icon: "👥" },
-    { path: "/requirements", label: "Requirements", icon: "📄" },
-    { path: "/designer", label: "Architecture", icon: "🏗️" },
+    { path: "/requirements", label: "Library", icon: "📚" },
+    { path: "/reports", label: "Reports", icon: "📊" },
+    { path: "/settings", label: "Settings", icon: "⚙️" },
   ];
 
   return (
@@ -29,8 +27,8 @@ const Header = () => {
               <span className="text-primary-foreground font-bold text-lg">P</span>
             </div>
             <div>
-              <span className="text-xl font-bold text-foreground">Portnox</span>
-              <span className="text-sm text-muted-foreground ml-2">NAC Platform</span>
+              <span className="text-xl font-bold text-foreground">Master Site Deployment Plan</span>
+              <span className="text-sm text-muted-foreground ml-2">Deployment & Use Case Tracker</span>
             </div>
           </div>
           

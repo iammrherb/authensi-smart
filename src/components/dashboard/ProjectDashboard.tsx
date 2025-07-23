@@ -6,14 +6,16 @@ import { Progress } from "@/components/ui/progress";
 import { useProjects } from "@/hooks/useProjects";
 import { useSites } from "@/hooks/useSites";
 import { useQuestionnaires } from "@/hooks/useQuestionnaires";
-import { demoProjects, demoAnalytics } from "@/hooks/useDemoData";
-import { TrendingUp, TrendingDown, Users, Building, FileText, Target } from "lucide-react";
+import { demoProjects, demoAnalytics, useSeedDemoData, useClearDemoData } from "@/hooks/useDemoData";
+import { TrendingUp, TrendingDown, Users, Building, FileText, Target, Database, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 
 const ProjectDashboard = () => {
   const { data: projects } = useProjects();
   const { data: sites } = useSites();
   const { data: questionnaires } = useQuestionnaires();
+  const seedDemoData = useSeedDemoData();
+  const clearDemoData = useClearDemoData();
 
   const stats = useMemo(() => {
     const activeProjects = projects?.filter(p => ['planning', 'scoping', 'designing', 'implementing'].includes(p.status)).length || 0;
@@ -64,8 +66,55 @@ const ProjectDashboard = () => {
     return projects?.slice(0, 5) || [];
   }, [projects]);
 
+  const handleSeedDemoData = () => {
+    if (window.confirm('This will create demo data including sites, projects, and questionnaires. Continue?')) {
+      seedDemoData.mutate();
+    }
+  };
+
+  const handleClearDemoData = () => {
+    if (window.confirm('This will delete ALL your data including sites, projects, and questionnaires. This action cannot be undone. Continue?')) {
+      clearDemoData.mutate();
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Demo Data Controls */}
+      <Card className="bg-gradient-glow border-primary/20">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="flex items-center space-x-2">
+                <Database className="h-5 w-5" />
+                <span>Demo Data Management</span>
+              </CardTitle>
+              <p className="text-muted-foreground mt-1">
+                Quickly populate your workspace with comprehensive demo data
+              </p>
+            </div>
+            <div className="flex space-x-2">
+              <Button 
+                onClick={handleSeedDemoData}
+                disabled={seedDemoData.isPending}
+                className="bg-gradient-primary hover:opacity-90"
+              >
+                <Database className="h-4 w-4 mr-2" />
+                {seedDemoData.isPending ? 'Creating...' : 'Seed Demo Data'}
+              </Button>
+              <Button 
+                onClick={handleClearDemoData}
+                disabled={clearDemoData.isPending}
+                variant="outline"
+                className="text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                {clearDemoData.isPending ? 'Clearing...' : 'Clear All Data'}
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

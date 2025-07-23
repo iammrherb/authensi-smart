@@ -1,4 +1,7 @@
 // Enhanced demo data for the NAC deployment platform
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 export const demoProjects = [
   {
@@ -11,6 +14,7 @@ export const demoProjects = [
     progress_percentage: 65,
     start_date: "2023-10-01",
     target_completion: "2024-03-15",
+    actual_completion: null,
     budget: 485000,
     created_by: "user-123",
     sites: [
@@ -30,6 +34,7 @@ export const demoProjects = [
     progress_percentage: 25,
     start_date: "2024-01-15",
     target_completion: "2024-06-30",
+    actual_completion: null,
     budget: 320000,
     created_by: "user-123",
     sites: [
@@ -48,6 +53,7 @@ export const demoProjects = [
     progress_percentage: 85,
     start_date: "2023-08-01",
     target_completion: "2024-02-01",
+    actual_completion: "2024-01-28",
     budget: 275000,
     created_by: "user-123",
     sites: [
@@ -504,4 +510,180 @@ export const demoAnalytics = {
       created: "2024-01-18T14:22:00Z"
     }
   ]
+};
+
+export const useDemoData = () => {
+  return {
+    projects: demoProjects,
+    sites: demoSites,
+    vendors: demoVendors,
+    requirements: demoRequirements,
+    useCases: demoUseCases,
+    questionnaires: demoQuestionnaires,
+    analytics: demoAnalytics
+  };
+};
+
+// Hook to seed demo data into the database
+export const useSeedDemoData = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async () => {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) throw new Error('Not authenticated');
+
+      // First create sites
+      const siteInserts = demoSites.map(site => ({
+        name: site.name,
+        location: site.location,
+        address: site.address,
+        contact_name: site.contact_name,
+        contact_email: site.contact_email,
+        contact_phone: site.contact_phone,
+        site_type: site.site_type,
+        status: site.status,
+        priority: site.priority,
+        network_segments: site.network_segments,
+        device_count: site.device_count,
+        assigned_engineer: null,
+        created_by: user.id
+      }));
+
+      const { data: insertedSites, error: sitesError } = await supabase
+        .from('sites')
+        .insert(siteInserts)
+        .select();
+
+      if (sitesError) throw sitesError;
+
+      // Then create projects
+      const projectInserts = demoProjects.map(project => ({
+        name: project.name,
+        description: project.description,
+        client_name: project.client_name,
+        status: project.status,
+        current_phase: project.current_phase,
+        start_date: project.start_date,
+        target_completion: project.target_completion,
+        actual_completion: project.actual_completion,
+        budget: project.budget,
+        progress_percentage: project.progress_percentage,
+        project_manager: null,
+        created_by: user.id
+      }));
+
+      const { data: insertedProjects, error: projectsError } = await supabase
+        .from('projects')
+        .insert(projectInserts)
+        .select();
+
+      if (projectsError) throw projectsError;
+
+      // Create project-site relationships
+      if (insertedProjects && insertedSites) {
+        const projectSiteInserts = [];
+        for (let i = 0; i < Math.min(insertedProjects.length, insertedSites.length); i++) {
+          projectSiteInserts.push({
+            project_id: insertedProjects[i].id,
+            site_id: insertedSites[i].id,
+            deployment_order: i + 1,
+            site_specific_notes: `Demo deployment for ${insertedSites[i].name}`
+          });
+        }
+
+        const { error: projectSitesError } = await supabase
+          .from('project_sites')
+          .insert(projectSiteInserts);
+
+        if (projectSitesError) throw projectSitesError;
+      }
+
+      // Create demo questionnaires
+      if (insertedSites) {
+        const questionnaireInserts = insertedSites.slice(0, 3).map((site, index) => ({
+          site_id: site.id,
+          project_id: insertedProjects?.[index]?.id || null,
+          questionnaire_data: demoQuestionnaires[0].questionnaire_data,
+          status: ['draft', 'completed', 'under_review'][index % 3],
+          completion_percentage: [25, 100, 75][index % 3],
+          created_by: user.id
+        }));
+
+        const { error: questionnairesError } = await supabase
+          .from('scoping_questionnaires')
+          .insert(questionnaireInserts);
+
+        if (questionnairesError) throw questionnairesError;
+      }
+
+      return { sites: insertedSites, projects: insertedProjects };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sites'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['questionnaires'] });
+      toast({
+        title: "Success",
+        description: "Demo data created successfully!",
+      });
+    },
+    onError: (error) => {
+      console.error('Error seeding demo data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create demo data",
+        variant: "destructive",
+      });
+    }
+  });
+};
+
+// Hook to clear all demo data
+export const useClearDemoData = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async () => {
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) throw new Error('Not authenticated');
+
+      // Delete in reverse order of dependencies
+      await supabase.from('implementation_checklists').delete().eq('created_by', user.id);
+      await supabase.from('scoping_questionnaires').delete().eq('created_by', user.id);
+      
+      // Get user's projects to delete project_sites
+      const { data: userProjects } = await supabase
+        .from('projects')
+        .select('id')
+        .eq('created_by', user.id);
+      
+      if (userProjects && userProjects.length > 0) {
+        const projectIds = userProjects.map(p => p.id);
+        await supabase.from('project_sites').delete().in('project_id', projectIds);
+      }
+      
+      await supabase.from('projects').delete().eq('created_by', user.id);
+      await supabase.from('sites').delete().eq('created_by', user.id);
+      
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sites'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['questionnaires'] });
+      toast({
+        title: "Success",
+        description: "All data cleared successfully!",
+      });
+    },
+    onError: (error) => {
+      console.error('Error clearing data:', error);
+      toast({
+        title: "Error", 
+        description: "Failed to clear data",
+        variant: "destructive",
+      });
+    }
+  });
 };

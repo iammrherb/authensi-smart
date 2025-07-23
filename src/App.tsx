@@ -17,6 +17,8 @@ import Requirements from "./pages/Requirements";
 import Vendors from "./pages/Vendors";
 import Users from "./pages/Users";
 import Questionnaires from "./pages/Questionnaires";
+import Reports from "./pages/Reports";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -73,6 +75,16 @@ const App = () => (
             <Route path="/users" element={
               <ProtectedRoute>
                 <Users />
+              </ProtectedRoute>
+            } />
+            <Route path="/reports" element={
+              <ProtectedRoute>
+                <Reports />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />
