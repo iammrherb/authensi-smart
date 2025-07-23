@@ -295,7 +295,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      user_owns_project: {
+        Args: { project_uuid: string }
+        Returns: boolean
+      }
+      user_owns_site: {
+        Args: { site_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
