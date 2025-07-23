@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,7 @@ import Generator from "./pages/Generator";
 import Dashboard from "./pages/Dashboard";
 import Templates from "./pages/Templates";
 import Sites from "./pages/Sites";
+import Questionnaires from "./pages/Questionnaires";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -60,6 +62,11 @@ const App = () => (
             <Route path="/sites" element={
               <ProtectedRoute>
                 <Sites />
+              </ProtectedRoute>
+            } />
+            <Route path="/questionnaires" element={
+              <ProtectedRoute>
+                <Questionnaires />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />
