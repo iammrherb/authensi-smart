@@ -10,11 +10,11 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Designer from "./pages/Designer";
 import Tracker from "./pages/Tracker";
-import Generator from "./pages/Generator";
 import Dashboard from "./pages/Dashboard";
-import Templates from "./pages/Templates";
 import Sites from "./pages/Sites";
 import Questionnaires from "./pages/Questionnaires";
+import Vendors from "./pages/Vendors";
+import Requirements from "./pages/Requirements";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,19 +43,9 @@ const App = () => (
                 <Tracker />
               </ProtectedRoute>
             } />
-            <Route path="/generator" element={
-              <ProtectedRoute>
-                <Generator />
-              </ProtectedRoute>
-            } />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/templates" element={
-              <ProtectedRoute>
-                <Templates />
               </ProtectedRoute>
             } />
             <Route path="/sites" element={
@@ -66,6 +56,16 @@ const App = () => (
             <Route path="/questionnaires" element={
               <ProtectedRoute>
                 <Questionnaires />
+              </ProtectedRoute>
+            } />
+            <Route path="/vendors" element={
+              <ProtectedRoute>
+                <Vendors />
+              </ProtectedRoute>
+            } />
+            <Route path="/requirements" element={
+              <ProtectedRoute>
+                <Requirements />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />

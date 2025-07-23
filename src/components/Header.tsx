@@ -10,12 +10,13 @@ const Header = () => {
 
   const navItems = [
     { path: "/", label: "Home", icon: "🏠" },
-    { path: "/sites", label: "Site Manager", icon: "🏢" },
-    { path: "/designer", label: "Architecture Designer", icon: "🏗️" },
-    { path: "/tracker", label: "Deployment Tracker", icon: "📊" },
-    { path: "/generator", label: "AI Generator", icon: "🤖" },
-    { path: "/templates", label: "Templates", icon: "📋" },
     { path: "/dashboard", label: "Dashboard", icon: "📈" },
+    { path: "/sites", label: "Site Manager", icon: "🏢" },
+    { path: "/questionnaires", label: "Scoping", icon: "📋" },
+    { path: "/tracker", label: "Project Tracker", icon: "📊" },
+    { path: "/vendors", label: "Vendors", icon: "🏭" },
+    { path: "/requirements", label: "Requirements", icon: "📄" },
+    { path: "/designer", label: "Architecture", icon: "🏗️" },
   ];
 
   return (
