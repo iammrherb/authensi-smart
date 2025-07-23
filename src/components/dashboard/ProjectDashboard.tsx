@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { useProjects } from "@/hooks/useProjects";
 import { useSites } from "@/hooks/useSites";
 import { useQuestionnaires } from "@/hooks/useQuestionnaires";
-import { useSeedDemoData, useClearDemoData } from "@/hooks/useDemoData";
+import { demoProjects, demoAnalytics } from "@/hooks/useDemoData";
 import { TrendingUp, TrendingDown, Users, Building, FileText, Target, Database, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 
