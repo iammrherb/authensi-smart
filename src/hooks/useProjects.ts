@@ -52,10 +52,13 @@ export const useProject = (id: string) => {
         .from('projects')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
       
-      if (error) throw error;
-      return data as Project;
+      if (error) {
+        console.error('Error fetching project:', error);
+        throw error;
+      }
+      return data as Project | null;
     },
     enabled: !!id,
   });
@@ -89,16 +92,23 @@ export const useCreateProject = () => {
     mutationFn: async (projectData: Omit<Project, 'id' | 'created_at' | 'updated_at'>) => {
       const { data: { user } } = await supabase.auth.getUser();
       
+      if (!user) {
+        throw new Error('User must be authenticated to create projects');
+      }
+
       const { data, error } = await supabase
         .from('projects')
         .insert([{
           ...projectData,
-          created_by: user?.id,
+          created_by: user.id,
         }])
         .select()
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating project:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
@@ -108,7 +118,8 @@ export const useCreateProject = () => {
         description: "Project created successfully",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Project creation error:', error);
       toast({
         title: "Error",
         description: "Failed to create project: " + error.message,
@@ -129,9 +140,12 @@ export const useUpdateProject = () => {
         .update(updates)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating project:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
@@ -201,9 +215,12 @@ export const useAddSiteToProject = () => {
           site_specific_notes: notes,
         }])
         .select()
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error adding site to project:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {

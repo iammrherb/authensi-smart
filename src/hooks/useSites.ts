@@ -44,16 +44,23 @@ export const useCreateSite = () => {
     mutationFn: async (siteData: Omit<Site, 'id' | 'created_at' | 'updated_at'>) => {
       const { data: { user } } = await supabase.auth.getUser();
       
+      if (!user) {
+        throw new Error('User must be authenticated to create sites');
+      }
+
       const { data, error } = await supabase
         .from('sites')
         .insert([{
           ...siteData,
-          created_by: user?.id,
+          created_by: user.id,
         }])
         .select()
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating site:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
@@ -63,7 +70,8 @@ export const useCreateSite = () => {
         description: "Site created successfully",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Site creation error:', error);
       toast({
         title: "Error",
         description: "Failed to create site: " + error.message,
@@ -84,9 +92,12 @@ export const useUpdateSite = () => {
         .update(updates)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating site:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
