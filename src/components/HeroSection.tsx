@@ -24,38 +24,38 @@ const HeroSection = () => {
       <div className="relative z-10 container mx-auto px-6 py-32 text-center">
         <div className="max-w-4xl mx-auto space-y-8 animate-slide-up">
           <Badge variant="ai" className="mb-4">
-            🚀 AI-Powered Network Authentication
+            🚀 World's Best Portnox Platform
           </Badge>
           
           <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-foreground via-primary to-primary-glow bg-clip-text text-transparent leading-tight">
-            Intelligent Network
+            Portnox NAC
             <br />
-            <span className="bg-gradient-primary bg-clip-text">Authentication</span>
+            <span className="bg-gradient-primary bg-clip-text">Design & Deploy</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Eliminate network authentication complexity through AI-driven automation. 
-            Get real-time optimization, predictive analytics, and zero-touch deployment 
-            for TACACS+, RADIUS, and RADSEC across all network vendors.
+            The world's most advanced Portnox NAC scoping, design, and deployment platform. 
+            AI-powered architecture designer, comprehensive project tracking, and automated 
+            configuration generation for enterprise network access control.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
             <Button variant="hero" size="lg" className="text-lg px-8 py-4">
-              Start Free Trial
+              Start Designing
             </Button>
             <Button variant="glow" size="lg" className="text-lg px-8 py-4">
-              Watch Demo
+              View Demo
             </Button>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 pt-16 border-t border-border/30">
             <div className="text-center space-y-2">
-              <div className="text-3xl font-bold text-primary">80%</div>
-              <div className="text-muted-foreground">Reduction in Config Time</div>
+              <div className="text-3xl font-bold text-primary">90%</div>
+              <div className="text-muted-foreground">Faster Design Process</div>
             </div>
             <div className="text-center space-y-2">
-              <div className="text-3xl font-bold text-primary">50+</div>
-              <div className="text-muted-foreground">Network Vendors Supported</div>
+              <div className="text-3xl font-bold text-primary">100+</div>
+              <div className="text-muted-foreground">Successful Deployments</div>
             </div>
             <div className="text-center space-y-2">
               <div className="text-3xl font-bold text-primary">99.9%</div>
