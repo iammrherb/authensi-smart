@@ -10,6 +10,7 @@ import Tracker from "./pages/Tracker";
 import Generator from "./pages/Generator";
 import Dashboard from "./pages/Dashboard";
 import Templates from "./pages/Templates";
+import Sites from "./pages/Sites";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/generator" element={<Generator />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/templates" element={<Templates />} />
+          <Route path="/sites" element={<Sites />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
