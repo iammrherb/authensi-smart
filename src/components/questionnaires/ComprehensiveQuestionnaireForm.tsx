@@ -86,43 +86,26 @@ const ComprehensiveQuestionnaireForm = ({ questionnaire, sites, projects, mode, 
   const [selectedProject, setSelectedProject] = useState('');
   
   const [formData, setFormData] = useState({
-    // Required for existing QuestionnaireData interface
-    deploymentType: '',
-    useCases: [] as string[],
-    requirements: {
-      endpoints: 0,
-      sites: 0,
-      networkInfrastructure: '',
-      authenticationMethod: '',
-      compliance: '',
-      timeline: ''
-    },
-    discoveryAnswers: {
-      infrastructure: {},
-      security: {},
-      business: {}
-    },
-    testCases: [] as any[],
-    sizing: {
-      estimatedEndpoints: 0,
-      requiredAppliances: 0,
-      estimatedTimeline: '',
-      budget: 0
-    }
-  });
-
-  // Extended fields for comprehensive questionnaire  
-  const [extendedData, setExtendedData] = useState({
     title: '',
     description: '',
     priority: 'medium' as 'high' | 'medium' | 'low',
     estimatedDuration: '',
     targetGoLiveDate: '',
-    customUseCases: [] as UseCase[],
-    customRequirements: [] as Requirement[],
-    wiredWireless: {
-      wiredInfrastructure: [] as string[],
-      wirelessInfrastructure: [] as string[]
+    deploymentType: '',
+    useCases: [] as UseCase[],
+    requirements: [] as Requirement[],
+    wiredWireless: [] as string[],
+    discoveryAnswers: {
+      infrastructure: {},
+      security: {},
+      business: {}
+    },
+    testCases: [] as TestCase[],
+    sizing: {
+      estimatedEndpoints: 0,
+      requiredAppliances: 0,
+      estimatedTimeline: '',
+      budget: 0
     },
     implementationPlan: {
       phases: [] as any[],
@@ -435,10 +418,34 @@ const ComprehensiveQuestionnaireForm = ({ questionnaire, sites, projects, mode, 
       return;
     }
 
+    // Transform comprehensive form data to match existing QuestionnaireData interface
+    const transformedData: QuestionnaireData = {
+      deploymentType: formData.deploymentType,
+      useCases: formData.useCases.map(uc => uc.id), // Convert UseCase objects to string IDs
+      requirements: {
+        endpoints: formData.sizing.estimatedEndpoints,
+        sites: 1, // Default to 1 for single site
+        networkInfrastructure: formData.wiredWireless.join(', '),
+        authenticationMethod: 'Certificate-based',
+        compliance: 'TBD',
+        timeline: formData.estimatedDuration
+      },
+      discoveryAnswers: formData.discoveryAnswers,
+      testCases: formData.testCases.map(tc => ({
+        category: tc.useCaseNumbers.join(', '),
+        name: tc.title,
+        description: tc.description,
+        priority: tc.priority,
+        status: tc.status,
+        requirements: []
+      })),
+      sizing: formData.sizing
+    };
+
     const questionnaireData = {
       site_id: selectedSite,
       project_id: selectedProject === 'no-project' ? undefined : selectedProject,
-      questionnaire_data: formData,
+      questionnaire_data: transformedData,
       status: calculateProgress() === 100 ? 'completed' : 'in-progress'
     };
 
