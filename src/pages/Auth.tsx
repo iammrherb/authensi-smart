@@ -78,24 +78,22 @@ const Auth = () => {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950">
-      {/* Modern Geometric Background */}
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+      {/* Ultra Modern Background */}
       <div className="absolute inset-0">
-        {/* Grid pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.1)_1px,transparent_1px)] bg-[size:100px_100px]"></div>
+        {/* Subtle grid */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
         </div>
         
-        {/* Modern geometric shapes */}
-        <div className="absolute top-20 left-20 w-32 h-32 bg-blue-500/20 rounded-2xl transform rotate-45"></div>
-        <div className="absolute bottom-32 right-24 w-24 h-24 bg-purple-500/20 rounded-full"></div>
-        <div className="absolute top-1/2 left-12 w-16 h-16 bg-indigo-500/30 rounded-lg transform rotate-12"></div>
-        <div className="absolute bottom-20 left-1/3 w-20 h-20 bg-cyan-500/20 rounded-2xl transform -rotate-12"></div>
+        {/* Modern accent lines */}
+        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-blue-500/20 to-transparent"></div>
+        <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-purple-500/15 to-transparent"></div>
         
-        {/* Gradient orbs */}
-        <div className="absolute top-16 right-16 w-40 h-40 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-full blur-2xl"></div>
-        <div className="absolute bottom-24 left-1/4 w-48 h-48 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-2/3 right-1/3 w-32 h-32 bg-gradient-to-r from-indigo-500/25 to-cyan-500/25 rounded-full blur-xl"></div>
+        {/* Subtle glow elements */}
+        <div className="absolute top-1/4 left-10 w-2 h-2 bg-blue-400 rounded-full opacity-60"></div>
+        <div className="absolute bottom-1/3 right-12 w-1 h-1 bg-purple-400 rounded-full opacity-40"></div>
+        <div className="absolute top-2/3 left-1/5 w-1.5 h-1.5 bg-cyan-400 rounded-full opacity-50"></div>
       </div>
 
       {/* Main Auth Container */}
@@ -103,23 +101,23 @@ const Auth = () => {
         <div className="w-full max-w-md">
           {/* Animated Logo Header */}
           <div className="text-center mb-8">
-            <div className="flex flex-col items-center justify-center gap-4 mb-6">
-              <div className="relative">
+            <div className="flex flex-col items-center justify-center gap-6 mb-8">
+              <div className="relative p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
                 <img 
                   src={portnoxLogo} 
                   alt="Portnox Logo" 
-                  className="h-20 w-auto font-black filter drop-shadow-2xl brightness-110 contrast-125"
+                  className="h-24 w-auto filter brightness-150 contrast-125 drop-shadow-2xl"
                 />
               </div>
               <div className="text-center">
-                <h1 className="text-4xl lg:text-5xl font-black text-white mb-3 bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent tracking-tight">
-                  PORTNOX
+                <h1 className="text-4xl lg:text-5xl font-black text-white mb-3 tracking-tight">
+                  SCOPE SLAYER
                 </h1>
-                <h2 className="text-2xl lg:text-3xl font-bold text-blue-200 mb-2 tracking-wide">
-                  ZTAC Platform
+                <h2 className="text-xl lg:text-2xl font-bold text-gray-300 mb-2 tracking-wide">
+                  POC Tracker • Deployment Master
                 </h2>
-                <p className="text-lg text-blue-300 font-semibold">
-                  Zero Trust Access Control
+                <p className="text-lg text-gray-400 font-semibold">
+                  🎯 Use Case Maestro 🎯
                 </p>
               </div>
             </div>
@@ -128,12 +126,12 @@ const Auth = () => {
           <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-card/95">
             <CardHeader className="space-y-1 text-center pb-4">
               <CardTitle className="text-3xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
-                {isSignUp ? 'Join Portnox Platform' : 'Welcome Back'}
+                {isSignUp ? 'Join the Platform' : 'Welcome Back'}
               </CardTitle>
               <CardDescription className="text-base">
                 {isSignUp 
-                  ? 'Create your account to access the Portnox ZTAC platform for comprehensive POC management and deployment tracking'
-                  : 'Sign in to your Portnox ZTAC Platform - Your command center for zero trust access control deployment excellence'
+                  ? 'Create your account to access the ultimate Scope Slayer platform for comprehensive POC management and deployment tracking'
+                  : 'Sign in to your Scope Slayer Platform - Your command center for POC management, deployment mastery, and use case excellence'
                 }
               </CardDescription>
             </CardHeader>
@@ -333,10 +331,10 @@ const Auth = () => {
           </Card>
 
           {/* Footer */}
-          <div className="mt-8 text-center text-xs text-blue-300">
+          <div className="mt-8 text-center text-xs text-gray-400">
             <p className="flex items-center justify-center gap-1">
               <Shield className="h-3 w-3" />
-              © 2024 Portnox ZTAC Platform - Enterprise Zero Trust Access Control
+              © 2024 Scope Slayer Platform - Ultimate POC Tracker & Deployment Master
             </p>
           </div>
         </div>
