@@ -12,7 +12,7 @@ import { useQuestionnaires } from '@/hooks/useQuestionnaires';
 import { 
   Building2, Users, FileText, Zap, BarChart3, CheckCircle, 
   Clock, AlertTriangle, TrendingUp, Activity, Shield, 
-  Network, Settings, Plus, ArrowRight, MapPin, Calendar
+  Network, Settings, Plus, ArrowRight, MapPin, Calendar, BookOpen
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -110,17 +110,23 @@ const Index = () => {
                   <Badge variant="glow">Live Dashboard</Badge>
                 </div>
                 <h2 className="text-3xl font-bold mb-2">
-                  NAC Deployment Command Center
+                  Portnox NAC Designer & Deployment Tracker
                 </h2>
                 <p className="text-muted-foreground text-lg mb-6 max-w-2xl">
-                  Monitor real-time progress across all your Portnox Network Access Control 
-                  implementations. Track sites, manage questionnaires, and ensure successful deployments.
+                  AI-powered NAC implementation platform with intelligent scoping, comprehensive use case library, 
+                  and advanced project tracking. Transform complex deployments into repeatable successes.
                 </p>
                 <div className="flex gap-3">
                   <Button asChild size="lg" className="shadow-lg">
-                    <Link to="/questionnaires">
+                    <Link to="/scoping">
                       <Plus className="h-4 w-4 mr-2" />
-                      New Scoping Questionnaire
+                      AI-Powered Scoping
+                    </Link>
+                  </Button>
+                  <Button variant="outline" size="lg" asChild>
+                    <Link to="/use-cases">
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Use Case Library
                     </Link>
                   </Button>
                   <Button variant="outline" size="lg" asChild>
@@ -206,12 +212,20 @@ const Index = () => {
               <TabsContent value="projects" className="space-y-6">
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-semibold">Active Projects Overview</h2>
-                  <Link to="/tracker">
-                    <Button className="bg-gradient-primary hover:opacity-90">
-                      <TrendingUp className="h-4 w-4 mr-2" />
-                      View Project Tracker
-                    </Button>
-                  </Link>
+                  <div className="flex gap-2">
+                    <Link to="/scoping">
+                      <Button className="bg-gradient-primary hover:opacity-90">
+                        <Plus className="h-4 w-4 mr-2" />
+                        AI Scoping Wizard
+                      </Button>
+                    </Link>
+                    <Link to="/tracker">
+                      <Button variant="outline">
+                        <TrendingUp className="h-4 w-4 mr-2" />
+                        Project Tracker
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
                 
                 <div className="grid gap-6">
@@ -257,7 +271,7 @@ const Index = () => {
                               <span>{project.nextMilestone}</span>
                             </div>
                             <div className="flex justify-end">
-                              <Link to="/tracker">
+                              <Link to={`/projects/${project.id}`}>
                                 <Button variant="outline" size="sm">
                                   View Details
                                 </Button>

@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Building2, Users, Target, Rocket, BarChart3, Settings } from "lucide-react";
+import { Plus, Building2, Users, Target, Rocket, BarChart3, Settings, Brain, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import ProjectOverview from "@/components/tracker/ProjectOverview";
 import { useSites } from "@/hooks/useSites";
@@ -51,12 +51,15 @@ const Dashboard = () => {
   ];
 
   const quickActions = [
-    { title: "Create New Project", description: "Start a new NAC deployment project", href: "/tracker", icon: <Plus className="h-5 w-5" />, color: "bg-blue-500" },
-    { title: "Add Site", description: "Register a new deployment site", href: "/sites", icon: <Building2 className="h-5 w-5" />, color: "bg-green-500" },
-    { title: "Manage Users", description: "Configure team members and roles", href: "/users", icon: <Users className="h-5 w-5" />, color: "bg-purple-500" },
-    { title: "Scoping Wizard", description: "Capture site requirements", href: "/questionnaires", icon: <Target className="h-5 w-5" />, color: "bg-orange-500" },
-    { title: "Vendor Management", description: "Configure network vendors", href: "/vendors", icon: <Settings className="h-5 w-5" />, color: "bg-indigo-500" },
-    { title: "Use Case Library", description: "Browse implementation patterns", href: "/requirements", icon: <BarChart3 className="h-5 w-5" />, color: "bg-pink-500" }
+    { title: "AI Scoping Wizard", description: "Intelligent project scoping with AI recommendations", href: "/scoping", icon: <Brain className="h-5 w-5" />, color: "bg-blue-500" },
+    { title: "Use Case Library", description: "Browse 200+ pre-built NAC use cases", href: "/use-cases", icon: <BookOpen className="h-5 w-5" />, color: "bg-green-500" },
+    { title: "Add Site", description: "Register a new deployment site", href: "/sites", icon: <Building2 className="h-5 w-5" />, color: "bg-purple-500" },
+    { title: "Create Project", description: "Start a new NAC deployment project", href: "/tracker", icon: <Plus className="h-5 w-5" />, color: "bg-orange-500" },
+    { title: "Manual Scoping", description: "Traditional requirements capture", href: "/questionnaires", icon: <Target className="h-5 w-5" />, color: "bg-indigo-500" },
+    { title: "Team Management", description: "Configure users and permissions", href: "/users", icon: <Users className="h-5 w-5" />, color: "bg-pink-500" },
+    { title: "Vendor Library", description: "Manage network vendor configurations", href: "/vendors", icon: <Settings className="h-5 w-5" />, color: "bg-cyan-500" },
+    { title: "Reports & Analytics", description: "Track deployment performance", href: "/reports", icon: <BarChart3 className="h-5 w-5" />, color: "bg-amber-500" },
+    { title: "Deployment Planner", description: "Plan and execute go-live activities", href: "/deployment", icon: <Rocket className="h-5 w-5" />, color: "bg-red-500" }
   ];
 
   return (
@@ -69,12 +72,12 @@ const Dashboard = () => {
               🎯 SCOPE SLAYER Command Center
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              <span className="bg-gradient-primary bg-clip-text text-transparent">POC TRACKER</span> • 
-              <span className="text-foreground"> DEPLOYMENT MASTER</span>
+              <span className="bg-gradient-primary bg-clip-text text-transparent">NAC DESIGNER</span> • 
+              <span className="text-foreground"> DEPLOYMENT TRACKER</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              🎯 <strong>USE CASE MAESTRO</strong> - Your ultimate command center for Portnox ZTAC projects, 
-              POC orchestration, deployment tracking, and implementation management.
+              🧠 <strong>AI-POWERED SCOPING</strong> • 🎯 <strong>USE CASE MAESTRO</strong> • 🚀 <strong>DEPLOYMENT MASTER</strong><br/>
+              Your ultimate command center for intelligent NAC implementations with 200+ pre-built use cases.
             </p>
           </div>
 

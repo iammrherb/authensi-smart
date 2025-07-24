@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+
 // Page imports
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -22,6 +23,11 @@ import Questionnaires from "./pages/Questionnaires";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+
+// New enhanced pages
+import IntelligentScoping from "./pages/IntelligentScoping";
+import UseCaseLibrary from "./pages/UseCaseLibrary";
+import ProjectDetails from "./pages/ProjectDetails";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +46,13 @@ const App = () => (
                   <Route path="/" element={<Index />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/admin" element={<AdminDashboard />} />
+                  
+                  {/* Enhanced NAC Designer & Deployment Tracker */}
+                  <Route path="/scoping" element={<IntelligentScoping />} />
+                  <Route path="/use-cases" element={<UseCaseLibrary />} />
+                  <Route path="/projects/:id" element={<ProjectDetails />} />
+                  
+                  {/* Existing Pages */}
                   <Route path="/designer" element={<Designer />} />
                   <Route path="/tracker" element={<Tracker />} />
                   <Route path="/deployment" element={<Deployment />} />
