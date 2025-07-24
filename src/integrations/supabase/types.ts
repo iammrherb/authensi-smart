@@ -1026,6 +1026,36 @@ export type Database = {
           },
         ]
       }
+      security_audit_log: {
+        Row: {
+          created_at: string | null
+          event_details: Json | null
+          event_type: string
+          id: string
+          ip_address: unknown | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_details?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_details?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       sites: {
         Row: {
           address: string | null
@@ -1368,6 +1398,10 @@ export type Database = {
           _scope_id?: string
         }
         Returns: boolean
+      }
+      log_security_event: {
+        Args: { _event_type: string; _event_details?: Json; _user_id?: string }
+        Returns: undefined
       }
       user_owns_project: {
         Args: { project_uuid: string }
