@@ -277,6 +277,11 @@ const Sites = () => {
           setIsDetailsOpen(false);
           setSelectedSite(null);
         }}
+        onEdit={(site) => {
+          setSelectedSite(site);
+          setIsDetailsOpen(false);
+          setIsFormOpen(true);
+        }}
       />
 
       <BulkSiteCreator

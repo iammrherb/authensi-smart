@@ -1,22 +1,26 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { 
   MapPin, User, Phone, Mail, Network, Monitor, Calendar, Building, 
   Shield, Wifi, Router, Server, Database, Globe, Clock, 
-  Target, CheckCircle, AlertCircle, TrendingUp, Users, Zap
+  Target, CheckCircle, AlertCircle, TrendingUp, Users, Zap, 
+  Edit, BookOpen, UserPlus, Settings, FileText, BarChart3
 } from "lucide-react";
 import { Site } from "@/hooks/useSites";
+import { Link } from "react-router-dom";
 
 interface SiteDetailsDialogProps {
   site: Site | null;
   isOpen: boolean;
   onClose: () => void;
+  onEdit?: (site: Site) => void;
 }
 
-const SiteDetailsDialog = ({ site, isOpen, onClose }: SiteDetailsDialogProps) => {
+const SiteDetailsDialog = ({ site, isOpen, onClose, onEdit }: SiteDetailsDialogProps) => {
   if (!site) return null;
 
   const statusColors = {
@@ -54,13 +58,37 @@ const SiteDetailsDialog = ({ site, isOpen, onClose }: SiteDetailsDialogProps) =>
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl flex items-center gap-2">
-            <Building className="h-6 w-6" />
-            {site.name}
-          </DialogTitle>
-          <DialogDescription>
-            Comprehensive site analysis, network infrastructure details, deployment configuration, and implementation status.
-          </DialogDescription>
+          <div className="flex items-start justify-between">
+            <div>
+              <DialogTitle className="text-2xl flex items-center gap-2">
+                <Building className="h-6 w-6" />
+                {site.name}
+              </DialogTitle>
+              <DialogDescription>
+                Comprehensive site analysis, network infrastructure details, deployment configuration, and implementation status.
+              </DialogDescription>
+            </div>
+            <div className="flex gap-2">
+              {onEdit && (
+                <Button variant="outline" size="sm" onClick={() => onEdit(site)}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Site
+                </Button>
+              )}
+              <Link to={`/questionnaires?site=${site.id}`}>
+                <Button variant="outline" size="sm">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Scoping
+                </Button>
+              </Link>
+              <Link to={`/tracker?site=${site.id}`}>
+                <Button variant="default" size="sm">
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Implementation Workbook
+                </Button>
+              </Link>
+            </div>
+          </div>
         </DialogHeader>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -262,6 +290,61 @@ const SiteDetailsDialog = ({ site, isOpen, onClose }: SiteDetailsDialogProps) =>
                     }
                     return null;
                   })}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Site Actions */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  Site Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <Link to={`/questionnaires?site=${site.id}`} className="block">
+                    <Button variant="outline" className="w-full justify-start">
+                      <FileText className="h-4 w-4 mr-2" />
+                      Scoping Questionnaire
+                    </Button>
+                  </Link>
+                  
+                  <Link to={`/tracker?site=${site.id}`} className="block">
+                    <Button variant="default" className="w-full justify-start">
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Implementation Workbook
+                    </Button>
+                  </Link>
+                  
+                  <Link to={`/deployment?site=${site.id}`} className="block">
+                    <Button variant="outline" className="w-full justify-start">
+                      <Zap className="h-4 w-4 mr-2" />
+                      Deployment Planner
+                    </Button>
+                  </Link>
+                  
+                  <Link to={`/reports?site=${site.id}`} className="block">
+                    <Button variant="outline" className="w-full justify-start">
+                      <BarChart3 className="h-4 w-4 mr-2" />
+                      Progress Reports
+                    </Button>
+                  </Link>
+                  
+                  <Link to={`/users?site=${site.id}`} className="block">
+                    <Button variant="outline" className="w-full justify-start">
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Assign Team
+                    </Button>
+                  </Link>
+                  
+                  <Link to={`/vendors?site=${site.id}`} className="block">
+                    <Button variant="outline" className="w-full justify-start">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Configure Vendors
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
