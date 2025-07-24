@@ -61,7 +61,11 @@ All colors MUST be HSL.
     --shadow-modal: 0 10px 40px hsl(220 27% 4% / 0.6);
 
     /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Animation delays */
+  --animation-delay-2000: 2s;
+  --animation-delay-4000: 4s;
     --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --radius: 0.5rem;

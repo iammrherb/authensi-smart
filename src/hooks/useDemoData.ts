@@ -1,689 +1,548 @@
-// Enhanced demo data for the NAC deployment platform
+// Enhanced demo data for the Ultimate Portnox ZTAC Platform
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
-export const demoProjects = [
+// Mock data for demonstration purposes
+const demoProjects = [
   {
-    id: "proj-001",
-    name: "Global Bank NAC Rollout",
-    client_name: "First National Bank",
-    description: "Comprehensive NAC deployment across 12 banking locations with strict regulatory requirements for PCI-DSS and SOX regulations.",
-    status: "implementing",
-    current_phase: "phase-2-testing",
-    progress_percentage: 65,
-    start_date: "2023-10-01",
-    target_completion: "2024-03-15",
+    id: '1',
+    name: 'Global Financial Services ZTAC Implementation',
+    description: 'Enterprise-wide Zero Trust Access Control deployment across 45 global locations with advanced threat detection and compliance automation',
+    status: 'planning',
+    priority: 'critical',
+    start_date: '2024-01-15',
+    target_completion: '2024-08-30',
     actual_completion: null,
-    budget: 485000,
-    created_by: "user-123",
-    sites: [
-      { id: "site-001", name: "HQ Data Center", location: "New York, NY" },
-      { id: "site-002", name: "Trading Floor", location: "New York, NY" },
-      { id: "site-003", name: "Branch Office - Manhattan", location: "New York, NY" },
-      { id: "site-004", name: "Branch Office - Brooklyn", location: "Brooklyn, NY" }
-    ]
+    budget: 450000,
+    project_manager: 'Sarah Johnson',
+    technical_lead: 'Mike Chen',
+    business_sponsor: 'David Rodriguez, CISO',
+    deployment_type: 'phased_global',
+    scope: 'global',
+    compliance_requirements: ['SOX', 'PCI-DSS', 'GDPR', 'FFIEC', 'Basel III'],
+    technology_stack: ['Portnox CORE', 'Portnox CLEAR', 'ClearPass Integration', 'Active Directory', 'Splunk SIEM'],
+    risk_level: 'high',
+    created_at: '2024-01-01',
+    updated_at: '2024-01-15',
+    created_by: 'demo-user'
   },
   {
-    id: "proj-002", 
-    name: "Healthcare Network Security",
-    client_name: "Regional Medical Center",
-    description: "HIPAA-compliant NAC implementation for medical devices, staff workstations, and IoT medical equipment across multiple facilities.",
-    status: "scoping",
-    current_phase: "discovery",
-    progress_percentage: 25,
-    start_date: "2024-01-15",
-    target_completion: "2024-06-30",
+    id: '2',
+    name: 'Healthcare Zero Trust Network Transformation',
+    description: 'HIPAA-compliant zero trust network access control for 12-site healthcare provider with IoT medical device protection and patient data segmentation',
+    status: 'in_progress',
+    priority: 'critical',
+    start_date: '2024-02-01',
+    target_completion: '2024-07-15',
     actual_completion: null,
     budget: 320000,
-    created_by: "user-123",
-    sites: [
-      { id: "site-005", name: "Main Hospital", location: "Chicago, IL" },
-      { id: "site-006", name: "Outpatient Clinic", location: "Chicago, IL" },
-      { id: "site-007", name: "Emergency Care Center", location: "Evanston, IL" }
-    ]
+    project_manager: 'Jennifer Walsh',
+    technical_lead: 'Alex Kumar',
+    business_sponsor: 'Dr. Patricia Williams, Chief Medical Officer',
+    deployment_type: 'pilot_then_rollout',
+    scope: 'regional',
+    compliance_requirements: ['HIPAA', 'HITECH', 'FDA 21 CFR Part 11', 'Joint Commission'],
+    technology_stack: ['Portnox CORE', 'Portnox CLEAR', 'Cisco ISE', 'VMware NSX', 'Medigate IoT Security'],
+    risk_level: 'critical',
+    created_at: '2024-01-20',
+    updated_at: '2024-02-05',
+    created_by: 'demo-user'
   },
   {
-    id: "proj-003",
-    name: "Manufacturing IoT Security",
-    client_name: "Tech Industries Ltd",
-    description: "Industrial IoT device security with NAC for production line automation, quality control systems, and operational technology networks.",
-    status: "testing",
-    current_phase: "user-acceptance-testing",
-    progress_percentage: 85,
-    start_date: "2023-08-01",
-    target_completion: "2024-02-01",
-    actual_completion: "2024-01-28",
-    budget: 275000,
-    created_by: "user-123",
-    sites: [
-      { id: "site-008", name: "Production Plant A", location: "Detroit, MI" },
-      { id: "site-009", name: "Quality Lab", location: "Detroit, MI" },
-      { id: "site-010", name: "Warehouse Facility", location: "Detroit, MI" }
-    ]
+    id: '3',
+    name: 'Smart Manufacturing IoT Zero Trust Platform',
+    description: 'Industrial IoT device management and network segmentation for smart factory with OT/IT convergence and predictive security analytics',
+    status: 'completed',
+    priority: 'high',
+    start_date: '2023-09-01',
+    target_completion: '2023-12-31',
+    actual_completion: '2023-12-15',
+    budget: 280000,
+    project_manager: 'Robert Kim',
+    technical_lead: 'Lisa Zhang',
+    business_sponsor: 'Mark Thompson, VP Operations',
+    deployment_type: 'greenfield',
+    scope: 'multi_site',
+    compliance_requirements: ['ISO 27001', 'NIST', 'IEC 62443', 'NERC CIP'],
+    technology_stack: ['Portnox CORE', 'Portnox CLEAR', 'Fortinet', 'Aruba CX', 'Claroty OT Security'],
+    risk_level: 'high',
+    created_at: '2023-08-15',
+    updated_at: '2023-12-20',
+    created_by: 'demo-user'
+  },
+  {
+    id: '4',
+    name: 'Government Agency Zero Trust Modernization',
+    description: 'Federal agency FISMA-compliant zero trust architecture implementation with multi-level security clearance access controls',
+    status: 'planning',
+    priority: 'critical',
+    start_date: '2024-03-01',
+    target_completion: '2024-12-31',
+    actual_completion: null,
+    budget: 850000,
+    project_manager: 'Colonel James Mitchell',
+    technical_lead: 'Dr. Amanda Foster',
+    business_sponsor: 'Deputy Director Maria Santos',
+    deployment_type: 'secure_phased',
+    scope: 'federal',
+    compliance_requirements: ['FISMA', 'FedRAMP', 'NIST 800-53', 'CJIS', 'ITAR'],
+    technology_stack: ['Portnox CORE', 'Portnox CLEAR', 'Okta Federal', 'Splunk Federal', 'Tanium'],
+    risk_level: 'critical',
+    created_at: '2024-02-15',
+    updated_at: '2024-02-28',
+    created_by: 'demo-user'
+  },
+  {
+    id: '5',
+    name: 'Retail Chain Omnichannel Security Platform',
+    description: 'Multi-brand retail chain zero trust implementation covering 500+ stores, distribution centers, and corporate offices with PCI compliance',
+    status: 'in_progress',
+    priority: 'high',
+    start_date: '2024-01-01',
+    target_completion: '2024-09-30',
+    actual_completion: null,
+    budget: 420000,
+    project_manager: 'Ashley Rodriguez',
+    technical_lead: 'Kevin Park',
+    business_sponsor: 'Chief Technology Officer Rachel Green',
+    deployment_type: 'wave_deployment',
+    scope: 'national',
+    compliance_requirements: ['PCI-DSS', 'SOX', 'CCPA', 'GDPR'],
+    technology_stack: ['Portnox CORE', 'Portnox CLEAR', 'Cisco Meraki', 'Microsoft Azure AD', 'Qualys VMDR'],
+    risk_level: 'high',
+    created_at: '2023-12-01',
+    updated_at: '2024-01-30',
+    created_by: 'demo-user'
   }
 ];
 
-export const demoSites = [
+const demoSites = [
   {
-    id: "site-001",
-    name: "HQ Data Center",
-    location: "New York, NY",
-    address: "123 Financial District, New York, NY 10004",
-    contact_name: "John Smith",
-    contact_email: "john.smith@firstnational.com",
-    contact_phone: "+1 (555) 123-4567",
-    site_type: "data_center",
-    network_segments: 8,
-    device_count: 2847,
-    status: "implementing",
-    priority: "critical",
-    assigned_engineer: "eng-001",
-    created_by: "user-123"
-  },
-  {
-    id: "site-002",
-    name: "Branch Office 12",
-    location: "Chicago, IL", 
-    address: "456 Michigan Ave, Chicago, IL 60611",
-    contact_name: "Sarah Johnson",
-    contact_email: "sarah.johnson@regionalmed.org",
-    contact_phone: "+1 (555) 234-5678",
-    site_type: "office",
-    network_segments: 3,
-    device_count: 150,
-    status: "designing",
-    priority: "medium",
-    assigned_engineer: "eng-002",
-    created_by: "user-123"
-  },
-  {
-    id: "site-003",
-    name: "Manufacturing Plant A",
-    location: "Detroit, MI",
-    address: "789 Industrial Blvd, Detroit, MI 48201",
-    contact_name: "Mike Wilson",
-    contact_email: "mike.wilson@techindustries.com", 
-    contact_phone: "+1 (555) 345-6789",
-    site_type: "manufacturing",
+    id: '1',
+    name: 'Financial District Headquarters',
+    location: 'New York, NY',
+    address: '500 Wall Street, New York, NY 10005',
+    contact_name: 'Michael Harrison',
+    contact_email: 'michael.harrison@globalbank.com',
+    contact_phone: '+1 (212) 555-0123',
+    site_type: 'headquarters',
     network_segments: 12,
-    device_count: 1250,
-    status: "testing",
-    priority: "high",
-    assigned_engineer: "eng-003",
-    created_by: "user-123"
+    device_count: 2500,
+    status: 'planning',
+    priority: 'critical',
+    assigned_engineer: 'Sarah Johnson',
+    compliance_zones: ['DMZ', 'Internal', 'Restricted', 'Executive'],
+    security_level: 'maximum',
+    business_hours: '24/7',
+    created_by: 'demo-user'
   },
   {
-    id: "site-004",
-    name: "R&D Laboratory",
-    location: "Austin, TX",
-    address: "321 Innovation Way, Austin, TX 78701",
-    contact_name: "Dr. Lisa Chen",
-    contact_email: "lisa.chen@research.com",
-    contact_phone: "+1 (555) 456-7890", 
-    site_type: "laboratory",
-    network_segments: 5,
-    device_count: 420,
-    status: "scoping",
-    priority: "low",
-    assigned_engineer: "eng-004",
-    created_by: "user-123"
+    id: '2',
+    name: 'Regional Medical Center Campus',
+    location: 'Chicago, IL',
+    address: '1400 Medical Plaza Drive, Chicago, IL 60611',
+    contact_name: 'Dr. Emily Carter',
+    contact_email: 'emily.carter@regionalmed.org',
+    contact_phone: '+1 (312) 555-0456',
+    site_type: 'healthcare_campus',
+    network_segments: 8,
+    device_count: 1850,
+    status: 'in_progress',
+    priority: 'critical',
+    assigned_engineer: 'Jennifer Walsh',
+    compliance_zones: ['Patient Care', 'Administrative', 'Research', 'Guest'],
+    security_level: 'high',
+    business_hours: '24/7',
+    created_by: 'demo-user'
+  },
+  {
+    id: '3',
+    name: 'Smart Manufacturing Plant Alpha',
+    location: 'Detroit, MI',
+    address: '2500 Industrial Boulevard, Detroit, MI 48201',
+    contact_name: 'James Wilson',
+    contact_email: 'james.wilson@smartmfg.com',
+    contact_phone: '+1 (313) 555-0789',
+    site_type: 'manufacturing',
+    network_segments: 6,
+    device_count: 3200,
+    status: 'completed',
+    priority: 'high',
+    assigned_engineer: 'Robert Kim',
+    compliance_zones: ['Production', 'Quality Control', 'Office', 'Maintenance'],
+    security_level: 'high',
+    business_hours: '24/7',
+    created_by: 'demo-user'
+  },
+  {
+    id: '4',
+    name: 'Federal Agency Data Center',
+    location: 'Washington, DC',
+    address: '300 Constitution Avenue NW, Washington, DC 20001',
+    contact_name: 'Colonel Sarah Mitchell',
+    contact_email: 'sarah.mitchell@fed.gov',
+    contact_phone: '+1 (202) 555-0101',
+    site_type: 'government_facility',
+    network_segments: 15,
+    device_count: 1200,
+    status: 'planning',
+    priority: 'critical',
+    assigned_engineer: 'Colonel James Mitchell',
+    compliance_zones: ['Classified', 'Secret', 'Confidential', 'Unclassified'],
+    security_level: 'maximum',
+    business_hours: '24/7',
+    created_by: 'demo-user'
+  },
+  {
+    id: '5',
+    name: 'Retail Distribution Center West',
+    location: 'Los Angeles, CA',
+    address: '1500 Commerce Way, Los Angeles, CA 90021',
+    contact_name: 'Maria Rodriguez',
+    contact_email: 'maria.rodriguez@retailchain.com',
+    contact_phone: '+1 (213) 555-0234',
+    site_type: 'distribution_center',
+    network_segments: 4,
+    device_count: 800,
+    status: 'in_progress',
+    priority: 'medium',
+    assigned_engineer: 'Ashley Rodriguez',
+    compliance_zones: ['Warehouse', 'Office', 'Shipping', 'Guest'],
+    security_level: 'medium',
+    business_hours: '6AM-11PM',
+    created_by: 'demo-user'
   }
 ];
 
-export const demoVendors = [
+const demoVendors = [
   {
-    id: "vendor-001",
-    name: "Portnox",
-    category: "Network Access Control",
-    status: "certified",
-    integration_level: "full",
-    certifications: ["ISO 27001", "SOC 2 Type II", "FIPS 140-2"],
-    supported_use_cases: [
-      "Device Authentication",
-      "BYOD Management", 
-      "IoT Security",
-      "Guest Access",
-      "Compliance Reporting"
-    ],
-    contact_info: {
-      primary_contact: "Alice Cooper",
-      email: "alice.cooper@portnox.com",
-      phone: "+1 (555) 100-1000"
+    id: '1',
+    name: 'Portnox',
+    category: 'NAC_Primary',
+    description: 'Leading Zero Trust Network Access Control platform with cloud-native architecture',
+    website: 'https://www.portnox.com',
+    contact_name: 'Enterprise Sales Team',
+    contact_email: 'enterprise@portnox.com',
+    contact_phone: '+1 (800) PORTNOX',
+    capabilities: ['Zero Trust NAC', 'Cloud Management', 'IoT Security', 'Compliance Automation'],
+    products: ['Portnox CORE', 'Portnox CLEAR', 'Portnox Cloud'],
+    certifications: ['FedRAMP', 'SOC 2', 'ISO 27001'],
+    deployment_models: ['On-Premises', 'Cloud', 'Hybrid'],
+    integration_partners: ['Cisco', 'Microsoft', 'VMware', 'Splunk'],
+    support_level: 'Premium',
+    created_by: 'demo-user'
+  },
+  {
+    id: '2',
+    name: 'Cisco Systems',
+    category: 'Network_Infrastructure',
+    description: 'Global network infrastructure and security solutions provider',
+    website: 'https://www.cisco.com',
+    contact_name: 'Enterprise Account Manager',
+    contact_email: 'enterprise@cisco.com',
+    contact_phone: '+1 (800) 553-6387',
+    capabilities: ['Network Infrastructure', 'Identity Services Engine', 'SD-WAN', 'Security'],
+    products: ['Cisco ISE', 'Catalyst Switches', 'ASA Firewalls', 'Meraki Cloud'],
+    certifications: ['Common Criteria', 'FIPS 140-2', 'NATO'],
+    deployment_models: ['On-Premises', 'Cloud', 'Hybrid'],
+    integration_partners: ['Portnox', 'Microsoft', 'VMware'],
+    support_level: 'Enterprise',
+    created_by: 'demo-user'
+  },
+  {
+    id: '3',
+    name: 'Microsoft Corporation',
+    category: 'Identity_Management',
+    description: 'Cloud identity and access management solutions',
+    website: 'https://www.microsoft.com',
+    contact_name: 'Azure Enterprise Team',
+    contact_email: 'azure@microsoft.com',
+    contact_phone: '+1 (800) 642-7676',
+    capabilities: ['Azure Active Directory', 'Conditional Access', 'Identity Protection', 'Zero Trust'],
+    products: ['Azure AD', 'Microsoft Intune', 'Defender for Identity', 'Sentinel SIEM'],
+    certifications: ['FedRAMP High', 'SOC 1/2/3', 'ISO 27001'],
+    deployment_models: ['Cloud', 'Hybrid'],
+    integration_partners: ['Portnox', 'Cisco', 'VMware'],
+    support_level: 'Premier',
+    created_by: 'demo-user'
+  }
+];
+
+const demoRequirements = [
+  {
+    id: '1',
+    title: 'Zero Trust Architecture Implementation',
+    category: 'Security Architecture',
+    priority: 'critical',
+    status: 'draft',
+    description: 'Implement comprehensive zero trust network architecture with continuous verification and least privilege access',
+    technical_details: 'Deploy microsegmentation, device trust verification, and continuous monitoring across all network segments',
+    business_justification: 'Reduce security incidents by 85% and ensure compliance with federal zero trust mandates',
+    acceptance_criteria: 'All devices authenticated, all traffic encrypted, all access logged and monitored',
+    compliance_mapping: ['NIST Zero Trust', 'Executive Order 14028'],
+    estimated_effort: 'High',
+    dependencies: ['Network Infrastructure', 'Identity Management'],
+    created_by: 'demo-user'
+  },
+  {
+    id: '2',
+    title: 'IoT Medical Device Security',
+    category: 'Healthcare Compliance',
+    priority: 'critical',
+    status: 'approved',
+    description: 'Secure all IoT medical devices with automatic discovery, classification, and policy enforcement',
+    technical_details: 'Implement device fingerprinting, behavioral analytics, and automated quarantine capabilities',
+    business_justification: 'Protect patient data and ensure HIPAA compliance for connected medical devices',
+    acceptance_criteria: 'All medical devices discovered, classified, and continuously monitored with zero patient data exposure',
+    compliance_mapping: ['HIPAA', 'FDA Cybersecurity Guidelines'],
+    estimated_effort: 'High',
+    dependencies: ['Network Segmentation', 'Device Management'],
+    created_by: 'demo-user'
+  },
+  {
+    id: '3',
+    title: 'Industrial OT/IT Convergence Security',
+    category: 'Operational Technology',
+    priority: 'high',
+    status: 'in_review',
+    description: 'Secure operational technology networks while maintaining industrial system availability and performance',
+    technical_details: 'Deploy OT-aware NAC with industrial protocol support and real-time monitoring',
+    business_justification: 'Protect manufacturing operations from cyber threats while maintaining 99.9% uptime',
+    acceptance_criteria: 'OT networks secured without operational impact, full visibility into industrial communications',
+    compliance_mapping: ['IEC 62443', 'NIST Manufacturing Profile'],
+    estimated_effort: 'Medium',
+    dependencies: ['OT Network Assessment', 'Vendor Coordination'],
+    created_by: 'demo-user'
+  }
+];
+
+const demoUseCases = [
+  {
+    id: '1',
+    name: 'Financial Services Branch Office',
+    category: 'Financial Services',
+    description: 'Secure branch office with customer terminals, employee workstations, and back-office systems',
+    industry: 'Banking',
+    complexity: 'high',
+    typical_devices: 1200,
+    network_segments: ['Customer Zone', 'Employee Zone', 'Back Office', 'ATM Network'],
+    security_requirements: ['PCI-DSS', 'SOX', 'Data Encryption', 'Audit Logging'],
+    business_outcomes: ['Regulatory Compliance', 'Customer Data Protection', 'Operational Efficiency'],
+    implementation_time: '6-8 weeks',
+    success_metrics: ['Zero PCI violations', '99.9% uptime', 'Sub-second authentication'],
+    created_by: 'demo-user'
+  },
+  {
+    id: '2',
+    name: 'Hospital Critical Care Unit',
+    category: 'Healthcare',
+    description: 'Secure critical care environment with life-support systems, monitoring devices, and staff access',
+    industry: 'Healthcare',
+    complexity: 'critical',
+    typical_devices: 800,
+    network_segments: ['Patient Care', 'Medical Devices', 'Staff Network', 'Guest Access'],
+    security_requirements: ['HIPAA', 'Patient Safety', 'Device Integrity', 'Emergency Access'],
+    business_outcomes: ['Patient Safety', 'HIPAA Compliance', 'Clinical Efficiency'],
+    implementation_time: '8-12 weeks',
+    success_metrics: ['Zero patient data breaches', '100% device visibility', 'Emergency access < 30 seconds'],
+    created_by: 'demo-user'
+  },
+  {
+    id: '3',
+    name: 'Smart Factory Production Line',
+    category: 'Manufacturing',
+    description: 'Secure automated production line with robots, sensors, and quality control systems',
+    industry: 'Manufacturing',
+    complexity: 'high',
+    typical_devices: 2500,
+    network_segments: ['Production Control', 'Quality Systems', 'Maintenance', 'Office Network'],
+    security_requirements: ['ISO 27001', 'Production Continuity', 'Data Integrity', 'Safety Systems'],
+    business_outcomes: ['Operational Continuity', 'Quality Assurance', 'Cyber Resilience'],
+    implementation_time: '10-14 weeks',
+    success_metrics: ['Zero production downtime', '100% OT visibility', 'Real-time threat detection'],
+    created_by: 'demo-user'
+  }
+];
+
+const demoQuestionnaires = [
+  {
+    id: '1',
+    project_id: '1',
+    questionnaire_type: 'technical_discovery',
+    title: 'Global Financial Services Technical Assessment',
+    status: 'completed',
+    responses: {
+      network_infrastructure: 'Cisco catalyst switches with ISE integration',
+      device_count: '15000+ endpoints across 45 locations',
+      compliance_requirements: 'SOX, PCI-DSS, GDPR, FFIEC, Basel III',
+      current_security_tools: 'CyberArk, Splunk, McAfee ePO, Cisco ASA',
+      budget_range: '$400K-500K',
+      timeline_requirements: '8 months phased deployment',
+      risk_tolerance: 'Low - financial services regulatory environment'
     },
-    documentation_links: [
-      "https://docs.portnox.com/integration-guide",
-      "https://docs.portnox.com/api-reference"
-    ],
-    pricing_model: "per_endpoint",
-    deployment_complexity: "medium"
+    completion_date: '2024-01-20',
+    completed_by: 'Sarah Johnson',
+    created_by: 'demo-user'
   },
   {
-    id: "vendor-002", 
-    name: "Cisco ISE",
-    category: "Identity Services Engine",
-    status: "certified",
-    integration_level: "full",
-    certifications: ["Common Criteria", "FIPS 140-2", "CC EAL4+"],
-    supported_use_cases: [
-      "Identity Management",
-      "Policy Enforcement",
-      "TrustSec Integration",
-      "Guest Services",
-      "Profiling"
-    ],
-    contact_info: {
-      primary_contact: "Bob Martinez",
-      email: "bob.martinez@cisco.com", 
-      phone: "+1 (555) 200-2000"
+    id: '2',
+    project_id: '2',
+    questionnaire_type: 'security_assessment',
+    title: 'Healthcare Zero Trust Security Evaluation',
+    status: 'in_progress',
+    responses: {
+      current_threats: 'Medical device vulnerabilities, ransomware concerns',
+      compliance_gaps: 'IoT device inventory, access logging',
+      security_incidents: '2 minor breaches in past year',
+      staff_training: 'Basic cybersecurity awareness',
+      budget_constraints: 'Limited capital budget, prefer OpEx model',
+      integration_requirements: 'Epic EMR, Philips monitoring systems'
     },
-    documentation_links: [
-      "https://cisco.com/ise-deployment-guide",
-      "https://cisco.com/ise-api-docs"
-    ],
-    pricing_model: "tiered_licensing",
-    deployment_complexity: "high"
-  },
-  {
-    id: "vendor-003",
-    name: "Aruba ClearPass",
-    category: "Policy Management Platform", 
-    status: "certified",
-    integration_level: "full",
-    certifications: ["ISO 27001", "SOC 2", "Common Criteria"],
-    supported_use_cases: [
-      "Role-based Access",
-      "Device Onboarding",
-      "Certificate Management", 
-      "Guest Management",
-      "BYOD Policies"
-    ],
-    contact_info: {
-      primary_contact: "Carol Davis",
-      email: "carol.davis@arubanetworks.com",
-      phone: "+1 (555) 300-3000"
-    },
-    documentation_links: [
-      "https://aruba.com/clearpass-integration",
-      "https://aruba.com/clearpass-apis"
-    ],
-    pricing_model: "concurrent_users",
-    deployment_complexity: "medium"
+    completion_date: null,
+    completed_by: null,
+    created_by: 'demo-user'
   }
 ];
 
-export const demoRequirements = [
-  {
-    id: "req-001",
-    title: "Device Authentication & Authorization",
-    category: "Network Access Control",
-    priority: "critical", 
-    status: "active",
-    description: "Comprehensive device identification and policy enforcement for all network endpoints including managed, unmanaged, and IoT devices.",
-    acceptance_criteria: [
-      "Support for 802.1X authentication",
-      "MAC address-based authentication fallback",
-      "Certificate-based device authentication",
-      "Integration with Active Directory/LDAP",
-      "Support for 10,000+ concurrent devices"
-    ],
-    test_cases: [
-      {
-        name: "Managed Device Authentication",
-        description: "Verify corporate devices authenticate successfully via 802.1X",
-        expected_result: "Device receives appropriate VLAN assignment and network access",
-        priority: "high"
-      },
-      {
-        name: "Unknown Device Quarantine", 
-        description: "Verify unknown devices are quarantined to isolated network segment",
-        expected_result: "Device placed in quarantine VLAN with limited access",
-        priority: "high"
-      }
-    ],
-    compliance_frameworks: ["PCI-DSS", "HIPAA", "SOX"],
-    vendor_support: {
-      "Portnox": "full",
-      "Cisco ISE": "full",
-      "Aruba ClearPass": "full"
-    }
-  },
-  {
-    id: "req-002",
-    title: "BYOD Policy Enforcement",
-    category: "Bring Your Own Device",
-    priority: "high",
-    status: "active", 
-    description: "Secure onboarding and policy enforcement for personal devices accessing corporate network resources.",
-    acceptance_criteria: [
-      "Self-service device enrollment portal",
-      "Certificate provisioning for personal devices", 
-      "Application-level access control",
-      "Device compliance checking",
-      "Remote device management capabilities"
-    ],
-    test_cases: [
-      {
-        name: "Device Enrollment Process",
-        description: "Verify users can self-enroll personal devices through web portal",
-        expected_result: "Successful certificate installation and network access",
-        priority: "high"
-      },
-      {
-        name: "Non-compliant Device Blocking",
-        description: "Verify devices not meeting security policies are blocked", 
-        expected_result: "Access denied for non-compliant devices",
-        priority: "medium"
-      }
-    ],
-    compliance_frameworks: ["GDPR", "CCPA"],
-    vendor_support: {
-      "Portnox": "full",
-      "Cisco ISE": "full", 
-      "Aruba ClearPass": "full"
-    }
-  },
-  {
-    id: "req-003",
-    title: "IoT Device Management",
-    category: "Internet of Things",
-    priority: "high",
-    status: "active",
-    description: "Automated discovery, classification, and security policy enforcement for IoT and operational technology devices.",
-    acceptance_criteria: [
-      "Automatic IoT device discovery and profiling",
-      "Device behavior monitoring and anomaly detection",
-      "Microsegmentation for IoT device communication",
-      "Integration with IoT management platforms",
-      "Support for common IoT protocols (MQTT, CoAP, etc.)"
-    ],
-    test_cases: [
-      {
-        name: "IoT Device Auto-Discovery",
-        description: "Verify new IoT devices are automatically discovered and classified",
-        expected_result: "Device properly identified and assigned to IoT network segment",
-        priority: "high"
-      },
-      {
-        name: "IoT Communication Restrictions",
-        description: "Verify IoT devices can only communicate with authorized resources",
-        expected_result: "Blocked communication attempts to unauthorized destinations",
-        priority: "high"  
-      }
-    ],
-    compliance_frameworks: ["NIST Cybersecurity Framework"],
-    vendor_support: {
-      "Portnox": "full",
-      "Cisco ISE": "partial", 
-      "Aruba ClearPass": "full"
-    }
-  }
-];
-
-export const demoUseCases = [
-  {
-    id: "uc-001",
-    name: "Financial Services NAC Deployment",
-    industry: "Financial Services",
-    description: "Comprehensive NAC solution for multi-location bank with strict regulatory requirements.",
-    business_value: "Ensure PCI-DSS compliance, protect customer data, reduce security incidents by 75%",
-    technical_requirements: [
-      "Support for 50,000+ endpoints across 25 locations",
-      "Integration with existing Cisco network infrastructure", 
-      "Real-time threat detection and response",
-      "Comprehensive audit logging and reporting"
-    ],
-    success_metrics: [
-      "100% device visibility across all network segments",
-      "< 30 second device authentication time",
-      "Zero security incidents related to unauthorized access",
-      "95% reduction in help desk calls for network access issues"
-    ],
-    implementation_timeline: "16 weeks",
-    estimated_cost: "$485,000",
-    complexity_level: "High"
-  },
-  {
-    id: "uc-002", 
-    name: "Healthcare HIPAA Compliance",
-    industry: "Healthcare",
-    description: "HIPAA-compliant network access control for medical devices and staff systems.",
-    business_value: "Achieve HIPAA compliance, secure PHI, improve operational efficiency",
-    technical_requirements: [
-      "Medical device integration and profiling",
-      "Role-based access control for clinical staff",
-      "Guest network isolation for patients/visitors", 
-      "Integration with EMR systems"
-    ],
-    success_metrics: [
-      "100% HIPAA audit compliance",
-      "Zero PHI data breaches", 
-      "50% faster device onboarding for clinical staff",
-      "99.9% network uptime for critical medical devices"
-    ],
-    implementation_timeline: "12 weeks",
-    estimated_cost: "$320,000", 
-    complexity_level: "Medium"
-  },
-  {
-    id: "uc-003",
-    name: "Manufacturing OT Security",
-    industry: "Manufacturing", 
-    description: "Operational technology network security for industrial control systems and IoT devices.",
-    business_value: "Protect production systems, prevent cyber attacks, ensure operational continuity",
-    technical_requirements: [
-      "Industrial protocol support (Modbus, DNP3, etc.)",
-      "OT/IT network segmentation",
-      "Real-time monitoring of industrial devices",
-      "Integration with SCADA systems"
-    ],
-    success_metrics: [
-      "Zero production downtime due to security incidents",
-      "100% visibility into OT device communications", 
-      "90% reduction in false positive security alerts",
-      "Compliance with ICS-CERT guidelines"
-    ],
-    implementation_timeline: "20 weeks",
-    estimated_cost: "$275,000",
-    complexity_level: "High"
-  }
-];
-
-export const demoQuestionnaires = [
-  {
-    id: "quest-001",
-    site_id: "site-001",
-    project_id: "proj-001",
-    status: "completed",
-    completion_percentage: 100,
-    questionnaire_data: {
-      deploymentType: "large-enterprise",
-      useCases: [
-        "Device Authentication & Authorization",
-        "BYOD Policy Enforcement", 
-        "Compliance Monitoring (PCI-DSS, HIPAA, SOX)",
-        "Zero Trust Network Access"
-      ],
-      requirements: {
-        endpoints: 2847,
-        sites: 1,
-        networkInfrastructure: "cisco",
-        authenticationMethod: "802.1x-certificate", 
-        compliance: "pci-dss",
-        timeline: "16-weeks"
-      },
-      discoveryAnswers: {
-        infrastructure: {
-          "How many total endpoints need NAC coverage?": "2,847 endpoints including workstations, servers, and network devices",
-          "What types of devices are in your environment?": "Windows/Mac workstations, iOS/Android mobile devices, printers, IP phones, security cameras",
-          "What network infrastructure vendors are you using?": "Cisco (switches, routers, wireless), Palo Alto (firewalls)",
-          "Do you have existing network segmentation?": "Yes, VLANs for different business units and security zones",
-          "What authentication systems are currently in place?": "Active Directory with LDAP, some certificate-based auth for servers"
-        },
-        security: {
-          "What compliance requirements must be met?": "PCI-DSS Level 1, SOX compliance for financial reporting systems",
-          "What are your current security policies?": "Strong password policy, MFA for admin access, encryption at rest",
-          "Do you have existing security tools to integrate?": "Splunk SIEM, CrowdStrike EDR, Qualys vulnerability scanner",
-          "What are your incident response procedures?": "24/7 SOC with defined escalation procedures and forensic capabilities",
-          "What visibility requirements do you have?": "Real-time device tracking, comprehensive audit logs, compliance reporting"
-        },
-        business: {
-          "What is driving the NAC implementation?": "Regulatory compliance requirements and recent security audit findings",
-          "What are your success criteria?": "100% device visibility, automated compliance reporting, reduced manual processes",
-          "What is your timeline for deployment?": "16 weeks with phased rollout across locations",
-          "What resources do you have available?": "Dedicated project team of 4 network engineers, 2 security analysts",
-          "What is your change management process?": "Change advisory board approval, maintenance windows, rollback procedures"
-        }
-      },
-      testCases: [
-        {
-          category: "Authentication",
-          name: "802.1X Certificate Authentication",
-          description: "Verify managed devices authenticate successfully using machine certificates",
-          priority: "high",
-          status: "passed",
-          requirements: ["Active Directory integration", "Certificate authority", "802.1X supplicant"]
-        },
-        {
-          category: "Policy Enforcement", 
-          name: "VLAN Assignment Based on Device Type",
-          description: "Verify devices are assigned to appropriate VLANs based on device profiling",
-          priority: "high",
-          status: "passed", 
-          requirements: ["Device profiling database", "Dynamic VLAN assignment", "RADIUS integration"]
-        },
-        {
-          category: "Compliance",
-          name: "PCI-DSS Audit Trail Generation",
-          description: "Verify all network access events are logged with required PCI-DSS fields",
-          priority: "critical",
-          status: "passed",
-          requirements: ["Centralized logging", "Log retention policy", "Audit report generation"]
-        }
-      ],
-      sizing: {
-        estimatedEndpoints: 2847,
-        requiredAppliances: 3,
-        estimatedTimeline: "16 weeks",
-        budget: 485000
-      }
-    },
-    created_by: "user-123",
-    completed_at: "2023-11-15T10:30:00Z"
-  }
-];
-
-export const demoAnalytics = {
+const demoAnalytics = {
+  totalProjects: 5,
+  activeProjects: 3,
+  completedProjects: 1,
+  totalSites: 25,
+  averageProjectValue: 450000,
+  successRate: 94,
   deploymentStats: {
-    totalProjects: 47,
-    activeProjects: 12,
-    completedProjects: 23,
-    totalSites: 156,
-    totalEndpoints: 45723,
-    avgDeploymentTime: 8.5, // weeks
-    successRate: 94.2, // percentage
-    costEfficiency: 12 // percentage under budget
+    planning: 2,
+    implementing: 2,
+    testing: 0,
+    completed: 1
   },
-  monthlyMetrics: {
-    projectsStarted: [2, 3, 1, 4, 2, 3],
-    projectsCompleted: [1, 2, 3, 2, 3, 1], 
-    endpointsDeployed: [2847, 1205, 3421, 892, 1654, 2103],
-    months: ["Aug", "Sep", "Oct", "Nov", "Dec", "Jan"]
+  complianceBreakdown: {
+    'PCI-DSS': 3,
+    'HIPAA': 2,
+    'SOX': 2,
+    'FISMA': 1,
+    'ISO 27001': 3
   },
-  criticalIssues: [
-    {
-      id: "issue-001",
-      title: "Certificate Authority Integration Failure", 
-      project: "Global Bank NAC Rollout",
-      severity: "critical",
-      status: "open",
-      assignee: "eng-001",
-      created: "2024-01-20T09:15:00Z"
-    },
-    {
-      id: "issue-002",
-      title: "IoT Device Profiling Accuracy Below Threshold",
-      project: "Manufacturing IoT Security", 
-      severity: "high",
-      status: "in-progress",
-      assignee: "eng-003",
-      created: "2024-01-18T14:22:00Z"
-    }
+  monthlyProgress: [
+    { month: 'Jan', projects: 1, budget: 450000 },
+    { month: 'Feb', projects: 2, budget: 770000 },
+    { month: 'Mar', projects: 3, budget: 1120000 },
+    { month: 'Apr', projects: 4, budget: 1540000 },
+    { month: 'May', projects: 5, budget: 1970000 }
   ]
 };
 
+// Export demo data directly for component use
+export { demoProjects, demoSites, demoVendors, demoRequirements, demoUseCases, demoQuestionnaires, demoAnalytics };
+
 export const useDemoData = () => {
   return {
-    projects: demoProjects,
-    sites: demoSites,
-    vendors: demoVendors,
-    requirements: demoRequirements,
-    useCases: demoUseCases,
-    questionnaires: demoQuestionnaires,
-    analytics: demoAnalytics
+    demoProjects,
+    demoSites,
+    demoVendors,
+    demoRequirements,
+    demoUseCases,
+    demoQuestionnaires,
+    demoAnalytics
   };
 };
 
-// Hook to seed demo data into the database
 export const useSeedDemoData = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async () => {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) throw new Error('Not authenticated');
-
-      // First create sites
-      const siteInserts = demoSites.map(site => ({
-        name: site.name,
-        location: site.location,
-        address: site.address,
-        contact_name: site.contact_name,
-        contact_email: site.contact_email,
-        contact_phone: site.contact_phone,
-        site_type: site.site_type,
-        status: site.status,
-        priority: site.priority,
-        network_segments: site.network_segments,
-        device_count: site.device_count,
-        assigned_engineer: null,
-        created_by: user.id
-      }));
-
-      const { data: insertedSites, error: sitesError } = await supabase
+      // Insert demo sites
+      const { error: sitesError } = await supabase
         .from('sites')
-        .insert(siteInserts)
-        .select();
+        .insert(demoSites.map(site => ({
+          name: site.name,
+          location: site.location,
+          address: site.address,
+          contact_name: site.contact_name,
+          contact_email: site.contact_email,
+          contact_phone: site.contact_phone,
+          site_type: site.site_type,
+          network_segments: site.network_segments,
+          device_count: site.device_count,
+          status: site.status,
+          priority: site.priority,
+          created_by: site.created_by
+        })));
 
       if (sitesError) throw sitesError;
 
-      // Then create projects
-      const projectInserts = demoProjects.map(project => ({
-        name: project.name,
-        description: project.description,
-        client_name: project.client_name,
-        status: project.status,
-        current_phase: project.current_phase,
-        start_date: project.start_date,
-        target_completion: project.target_completion,
-        actual_completion: project.actual_completion,
-        budget: project.budget,
-        progress_percentage: project.progress_percentage,
-        project_manager: null,
-        created_by: user.id
-      }));
-
-      const { data: insertedProjects, error: projectsError } = await supabase
+      // Insert demo projects
+      const { error: projectsError } = await supabase
         .from('projects')
-        .insert(projectInserts)
-        .select();
+        .insert(demoProjects.map(project => ({
+          name: project.name,
+          description: project.description,
+          status: project.status,
+          priority: project.priority,
+          start_date: project.start_date,
+          target_completion: project.target_completion,
+          actual_completion: project.actual_completion,
+          budget: project.budget,
+          created_by: project.created_by
+        })));
 
       if (projectsError) throw projectsError;
 
-      // Create project-site relationships
-      if (insertedProjects && insertedSites) {
-        const projectSiteInserts = [];
-        for (let i = 0; i < Math.min(insertedProjects.length, insertedSites.length); i++) {
-          projectSiteInserts.push({
-            project_id: insertedProjects[i].id,
-            site_id: insertedSites[i].id,
-            deployment_order: i + 1,
-            site_specific_notes: `Demo deployment for ${insertedSites[i].name}`
-          });
-        }
 
-        const { error: projectSitesError } = await supabase
-          .from('project_sites')
-          .insert(projectSiteInserts);
-
-        if (projectSitesError) throw projectSitesError;
-      }
-
-      // Create demo questionnaires
-      if (insertedSites) {
-        const questionnaireInserts = insertedSites.slice(0, 3).map((site, index) => ({
-          site_id: site.id,
-          project_id: insertedProjects?.[index]?.id || null,
-          questionnaire_data: demoQuestionnaires[0].questionnaire_data,
-          status: ['draft', 'completed', 'under_review'][index % 3],
-          completion_percentage: [25, 100, 75][index % 3],
-          created_by: user.id
-        }));
-
-        const { error: questionnairesError } = await supabase
-          .from('scoping_questionnaires')
-          .insert(questionnaireInserts);
-
-        if (questionnairesError) throw questionnairesError;
-      }
-
-      return { sites: insertedSites, projects: insertedProjects };
+      return { success: true };
     },
     onSuccess: () => {
+      toast({
+        title: "Demo Data Loaded",
+        description: "Comprehensive NAC deployment demo data has been successfully loaded into the platform.",
+      });
+      // Invalidate relevant queries to refetch data
       queryClient.invalidateQueries({ queryKey: ['sites'] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['questionnaires'] });
-      toast({
-        title: "Success",
-        description: "Demo data created successfully!",
-      });
     },
     onError: (error) => {
       console.error('Error seeding demo data:', error);
       toast({
-        title: "Error",
-        description: "Failed to create demo data",
+        title: "Error Loading Demo Data",
+        description: "Failed to load demo data. Please try again.",
         variant: "destructive",
       });
-    }
+    },
   });
 };
 
-// Hook to clear all demo data
 export const useClearDemoData = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async () => {
-      const user = (await supabase.auth.getUser()).data.user;
-      if (!user) throw new Error('Not authenticated');
-
-      // Delete in reverse order of dependencies
-      await supabase.from('implementation_checklists').delete().eq('created_by', user.id);
-      await supabase.from('scoping_questionnaires').delete().eq('created_by', user.id);
+      // Delete in correct order due to foreign key constraints
+      await supabase.from('projects').delete().eq('created_by', 'demo-user');
+      await supabase.from('sites').delete().eq('created_by', 'demo-user');
       
-      // Get user's projects to delete project_sites
-      const { data: userProjects } = await supabase
-        .from('projects')
-        .select('id')
-        .eq('created_by', user.id);
-      
-      if (userProjects && userProjects.length > 0) {
-        const projectIds = userProjects.map(p => p.id);
-        await supabase.from('project_sites').delete().in('project_id', projectIds);
-      }
-      
-      await supabase.from('projects').delete().eq('created_by', user.id);
-      await supabase.from('sites').delete().eq('created_by', user.id);
-      
-      return true;
+      return { success: true };
     },
     onSuccess: () => {
+      toast({
+        title: "Demo Data Cleared",
+        description: "All demo data has been successfully removed from the platform.",
+      });
+      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['sites'] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['questionnaires'] });
-      toast({
-        title: "Success",
-        description: "All data cleared successfully!",
-      });
     },
     onError: (error) => {
-      console.error('Error clearing data:', error);
+      console.error('Error clearing demo data:', error);
       toast({
-        title: "Error", 
-        description: "Failed to clear data",
+        title: "Error Clearing Demo Data",
+        description: "Failed to clear demo data. Please try again.",
         variant: "destructive",
       });
-    }
+    },
   });
 };

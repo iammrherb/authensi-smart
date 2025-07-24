@@ -28,15 +28,15 @@ const HeroSection = () => {
           </Badge>
           
           <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-foreground via-primary to-primary-glow bg-clip-text text-transparent leading-tight">
-            Portnox NAC
+            Portnox ZTAC
             <br />
-            <span className="bg-gradient-primary bg-clip-text">Design & Deploy</span>
+            <span className="bg-gradient-primary bg-clip-text">Ultimate Platform</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            The world's most advanced Portnox NAC scoping, design, and deployment platform. 
-            AI-powered architecture designer, comprehensive project tracking, and automated 
-            configuration generation for enterprise network access control.
+            The Ultimate Zero Trust Access Control platform for enterprise Portnox scoping, 
+            POC management, deployment tracking, and implementation management. Complete project 
+            lifecycle management with advanced automation and reporting.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
