@@ -1033,16 +1033,25 @@ export type Database = {
           contact_email: string | null
           contact_name: string | null
           contact_phone: string | null
+          country: string | null
           created_at: string
           created_by: string | null
+          current_phase: string | null
+          deployment_config: Json | null
           device_count: number | null
           id: string
           location: string | null
           name: string
           network_segments: number | null
+          notifications_enabled: boolean | null
           priority: string | null
+          progress_percentage: number | null
+          region: string | null
+          site_id: string | null
           site_type: string | null
           status: string | null
+          timeline_end: string | null
+          timeline_start: string | null
           updated_at: string
         }
         Insert: {
@@ -1051,16 +1060,25 @@ export type Database = {
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
+          country?: string | null
           created_at?: string
           created_by?: string | null
+          current_phase?: string | null
+          deployment_config?: Json | null
           device_count?: number | null
           id?: string
           location?: string | null
           name: string
           network_segments?: number | null
+          notifications_enabled?: boolean | null
           priority?: string | null
+          progress_percentage?: number | null
+          region?: string | null
+          site_id?: string | null
           site_type?: string | null
           status?: string | null
+          timeline_end?: string | null
+          timeline_start?: string | null
           updated_at?: string
         }
         Update: {
@@ -1069,16 +1087,25 @@ export type Database = {
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
+          country?: string | null
           created_at?: string
           created_by?: string | null
+          current_phase?: string | null
+          deployment_config?: Json | null
           device_count?: number | null
           id?: string
           location?: string | null
           name?: string
           network_segments?: number | null
+          notifications_enabled?: boolean | null
           priority?: string | null
+          progress_percentage?: number | null
+          region?: string | null
+          site_id?: string | null
           site_type?: string | null
           status?: string | null
+          timeline_end?: string | null
+          timeline_start?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1358,6 +1385,13 @@ export type Database = {
         | "lead_engineer"
         | "engineer"
         | "viewer"
+        | "super_admin"
+        | "sales"
+        | "solution_engineer"
+        | "technical_account_manager"
+        | "product_manager"
+        | "customer_contact"
+        | "technical_owner"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1491,6 +1525,13 @@ export const Constants = {
         "lead_engineer",
         "engineer",
         "viewer",
+        "super_admin",
+        "sales",
+        "solution_engineer",
+        "technical_account_manager",
+        "product_manager",
+        "customer_contact",
+        "technical_owner",
       ],
     },
   },
