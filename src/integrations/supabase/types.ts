@@ -1382,6 +1382,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_initial_user_role: {
+        Args: {
+          _user_id: string
+          _role?: Database["public"]["Enums"]["app_role"]
+          _scope_type?: string
+          _scope_id?: string
+        }
+        Returns: boolean
+      }
       can_manage_roles: {
         Args: { _user_id: string; _scope_type?: string; _scope_id?: string }
         Returns: boolean
@@ -1389,6 +1398,16 @@ export type Database = {
       create_initial_admin: {
         Args: { _user_id: string }
         Returns: undefined
+      }
+      create_new_user: {
+        Args: {
+          _email: string
+          _password: string
+          _first_name?: string
+          _last_name?: string
+          _role?: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: Json
       }
       has_role: {
         Args: {

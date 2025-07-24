@@ -8,10 +8,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useUserRoles, useAssignRole, useRemoveRole, useCanManageRoles, type AppRole, type ScopeType } from "@/hooks/useUserRoles";
-import { Plus, Trash2, Search, Users, Shield } from "lucide-react";
+import { Plus, Trash2, Search, Users, Shield, UserPlus, Mail, Lock } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { logRoleEvent } from "@/lib/security";
+import { useToast } from "@/hooks/use-toast";
 
 interface UserManagementProps {
   scopeType?: ScopeType;
@@ -21,10 +22,16 @@ interface UserManagementProps {
 
 const UserManagement = ({ scopeType = 'global', scopeId, scopeName }: UserManagementProps) => {
   const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
+  const [newUserFirstName, setNewUserFirstName] = useState('');
+  const [newUserLastName, setNewUserLastName] = useState('');
   const [newUserRole, setNewUserRole] = useState<AppRole>('viewer');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
 
+  const { toast } = useToast();
   const { data: userRoles, isLoading } = useUserRoles(scopeType, scopeId);
   const { data: canManage } = useCanManageRoles(scopeType, scopeId);
   const assignRole = useAssignRole();
@@ -57,6 +64,85 @@ const UserManagement = ({ scopeType = 'global', scopeId, scopeName }: UserManage
     return colors[role];
   };
 
+  const handleCreateUser = async () => {
+    if (!newUserEmail || !newUserPassword || !newUserFirstName || !newUserLastName) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsCreating(true);
+    try {
+      // Create user account via Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: newUserEmail,
+        password: newUserPassword,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            first_name: newUserFirstName,
+            last_name: newUserLastName,
+          }
+        }
+      });
+
+      if (authError) {
+        throw authError;
+      }
+
+      if (!authData.user) {
+        throw new Error('User creation failed - no user returned');
+      }
+
+      // Wait a moment for the trigger to create the profile
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Assign the initial role
+      try {
+        await supabase.rpc('assign_initial_user_role', {
+          _user_id: authData.user.id,
+          _role: newUserRole,
+          _scope_type: scopeType,
+          _scope_id: scopeId
+        });
+
+        toast({
+          title: "Success",
+          description: `User ${newUserEmail} created successfully with ${roleLabels[newUserRole]} role`,
+        });
+
+        // Reset form
+        setNewUserEmail('');
+        setNewUserPassword('');
+        setNewUserFirstName('');
+        setNewUserLastName('');
+        setNewUserRole('viewer');
+        setShowCreateDialog(false);
+
+      } catch (roleError) {
+        console.error('Role assignment error:', roleError);
+        toast({
+          title: "User created but role assignment failed",
+          description: "The user was created but their role couldn't be assigned. Please assign manually.",
+          variant: "destructive",
+        });
+      }
+
+    } catch (error: any) {
+      console.error('Error creating user:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create user",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   const handleAssignRole = async () => {
     if (!newUserEmail || !newUserRole) return;
 
@@ -85,8 +171,18 @@ const UserManagement = ({ scopeType = 'global', scopeId, scopeName }: UserManage
       setNewUserEmail('');
       setNewUserRole('viewer');
       setShowAssignDialog(false);
-    } catch (error) {
+      
+      toast({
+        title: "Success",
+        description: `Role ${roleLabels[newUserRole]} assigned successfully`,
+      });
+    } catch (error: any) {
       console.error('Error assigning role:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to assign role",
+        variant: "destructive",
+      });
     }
   };
 
@@ -120,13 +216,108 @@ const UserManagement = ({ scopeType = 'global', scopeId, scopeName }: UserManage
           </p>
         </div>
         {canManage && (
-          <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-primary hover:opacity-90">
-                <Plus className="h-4 w-4 mr-2" />
-                Assign Role
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-primary hover:opacity-90">
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Create User
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Create New User</DialogTitle>
+                  <DialogDescription>
+                    Create a new user account and assign their initial role.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium">First Name</label>
+                      <Input
+                        placeholder="John"
+                        value={newUserFirstName}
+                        onChange={(e) => setNewUserFirstName(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Last Name</label>
+                      <Input
+                        placeholder="Doe"
+                        value={newUserLastName}
+                        onChange={(e) => setNewUserLastName(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Email</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="email"
+                        placeholder="john.doe@company.com"
+                        value={newUserEmail}
+                        onChange={(e) => setNewUserEmail(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Password</label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        value={newUserPassword}
+                        onChange={(e) => setNewUserPassword(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Initial Role</label>
+                    <Select value={newUserRole} onValueChange={(value: AppRole) => setNewUserRole(value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(roleLabels).map(([role, label]) => (
+                          <SelectItem key={role} value={role}>
+                            <div className="flex flex-col">
+                              <span>{label}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {roleDescriptions[role as AppRole]}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={handleCreateUser} 
+                      disabled={isCreating || !newUserEmail || !newUserPassword || !newUserFirstName || !newUserLastName}
+                    >
+                      {isCreating ? 'Creating...' : 'Create User'}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+            
+            <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Assign Role
+                </Button>
+              </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Assign User Role</DialogTitle>
@@ -175,8 +366,9 @@ const UserManagement = ({ scopeType = 'global', scopeId, scopeName }: UserManage
                   </Button>
                 </div>
               </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          </div>
         )}
       </div>
 
