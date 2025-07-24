@@ -11,14 +11,14 @@ const Dashboard = () => {
         <div className="container mx-auto px-6 py-8">
           <div className="text-center mb-8">
             <Badge variant="glow" className="mb-4">
-              📈 Project Dashboard
+              🎯 Command Center
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Project <span className="bg-gradient-primary bg-clip-text text-transparent">Command Center</span>
+              Portnox ZTAC <span className="bg-gradient-primary bg-clip-text text-transparent">Ultimate Dashboard</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Comprehensive overview of all your Portnox projects, deployments, and performance metrics 
-              in one centralized dashboard.
+              Your comprehensive command center for Portnox ZTAC projects, POC orchestration, deployment tracking, 
+              and implementation management across your enterprise.
             </p>
           </div>
           

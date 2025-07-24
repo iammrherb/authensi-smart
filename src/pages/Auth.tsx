@@ -103,8 +103,9 @@ const Auth = () => {
                 Ultimate Platform
               </span>
             </h1>
-            <p className="text-lg text-blue-100 mb-8 max-w-md">
-              The ultimate Zero Trust Access Control platform for enterprise scoping, POC management, and deployment tracking.
+            <p className="text-lg text-blue-100 mb-8 max-w-md leading-relaxed">
+              The premier Zero Trust Access Control platform for enterprise scoping, 
+              POC orchestration, deployment tracking, and comprehensive implementation management.
             </p>
           </div>
 
@@ -151,8 +152,8 @@ const Auth = () => {
               </CardTitle>
               <CardDescription className="text-base">
                 {isSignUp 
-                  ? 'Create your account to start managing NAC deployments with enterprise-grade security'
-                  : 'Sign in to access your Zero Trust Access Control dashboard'
+                  ? 'Create your account to access the ultimate Portnox ZTAC platform for comprehensive POC management and deployment tracking'
+                  : 'Sign in to your Portnox ZTAC Ultimate Platform - Your command center for scoping, POC management, and deployment excellence'
                 }
               </CardDescription>
             </CardHeader>
