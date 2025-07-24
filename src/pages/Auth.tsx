@@ -6,8 +6,10 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
-import { Shield, Users, Building2, Eye, EyeOff, Network, Lock, Zap, CheckCircle } from 'lucide-react';
+import { Shield, Users, Building2, Eye, EyeOff, Network, Lock, Zap, CheckCircle, Mail, HelpCircle } from 'lucide-react';
 import portnoxLogo from '@/assets/portnox-logo.png';
+import dragonImage from '@/assets/dragon-datacenter.png';
+import unicornImage from '@/assets/unicorn-datacenter.png';
 
 const Auth = () => {
   const { user, signIn, signUp, loading } = useAuth();
@@ -20,6 +22,8 @@ const Auth = () => {
     lastName: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showMagicLink, setShowMagicLink] = useState(false);
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
 
   // Redirect if already authenticated
   if (user) {
@@ -45,7 +49,13 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      if (isSignUp) {
+      if (showMagicLink) {
+        // Handle magic link
+        console.log('Magic link requested for:', formData.email);
+      } else if (showPasswordReset) {
+        // Handle password reset
+        console.log('Password reset requested for:', formData.email);
+      } else if (isSignUp) {
         await signUp(formData.email, formData.password, formData.firstName, formData.lastName);
       } else {
         await signIn(formData.email, formData.password);
@@ -79,19 +89,19 @@ const Auth = () => {
         </div>
         
         {/* Animated Dragons */}
-        <div className="absolute top-20 left-10 w-16 h-16 text-purple-400 animate-bounce opacity-60">
-          🐉
+        <div className="absolute top-20 left-10 w-24 h-16 opacity-70 animate-float">
+          <img src={dragonImage} alt="Dragon" className="w-full h-full object-contain" />
         </div>
-        <div className="absolute top-40 right-20 w-12 h-12 text-purple-300 animate-pulse opacity-50" style={{ animationDelay: '1s' }}>
-          🐲
+        <div className="absolute top-40 right-20 w-20 h-14 opacity-60 animate-bounce" style={{ animationDelay: '1s' }}>
+          <img src={dragonImage} alt="Dragon" className="w-full h-full object-contain transform scale-x-[-1]" />
         </div>
         
         {/* Animated Unicorns */}
-        <div className="absolute bottom-32 left-16 w-14 h-14 text-pink-400 animate-bounce opacity-60" style={{ animationDelay: '0.5s' }}>
-          🦄
+        <div className="absolute bottom-32 left-16 w-22 h-16 opacity-70 animate-bounce" style={{ animationDelay: '0.5s' }}>
+          <img src={unicornImage} alt="Unicorn" className="w-full h-full object-contain" />
         </div>
-        <div className="absolute bottom-20 right-32 w-12 h-12 text-purple-200 animate-pulse opacity-50" style={{ animationDelay: '2s' }}>
-          🦄
+        <div className="absolute bottom-20 right-32 w-20 h-14 opacity-60 animate-float" style={{ animationDelay: '2s' }}>
+          <img src={unicornImage} alt="Unicorn" className="w-full h-full object-contain transform scale-x-[-1]" />
         </div>
         
         {/* Floating server icons */}
@@ -121,19 +131,19 @@ const Auth = () => {
                 <img 
                   src={portnoxLogo} 
                   alt="Portnox Logo" 
-                  className="h-16 w-auto animate-pulse hover:animate-bounce transition-all duration-300 filter drop-shadow-lg"
+                  className="h-16 w-auto font-black animate-pulse hover:animate-bounce transition-all duration-300 filter drop-shadow-2xl brightness-110"
                 />
-                <div className="absolute -inset-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-20 animate-ping"></div>
+                <div className="absolute -inset-3 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-25 animate-ping"></div>
               </div>
               <div className="text-center">
                 <h1 className="text-3xl lg:text-4xl font-black text-white mb-2 animate-fade-in bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent">
-                  PORTNOX ZTAC
+                  SCOPE SLAYER
                 </h1>
-                <h2 className="text-xl lg:text-2xl font-bold text-purple-200 mb-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                  Ultimate Platform
+                <h2 className="text-xl lg:text-2xl font-bold text-purple-200 mb-1 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                  POC Tracker • Deployment Master
                 </h2>
-                <p className="text-sm text-purple-300 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                  🚀 POC Tracker & Deployment Manager 🚀
+                <p className="text-base text-purple-300 animate-fade-in font-semibold" style={{ animationDelay: '0.4s' }}>
+                  🎯 Use Case Maestro 🎯
                 </p>
               </div>
             </div>
@@ -153,15 +163,27 @@ const Auth = () => {
             </CardHeader>
             
             <CardContent className="pt-2">
-              <Tabs value={isSignUp ? 'signup' : 'signin'} onValueChange={(value) => setIsSignUp(value === 'signup')}>
-                <TabsList className="grid w-full grid-cols-2 mb-6 h-12">
-                  <TabsTrigger value="signin" className="flex items-center gap-2 text-sm font-medium">
-                    <Users className="h-4 w-4" />
+              <Tabs value={showMagicLink ? 'magic' : showPasswordReset ? 'reset' : isSignUp ? 'signup' : 'signin'} onValueChange={(value) => {
+                setShowMagicLink(value === 'magic');
+                setShowPasswordReset(value === 'reset');
+                setIsSignUp(value === 'signup');
+              }}>
+                <TabsList className="grid w-full grid-cols-4 mb-6 h-12 text-xs">
+                  <TabsTrigger value="signin" className="flex items-center gap-1">
+                    <Users className="h-3 w-3" />
                     Sign In
                   </TabsTrigger>
-                  <TabsTrigger value="signup" className="flex items-center gap-2 text-sm font-medium">
-                    <Building2 className="h-4 w-4" />
+                  <TabsTrigger value="signup" className="flex items-center gap-1">
+                    <Building2 className="h-3 w-3" />
                     Sign Up
+                  </TabsTrigger>
+                  <TabsTrigger value="magic" className="flex items-center gap-1">
+                    <Mail className="h-3 w-3" />
+                    Magic Link
+                  </TabsTrigger>
+                  <TabsTrigger value="reset" className="flex items-center gap-1">
+                    <Lock className="h-3 w-3" />
+                    Reset
                   </TabsTrigger>
                 </TabsList>
 
@@ -197,6 +219,18 @@ const Auth = () => {
                     </div>
                   </TabsContent>
 
+                  <TabsContent value="magic" className="space-y-4 mt-0">
+                    <div className="text-center text-sm text-muted-foreground mb-4">
+                      Enter your email to receive a magic sign-in link
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="reset" className="space-y-4 mt-0">
+                    <div className="text-center text-sm text-muted-foreground mb-4">
+                      Enter your email to receive a password reset link
+                    </div>
+                  </TabsContent>
+
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
                     <Input
@@ -212,40 +246,42 @@ const Auth = () => {
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        name="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter your secure password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        required
-                        autoComplete={isSignUp ? "new-password" : "current-password"}
-                        className="h-11 pr-12"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? 
-                          <EyeOff className="h-4 w-4 text-muted-foreground" /> : 
-                          <Eye className="h-4 w-4 text-muted-foreground" />
-                        }
-                      </Button>
+                  {!showMagicLink && !showPasswordReset && (
+                    <div className="space-y-2">
+                      <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                      <div className="relative">
+                        <Input
+                          id="password"
+                          name="password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter your secure password"
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          required
+                          autoComplete={isSignUp ? "new-password" : "current-password"}
+                          className="h-11 pr-12"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? 
+                            <EyeOff className="h-4 w-4 text-muted-foreground" /> : 
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                          }
+                        </Button>
+                      </div>
+                      {isSignUp && (
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Lock className="h-3 w-3" />
+                          Password must be at least 8 characters long for enterprise security
+                        </p>
+                      )}
                     </div>
-                    {isSignUp && (
-                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Lock className="h-3 w-3" />
-                        Password must be at least 8 characters long for enterprise security
-                      </p>
-                    )}
-                  </div>
+                  )}
 
                   <Button 
                     type="submit" 
@@ -255,15 +291,43 @@ const Auth = () => {
                     {isLoading ? (
                       <div className="flex items-center gap-3">
                         <div className="animate-spin rounded-full h-5 w-5 border-2 border-current border-t-transparent"></div>
-                        {isSignUp ? 'Creating Your Account...' : 'Signing You In...'}
+                        {showMagicLink ? 'Sending Magic Link...' : showPasswordReset ? 'Sending Reset Link...' : isSignUp ? 'Creating Your Account...' : 'Signing You In...'}
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <Shield className="h-5 w-5" />
-                        {isSignUp ? 'Create Account' : 'Sign In Securely'}
+                        {showMagicLink ? <Mail className="h-5 w-5" /> : showPasswordReset ? <Lock className="h-5 w-5" /> : <Shield className="h-5 w-5" />}
+                        {showMagicLink ? 'Send Magic Link' : showPasswordReset ? 'Reset Password' : isSignUp ? 'Create Account' : 'Sign In Securely'}
                       </div>
                     )}
                   </Button>
+
+                  {!showMagicLink && !showPasswordReset && (
+                    <div className="mt-4 text-center">
+                      <Button 
+                        variant="link" 
+                        className="text-xs text-muted-foreground hover:text-primary"
+                        onClick={() => setShowPasswordReset(true)}
+                      >
+                        Forgot password?
+                      </Button>
+                      <span className="mx-2 text-muted-foreground">•</span>
+                      <Button 
+                        variant="link" 
+                        className="text-xs text-muted-foreground hover:text-primary"
+                        onClick={() => setShowMagicLink(true)}
+                      >
+                        Magic link
+                      </Button>
+                      <span className="mx-2 text-muted-foreground">•</span>
+                      <Button 
+                        variant="link" 
+                        className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
+                      >
+                        <HelpCircle className="h-3 w-3" />
+                        Contact Admin
+                      </Button>
+                    </div>
+                  )}
                 </form>
 
                 <div className="mt-6 text-center text-sm">
