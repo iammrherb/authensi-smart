@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
-import { Shield, Users, Building2, Eye, EyeOff, Network, Lock, Zap, CheckCircle, Mail, HelpCircle } from 'lucide-react';
+import { Shield, Users, Building2, Eye, EyeOff, Network, Lock, Zap, CheckCircle } from 'lucide-react';
 import portnoxLogo from '@/assets/portnox-logo.png';
 
 const Auth = () => {
@@ -20,8 +20,6 @@ const Auth = () => {
     lastName: ''
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [showMagicLink, setShowMagicLink] = useState(false);
-  const [showPasswordReset, setShowPasswordReset] = useState(false);
 
   // Redirect if already authenticated
   if (user) {
@@ -47,13 +45,7 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      if (showMagicLink) {
-        // Handle magic link
-        console.log('Magic link requested for:', formData.email);
-      } else if (showPasswordReset) {
-        // Handle password reset
-        console.log('Password reset requested for:', formData.email);
-      } else if (isSignUp) {
+      if (isSignUp) {
         await signUp(formData.email, formData.password, formData.firstName, formData.lastName);
       } else {
         await signIn(formData.email, formData.password);
@@ -78,86 +70,104 @@ const Auth = () => {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-      {/* Ultra Modern Background */}
-      <div className="absolute inset-0">
-        {/* Subtle grid */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
+    <div className="min-h-screen flex">
+      {/* Left Side - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-0 w-full h-full opacity-20">
+            <div className="absolute top-20 left-20 w-32 h-32 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl animate-float"></div>
+            <div className="absolute top-40 right-20 w-32 h-32 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl animate-float animation-delay-2000"></div>
+            <div className="absolute bottom-20 left-40 w-32 h-32 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl animate-float animation-delay-4000"></div>
+          </div>
+          
+          {/* Grid pattern */}
+          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-transparent">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+          </div>
         </div>
         
-        {/* Modern accent lines */}
-        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-blue-500/20 to-transparent"></div>
-        <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-purple-500/15 to-transparent"></div>
-        
-        {/* Subtle glow elements */}
-        <div className="absolute top-1/4 left-10 w-2 h-2 bg-blue-400 rounded-full opacity-60"></div>
-        <div className="absolute bottom-1/3 right-12 w-1 h-1 bg-purple-400 rounded-full opacity-40"></div>
-        <div className="absolute top-2/3 left-1/5 w-1.5 h-1.5 bg-cyan-400 rounded-full opacity-50"></div>
+        <div className="relative z-10 flex flex-col justify-center items-center text-center p-12 w-full">
+          {/* Logo and branding */}
+          <div className="mb-8 animate-slide-up">
+            <div className="flex items-center justify-center mb-6">
+              <img 
+                src={portnoxLogo} 
+                alt="Portnox Logo" 
+                className="h-16 w-auto filter brightness-0 invert opacity-90"
+              />
+            </div>
+            <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
+              Portnox ZTAC
+              <span className="block text-3xl bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Ultimate Platform
+              </span>
+            </h1>
+            <p className="text-lg text-blue-100 mb-8 max-w-md leading-relaxed">
+              The premier Zero Trust Access Control platform for enterprise scoping, 
+              POC orchestration, deployment tracking, and comprehensive implementation management.
+            </p>
+          </div>
+
+          {/* Feature highlights */}
+          <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
+            {features.map((feature, index) => (
+              <div 
+                key={index}
+                className="flex flex-col items-center p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 animate-fade-in hover:bg-white/15 transition-all duration-300"
+                style={{ animationDelay: `${index * 150}ms` }}
+              >
+                <feature.icon className={`h-6 w-6 ${feature.color} mb-2`} />
+                <span className="text-white text-sm font-medium text-center">{feature.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Main Auth Container */}
-      <div className="relative z-10 w-full max-w-md p-8">
+      {/* Right Side - Auth Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-8">
         <div className="w-full max-w-md">
-          {/* Animated Logo Header */}
-          <div className="text-center mb-8">
-            <div className="flex flex-col items-center justify-center gap-6 mb-8">
-              <div className="relative p-8 bg-white/95 backdrop-blur-sm rounded-3xl border-4 border-white shadow-2xl">
-                <img 
-                  src={portnoxLogo} 
-                  alt="Portnox Logo" 
-                  className="h-32 w-auto filter brightness-100 contrast-125 drop-shadow-xl"
-                />
-              </div>
-              <div className="text-center space-y-2">
-                <h1 className="text-5xl lg:text-6xl font-black text-white mb-4 tracking-tight font-orbitron bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-lg">
-                  SCOPE SLAYER
+          {/* Mobile logo */}
+          <div className="lg:hidden text-center mb-8">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <img 
+                src={portnoxLogo} 
+                alt="Portnox Logo" 
+                className="h-12 w-auto"
+              />
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">
+                  Portnox ZTAC Ultimate
                 </h1>
-                <h2 className="text-2xl lg:text-3xl font-bold text-yellow-400 mb-2 tracking-wide font-exo drop-shadow-md">
-                  POC TRACKER • DEPLOYMENT MASTER
-                </h2>
-                <p className="text-xl text-green-400 font-bold font-exo drop-shadow-md">
-                  🎯 USE CASE MAESTRO 🎯
-                </p>
+                <p className="text-sm text-muted-foreground">Enterprise NAC Platform</p>
               </div>
             </div>
           </div>
 
-          <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-card/95">
+          <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-card/95 animate-scale-in">
             <CardHeader className="space-y-1 text-center pb-4">
-              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent font-exo">
-                {isSignUp ? 'Join the Slayer Squad' : 'Welcome Back, Slayer'}
+              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+                {isSignUp ? 'Join the Platform' : 'Welcome Back'}
               </CardTitle>
-              <CardDescription className="text-base font-exo">
+              <CardDescription className="text-base">
                 {isSignUp 
-                  ? 'Create your account to access the ultimate Scope Slayer platform for comprehensive POC tracking and deployment mastery'
-                  : 'Sign in to your Scope Slayer Platform - Your command center for POC tracking, deployment mastery, and use case excellence'
+                  ? 'Create your account to access the ultimate Portnox ZTAC platform for comprehensive POC management and deployment tracking'
+                  : 'Sign in to your Portnox ZTAC Ultimate Platform - Your command center for scoping, POC management, and deployment excellence'
                 }
               </CardDescription>
             </CardHeader>
             
             <CardContent className="pt-2">
-              <Tabs value={showMagicLink ? 'magic' : showPasswordReset ? 'reset' : isSignUp ? 'signup' : 'signin'} onValueChange={(value) => {
-                setShowMagicLink(value === 'magic');
-                setShowPasswordReset(value === 'reset');
-                setIsSignUp(value === 'signup');
-              }}>
-                <TabsList className="grid w-full grid-cols-4 mb-6 h-12 text-xs">
-                  <TabsTrigger value="signin" className="flex items-center gap-1">
-                    <Users className="h-3 w-3" />
+              <Tabs value={isSignUp ? 'signup' : 'signin'} onValueChange={(value) => setIsSignUp(value === 'signup')}>
+                <TabsList className="grid w-full grid-cols-2 mb-6 h-12">
+                  <TabsTrigger value="signin" className="flex items-center gap-2 text-sm font-medium">
+                    <Users className="h-4 w-4" />
                     Sign In
                   </TabsTrigger>
-                  <TabsTrigger value="signup" className="flex items-center gap-1">
-                    <Building2 className="h-3 w-3" />
+                  <TabsTrigger value="signup" className="flex items-center gap-2 text-sm font-medium">
+                    <Building2 className="h-4 w-4" />
                     Sign Up
-                  </TabsTrigger>
-                  <TabsTrigger value="magic" className="flex items-center gap-1">
-                    <Mail className="h-3 w-3" />
-                    Magic Link
-                  </TabsTrigger>
-                  <TabsTrigger value="reset" className="flex items-center gap-1">
-                    <Lock className="h-3 w-3" />
-                    Reset
                   </TabsTrigger>
                 </TabsList>
 
@@ -193,18 +203,6 @@ const Auth = () => {
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="magic" className="space-y-4 mt-0">
-                    <div className="text-center text-sm text-muted-foreground mb-4">
-                      Enter your email to receive a magic sign-in link
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="reset" className="space-y-4 mt-0">
-                    <div className="text-center text-sm text-muted-foreground mb-4">
-                      Enter your email to receive a password reset link
-                    </div>
-                  </TabsContent>
-
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
                     <Input
@@ -220,42 +218,40 @@ const Auth = () => {
                     />
                   </div>
 
-                  {!showMagicLink && !showPasswordReset && (
-                    <div className="space-y-2">
-                      <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-                      <div className="relative">
-                        <Input
-                          id="password"
-                          name="password"
-                          type={showPassword ? "text" : "password"}
-                          placeholder="Enter your secure password"
-                          value={formData.password}
-                          onChange={handleInputChange}
-                          required
-                          autoComplete={isSignUp ? "new-password" : "current-password"}
-                          className="h-11 pr-12"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-transparent"
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? 
-                            <EyeOff className="h-4 w-4 text-muted-foreground" /> : 
-                            <Eye className="h-4 w-4 text-muted-foreground" />
-                          }
-                        </Button>
-                      </div>
-                      {isSignUp && (
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Lock className="h-3 w-3" />
-                          Password must be at least 8 characters long for enterprise security
-                        </p>
-                      )}
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your secure password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        required
+                        autoComplete={isSignUp ? "new-password" : "current-password"}
+                        className="h-11 pr-12"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? 
+                          <EyeOff className="h-4 w-4 text-muted-foreground" /> : 
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        }
+                      </Button>
                     </div>
-                  )}
+                    {isSignUp && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Lock className="h-3 w-3" />
+                        Password must be at least 8 characters long for enterprise security
+                      </p>
+                    )}
+                  </div>
 
                   <Button 
                     type="submit" 
@@ -265,43 +261,15 @@ const Auth = () => {
                     {isLoading ? (
                       <div className="flex items-center gap-3">
                         <div className="animate-spin rounded-full h-5 w-5 border-2 border-current border-t-transparent"></div>
-                        {showMagicLink ? 'Sending Magic Link...' : showPasswordReset ? 'Sending Reset Link...' : isSignUp ? 'Creating Your Account...' : 'Signing You In...'}
+                        {isSignUp ? 'Creating Your Account...' : 'Signing You In...'}
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        {showMagicLink ? <Mail className="h-5 w-5" /> : showPasswordReset ? <Lock className="h-5 w-5" /> : <Shield className="h-5 w-5" />}
-                        {showMagicLink ? 'Send Magic Link' : showPasswordReset ? 'Reset Password' : isSignUp ? 'Create Account' : 'Sign In Securely'}
+                        <Shield className="h-5 w-5" />
+                        {isSignUp ? 'Create Account' : 'Sign In Securely'}
                       </div>
                     )}
                   </Button>
-
-                  {!showMagicLink && !showPasswordReset && (
-                    <div className="mt-4 text-center">
-                      <Button 
-                        variant="link" 
-                        className="text-xs text-muted-foreground hover:text-primary"
-                        onClick={() => setShowPasswordReset(true)}
-                      >
-                        Forgot password?
-                      </Button>
-                      <span className="mx-2 text-muted-foreground">•</span>
-                      <Button 
-                        variant="link" 
-                        className="text-xs text-muted-foreground hover:text-primary"
-                        onClick={() => setShowMagicLink(true)}
-                      >
-                        Magic link
-                      </Button>
-                      <span className="mx-2 text-muted-foreground">•</span>
-                      <Button 
-                        variant="link" 
-                        className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
-                      >
-                        <HelpCircle className="h-3 w-3" />
-                        Contact Admin
-                      </Button>
-                    </div>
-                  )}
                 </form>
 
                 <div className="mt-6 text-center text-sm">
@@ -331,10 +299,10 @@ const Auth = () => {
           </Card>
 
           {/* Footer */}
-          <div className="mt-8 text-center text-xs text-gray-400">
-            <p className="flex items-center justify-center gap-1 font-exo">
+          <div className="mt-8 text-center text-xs text-muted-foreground">
+            <p className="flex items-center justify-center gap-1">
               <Shield className="h-3 w-3" />
-              © 2024 Scope Slayer Platform - Ultimate POC Tracker & Deployment Master
+              © 2024 Portnox ZTAC Ultimate Platform - Enterprise Zero Trust Access Control
             </p>
           </div>
         </div>
