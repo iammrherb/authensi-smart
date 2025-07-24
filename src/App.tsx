@@ -50,17 +50,17 @@ const App = () => (
                   
                   {/* Admin Routes */}
                   <Route path="/vendors" element={
-                    <ProtectedRoute requiredRoles={['admin', 'project_owner']}>
+                    <ProtectedRoute requiredRoles={['project_owner']}>
                       <Vendors />
                     </ProtectedRoute>
                   } />
                   <Route path="/users" element={
-                    <ProtectedRoute requiredRoles={['admin', 'project_owner']}>
+                    <ProtectedRoute requiredRoles={['project_owner', 'project_manager']}>
                       <Users />
                     </ProtectedRoute>
                   } />
                   <Route path="/settings" element={
-                    <ProtectedRoute requiredRoles={['admin', 'project_owner']}>
+                    <ProtectedRoute requiredRoles={['project_owner']}>
                       <Settings />
                     </ProtectedRoute>
                   } />

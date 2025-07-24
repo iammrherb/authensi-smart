@@ -55,6 +55,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const [userRoleData, setUserRoleData] = useState<Array<{role: string, scope_type: string, scope_id: string | null}>>([]);
+
   const fetchUserRoles = async (userId: string) => {
     try {
       const { data, error } = await supabase
@@ -67,7 +69,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      const roles = data?.map(r => r.role) || [];
+      const roleData = data || [];
+      const roles = roleData.map(r => r.role);
+      setUserRoleData(roleData);
       setUserRoles(roles);
     } catch (error) {
       console.error('Error fetching user roles:', error);
@@ -81,11 +85,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const hasRole = (role: string, scope?: string, scopeId?: string): boolean => {
-    return userRoles.includes(role);
+    // Check for global roles first (highest privilege)
+    const hasGlobalRole = userRoleData.some(r => 
+      r.role === role && r.scope_type === 'global'
+    );
+    
+    if (hasGlobalRole) return true;
+    
+    // If no scope specified, only check for global roles
+    if (!scope) return false;
+    
+    // Check for scoped roles
+    const hasScopedRole = userRoleData.some(r => 
+      r.role === role && 
+      r.scope_type === scope && 
+      (scopeId ? r.scope_id === scopeId : true)
+    );
+    
+    return hasScopedRole;
   };
 
-  const isAdmin = userRoles.includes('admin') || userRoles.includes('project_owner');
-  const isProjectManager = userRoles.includes('project_manager') || isAdmin;
+  const isAdmin = hasRole('project_owner', 'global');
+  const isProjectManager = hasRole('project_manager', 'global') || isAdmin;
 
   useEffect(() => {
     // Set up auth state listener
