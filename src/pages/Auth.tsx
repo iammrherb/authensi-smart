@@ -63,10 +63,10 @@ const Auth = () => {
   };
 
   const features = [
-    { icon: Network, text: "Zero Trust Architecture", color: "text-blue-400" },
-    { icon: Shield, text: "Advanced Security", color: "text-green-400" },
-    { icon: Zap, text: "Rapid Deployment", color: "text-yellow-400" },
-    { icon: CheckCircle, text: "Enterprise Ready", color: "text-purple-400" }
+    { icon: Network, text: "Zero Trust Mastery", color: "text-cyan-400" },
+    { icon: Shield, text: "Security Fortress", color: "text-emerald-400" },
+    { icon: Zap, text: "Lightning Deploy", color: "text-yellow-400" },
+    { icon: CheckCircle, text: "Enterprise Beast", color: "text-purple-400" }
   ];
 
   return (
@@ -97,15 +97,20 @@ const Auth = () => {
                 className="h-16 w-auto filter brightness-0 invert opacity-90"
               />
             </div>
-            <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
-              Portnox ZTAC
-              <span className="block text-3xl bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Ultimate Platform
-              </span>
+            <h1 className="font-display text-5xl font-black text-white mb-2 leading-tight tracking-wider">
+              🚀 SCOPE SLAYER
             </h1>
-            <p className="text-lg text-blue-100 mb-8 max-w-md leading-relaxed">
-              The premier Zero Trust Access Control platform for enterprise scoping, 
-              POC orchestration, deployment tracking, and comprehensive implementation management.
+            <h2 className="font-tech text-3xl font-bold mb-4 leading-tight">
+              <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                POC TRACKER • DEPLOYMENT MASTER
+              </span>
+            </h2>
+            <h3 className="font-display text-2xl font-bold text-yellow-300 mb-6">
+              🎯 USE CASE MAESTRO 🎯
+            </h3>
+            <p className="font-tech text-lg text-blue-100 mb-8 max-w-md leading-relaxed font-medium">
+              The ultimate Zero Trust command center that turns complex enterprise deployments 
+              into streamlined victories. Master your POCs, dominate deployments, and orchestrate success.
             </p>
           </div>
 
@@ -118,7 +123,7 @@ const Auth = () => {
                 style={{ animationDelay: `${index * 150}ms` }}
               >
                 <feature.icon className={`h-6 w-6 ${feature.color} mb-2`} />
-                <span className="text-white text-sm font-medium text-center">{feature.text}</span>
+                <span className="text-white text-sm font-tech font-semibold text-center">{feature.text}</span>
               </div>
             ))}
           </div>
@@ -137,23 +142,23 @@ const Auth = () => {
                 className="h-12 w-auto"
               />
               <div>
-                <h1 className="text-2xl font-bold text-foreground">
-                  Portnox ZTAC Ultimate
+                <h1 className="font-display text-2xl font-black text-foreground">
+                  SCOPE SLAYER
                 </h1>
-                <p className="text-sm text-muted-foreground">Enterprise NAC Platform</p>
+                <p className="font-tech text-sm text-muted-foreground font-semibold">POC Tracker • Deployment Master</p>
               </div>
             </div>
           </div>
 
           <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-card/95 animate-scale-in">
             <CardHeader className="space-y-1 text-center pb-4">
-              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
-                {isSignUp ? 'Join the Platform' : 'Welcome Back'}
+              <CardTitle className="font-display text-3xl font-black bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+                {isSignUp ? '🚀 JOIN THE ELITE' : '⚡ WELCOME BACK, WARRIOR'}
               </CardTitle>
-              <CardDescription className="text-base">
+              <CardDescription className="font-tech text-base font-medium">
                 {isSignUp 
-                  ? 'Create your account to access the ultimate Portnox ZTAC platform for comprehensive POC management and deployment tracking'
-                  : 'Sign in to your Portnox ZTAC Ultimate Platform - Your command center for scoping, POC management, and deployment excellence'
+                  ? 'Unlock your access to the ultimate deployment mastery platform. Scope like a pro, track like a boss, deploy like a legend.'
+                  : 'Access your command center for POC domination and deployment excellence. Time to slay those scopes and master those use cases.'
                 }
               </CardDescription>
             </CardHeader>
@@ -264,9 +269,9 @@ const Auth = () => {
                         {isSignUp ? 'Creating Your Account...' : 'Signing You In...'}
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2">
+                       <div className="flex items-center gap-2 font-tech font-bold">
                         <Shield className="h-5 w-5" />
-                        {isSignUp ? 'Create Account' : 'Sign In Securely'}
+                        {isSignUp ? '🚀 ACTIVATE ACCOUNT' : '⚡ DEPLOY SECURE ACCESS'}
                       </div>
                     )}
                   </Button>

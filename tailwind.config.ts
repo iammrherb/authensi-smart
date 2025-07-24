@@ -156,6 +156,11 @@ export default {
 			animationDelay: {
 				'2000': '2s',
 				'4000': '4s'
+			},
+			fontFamily: {
+				sans: ["Space Grotesk", "sans-serif"],
+				display: ["Orbitron", "sans-serif"],
+				tech: ["Rajdhani", "monospace"],
 			}
 		}
 	},
