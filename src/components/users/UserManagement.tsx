@@ -11,6 +11,7 @@ import { useUserRoles, useAssignRole, useRemoveRole, useCanManageRoles, type App
 import { Plus, Trash2, Search, Users, Shield } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
+import { logRoleEvent } from "@/lib/security";
 
 interface UserManagementProps {
   scopeType?: ScopeType;
@@ -77,6 +78,9 @@ const UserManagement = ({ scopeType = 'global', scopeId, scopeName }: UserManage
         scope_type: scopeType,
         scope_id: scopeId
       });
+
+      // Log the role assignment
+      await logRoleEvent('assigned', newUserRole, userProfile.id, scopeType, scopeId);
 
       setNewUserEmail('');
       setNewUserRole('viewer');
@@ -255,12 +259,15 @@ const UserManagement = ({ scopeType = 'global', scopeId, scopeName }: UserManage
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction 
-                                onClick={() => removeRole.mutate(userRole.id)}
-                                className="bg-red-600 hover:bg-red-700"
-                              >
-                                Remove Role
-                              </AlertDialogAction>
+                           <AlertDialogAction 
+                                 onClick={async () => {
+                                   await logRoleEvent('removed', userRole.role, userRole.user_id, userRole.scope_type, userRole.scope_id);
+                                   removeRole.mutate(userRole.id);
+                                 }}
+                                 className="bg-red-600 hover:bg-red-700"
+                               >
+                                 Remove Role
+                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { logAuthEvent, logSecurityEvent } from '@/lib/security';
 
 interface AuthContextType {
   user: User | null;
@@ -153,6 +154,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password,
       });
       
+      // Log security event
+      await logAuthEvent(!error, email, error?.message);
+      
       if (error) {
         toast({
           title: "Error",
@@ -168,6 +172,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       return { error };
     } catch (error: any) {
+      // Log unexpected error
+      await logAuthEvent(false, email, 'Unexpected error occurred');
+      
       toast({
         title: "Error",
         description: "An unexpected error occurred",
@@ -193,6 +200,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
       
+      // Log security event
+      if (!error) {
+        await logSecurityEvent('user_registration', { email });
+      } else {
+        await logAuthEvent(false, email, error.message);
+      }
+      
       if (error) {
         toast({
           title: "Error",
@@ -208,6 +222,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       return { error };
     } catch (error: any) {
+      // Log unexpected error
+      await logAuthEvent(false, email, 'Unexpected error during registration');
+      
       toast({
         title: "Error",
         description: "An unexpected error occurred",
@@ -219,6 +236,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
+      // Log logout before signing out
+      await logSecurityEvent('user_logout');
+      
       const { error } = await supabase.auth.signOut();
       if (error) {
         toast({
