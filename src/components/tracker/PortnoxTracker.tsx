@@ -58,45 +58,77 @@ const PortnoxTracker = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Enhanced Tab Navigation */}
-      <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-        <CardHeader className="pb-4">
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-2xl bg-gradient-primary bg-clip-text text-transparent">
-              Portnox Enterprise Deployment Suite
-            </CardTitle>
-            <Badge variant="outline" className="text-primary border-primary/30">
-              Enterprise Grade
-            </Badge>
+    <div className="space-y-8">
+      {/* Modern Tab Navigation */}
+      <Card className="bg-card/30 backdrop-blur-xl border-border/30 shadow-elevated">
+        <CardHeader className="pb-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <CardTitle className="text-3xl bg-gradient-primary bg-clip-text text-transparent mb-2">
+                Deployment Management Suite
+              </CardTitle>
+              <p className="text-muted-foreground">
+                Comprehensive tools for enterprise NAC implementation success
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge variant="glow" className="text-sm px-3 py-1">
+                <span className="w-2 h-2 bg-primary rounded-full mr-2 animate-pulse"></span>
+                Live Status
+              </Badge>
+              <Badge variant="outline" className="text-primary border-primary/30">
+                Enterprise v2.0
+              </Badge>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            {tabs.map((tab) => (
+          {/* Enhanced Tab Grid */}
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+            {tabs.map((tab, index) => (
               <Button
                 key={tab.id}
-                variant={activeTab === tab.id ? "default" : "outline"}
-                className={`flex flex-col items-center p-4 h-auto space-y-2 transition-all duration-300 ${
+                variant={activeTab === tab.id ? "default" : "ghost"}
+                className={`group flex flex-col items-center p-6 h-auto space-y-3 transition-all duration-500 ease-out ${
                   activeTab === tab.id 
-                    ? "bg-gradient-primary text-primary-foreground shadow-glow" 
-                    : "hover:bg-accent/50 hover:border-primary/30"
-                }`}
+                    ? "bg-gradient-primary text-primary-foreground shadow-glow scale-105 border-0" 
+                    : "hover:bg-accent/60 hover:border-primary/20 hover:shadow-md hover:scale-102 border border-border/50"
+                } ${index < 5 ? 'lg:col-span-1' : 'col-span-1'}`}
                 onClick={() => setActiveTab(tab.id)}
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <span className="text-2xl">{tab.icon}</span>
-                <span className="text-xs font-medium text-center leading-tight">
-                  {tab.label}
-                </span>
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                  activeTab === tab.id 
+                    ? "bg-primary-foreground/20 text-primary-foreground" 
+                    : "bg-primary/10 text-primary group-hover:bg-primary/20 group-hover:scale-110"
+                }`}>
+                  <span className="text-2xl">{tab.icon}</span>
+                </div>
+                <div className="text-center">
+                  <span className="text-sm font-semibold leading-tight block">
+                    {tab.label}
+                  </span>
+                  {activeTab === tab.id && (
+                    <div className="w-8 h-0.5 bg-primary-foreground/50 mx-auto mt-2 rounded-full"></div>
+                  )}
+                </div>
               </Button>
             ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Dynamic Tab Content */}
-      <div className="min-h-[600px]">
-        {renderTabContent()}
+      {/* Enhanced Tab Content with Animation */}
+      <div className="min-h-[700px] animate-fade-in">
+        <div className="relative">
+          {/* Background Glow Effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 rounded-2xl blur-3xl"></div>
+          
+          {/* Content Container */}
+          <div className="relative">
+            {renderTabContent()}
+          </div>
+        </div>
       </div>
     </div>
   );
