@@ -1,6 +1,5 @@
 import React from 'react';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/layout/AppSidebar';
+import Header from '@/components/Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -98,51 +97,11 @@ const Index = () => {
   };
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
-        <AppSidebar />
-        
-        <main className="flex-1">
-          {/* Header */}
-          <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="flex h-16 items-center px-6">
-              <SidebarTrigger className="mr-4" />
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-glow">
-                  <Shield className="h-4 w-4 text-white" />
-                </div>
-                <div>
-                  <h1 className="font-semibold text-xl bg-gradient-primary bg-clip-text text-transparent">
-                    Portnox NAC Tracker
-                  </h1>
-                  <p className="text-xs text-muted-foreground">Enterprise Network Access Control Platform</p>
-                </div>
-              </div>
-              
-              <div className="ml-auto flex items-center gap-4">
-                <Badge variant="glow" className="hidden md:flex">
-                  {userRoles.includes('admin') ? 'Administrator' : 
-                   userRoles.includes('project_manager') ? 'Project Manager' : 'Team Member'}
-                </Badge>
-                <div className="text-right hidden md:block">
-                  <p className="text-sm font-medium">
-                    Welcome, {profile?.first_name || user?.email?.split('@')[0]}!
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date().toLocaleDateString('en-US', { 
-                      weekday: 'long', 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </header>
-
-          {/* Main Content */}
-          <div className="flex-1 space-y-6 p-6">
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="pt-20">
+        <div className="container mx-auto px-6 py-8">
+          <div className="space-y-6">
             {/* Hero Section */}
             <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 p-8 border border-border/50">
               <div className="relative z-10">
@@ -427,9 +386,9 @@ const Index = () => {
               </TabsContent>
             </Tabs>
           </div>
-        </main>
+        </div>
       </div>
-    </SidebarProvider>
+    </div>
   );
 };
 
