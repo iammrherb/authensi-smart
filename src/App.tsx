@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Designer from "./pages/Designer";
 import Tracker from "./pages/Tracker";
+import Deployment from "./pages/Deployment";
 import Dashboard from "./pages/Dashboard";
 import Sites from "./pages/Sites";
 import Requirements from "./pages/Requirements";
@@ -45,6 +46,11 @@ const App = () => (
             <Route path="/tracker" element={
               <ProtectedRoute>
                 <Tracker />
+              </ProtectedRoute>
+            } />
+            <Route path="/deployment" element={
+              <ProtectedRoute>
+                <Deployment />
               </ProtectedRoute>
             } />
             <Route path="/dashboard" element={

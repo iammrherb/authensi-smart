@@ -37,14 +37,28 @@ All colors MUST be HSL.
     --input: 220 27% 12%;
     --ring: 195 100% 50%;
 
+    /* Deployment tracking specific colors */
+    --status-planned: 199 89% 48%;
+    --status-in-progress: 36 100% 50%;
+    --status-complete: 142 69% 58%;
+    --status-delayed: 0 84% 60%;
+    --portnox-teal: 187 20% 31%;
+
     /* AI-themed gradients */
     --gradient-primary: linear-gradient(135deg, hsl(195 100% 50%), hsl(240 100% 60%));
     --gradient-secondary: linear-gradient(135deg, hsl(220 27% 6%), hsl(220 27% 12%));
     --gradient-glow: linear-gradient(135deg, hsl(195 100% 50% / 0.1), hsl(240 100% 60% / 0.1));
+    --gradient-header: linear-gradient(135deg, hsl(210 29% 24%), hsl(187 20% 31%));
+
+    /* Progress and chart gradients */
+    --gradient-progress: linear-gradient(90deg, hsl(195 100% 50%), hsl(195 100% 60%));
+    --gradient-chart: linear-gradient(45deg, hsl(220 27% 6% / 0.1), hsl(195 100% 50% / 0.1));
 
     /* Shadows and effects */
     --shadow-glow: 0 0 40px hsl(195 100% 50% / 0.3);
     --shadow-elevated: 0 10px 30px -10px hsl(220 27% 4% / 0.5);
+    --shadow-card: 0 4px 10px hsl(220 27% 4% / 0.3);
+    --shadow-modal: 0 10px 40px hsl(220 27% 4% / 0.6);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
