@@ -1,7 +1,13 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { MapPin, User, Phone, Mail, Network, Monitor, Calendar, Building } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { 
+  MapPin, User, Phone, Mail, Network, Monitor, Calendar, Building, 
+  Shield, Wifi, Router, Server, Database, Globe, Clock, 
+  Target, CheckCircle, AlertCircle, TrendingUp, Users, Zap
+} from "lucide-react";
 import { Site } from "@/hooks/useSites";
 
 interface SiteDetailsDialogProps {
@@ -30,86 +36,121 @@ const SiteDetailsDialog = ({ site, isOpen, onClose }: SiteDetailsDialogProps) =>
     critical: "destructive"
   } as const;
 
+  const deploymentConfig = site.deployment_config || {};
+  const networkConfig = deploymentConfig.network || {};
+  const securityConfig = deploymentConfig.security || {};
+  const deviceTypes = deploymentConfig.device_types || {};
+  const userTypes = deploymentConfig.user_types || {};
+
+  const calculateDeviceTotal = () => {
+    return Object.values(deviceTypes).reduce((sum: number, count: any) => sum + (count || 0), 0);
+  };
+
+  const calculateUserTotal = () => {
+    return Object.values(userTypes).reduce((sum: number, count: any) => sum + (count || 0), 0);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">{site.name}</DialogTitle>
+          <DialogTitle className="text-2xl flex items-center gap-2">
+            <Building className="h-6 w-6" />
+            {site.name}
+          </DialogTitle>
           <DialogDescription>
-            Complete site information including location, network details, and contact information.
+            Comprehensive site analysis, network infrastructure details, deployment configuration, and implementation status.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Status and Priority */}
-          <div className="flex flex-wrap gap-2">
-            <Badge variant={statusColors[site.status]} className="text-sm">
-              {site.status}
-            </Badge>
-            <Badge variant={priorityColors[site.priority]} className="text-sm">
-              {site.priority} priority
-            </Badge>
-            <Badge variant="outline" className="text-sm">
-              {site.site_type}
-            </Badge>
-          </div>
-
-          <Separator />
-
-          {/* Location Information */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-lg">Location Details</h3>
-            <div className="grid grid-cols-1 gap-3">
-              {site.location && (
-                <div className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-3 text-muted-foreground" />
-                  <span>{site.location}</span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Overview */}
+          <div className="lg:col-span-1 space-y-4">
+            {/* Status Cards */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  Site Overview
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant={statusColors[site.status]} className="text-sm">
+                    {site.status}
+                  </Badge>
+                  <Badge variant={priorityColors[site.priority]} className="text-sm">
+                    {site.priority} priority
+                  </Badge>
+                  <Badge variant="outline" className="text-sm">
+                    {site.site_type}
+                  </Badge>
                 </div>
-              )}
-              {site.address && (
-                <div className="flex items-start">
-                  <Building className="h-4 w-4 mr-3 mt-1 text-muted-foreground" />
-                  <span>{site.address}</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Network Information */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-lg">Network Details</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center">
-                <Network className="h-4 w-4 mr-3 text-muted-foreground" />
-                <span>{site.network_segments} Network Segments</span>
-              </div>
-              <div className="flex items-center">
-                <Monitor className="h-4 w-4 mr-3 text-muted-foreground" />
-                <span>{site.device_count} Devices</span>
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Contact Information */}
-          {(site.contact_name || site.contact_email || site.contact_phone) && (
-            <>
-              <div className="space-y-3">
-                <h3 className="font-semibold text-lg">Contact Information</h3>
+                
                 <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Progress</span>
+                    <span>{site.progress_percentage}%</span>
+                  </div>
+                  <Progress value={site.progress_percentage} className="h-2" />
+                </div>
+                
+                <div className="text-sm text-muted-foreground">
+                  Current Phase: <span className="font-medium text-foreground">{site.current_phase}</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Location Information */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  Location Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {site.location && (
+                  <div className="flex items-center">
+                    <Globe className="h-4 w-4 mr-3 text-muted-foreground" />
+                    <span>{site.location}</span>
+                  </div>
+                )}
+                {site.address && (
+                  <div className="flex items-start">
+                    <Building className="h-4 w-4 mr-3 mt-1 text-muted-foreground" />
+                    <span className="text-sm">{site.address}</span>
+                  </div>
+                )}
+                {(site.region || site.country) && (
+                  <div className="flex items-center">
+                    <MapPin className="h-4 w-4 mr-3 text-muted-foreground" />
+                    <span className="text-sm">{site.region}{site.region && site.country && ", "}{site.country}</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Contact Information */}
+            {(site.contact_name || site.contact_email || site.contact_phone) && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <User className="h-5 w-5" />
+                    Site Contact
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
                   {site.contact_name && (
                     <div className="flex items-center">
                       <User className="h-4 w-4 mr-3 text-muted-foreground" />
-                      <span>{site.contact_name}</span>
+                      <span className="font-medium">{site.contact_name}</span>
                     </div>
                   )}
                   {site.contact_email && (
                     <div className="flex items-center">
                       <Mail className="h-4 w-4 mr-3 text-muted-foreground" />
-                      <a href={`mailto:${site.contact_email}`} className="text-primary hover:underline">
+                      <a href={`mailto:${site.contact_email}`} className="text-primary hover:underline text-sm">
                         {site.contact_email}
                       </a>
                     </div>
@@ -117,30 +158,209 @@ const SiteDetailsDialog = ({ site, isOpen, onClose }: SiteDetailsDialogProps) =>
                   {site.contact_phone && (
                     <div className="flex items-center">
                       <Phone className="h-4 w-4 mr-3 text-muted-foreground" />
-                      <a href={`tel:${site.contact_phone}`} className="text-primary hover:underline">
+                      <a href={`tel:${site.contact_phone}`} className="text-primary hover:underline text-sm">
                         {site.contact_phone}
                       </a>
                     </div>
                   )}
-                </div>
-              </div>
-              <Separator />
-            </>
-          )}
+                </CardContent>
+              </Card>
+            )}
+          </div>
 
-          {/* Timestamps */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-lg">Timeline</h3>
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <div className="flex items-center">
-                <Calendar className="h-4 w-4 mr-3" />
-                <span>Created: {new Date(site.created_at).toLocaleDateString()}</span>
-              </div>
-              <div className="flex items-center">
-                <Calendar className="h-4 w-4 mr-3" />
-                <span>Last Updated: {new Date(site.updated_at).toLocaleDateString()}</span>
-              </div>
+          {/* Right Column - Technical Details */}
+          <div className="lg:col-span-2 space-y-4">
+            {/* Network Infrastructure */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Network className="h-5 w-5" />
+                  Network Infrastructure
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-sm text-muted-foreground">NETWORK SEGMENTS</h4>
+                    <div className="flex items-center">
+                      <Network className="h-4 w-4 mr-3 text-muted-foreground" />
+                      <span className="text-2xl font-bold">{site.network_segments}</span>
+                      <span className="text-sm text-muted-foreground ml-2">segments</span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-sm text-muted-foreground">TOTAL DEVICES</h4>
+                    <div className="flex items-center">
+                      <Monitor className="h-4 w-4 mr-3 text-muted-foreground" />
+                      <span className="text-2xl font-bold">{site.device_count || calculateDeviceTotal()}</span>
+                      <span className="text-sm text-muted-foreground ml-2">devices</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Network Vendors */}
+                {(networkConfig.wired_vendors?.length > 0 || networkConfig.wireless_vendors?.length > 0) && (
+                  <div className="mt-6 space-y-4">
+                    <h4 className="font-medium text-sm text-muted-foreground">NETWORK VENDORS</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      {networkConfig.wired_vendors?.length > 0 && (
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Router className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">Wired</span>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {networkConfig.wired_vendors.map((vendor: string, index: number) => (
+                              <Badge key={index} variant="outline" className="text-xs">{vendor}</Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {networkConfig.wireless_vendors?.length > 0 && (
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Wifi className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">Wireless</span>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {networkConfig.wireless_vendors.map((vendor: string, index: number) => (
+                              <Badge key={index} variant="outline" className="text-xs">{vendor}</Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Security Configuration */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Security Configuration
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 gap-4">
+                  {Object.entries(securityConfig).map(([key, value]) => {
+                    if (typeof value === 'boolean') {
+                      return (
+                        <div key={key} className="flex items-center justify-between p-2 bg-accent/50 rounded">
+                          <span className="text-xs capitalize">{key.replace(/_/g, ' ')}</span>
+                          {value ? (
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Device & User Breakdown */}
+            <div className="grid grid-cols-2 gap-4">
+              {Object.keys(deviceTypes).length > 0 && (
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Monitor className="h-5 w-5" />
+                      Device Types
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {Object.entries(deviceTypes).map(([type, count]) => (
+                      (count as number) > 0 && (
+                        <div key={type} className="flex justify-between items-center">
+                          <span className="text-sm capitalize">{type.replace(/_/g, ' ')}</span>
+                          <Badge variant="secondary" className="text-xs">{count as number}</Badge>
+                        </div>
+                      )
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+
+              {Object.keys(userTypes).length > 0 && (
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Users className="h-5 w-5" />
+                      User Types
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {Object.entries(userTypes).map(([type, count]) => (
+                      (count as number) > 0 && (
+                        <div key={type} className="flex justify-between items-center">
+                          <span className="text-sm capitalize">{type.replace(/_/g, ' ')}</span>
+                          <Badge variant="secondary" className="text-xs">{count as number}</Badge>
+                        </div>
+                      )
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
             </div>
+
+            {/* Timeline */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Timeline & Milestones
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-3 text-muted-foreground" />
+                    <div>
+                      <div className="font-medium">Created</div>
+                      <div className="text-muted-foreground">{new Date(site.created_at).toLocaleDateString()}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-3 text-muted-foreground" />
+                    <div>
+                      <div className="font-medium">Last Updated</div>
+                      <div className="text-muted-foreground">{new Date(site.updated_at).toLocaleDateString()}</div>
+                    </div>
+                  </div>
+                </div>
+                
+                {(site.timeline_start || site.timeline_end) && (
+                  <div className="grid grid-cols-2 gap-4 text-sm border-t pt-4">
+                    {site.timeline_start && (
+                      <div className="flex items-center">
+                        <Zap className="h-4 w-4 mr-3 text-green-500" />
+                        <div>
+                          <div className="font-medium">Project Start</div>
+                          <div className="text-muted-foreground">{new Date(site.timeline_start).toLocaleDateString()}</div>
+                        </div>
+                      </div>
+                    )}
+                    {site.timeline_end && (
+                      <div className="flex items-center">
+                        <Target className="h-4 w-4 mr-3 text-blue-500" />
+                        <div>
+                          <div className="font-medium">Target Completion</div>
+                          <div className="text-muted-foreground">{new Date(site.timeline_end).toLocaleDateString()}</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
       </DialogContent>

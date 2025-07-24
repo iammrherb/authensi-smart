@@ -11,14 +11,15 @@ const Dashboard = () => {
         <div className="container mx-auto px-6 py-8">
           <div className="text-center mb-8">
             <Badge variant="glow" className="mb-4">
-              🎯 Command Center
+              🎯 SCOPE SLAYER Command Center
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Portnox ZTAC <span className="bg-gradient-primary bg-clip-text text-transparent">Ultimate Dashboard</span>
+              <span className="bg-gradient-primary bg-clip-text text-transparent">POC TRACKER</span> • 
+              <span className="text-foreground"> DEPLOYMENT MASTER</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Your comprehensive command center for Portnox ZTAC projects, POC orchestration, deployment tracking, 
-              and implementation management across your enterprise.
+              🎯 <strong>USE CASE MAESTRO</strong> - Your ultimate command center for Portnox ZTAC projects, 
+              POC orchestration, deployment tracking, and implementation management.
             </p>
           </div>
           

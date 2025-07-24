@@ -19,6 +19,32 @@ export interface Site {
   updated_at: string;
   created_by?: string;
   assigned_engineer?: string;
+  region?: string;
+  country?: string;
+  site_id?: string;
+  current_phase?: string;
+  progress_percentage?: number;
+  timeline_start?: string;
+  timeline_end?: string;
+  deployment_config?: {
+    network?: {
+      wired_vendors?: string[];
+      wireless_vendors?: string[];
+      switch_vendors?: string[];
+      firewall_vendors?: string[];
+    };
+    security?: {
+      [key: string]: boolean | string;
+    };
+    device_types?: {
+      [key: string]: number;
+    };
+    user_types?: {
+      [key: string]: number;
+    };
+    [key: string]: any;
+  };
+  notifications_enabled?: boolean;
 }
 
 export const useSites = () => {

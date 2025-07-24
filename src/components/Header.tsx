@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogOut, Users } from "lucide-react";
+import { LogOut, Users, Target, Zap, Building2, FileText, Rocket, BookOpen, BarChart3 } from "lucide-react";
 import portnoxLogo from "@/assets/portnox-logo.png";
 
 const Header = () => {
@@ -10,53 +10,58 @@ const Header = () => {
   const { user, signOut } = useAuth();
 
   const navItems = [
-    { path: "/", label: "Dashboard", icon: "🏠" },
-    { path: "/sites", label: "Sites", icon: "🏢" },
-    { path: "/questionnaires", label: "Scoping", icon: "📋" },
-    { path: "/tracker", label: "Implementation", icon: "⚙️" },
-    { path: "/deployment", label: "Deployment", icon: "🚀" },
-    { path: "/requirements", label: "Library", icon: "📚" },
-    { path: "/reports", label: "Reports", icon: "📊" },
-    { path: "/users", label: "Users", icon: <Users className="h-4 w-4" /> },
+    { path: "/", label: "Command Center", icon: <Target className="h-4 w-4" />, description: "Main Dashboard" },
+    { path: "/sites", label: "Site Management", icon: <Building2 className="h-4 w-4" />, description: "Site Discovery" },
+    { path: "/questionnaires", label: "Scoping Wizard", icon: <FileText className="h-4 w-4" />, description: "Requirements Capture" },
+    { path: "/tracker", label: "POC Tracker", icon: <Zap className="h-4 w-4" />, description: "Implementation Tracking" },
+    { path: "/deployment", label: "Deployment Master", icon: <Rocket className="h-4 w-4" />, description: "Go-Live Management" },
+    { path: "/requirements", label: "Use Case Library", icon: <BookOpen className="h-4 w-4" />, description: "Knowledge Base" },
+    { path: "/reports", label: "Analytics", icon: <BarChart3 className="h-4 w-4" />, description: "Performance Insights" },
+    { path: "/users", label: "Team", icon: <Users className="h-4 w-4" />, description: "User Management" },
   ];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <nav className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-4">
             <img 
               src={portnoxLogo} 
               alt="Portnox" 
-              className="h-8 w-auto"
+              className="h-10 w-auto drop-shadow-lg"
             />
-            <div className="border-l border-border pl-3">
-              <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                NAC Deployment Tracker
-              </span>
-              <div className="text-sm text-muted-foreground">
-                Enterprise Network Access Control Platform
+            <div className="border-l border-border pl-4">
+              <div className="flex items-center space-x-2">
+                <span className="text-2xl font-black bg-gradient-primary bg-clip-text text-transparent">
+                  SCOPE SLAYER
+                </span>
+                <span className="text-sm font-medium text-muted-foreground">•</span>
+                <span className="text-lg font-bold text-foreground">POC TRACKER</span>
+              </div>
+              <div className="text-sm text-muted-foreground font-medium">
+                🎯 USE CASE MAESTRO • Deployment Master Platform
               </div>
             </div>
           </div>
           
-          <div className="hidden lg:flex items-center space-x-6">
+          <div className="hidden lg:flex items-center space-x-1">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                className={`group flex flex-col items-center space-y-1 px-4 py-3 rounded-xl transition-all duration-300 ${
                   location.pathname === item.path
-                    ? "bg-primary/20 text-primary border border-primary/30"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                    ? "bg-gradient-primary text-white shadow-lg transform scale-105"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/80 hover:shadow-md hover:scale-102"
                 }`}
               >
-                {typeof item.icon === 'string' ? (
-                  <span className="text-sm">{item.icon}</span>
-                ) : (
-                  item.icon
-                )}
-                <span className="text-sm font-medium">{item.label}</span>
+                <div className="flex items-center space-x-2">
+                  {item.icon}
+                  <span className="text-xs font-bold tracking-wide">{item.label}</span>
+                </div>
+                <span className="text-xs opacity-70 group-hover:opacity-100 transition-opacity">
+                  {item.description}
+                </span>
               </Link>
             ))}
           </div>
