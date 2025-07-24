@@ -1,9 +1,62 @@
 
+import React, { useState } from 'react';
 import Header from "@/components/Header";
-import PortnoxTracker from "@/components/tracker/PortnoxTracker";
+import TrackerDashboard from '@/components/tracker/TrackerDashboard';
+import { useTrackerData } from '@/hooks/useTrackerData';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from "@/components/ui/badge";
 
 const Tracker = () => {
+  const { sites, stats, milestones, loading, createSite } = useTrackerData();
+
+  const handleCreateSite = () => {
+    createSite({
+      name: `New Site ${sites.length + 1}`,
+      customer: 'New Customer',
+      region: 'North America',
+      country: 'USA',
+      projectManager: 'TBD'
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="pt-20 container mx-auto py-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <Card key={i}>
+                <CardHeader className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-8 w-16" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-3 w-32" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <Skeleton className="h-96 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="pt-20 container mx-auto py-6">
+          <div className="text-center text-muted-foreground">
+            Unable to load tracker data
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -41,11 +94,11 @@ const Tracker = () => {
               {/* Quick Stats */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 max-w-2xl mx-auto">
                 <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-primary">15+</div>
+                  <div className="text-2xl font-bold text-primary">{stats.total_sites}</div>
                   <div className="text-sm text-muted-foreground">Active Projects</div>
                 </div>
                 <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-primary">97%</div>
+                  <div className="text-2xl font-bold text-primary">{Math.round(stats.overall_completion)}%</div>
                   <div className="text-sm text-muted-foreground">Success Rate</div>
                 </div>
                 <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
@@ -60,7 +113,12 @@ const Tracker = () => {
       
       {/* Main Content */}
       <div className="container mx-auto px-6 py-8">
-        <PortnoxTracker />
+        <TrackerDashboard
+          sites={sites}
+          stats={stats}
+          milestones={milestones}
+          onCreateSite={handleCreateSite}
+        />
       </div>
     </div>
   );

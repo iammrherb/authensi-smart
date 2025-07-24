@@ -74,35 +74,40 @@ const Auth = () => {
       <div className="w-full max-w-md mx-auto">
         {/* Header Section */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <img 
-              src={portnoxLogo} 
-              alt="Portnox Logo" 
-              className="h-8 w-auto filter brightness-0 invert"
-            />
-            <span className="text-xl font-bold text-white tracking-wider">
-              portnox™
-            </span>
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="relative">
+              <img 
+                src={portnoxLogo} 
+                alt="Portnox Logo" 
+                className="h-10 w-auto filter brightness-0 invert"
+              />
+            </div>
+            <div className="text-left">
+              <div className="text-2xl font-bold text-white tracking-wider">
+                p<span className="text-cyan-400">o</span>rtnox™
+              </div>
+              <div className="text-right">
+                <span className="text-xl font-bold text-white tracking-[0.3em]">
+                  SCOPE SLAYER
+                </span>
+                <div className="text-xs text-gray-400 tracking-wide mt-1">
+                  POC Tracker • Deployment Master
+                </div>
+              </div>
+            </div>
           </div>
           
-          <h1 className="text-3xl font-bold text-white mb-2 tracking-wider">
-            SCOPE SLAYER
-          </h1>
-          <p className="text-sm text-gray-400 mb-8 tracking-wide">
-            POC Tracker • Deployment Master
-          </p>
-          
-          <div className="mb-6">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Zap className="h-6 w-6 text-cyan-400" />
-              <h2 className="text-2xl font-bold text-cyan-400 tracking-wide">
+          <div className="mb-8">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <Zap className="h-7 w-7 text-cyan-400" />
+              <h2 className="text-3xl font-bold text-cyan-400 tracking-wide">
                 WELCOME BACK,
               </h2>
             </div>
-            <h2 className="text-2xl font-bold text-cyan-400 tracking-wide mb-4">
+            <h2 className="text-3xl font-bold text-cyan-400 tracking-wide mb-6">
               WARRIOR
             </h2>
-            <p className="text-gray-300 text-sm leading-relaxed max-w-sm mx-auto">
+            <p className="text-gray-300 text-base leading-relaxed max-w-md mx-auto">
               Access your command center for POC domination and 
               deployment excellence. Time to slay those scopes and 
               master those use cases.
@@ -181,17 +186,24 @@ const Auth = () => {
             <Label htmlFor="email" className="text-white font-medium">
               Email Address
             </Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="john.doe@company.com"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-              autoComplete="email"
-              className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12"
-            />
+            <div className="relative">
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="john.doe@company.com"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+                autoComplete="email"
+                className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12 pr-10"
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                <div className="w-6 h-6 bg-cyan-400/20 rounded flex items-center justify-center">
+                  <div className="w-2 h-2 bg-cyan-400 rounded"></div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -208,20 +220,25 @@ const Auth = () => {
                 onChange={handleInputChange}
                 required
                 autoComplete={isSignUp ? "new-password" : "current-password"}
-                className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12 pr-12"
+                className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12 pr-20"
               />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-transparent text-cyan-400"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? 
-                  <EyeOff className="h-4 w-4" /> : 
-                  <Eye className="h-4 w-4" />
-                }
-              </Button>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                <div className="w-6 h-6 bg-cyan-400/20 rounded flex items-center justify-center">
+                  <div className="w-2 h-2 bg-cyan-400 rounded"></div>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 hover:bg-transparent text-cyan-400"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? 
+                    <EyeOff className="h-4 w-4" /> : 
+                    <Eye className="h-4 w-4" />
+                  }
+                </Button>
+              </div>
             </div>
           </div>
 
