@@ -220,6 +220,7 @@ export type Database = {
           email: string | null
           first_name: string | null
           id: string
+          is_active: boolean | null
           job_title: string | null
           last_name: string | null
           phone: string | null
@@ -233,6 +234,7 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id: string
+          is_active?: boolean | null
           job_title?: string | null
           last_name?: string | null
           phone?: string | null
@@ -246,6 +248,7 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id?: string
+          is_active?: boolean | null
           job_title?: string | null
           last_name?: string | null
           phone?: string | null
@@ -1325,6 +1328,10 @@ export type Database = {
       can_manage_roles: {
         Args: { _user_id: string; _scope_type?: string; _scope_id?: string }
         Returns: boolean
+      }
+      create_initial_admin: {
+        Args: { _user_id: string }
+        Returns: undefined
       }
       has_role: {
         Args: {

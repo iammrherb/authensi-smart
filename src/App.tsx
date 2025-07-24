@@ -13,6 +13,7 @@ import Designer from "./pages/Designer";
 import Tracker from "./pages/Tracker";
 import Deployment from "./pages/Deployment";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./components/admin/AdminDashboard";
 import Sites from "./pages/Sites";
 import Requirements from "./pages/Requirements";
 import Vendors from "./pages/Vendors";
@@ -38,6 +39,7 @@ const App = () => (
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/admin" element={<AdminDashboard />} />
                   <Route path="/designer" element={<Designer />} />
                   <Route path="/tracker" element={<Tracker />} />
                   <Route path="/deployment" element={<Deployment />} />
