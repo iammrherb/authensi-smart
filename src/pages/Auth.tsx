@@ -102,22 +102,22 @@ const Auth = () => {
           {/* Animated Logo Header */}
           <div className="text-center mb-8">
             <div className="flex flex-col items-center justify-center gap-6 mb-8">
-              <div className="relative p-6 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
+              <div className="relative p-8 bg-white/95 backdrop-blur-sm rounded-3xl border-4 border-white shadow-2xl">
                 <img 
                   src={portnoxLogo} 
                   alt="Portnox Logo" 
-                  className="h-24 w-auto filter brightness-150 contrast-125 drop-shadow-2xl"
+                  className="h-32 w-auto filter brightness-100 contrast-125 drop-shadow-xl"
                 />
               </div>
-              <div className="text-center">
-                <h1 className="text-4xl lg:text-5xl font-black text-white mb-3 tracking-tight">
+              <div className="text-center space-y-2">
+                <h1 className="text-5xl lg:text-6xl font-black text-white mb-4 tracking-tight font-orbitron bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-lg">
                   SCOPE SLAYER
                 </h1>
-                <h2 className="text-xl lg:text-2xl font-bold text-gray-300 mb-2 tracking-wide">
-                  POC Tracker • Deployment Master
+                <h2 className="text-2xl lg:text-3xl font-bold text-yellow-400 mb-2 tracking-wide font-exo drop-shadow-md">
+                  POC TRACKER • DEPLOYMENT MASTER
                 </h2>
-                <p className="text-lg text-gray-400 font-semibold">
-                  🎯 Use Case Maestro 🎯
+                <p className="text-xl text-green-400 font-bold font-exo drop-shadow-md">
+                  🎯 USE CASE MAESTRO 🎯
                 </p>
               </div>
             </div>
@@ -125,13 +125,13 @@ const Auth = () => {
 
           <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-card/95">
             <CardHeader className="space-y-1 text-center pb-4">
-              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
-                {isSignUp ? 'Join the Platform' : 'Welcome Back'}
+              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent font-exo">
+                {isSignUp ? 'Join the Slayer Squad' : 'Welcome Back, Slayer'}
               </CardTitle>
-              <CardDescription className="text-base">
+              <CardDescription className="text-base font-exo">
                 {isSignUp 
-                  ? 'Create your account to access the ultimate Scope Slayer platform for comprehensive POC management and deployment tracking'
-                  : 'Sign in to your Scope Slayer Platform - Your command center for POC management, deployment mastery, and use case excellence'
+                  ? 'Create your account to access the ultimate Scope Slayer platform for comprehensive POC tracking and deployment mastery'
+                  : 'Sign in to your Scope Slayer Platform - Your command center for POC tracking, deployment mastery, and use case excellence'
                 }
               </CardDescription>
             </CardHeader>
@@ -332,7 +332,7 @@ const Auth = () => {
 
           {/* Footer */}
           <div className="mt-8 text-center text-xs text-gray-400">
-            <p className="flex items-center justify-center gap-1">
+            <p className="flex items-center justify-center gap-1 font-exo">
               <Shield className="h-3 w-3" />
               © 2024 Scope Slayer Platform - Ultimate POC Tracker & Deployment Master
             </p>
