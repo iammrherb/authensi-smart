@@ -1,5 +1,5 @@
 import Header from "@/components/Header";
-import UserManagement from "@/components/users/UserManagement";
+import EnhancedUserManagement from "@/components/admin/EnhancedUserManagement";
 import { Badge } from "@/components/ui/badge";
 
 const Users = () => {
@@ -21,7 +21,7 @@ const Users = () => {
             </p>
           </div>
           
-          <UserManagement />
+          <EnhancedUserManagement />
         </div>
       </div>
     </div>

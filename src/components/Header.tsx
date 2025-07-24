@@ -26,70 +26,60 @@ const Header = () => {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
-      <nav className="container mx-auto px-6 py-4">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border">
+      <nav className="container mx-auto px-6 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <img 
               src={portnoxLogo} 
               alt="Portnox" 
-              className="h-10 w-auto drop-shadow-lg"
+              className="h-8 w-auto"
             />
             <div className="border-l border-border pl-4">
               <div className="flex items-center space-x-2">
-                <span className="text-2xl font-black bg-gradient-primary bg-clip-text text-transparent">
+                <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
                   NAC DESIGNER
                 </span>
                 <span className="text-sm font-medium text-muted-foreground">•</span>
-                <span className="text-lg font-bold text-foreground">DEPLOYMENT TRACKER</span>
+                <span className="text-sm font-semibold text-foreground">DEPLOYMENT TRACKER</span>
               </div>
-              <div className="text-sm text-muted-foreground font-medium">
+              <div className="text-xs text-muted-foreground font-medium">
                 🧠 AI-Powered • 🎯 Use Case Maestro • 🚀 Deployment Master
               </div>
             </div>
           </div>
           
-          <div className="hidden lg:flex items-center space-x-1">
+          <div className="hidden lg:flex items-center space-x-2">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`group flex flex-col items-center space-y-1 px-3 py-2 rounded-xl transition-all duration-300 ${
+                className={`group flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   location.pathname === item.path
-                    ? "bg-gradient-primary text-white shadow-lg transform scale-105"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/80 hover:shadow-md hover:scale-102"
+                    ? "bg-gradient-primary text-white shadow-md"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 }`}
               >
-                <div className="flex items-center space-x-1">
-                  {item.icon}
-                  <span className="text-xs font-bold tracking-wide">{item.label}</span>
-                </div>
-                <span className="text-xs opacity-70 group-hover:opacity-100 transition-opacity">
-                  {item.description}
-                </span>
+                {item.icon}
+                <span>{item.label}</span>
               </Link>
             ))}
             
             {/* Admin Items with Separator */}
-            <div className="h-8 w-px bg-border mx-2"></div>
+            <div className="h-6 w-px bg-border mx-2"></div>
             
             {adminItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`group flex flex-col items-center space-y-1 px-3 py-2 rounded-xl transition-all duration-300 ${
+                className={`group flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   location.pathname === item.path
-                    ? "bg-gradient-primary text-white shadow-lg transform scale-105"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/80 hover:shadow-md hover:scale-102"
+                    ? "bg-gradient-primary text-white shadow-md"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 }`}
               >
-                <div className="flex items-center space-x-1">
-                  {item.icon}
-                  <span className="text-xs font-bold tracking-wide">{item.label}</span>
-                </div>
-                <span className="text-xs opacity-70 group-hover:opacity-100 transition-opacity">
-                  {item.description}
-                </span>
+                {item.icon}
+                <span>{item.label}</span>
               </Link>
             ))}
           </div>

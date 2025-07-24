@@ -4,9 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
-import { Shield, Users, Building2, Eye, EyeOff, Network, Lock, Zap, CheckCircle } from 'lucide-react';
+import { Shield, Users, Building2, Eye, EyeOff, Network, Lock, Zap, CheckCircle, Mail, ArrowRight, Sparkles } from 'lucide-react';
 import portnoxLogo from '@/assets/portnox-logo.png';
 
 const Auth = () => {
@@ -70,223 +70,288 @@ const Auth = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md mx-auto">
-        {/* Header Section */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="relative">
-              <img 
-                src={portnoxLogo} 
-                alt="Portnox Logo" 
-                className="h-10 w-auto filter brightness-0 invert"
-              />
-            </div>
-            <div className="text-left">
-              <div className="text-2xl font-bold text-white tracking-wider">
-                p<span className="text-cyan-400">o</span>rtnox™
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5 flex items-center justify-center p-4">
+      <div className="w-full max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 items-center">
+        
+        {/* Left Side - Branding */}
+        <div className="hidden lg:block space-y-8">
+          <div className="flex items-center gap-4">
+            <img 
+              src={portnoxLogo} 
+              alt="Portnox Logo" 
+              className="h-12 w-auto"
+            />
+            <div>
+              <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                NAC DESIGNER
               </div>
-              <div className="text-right">
-                <span className="text-xl font-bold text-white tracking-[0.3em]">
-                  SCOPE SLAYER
-                </span>
-                <div className="text-xs text-gray-400 tracking-wide mt-1">
-                  POC Tracker • Deployment Master
-                </div>
+              <div className="text-sm text-muted-foreground font-medium">
+                Maestro • 🧠 AI-Powered • 🎯 Use Case Maestro • 🚀 Deployment Master
               </div>
             </div>
           </div>
           
-          <div className="mb-8">
-            <div className="flex items-center justify-center gap-3 mb-2">
-              <Zap className="h-7 w-7 text-cyan-400" />
-              <h2 className="text-3xl font-bold text-cyan-400 tracking-wide">
-                WELCOME BACK,
-              </h2>
-            </div>
-            <h2 className="text-3xl font-bold text-cyan-400 tracking-wide mb-6">
-              WARRIOR
-            </h2>
-            <p className="text-gray-300 text-base leading-relaxed max-w-md mx-auto">
-              Access your command center for POC domination and 
-              deployment excellence. Time to slay those scopes and 
-              master those use cases.
+          <div className="space-y-6">
+            <h1 className="text-4xl font-bold leading-tight">
+              Welcome to the Ultimate
+              <span className="bg-gradient-primary bg-clip-text text-transparent block">
+                NAC Implementation Platform
+              </span>
+            </h1>
+            
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Transform complex NAC deployments into manageable, repeatable successes with 
+              AI-powered scoping, comprehensive use case library, and intelligent tracking.
             </p>
-          </div>
-        </div>
-
-        {/* Auth Tabs */}
-        <div className="mb-6">
-          <div className="flex bg-slate-800 rounded-lg p-1 mb-6">
-            <button
-              type="button"
-              onClick={() => setIsSignUp(false)}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-md text-sm font-medium transition-colors ${
-                !isSignUp 
-                  ? 'bg-slate-700 text-white' 
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              <Users className="h-4 w-4" />
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsSignUp(true)}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-md text-sm font-medium transition-colors ${
-                isSignUp 
-                  ? 'bg-slate-700 text-white' 
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              <Building2 className="h-4 w-4" />
-              Sign Up
-            </button>
-          </div>
-        </div>
-
-        {/* Auth Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {isSignUp && (
+            
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName" className="text-sm font-medium text-gray-300">
-                  First Name
-                </Label>
-                <Input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  placeholder="John"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  required={isSignUp}
-                  className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12"
-                />
+              <div className="flex items-center gap-3 p-4 rounded-lg bg-primary/5 border border-primary/10">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <span className="text-sm font-medium">AI-Powered Scoping</span>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName" className="text-sm font-medium text-gray-300">
-                  Last Name
-                </Label>
-                <Input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  placeholder="Doe"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  required={isSignUp}
-                  className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12"
-                />
+              <div className="flex items-center gap-3 p-4 rounded-lg bg-accent/5 border border-accent/10">
+                <Network className="h-5 w-5 text-accent" />
+                <span className="text-sm font-medium">200+ Use Cases</span>
               </div>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-white font-medium">
-              Email Address
-            </Label>
-            <div className="relative">
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="john.doe@company.com"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                autoComplete="email"
-                className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12 pr-10"
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                <div className="w-6 h-6 bg-cyan-400/20 rounded flex items-center justify-center">
-                  <div className="w-2 h-2 bg-cyan-400 rounded"></div>
-                </div>
+              <div className="flex items-center gap-3 p-4 rounded-lg bg-green-500/5 border border-green-500/10">
+                <Shield className="h-5 w-5 text-green-500" />
+                <span className="text-sm font-medium">Enterprise Security</span>
+              </div>
+              <div className="flex items-center gap-3 p-4 rounded-lg bg-blue-500/5 border border-blue-500/10">
+                <CheckCircle className="h-5 w-5 text-blue-500" />
+                <span className="text-sm font-medium">Deployment Tracking</span>
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-white font-medium">
-              Password
-            </Label>
-            <div className="relative">
-              <Input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your secure password"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-                autoComplete={isSignUp ? "new-password" : "current-password"}
-                className="bg-slate-800 border-slate-700 text-white placeholder:text-gray-500 h-12 pr-20"
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                <div className="w-6 h-6 bg-cyan-400/20 rounded flex items-center justify-center">
-                  <div className="w-2 h-2 bg-cyan-400 rounded"></div>
+        {/* Right Side - Auth Form */}
+        <div className="w-full max-w-md mx-auto lg:mx-0">
+          <Card className="shadow-2xl border-0 bg-card/50 backdrop-blur">
+            <CardHeader className="space-y-6 pb-8">
+              <div className="text-center lg:hidden">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <img src={portnoxLogo} alt="Portnox" className="h-8 w-auto" />
+                  <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                    NAC DESIGNER
+                  </span>
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0 hover:bg-transparent text-cyan-400"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? 
-                    <EyeOff className="h-4 w-4" /> : 
-                    <Eye className="h-4 w-4" />
+              </div>
+              
+              <div className="text-center">
+                <h2 className="text-2xl font-bold">{isSignUp ? 'Create Account' : 'Welcome Back'}</h2>
+                <p className="text-muted-foreground mt-2">
+                  {isSignUp 
+                    ? 'Join the NAC implementation revolution' 
+                    : 'Access your deployment command center'
                   }
+                </p>
+              </div>
+
+              {/* Auth Method Tabs */}
+              <div className="flex bg-muted rounded-lg p-1">
+                <button
+                  type="button"
+                  onClick={() => setIsSignUp(false)}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                    !isSignUp 
+                      ? 'bg-background text-foreground shadow-sm' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Users className="h-4 w-4" />
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsSignUp(true)}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                    isSignUp 
+                      ? 'bg-background text-foreground shadow-sm' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Building2 className="h-4 w-4" />
+                  Sign Up
+                </button>
+              </div>
+            </CardHeader>
+
+            <CardContent className="space-y-6">
+              
+              {/* Quick Auth Options */}
+              <div className="space-y-3">
+                <Button 
+                  variant="outline" 
+                  className="w-full h-11 relative overflow-hidden group hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-blue-600/10 border-blue-200 hover:border-blue-400 transition-all"
+                  onClick={() => {/* TODO: Implement Azure auth */}}
+                >
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="w-5 h-5 bg-gradient-to-r from-blue-500 to-blue-600 rounded"></div>
+                    <span className="font-medium">Continue with Microsoft Azure</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4 absolute right-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  className="w-full h-11 relative overflow-hidden group hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/20 border-primary/20 hover:border-primary/40 transition-all"
+                  onClick={() => {/* TODO: Implement Magic Link */}}
+                >
+                  <div className="flex items-center justify-center gap-3">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    <span className="font-medium">Magic Link (Passwordless)</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4 absolute right-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
-            </div>
-          </div>
 
-          <Button 
-            type="submit" 
-            className="w-full h-12 bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-bold text-lg transition-colors"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <div className="flex items-center gap-3">
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-current border-t-transparent"></div>
-                {isSignUp ? 'Creating Account...' : 'Signing In...'}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <Separator className="w-full" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">Or continue with email</span>
+                </div>
               </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                <Zap className="h-4 w-4" />
-                DEPLOY SECURE ACCESS
-              </div>
-            )}
-          </Button>
-        </form>
 
-        {/* Footer Link */}
-        <div className="mt-6 text-center text-sm">
-          {!isSignUp ? (
-            <p className="text-gray-400">
-              Don't have an account?{' '}
-              <button 
-                type="button"
-                className="text-cyan-400 hover:text-cyan-300 font-medium"
-                onClick={() => setIsSignUp(true)}
-              >
-                Create one now
-              </button>
-            </p>
-          ) : (
-            <p className="text-gray-400">
-              Already have an account?{' '}
-              <button 
-                type="button"
-                className="text-cyan-400 hover:text-cyan-300 font-medium"
-                onClick={() => setIsSignUp(false)}
-              >
-                Sign in instead
-              </button>
-            </p>
-          )}
+              {/* Email/Password Form */}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {isSignUp && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName" className="text-sm font-medium">
+                        First Name
+                      </Label>
+                      <Input
+                        id="firstName"
+                        name="firstName"
+                        type="text"
+                        placeholder="John"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        required={isSignUp}
+                        className="h-10"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName" className="text-sm font-medium">
+                        Last Name
+                      </Label>
+                      <Input
+                        id="lastName"
+                        name="lastName"
+                        type="text"
+                        placeholder="Doe"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        required={isSignUp}
+                        className="h-10"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-medium">
+                    Email Address
+                  </Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="john.doe@company.com"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      autoComplete="email"
+                      className="pl-10 h-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-sm font-medium">
+                    Password
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      required
+                      autoComplete={isSignUp ? "new-password" : "current-password"}
+                      className="pl-10 pr-10 h-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-10 px-3 hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? 
+                        <EyeOff className="h-4 w-4 text-muted-foreground" /> : 
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      }
+                    </Button>
+                  </div>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 bg-gradient-primary hover:opacity-90 text-white font-semibold transition-all shadow-lg hover:shadow-xl"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent"></div>
+                      {isSignUp ? 'Creating Account...' : 'Signing In...'}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      {isSignUp ? 'Create Account' : 'Sign In'}
+                      <ArrowRight className="h-4 w-4" />
+                    </div>
+                  )}
+                </Button>
+              </form>
+
+              {/* Footer Link */}
+              <div className="text-center text-sm">
+                {!isSignUp ? (
+                  <p className="text-muted-foreground">
+                    Don't have an account?{' '}
+                    <button 
+                      type="button"
+                      className="text-primary hover:underline font-medium"
+                      onClick={() => setIsSignUp(true)}
+                    >
+                      Sign up
+                    </button>
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground">
+                    Already have an account?{' '}
+                    <button 
+                      type="button"
+                      className="text-primary hover:underline font-medium"
+                      onClick={() => setIsSignUp(false)}
+                    >
+                      Sign in
+                    </button>
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

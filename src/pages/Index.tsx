@@ -102,99 +102,83 @@ const Index = () => {
       <div className="pt-20">
         <div className="container mx-auto px-6 py-8">
           <div className="space-y-6">
-            {/* Hero Section */}
-            <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 p-8 border border-border/50">
-              <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-4">
-                  <Activity className="h-8 w-8 text-primary" />
-                  <Badge variant="glow">Live Dashboard</Badge>
-                </div>
-                <h2 className="text-3xl font-bold mb-2">
-                  Portnox NAC Designer & Deployment Tracker
-                </h2>
-                <p className="text-muted-foreground text-lg mb-6 max-w-2xl">
-                  AI-powered NAC implementation platform with intelligent scoping, comprehensive use case library, 
-                  and advanced project tracking. Transform complex deployments into repeatable successes.
-                </p>
-                <div className="flex gap-3">
-                  <Button asChild size="lg" className="shadow-lg">
-                    <Link to="/scoping">
-                      <Plus className="h-4 w-4 mr-2" />
-                      AI-Powered Scoping
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="lg" asChild>
-                    <Link to="/use-cases">
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      Use Case Library
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="lg" asChild>
-                    <Link to="/sites">
-                      <Building2 className="h-4 w-4 mr-2" />
-                      Manage Sites
-                    </Link>
-                  </Button>
-                </div>
-              </div>
+            {/* Hero Section - Clean Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                Portnox NAC Designer & Deployment Tracker
+              </h1>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+                AI-powered NAC implementation platform with intelligent scoping, 
+                comprehensive use case library, and advanced project tracking. Transform 
+                complex deployments into repeatable successes.
+              </p>
               
-              {/* Background decoration */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5 opacity-50"></div>
-              <div className="absolute top-4 right-4 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
-              <div className="absolute bottom-4 left-4 w-24 h-24 bg-accent/10 rounded-full blur-2xl"></div>
+              {/* Quick Action Buttons */}
+              <div className="flex flex-wrap justify-center gap-3 mb-8">
+                <Button asChild size="lg" className="bg-gradient-primary hover:opacity-90 shadow-lg">
+                  <Link to="/scoping">
+                    <Plus className="h-4 w-4 mr-2" />
+                    AI-Powered Scoping
+                  </Link>
+                </Button>
+                <Button variant="outline" size="lg" asChild>
+                  <Link to="/use-cases">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Use Case Library
+                  </Link>
+                </Button>
+                <Button variant="outline" size="lg" asChild>
+                  <Link to="/sites">
+                    <Building2 className="h-4 w-4 mr-2" />
+                    Manage Sites
+                  </Link>
+                </Button>
+              </div>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary">
+            {/* Stats Grid - Matching Image Design */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <Card className="border-l-4 border-l-cyan-500 hover:shadow-lg transition-all duration-300">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Sites</CardTitle>
-                  <Building2 className="h-4 w-4 text-primary" />
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Sites</CardTitle>
+                  <Building2 className="h-4 w-4 text-cyan-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalSites}</div>
-                  <p className="text-xs text-muted-foreground">
-                    Across all locations
-                  </p>
+                  <div className="text-3xl font-bold text-foreground">{stats.totalSites}</div>
+                  <p className="text-xs text-muted-foreground">Across all locations</p>
                 </CardContent>
               </Card>
 
-              <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-accent">
+              <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-all duration-300">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-                  <Zap className="h-4 w-4 text-accent" />
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Active Projects</CardTitle>
+                  <Zap className="h-4 w-4 text-blue-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalProjects}</div>
-                  <p className="text-xs text-muted-foreground">
-                    In various phases
-                  </p>
+                  <div className="text-3xl font-bold text-foreground">{stats.totalProjects}</div>
+                  <p className="text-xs text-muted-foreground">In various phases</p>
                 </CardContent>
               </Card>
 
-              <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-blue-500">
+              <Card className="border-l-4 border-l-purple-500 hover:shadow-lg transition-all duration-300">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Questionnaires</CardTitle>
-                  <FileText className="h-4 w-4 text-blue-500" />
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Questionnaires</CardTitle>
+                  <FileText className="h-4 w-4 text-purple-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.activeQuestionnaires}</div>
-                  <p className="text-xs text-muted-foreground">
-                    Currently active
-                  </p>
+                  <div className="text-3xl font-bold text-foreground">{stats.activeQuestionnaires}</div>
+                  <p className="text-xs text-muted-foreground">Currently active</p>
                 </CardContent>
               </Card>
 
-              <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-green-500">
+              <Card className="border-l-4 border-l-green-500 hover:shadow-lg transition-all duration-300">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Completed</CardTitle>
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Completed</CardTitle>
                   <CheckCircle className="h-4 w-4 text-green-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.completedDeployments}</div>
-                  <p className="text-xs text-muted-foreground">
-                    Successful deployments
-                  </p>
+                  <div className="text-3xl font-bold text-foreground">{stats.completedDeployments}</div>
+                  <p className="text-xs text-muted-foreground">Successful deployments</p>
                 </CardContent>
               </Card>
             </div>
