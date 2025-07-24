@@ -2,34 +2,41 @@
 import { Button } from "@/components/ui/button";
 import { useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogOut } from "lucide-react";
+import { LogOut, Users } from "lucide-react";
+import portnoxLogo from "@/assets/portnox-logo.png";
 
 const Header = () => {
   const location = useLocation();
   const { user, signOut } = useAuth();
 
   const navItems = [
+    { path: "/", label: "Dashboard", icon: "🏠" },
     { path: "/sites", label: "Sites", icon: "🏢" },
-    { path: "/", label: "Progress", icon: "📈" },
-    { path: "/deployment", label: "Deployment", icon: "🚀" },
-    { path: "/tracker", label: "Implementation", icon: "⚙️" },
     { path: "/questionnaires", label: "Scoping", icon: "📋" },
+    { path: "/tracker", label: "Implementation", icon: "⚙️" },
+    { path: "/deployment", label: "Deployment", icon: "🚀" },
     { path: "/requirements", label: "Library", icon: "📚" },
     { path: "/reports", label: "Reports", icon: "📊" },
-    { path: "/settings", label: "Settings", icon: "⚙️" },
+    { path: "/users", label: "Users", icon: <Users className="h-4 w-4" /> },
   ];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <nav className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">P</span>
-            </div>
-            <div>
-              <span className="text-xl font-bold text-foreground">Master Site Deployment Plan</span>
-              <span className="text-sm text-muted-foreground ml-2">Deployment & Use Case Tracker</span>
+          <div className="flex items-center space-x-3">
+            <img 
+              src={portnoxLogo} 
+              alt="Portnox" 
+              className="h-8 w-auto"
+            />
+            <div className="border-l border-border pl-3">
+              <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                NAC Deployment Tracker
+              </span>
+              <div className="text-sm text-muted-foreground">
+                Enterprise Network Access Control Platform
+              </div>
             </div>
           </div>
           
@@ -40,11 +47,15 @@ const Header = () => {
                 to={item.path}
                 className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${
                   location.pathname === item.path
-                    ? "bg-primary/20 text-primary"
+                    ? "bg-primary/20 text-primary border border-primary/30"
                     : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 }`}
               >
-                <span className="text-sm">{item.icon}</span>
+                {typeof item.icon === 'string' ? (
+                  <span className="text-sm">{item.icon}</span>
+                ) : (
+                  item.icon
+                )}
                 <span className="text-sm font-medium">{item.label}</span>
               </Link>
             ))}

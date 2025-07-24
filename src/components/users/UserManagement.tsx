@@ -10,6 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useUserRoles, useAssignRole, useRemoveRole, useCanManageRoles, type AppRole, type ScopeType } from "@/hooks/useUserRoles";
 import { Plus, Trash2, Search, Users, Shield } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UserManagementProps {
   scopeType?: ScopeType;
@@ -58,20 +59,31 @@ const UserManagement = ({ scopeType = 'global', scopeId, scopeName }: UserManage
   const handleAssignRole = async () => {
     if (!newUserEmail || !newUserRole) return;
 
-    // Note: In a real implementation, you'd need to resolve email to user_id
-    // For now, we'll assume the email IS the user_id (which won't work in practice)
-    // You'd typically have a user lookup service or invite system
-    
-    await assignRole.mutateAsync({
-      user_id: newUserEmail, // This should be actual user ID
-      role: newUserRole,
-      scope_type: scopeType,
-      scope_id: scopeId
-    });
+    try {
+      // Create a user lookup from profiles table by email
+      const { data: userProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', newUserEmail)
+        .single();
 
-    setNewUserEmail('');
-    setNewUserRole('viewer');
-    setShowAssignDialog(false);
+      if (profileError || !userProfile) {
+        throw new Error('User not found. Please ensure the user has an account.');
+      }
+
+      await assignRole.mutateAsync({
+        user_id: userProfile.id,
+        role: newUserRole,
+        scope_type: scopeType,
+        scope_id: scopeId
+      });
+
+      setNewUserEmail('');
+      setNewUserRole('viewer');
+      setShowAssignDialog(false);
+    } catch (error) {
+      console.error('Error assigning role:', error);
+    }
   };
 
   const filteredRoles = userRoles?.filter(role => 
