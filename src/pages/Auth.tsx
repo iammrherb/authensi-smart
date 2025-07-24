@@ -70,77 +70,71 @@ const Auth = () => {
   ];
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-full h-full opacity-20">
-            <div className="absolute top-20 left-20 w-32 h-32 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl animate-float"></div>
-            <div className="absolute top-40 right-20 w-32 h-32 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl animate-float animation-delay-2000"></div>
-            <div className="absolute bottom-20 left-40 w-32 h-32 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl animate-float animation-delay-4000"></div>
-          </div>
-          
-          {/* Grid pattern */}
-          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-transparent">
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
-          </div>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900">
+      {/* Animated Data Center Background */}
+      <div className="absolute inset-0">
+        {/* Server racks pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_2px,transparent_2px),linear-gradient(90deg,rgba(255,255,255,0.05)_2px,transparent_2px)] bg-[size:80px_80px]"></div>
         </div>
         
-        <div className="relative z-10 flex flex-col justify-center items-center text-center p-12 w-full">
-          {/* Logo and branding */}
-          <div className="mb-8 animate-slide-up">
-            <div className="flex items-center justify-center mb-6">
-              <img 
-                src={portnoxLogo} 
-                alt="Portnox Logo" 
-                className="h-16 w-auto filter brightness-0 invert opacity-90"
-              />
-            </div>
-            <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
-              Portnox ZTAC
-              <span className="block text-3xl bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Ultimate Platform
-              </span>
-            </h1>
-            <p className="text-lg text-blue-100 mb-8 max-w-md leading-relaxed">
-              The premier Zero Trust Access Control platform for enterprise scoping, 
-              POC orchestration, deployment tracking, and comprehensive implementation management.
-            </p>
-          </div>
-
-          {/* Feature highlights */}
-          <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
-            {features.map((feature, index) => (
-              <div 
-                key={index}
-                className="flex flex-col items-center p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 animate-fade-in hover:bg-white/15 transition-all duration-300"
-                style={{ animationDelay: `${index * 150}ms` }}
-              >
-                <feature.icon className={`h-6 w-6 ${feature.color} mb-2`} />
-                <span className="text-white text-sm font-medium text-center">{feature.text}</span>
-              </div>
-            ))}
-          </div>
+        {/* Animated Dragons */}
+        <div className="absolute top-20 left-10 w-16 h-16 text-purple-400 animate-bounce opacity-60">
+          🐉
         </div>
+        <div className="absolute top-40 right-20 w-12 h-12 text-purple-300 animate-pulse opacity-50" style={{ animationDelay: '1s' }}>
+          🐲
+        </div>
+        
+        {/* Animated Unicorns */}
+        <div className="absolute bottom-32 left-16 w-14 h-14 text-pink-400 animate-bounce opacity-60" style={{ animationDelay: '0.5s' }}>
+          🦄
+        </div>
+        <div className="absolute bottom-20 right-32 w-12 h-12 text-purple-200 animate-pulse opacity-50" style={{ animationDelay: '2s' }}>
+          🦄
+        </div>
+        
+        {/* Floating server icons */}
+        <div className="absolute top-32 left-1/4 w-8 h-8 text-blue-400 animate-float opacity-40">
+          🖥️
+        </div>
+        <div className="absolute bottom-40 right-1/4 w-6 h-6 text-green-400 animate-float opacity-40" style={{ animationDelay: '1.5s' }}>
+          💾
+        </div>
+        <div className="absolute top-1/2 left-12 w-6 h-6 text-cyan-400 animate-pulse opacity-30">
+          ⚡
+        </div>
+        
+        {/* Glowing orbs */}
+        <div className="absolute top-16 right-16 w-24 h-24 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl animate-float opacity-30"></div>
+        <div className="absolute bottom-24 left-1/3 w-32 h-32 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl animate-float opacity-20" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-2/3 right-1/3 w-20 h-20 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl animate-float opacity-25" style={{ animationDelay: '3s' }}></div>
       </div>
 
-      {/* Right Side - Auth Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-8">
+      {/* Main Auth Container */}
+      <div className="relative z-10 w-full max-w-md p-8">
         <div className="w-full max-w-md">
-          {/* Mobile logo */}
-          <div className="lg:hidden text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <img 
-                src={portnoxLogo} 
-                alt="Portnox Logo" 
-                className="h-12 w-auto"
-              />
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">
-                  Portnox ZTAC Ultimate
+          {/* Animated Logo Header */}
+          <div className="text-center mb-8">
+            <div className="flex flex-col items-center justify-center gap-4 mb-6">
+              <div className="relative">
+                <img 
+                  src={portnoxLogo} 
+                  alt="Portnox Logo" 
+                  className="h-16 w-auto animate-pulse hover:animate-bounce transition-all duration-300 filter drop-shadow-lg"
+                />
+                <div className="absolute -inset-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-20 animate-ping"></div>
+              </div>
+              <div className="text-center">
+                <h1 className="text-3xl lg:text-4xl font-black text-white mb-2 animate-fade-in bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent">
+                  PORTNOX ZTAC
                 </h1>
-                <p className="text-sm text-muted-foreground">Enterprise NAC Platform</p>
+                <h2 className="text-xl lg:text-2xl font-bold text-purple-200 mb-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                  Ultimate Platform
+                </h2>
+                <p className="text-sm text-purple-300 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                  🚀 POC Tracker & Deployment Manager 🚀
+                </p>
               </div>
             </div>
           </div>
@@ -299,8 +293,8 @@ const Auth = () => {
           </Card>
 
           {/* Footer */}
-          <div className="mt-8 text-center text-xs text-muted-foreground">
-            <p className="flex items-center justify-center gap-1">
+          <div className="mt-8 text-center text-xs text-purple-300">
+            <p className="flex items-center justify-center gap-1 animate-fade-in" style={{ animationDelay: '0.6s' }}>
               <Shield className="h-3 w-3" />
               © 2024 Portnox ZTAC Ultimate Platform - Enterprise Zero Trust Access Control
             </p>
