@@ -8,8 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { Shield, Users, Building2, Eye, EyeOff, Network, Lock, Zap, CheckCircle, Mail, HelpCircle } from 'lucide-react';
 import portnoxLogo from '@/assets/portnox-logo.png';
-import dragonImage from '@/assets/dragon-datacenter.png';
-import unicornImage from '@/assets/unicorn-datacenter.png';
 
 const Auth = () => {
   const { user, signIn, signUp, loading } = useAuth();
@@ -80,45 +78,24 @@ const Auth = () => {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900">
-      {/* Animated Data Center Background */}
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950">
+      {/* Modern Geometric Background */}
       <div className="absolute inset-0">
-        {/* Server racks pattern */}
+        {/* Grid pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_2px,transparent_2px),linear-gradient(90deg,rgba(255,255,255,0.05)_2px,transparent_2px)] bg-[size:80px_80px]"></div>
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.1)_1px,transparent_1px)] bg-[size:100px_100px]"></div>
         </div>
         
-        {/* Animated Dragons */}
-        <div className="absolute top-20 left-10 w-24 h-16 opacity-70 animate-float">
-          <img src={dragonImage} alt="Dragon" className="w-full h-full object-contain" />
-        </div>
-        <div className="absolute top-40 right-20 w-20 h-14 opacity-60 animate-bounce" style={{ animationDelay: '1s' }}>
-          <img src={dragonImage} alt="Dragon" className="w-full h-full object-contain transform scale-x-[-1]" />
-        </div>
+        {/* Modern geometric shapes */}
+        <div className="absolute top-20 left-20 w-32 h-32 bg-blue-500/20 rounded-2xl transform rotate-45"></div>
+        <div className="absolute bottom-32 right-24 w-24 h-24 bg-purple-500/20 rounded-full"></div>
+        <div className="absolute top-1/2 left-12 w-16 h-16 bg-indigo-500/30 rounded-lg transform rotate-12"></div>
+        <div className="absolute bottom-20 left-1/3 w-20 h-20 bg-cyan-500/20 rounded-2xl transform -rotate-12"></div>
         
-        {/* Animated Unicorns */}
-        <div className="absolute bottom-32 left-16 w-22 h-16 opacity-70 animate-bounce" style={{ animationDelay: '0.5s' }}>
-          <img src={unicornImage} alt="Unicorn" className="w-full h-full object-contain" />
-        </div>
-        <div className="absolute bottom-20 right-32 w-20 h-14 opacity-60 animate-float" style={{ animationDelay: '2s' }}>
-          <img src={unicornImage} alt="Unicorn" className="w-full h-full object-contain transform scale-x-[-1]" />
-        </div>
-        
-        {/* Floating server icons */}
-        <div className="absolute top-32 left-1/4 w-8 h-8 text-blue-400 animate-float opacity-40">
-          🖥️
-        </div>
-        <div className="absolute bottom-40 right-1/4 w-6 h-6 text-green-400 animate-float opacity-40" style={{ animationDelay: '1.5s' }}>
-          💾
-        </div>
-        <div className="absolute top-1/2 left-12 w-6 h-6 text-cyan-400 animate-pulse opacity-30">
-          ⚡
-        </div>
-        
-        {/* Glowing orbs */}
-        <div className="absolute top-16 right-16 w-24 h-24 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl animate-float opacity-30"></div>
-        <div className="absolute bottom-24 left-1/3 w-32 h-32 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl animate-float opacity-20" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-2/3 right-1/3 w-20 h-20 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl animate-float opacity-25" style={{ animationDelay: '3s' }}></div>
+        {/* Gradient orbs */}
+        <div className="absolute top-16 right-16 w-40 h-40 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-24 left-1/4 w-48 h-48 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-2/3 right-1/3 w-32 h-32 bg-gradient-to-r from-indigo-500/25 to-cyan-500/25 rounded-full blur-xl"></div>
       </div>
 
       {/* Main Auth Container */}
@@ -131,33 +108,32 @@ const Auth = () => {
                 <img 
                   src={portnoxLogo} 
                   alt="Portnox Logo" 
-                  className="h-16 w-auto font-black animate-pulse hover:animate-bounce transition-all duration-300 filter drop-shadow-2xl brightness-110"
+                  className="h-20 w-auto font-black filter drop-shadow-2xl brightness-110 contrast-125"
                 />
-                <div className="absolute -inset-3 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-25 animate-ping"></div>
               </div>
               <div className="text-center">
-                <h1 className="text-3xl lg:text-4xl font-black text-white mb-2 animate-fade-in bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent">
-                  SCOPE SLAYER
+                <h1 className="text-4xl lg:text-5xl font-black text-white mb-3 bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent tracking-tight">
+                  PORTNOX
                 </h1>
-                <h2 className="text-xl lg:text-2xl font-bold text-purple-200 mb-1 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                  POC Tracker • Deployment Master
+                <h2 className="text-2xl lg:text-3xl font-bold text-blue-200 mb-2 tracking-wide">
+                  ZTAC Platform
                 </h2>
-                <p className="text-base text-purple-300 animate-fade-in font-semibold" style={{ animationDelay: '0.4s' }}>
-                  🎯 Use Case Maestro 🎯
+                <p className="text-lg text-blue-300 font-semibold">
+                  Zero Trust Access Control
                 </p>
               </div>
             </div>
           </div>
 
-          <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-card/95 animate-scale-in">
+          <Card className="shadow-2xl border-border/50 backdrop-blur-sm bg-card/95">
             <CardHeader className="space-y-1 text-center pb-4">
               <CardTitle className="text-3xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
-                {isSignUp ? 'Join the Platform' : 'Welcome Back'}
+                {isSignUp ? 'Join Portnox Platform' : 'Welcome Back'}
               </CardTitle>
               <CardDescription className="text-base">
                 {isSignUp 
-                  ? 'Create your account to access the ultimate Portnox ZTAC platform for comprehensive POC management and deployment tracking'
-                  : 'Sign in to your Portnox ZTAC Ultimate Platform - Your command center for scoping, POC management, and deployment excellence'
+                  ? 'Create your account to access the Portnox ZTAC platform for comprehensive POC management and deployment tracking'
+                  : 'Sign in to your Portnox ZTAC Platform - Your command center for zero trust access control deployment excellence'
                 }
               </CardDescription>
             </CardHeader>
@@ -357,10 +333,10 @@ const Auth = () => {
           </Card>
 
           {/* Footer */}
-          <div className="mt-8 text-center text-xs text-purple-300">
-            <p className="flex items-center justify-center gap-1 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+          <div className="mt-8 text-center text-xs text-blue-300">
+            <p className="flex items-center justify-center gap-1">
               <Shield className="h-3 w-3" />
-              © 2024 Portnox ZTAC Ultimate Platform - Enterprise Zero Trust Access Control
+              © 2024 Portnox ZTAC Platform - Enterprise Zero Trust Access Control
             </p>
           </div>
         </div>
