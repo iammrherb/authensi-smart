@@ -33,67 +33,40 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
-            <Route path="/" element={
+            <Route path="/*" element={
               <ProtectedRoute>
-                <Index />
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/designer" element={<Designer />} />
+                  <Route path="/tracker" element={<Tracker />} />
+                  <Route path="/deployment" element={<Deployment />} />
+                  <Route path="/sites" element={<Sites />} />
+                  <Route path="/questionnaires" element={<Questionnaires />} />
+                  <Route path="/requirements" element={<Requirements />} />
+                  <Route path="/reports" element={<Reports />} />
+                  
+                  {/* Admin Routes */}
+                  <Route path="/vendors" element={
+                    <ProtectedRoute requiredRoles={['admin', 'project_owner']}>
+                      <Vendors />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/users" element={
+                    <ProtectedRoute requiredRoles={['admin', 'project_owner']}>
+                      <Users />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/settings" element={
+                    <ProtectedRoute requiredRoles={['admin', 'project_owner']}>
+                      <Settings />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
               </ProtectedRoute>
             } />
-            <Route path="/designer" element={
-              <ProtectedRoute>
-                <Designer />
-              </ProtectedRoute>
-            } />
-            <Route path="/tracker" element={
-              <ProtectedRoute>
-                <Tracker />
-              </ProtectedRoute>
-            } />
-            <Route path="/deployment" element={
-              <ProtectedRoute>
-                <Deployment />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/sites" element={
-              <ProtectedRoute>
-                <Sites />
-              </ProtectedRoute>
-            } />
-            <Route path="/questionnaires" element={
-              <ProtectedRoute>
-                <Questionnaires />
-              </ProtectedRoute>
-            } />
-            <Route path="/vendors" element={
-              <ProtectedRoute>
-                <Vendors />
-              </ProtectedRoute>
-            } />
-            <Route path="/requirements" element={
-              <ProtectedRoute>
-                <Requirements />
-              </ProtectedRoute>
-            } />
-            <Route path="/users" element={
-              <ProtectedRoute>
-                <Users />
-              </ProtectedRoute>
-            } />
-            <Route path="/reports" element={
-              <ProtectedRoute>
-                <Reports />
-              </ProtectedRoute>
-            } />
-            <Route path="/settings" element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            } />
-            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
