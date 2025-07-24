@@ -1,5 +1,5 @@
 import Header from "@/components/Header";
-import VendorManagement from "@/components/vendors/VendorManagement";
+import EnhancedVendorManagement from "@/components/vendors/EnhancedVendorManagement";
 import { Badge } from "@/components/ui/badge";
 
 const Vendors = () => {
@@ -21,7 +21,7 @@ const Vendors = () => {
             </p>
           </div>
           
-          <VendorManagement />
+          <EnhancedVendorManagement />
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@ import { Plus, Search, LayoutGrid, Table, Upload, Filter } from "lucide-react";
 import { useSites, useCreateSite, useUpdateSite, useDeleteSite, Site } from "@/hooks/useSites";
 import SiteCard from "@/components/sites/SiteCard";
 import SitesTable from "@/components/sites/SitesTable";
-import SiteForm from "@/components/sites/SiteForm";
+import EnhancedSiteForm from "@/components/sites/EnhancedSiteForm";
 import SiteDetailsDialog from "@/components/sites/SiteDetailsDialog";
 import BulkSiteCreator from "@/components/sites/BulkSiteCreator";
 
@@ -259,7 +259,7 @@ const Sites = () => {
         </div>
       </div>
 
-      <SiteForm
+      <EnhancedSiteForm
         isOpen={isFormOpen}
         onClose={() => {
           setIsFormOpen(false);
