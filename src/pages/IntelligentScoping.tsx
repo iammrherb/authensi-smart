@@ -1,6 +1,6 @@
 import React from 'react';
 import Header from '@/components/Header';
-import IntelligentScopingWizard from '@/components/scoping/IntelligentScopingWizard';
+import ComprehensiveAIScopingWizard from '@/components/scoping/ComprehensiveAIScopingWizard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Brain, Target, Zap, CheckCircle } from 'lucide-react';
@@ -79,8 +79,8 @@ const IntelligentScoping = () => {
               ))}
             </div>
 
-            {/* Scoping Wizard */}
-            <IntelligentScopingWizard 
+            {/* Comprehensive Scoping Wizard */}
+            <ComprehensiveAIScopingWizard 
               onComplete={handleScopingComplete}
               onCancel={handleCancel}
             />
