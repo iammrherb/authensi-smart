@@ -15,8 +15,11 @@ import {
 import { Link } from 'react-router-dom';
 import { useProjects } from '@/hooks/useProjects';
 import { useSites } from '@/hooks/useSites';
+import { useToast } from '@/hooks/use-toast';
 import EnhancedProjectCreationWizard from '@/components/comprehensive/EnhancedProjectCreationWizard';
 import AnalyticsDashboard from '@/components/tracker/AnalyticsDashboard';
+import AIWorkflowEngine from '@/components/ai/AIWorkflowEngine';
+import SmartProjectDashboard from '@/components/ai/SmartProjectDashboard';
 
 const CommandCenter = () => {
   const { data: projects = [], isLoading: projectsLoading } = useProjects();
@@ -24,6 +27,7 @@ const CommandCenter = () => {
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const { toast } = useToast();
 
   // Analytics calculations
   const analytics = {
@@ -178,8 +182,9 @@ const CommandCenter = () => {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="projects" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="projects">Project Overview</TabsTrigger>
+          <TabsTrigger value="ai-workflow">AI Workflow</TabsTrigger>
           <TabsTrigger value="analytics">Analytics Dashboard</TabsTrigger>
           <TabsTrigger value="pipeline">Project Pipeline</TabsTrigger>
           <TabsTrigger value="activities">Recent Activities</TabsTrigger>
@@ -349,6 +354,31 @@ const CommandCenter = () => {
                 </CardContent>
               </Card>
             )}
+          </div>
+        </TabsContent>
+
+        {/* AI Workflow Tab */}
+        <TabsContent value="ai-workflow">
+          <div className="space-y-6">
+            <AIWorkflowEngine 
+              context="project_creation"
+              onAction={(action, data) => {
+                console.log('AI Action:', action, data);
+                toast({
+                  title: "AI Action Executed",
+                  description: `Successfully performed: ${action.replace('_', ' ')}`,
+                });
+              }}
+              onRecommendationAccept={(recommendation) => {
+                console.log('Recommendation accepted:', recommendation);
+                toast({
+                  title: "Recommendation Applied",
+                  description: recommendation.title,
+                });
+              }}
+            />
+            
+            <SmartProjectDashboard projects={projects} />
           </div>
         </TabsContent>
 

@@ -23,6 +23,7 @@ import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { useCreateProject, useUpdateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
+import AIWorkflowEngine from '@/components/ai/AIWorkflowEngine';
 
 interface ComprehensiveScopingData {
   // Organization Profile

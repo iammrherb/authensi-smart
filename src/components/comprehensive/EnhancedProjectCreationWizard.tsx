@@ -19,6 +19,7 @@ import {
 import { format } from 'date-fns';
 import { useCreateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
+import AIWorkflowEngine from '@/components/ai/AIWorkflowEngine';
 
 // Country data for dropdowns
 const countries = [
