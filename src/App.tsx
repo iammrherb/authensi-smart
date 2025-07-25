@@ -9,6 +9,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { AppSidebar } from "./components/AppSidebar";
 import Header from "./components/Header";
+import NavigationBreadcrumb from "./components/NavigationBreadcrumb";
 
 // Page imports
 import Index from "./pages/Index";
@@ -41,7 +42,8 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => (
       <AppSidebar />
       <div className="flex-1 flex flex-col">
         <Header />
-        <main className="flex-1 pt-16 overflow-auto">
+        <NavigationBreadcrumb />
+        <main className="flex-1 p-6 overflow-auto bg-background">
           {children}
         </main>
       </div>

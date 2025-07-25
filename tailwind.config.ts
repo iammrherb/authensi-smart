@@ -27,7 +27,8 @@ export default {
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))',
-					glow: 'hsl(var(--primary-glow))'
+					glow: 'hsl(var(--primary-glow))',
+					bold: 'hsl(var(--primary-bold))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -43,7 +44,8 @@ export default {
 				},
 				accent: {
 					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
+					foreground: 'hsl(var(--accent-foreground))',
+					bold: 'hsl(var(--accent-bold))'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -62,6 +64,13 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				navigation: {
+					DEFAULT: 'hsl(var(--nav-background))',
+					foreground: 'hsl(var(--nav-foreground))',
+					border: 'hsl(var(--nav-border))',
+					hover: 'hsl(var(--nav-hover))',
+					active: 'hsl(var(--nav-active))'
 				}
 			},
 			borderRadius: {
