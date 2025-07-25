@@ -10,14 +10,11 @@ import { Shield, Users, Building2, Eye, EyeOff, Network, Lock, Zap, CheckCircle,
 import portnoxLogo from '@/assets/portnox-logo.png';
 
 const Auth = () => {
-  const { user, signIn, signUp, loading } = useAuth();
-  const [isSignUp, setIsSignUp] = useState(false);
+  const { user, signIn, loading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    firstName: '',
-    lastName: ''
+    password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -45,11 +42,7 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      if (isSignUp) {
-        await signUp(formData.email, formData.password, formData.firstName, formData.lastName);
-      } else {
-        await signIn(formData.email, formData.password);
-      }
+      await signIn(formData.email, formData.password);
     } finally {
       setIsLoading(false);
     }
@@ -139,42 +132,12 @@ const Auth = () => {
               </div>
               
               <div className="text-center">
-                <h2 className="text-2xl font-bold">{isSignUp ? 'Create Account' : 'Welcome Back'}</h2>
+                <h2 className="text-2xl font-bold">Welcome Back</h2>
                 <p className="text-muted-foreground mt-2">
-                  {isSignUp 
-                    ? 'Join the NAC implementation revolution' 
-                    : 'Access your deployment command center'
-                  }
+                  Access your deployment command center
                 </p>
               </div>
 
-              {/* Auth Method Tabs */}
-              <div className="flex bg-muted rounded-lg p-1">
-                <button
-                  type="button"
-                  onClick={() => setIsSignUp(false)}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                    !isSignUp 
-                      ? 'bg-background text-foreground shadow-sm' 
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <Users className="h-4 w-4" />
-                  Sign In
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsSignUp(true)}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                    isSignUp 
-                      ? 'bg-background text-foreground shadow-sm' 
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <Building2 className="h-4 w-4" />
-                  Sign Up
-                </button>
-              </div>
             </CardHeader>
 
             <CardContent className="space-y-6">
@@ -215,42 +178,7 @@ const Auth = () => {
                 </div>
               </div>
 
-              {/* Email/Password Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
-                {isSignUp && (
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName" className="text-sm font-medium">
-                        First Name
-                      </Label>
-                      <Input
-                        id="firstName"
-                        name="firstName"
-                        type="text"
-                        placeholder="John"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                        required={isSignUp}
-                        className="h-10"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName" className="text-sm font-medium">
-                        Last Name
-                      </Label>
-                      <Input
-                        id="lastName"
-                        name="lastName"
-                        type="text"
-                        placeholder="Doe"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        required={isSignUp}
-                        className="h-10"
-                      />
-                    </div>
-                  </div>
-                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-sm font-medium">
@@ -286,7 +214,7 @@ const Auth = () => {
                       value={formData.password}
                       onChange={handleInputChange}
                       required
-                      autoComplete={isSignUp ? "new-password" : "current-password"}
+                      autoComplete="current-password"
                       className="pl-10 pr-10 h-10"
                     />
                     <Button
@@ -312,44 +240,16 @@ const Auth = () => {
                   {isLoading ? (
                     <div className="flex items-center gap-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent"></div>
-                      {isSignUp ? 'Creating Account...' : 'Signing In...'}
+                      {isLoading ? 'Signing In...' : 'Sign In'}
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <Shield className="h-4 w-4" />
-                      {isSignUp ? 'Create Account' : 'Sign In'}
-                      <ArrowRight className="h-4 w-4" />
+                      {isLoading ? 'Signing In...' : 'Sign In'}
                     </div>
                   )}
                 </Button>
               </form>
 
-              {/* Footer Link */}
-              <div className="text-center text-sm">
-                {!isSignUp ? (
-                  <p className="text-muted-foreground">
-                    Don't have an account?{' '}
-                    <button 
-                      type="button"
-                      className="text-primary hover:underline font-medium"
-                      onClick={() => setIsSignUp(true)}
-                    >
-                      Sign up
-                    </button>
-                  </p>
-                ) : (
-                  <p className="text-muted-foreground">
-                    Already have an account?{' '}
-                    <button 
-                      type="button"
-                      className="text-primary hover:underline font-medium"
-                      onClick={() => setIsSignUp(false)}
-                    >
-                      Sign in
-                    </button>
-                  </p>
-                )}
-              </div>
             </CardContent>
           </Card>
         </div>
