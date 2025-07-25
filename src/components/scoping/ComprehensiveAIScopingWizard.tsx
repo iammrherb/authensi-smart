@@ -21,7 +21,7 @@ import {
 import { useVendors } from '@/hooks/useVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
-import { useCreateProject } from '@/hooks/useProjects';
+import { useCreateProject, useUpdateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
 
 interface ComprehensiveScopingData {
@@ -129,13 +129,15 @@ interface ComprehensiveScopingData {
 }
 
 interface ComprehensiveAIScopingWizardProps {
+  projectId?: string;
   onComplete?: (projectId: string, scopingData: ComprehensiveScopingData) => void;
   onCancel?: () => void;
 }
 
-const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> = ({ 
-  onComplete, 
-  onCancel 
+const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> = ({
+  projectId,
+  onComplete,
+  onCancel
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [aiAnalysisLoading, setAiAnalysisLoading] = useState(false);
@@ -189,7 +191,8 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
   const { data: vendors = [] } = useVendors();
   const { data: useCases = [] } = useUseCases();
   const { data: requirements = [] } = useRequirements();
-  const { mutate: createProject } = useCreateProject();
+  const createProject = useCreateProject();
+  const updateProject = useUpdateProject();
   const { toast } = useToast();
 
   const steps = [
@@ -459,45 +462,85 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
   };
 
   const handleCreateProject = async () => {
-    const { organization, templates_ai } = formData;
-    const { ai_recommendations } = templates_ai;
-    
-    const projectData = {
-      name: `${organization.name} - Comprehensive NAC Implementation`,
-      client_name: organization.name,
-      description: `AI-powered comprehensive NAC deployment for ${organization.name} with ${ai_recommendations.deployment_approach}`,
-      industry: organization.industry.toLowerCase().replace(/\s+/g, '-'),
-      deployment_type: organization.size.toLowerCase(),
-      security_level: formData.network_infrastructure.topology_type.toLowerCase(),
-      total_sites: formData.network_infrastructure.site_count,
-      total_endpoints: Object.entries(formData.network_infrastructure.device_inventory)
-        .filter(([key]) => key !== 'custom_devices')
-        .reduce((total, [_, count]) => total + (count as number), 0),
-      compliance_frameworks: organization.compliance_needs,
-      status: 'planning' as const,
-      current_phase: 'discovery' as const,
-      progress_percentage: 5,
-      success_criteria: formData.use_cases_requirements.success_criteria,
-      pain_points: organization.pain_points,
-      integration_requirements: formData.integration_compliance.required_integrations
-    };
+    try {
+      if (projectId) {
+        // Update existing project with scoping data
+        const { organization, templates_ai } = formData;
+        const { ai_recommendations } = templates_ai;
+        
+        const updateData = {
+          id: projectId,
+          industry: organization.industry,
+          compliance_frameworks: organization.compliance_needs,
+          deployment_type: organization.size.toLowerCase(),
+          security_level: formData.network_infrastructure.topology_type.toLowerCase(),
+          total_endpoints: Object.entries(formData.network_infrastructure.device_inventory)
+            .filter(([key]) => key !== 'custom_devices')
+            .reduce((total, [_, count]) => total + (count as number), 0),
+          total_sites: formData.network_infrastructure.site_count,
+          status: 'scoping' as const,
+          current_phase: 'scoping' as const,
+          progress_percentage: 25,
+          success_criteria: formData.use_cases_requirements.success_criteria,
+          pain_points: organization.pain_points,
+          integration_requirements: formData.integration_compliance.required_integrations
+        };
 
-    createProject(projectData, {
-      onSuccess: (project) => {
+        await updateProject.mutateAsync(updateData);
+        
+        if (onComplete) {
+          onComplete(projectId, formData);
+        }
+        
         toast({
-          title: "Comprehensive Project Created",
-          description: `${organization.name} NAC project created with full AI analysis and recommendations.`,
+          title: "Success!",
+          description: "Project scoping completed successfully with AI recommendations",
         });
-        onComplete?.(project.id, formData);
-      },
-      onError: (error) => {
+      } else {
+        // Create new project
+        const { organization, templates_ai } = formData;
+        const { ai_recommendations } = templates_ai;
+        
+        const projectData = {
+          name: `${organization.name} - Comprehensive NAC Implementation`,
+          client_name: organization.name,
+          description: `AI-powered comprehensive NAC deployment for ${organization.name} with ${ai_recommendations.deployment_approach}`,
+          industry: organization.industry,
+          compliance_frameworks: organization.compliance_needs,
+          deployment_type: organization.size.toLowerCase(),
+          security_level: formData.network_infrastructure.topology_type.toLowerCase(),
+          total_sites: formData.network_infrastructure.site_count,
+          total_endpoints: Object.entries(formData.network_infrastructure.device_inventory)
+            .filter(([key]) => key !== 'custom_devices')
+            .reduce((total, [_, count]) => total + (count as number), 0),
+          status: 'scoping' as const,
+          current_phase: 'scoping' as const,
+          start_date: new Date().toISOString().split('T')[0],
+          progress_percentage: 10,
+          success_criteria: formData.use_cases_requirements.success_criteria,
+          pain_points: organization.pain_points,
+          integration_requirements: formData.integration_compliance.required_integrations
+        };
+
+        const project = await createProject.mutateAsync(projectData);
+        
+        if (project && onComplete) {
+          onComplete(project.id, formData);
+        }
+        
         toast({
-          title: "Project Creation Failed",
-          description: error.message,
-          variant: "destructive",
+          title: "Success!",
+          description: "Comprehensive project created successfully with AI recommendations",
         });
       }
-    });
+    } catch (error) {
+      console.error('Failed to create/update project:', error);
+      toast({
+        title: "Error",
+        description: `Failed to ${projectId ? 'update' : 'create'} project. Please try again.`,
+        variant: "destructive",
+      });
+    }
   };
 
   const renderStepContent = () => {
@@ -1300,11 +1343,14 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
         {currentStep === steps.length - 1 ? (
           <Button
             onClick={handleCreateProject}
-            disabled={!formData.templates_ai.ai_recommendations.deployment_approach}
+            disabled={!formData.templates_ai.ai_recommendations.deployment_approach || createProject.isPending || updateProject.isPending}
             className="bg-gradient-primary"
           >
             <CheckCircle className="h-4 w-4 mr-2" />
-            Create Comprehensive Project
+            {(createProject.isPending || updateProject.isPending) ? 
+              (projectId ? "Updating..." : "Creating...") : 
+              (projectId ? "Complete Project Scoping" : "Create Comprehensive Project")
+            }
           </Button>
         ) : (
           <Button onClick={handleNext}>

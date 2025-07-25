@@ -30,6 +30,8 @@ import NotFound from "./pages/NotFound";
 
 // New enhanced pages
 import IntelligentScoping from "./pages/IntelligentScoping";
+import ProjectScoping from "./pages/ProjectScoping";
+import ProjectTracking from "./pages/ProjectTracking";
 import UseCaseLibrary from "./pages/UseCaseLibrary";
 import ProjectDetails from "./pages/ProjectDetails";
 import AIRecommendations from "./pages/AIRecommendations";
@@ -69,10 +71,12 @@ const App = () => (
                     
                     {/* AI Intelligence Hub */}
                     <Route path="/scoping" element={<IntelligentScoping />} />
+                    <Route path="/scoping/:projectId" element={<ProjectScoping />} />
                     <Route path="/recommendations" element={<AIRecommendations />} />
                     
                     {/* Project Management */}
                     <Route path="/tracker" element={<Tracker />} />
+                    <Route path="/project/:projectId/tracking" element={<ProjectTracking />} />
                     <Route path="/deployment" element={<Deployment />} />
                     <Route path="/reports" element={<Reports />} />
                     <Route path="/projects/:id" element={<ProjectDetails />} />

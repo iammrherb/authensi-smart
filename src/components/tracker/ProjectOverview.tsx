@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { Calendar, DollarSign, Clock, Target, Plus } from "lucide-react";
+import { Calendar, DollarSign, Clock, Target, Plus, Settings, BarChart3 } from "lucide-react";
 import { useProjects, useCreateProject } from "@/hooks/useProjects";
+import { Link } from "react-router-dom";
 
 const ProjectOverview = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -31,11 +32,13 @@ const ProjectOverview = () => {
     const projectData = {
       ...formData,
       budget: formData.budget ? parseFloat(formData.budget) : undefined,
-      progress_percentage: 0
+      progress_percentage: 0,
+      status: "planning" as const,
+      current_phase: "discovery" as const
     };
     
     createProject.mutate(projectData, {
-      onSuccess: () => {
+      onSuccess: (project) => {
         setIsCreateDialogOpen(false);
         setFormData({
           name: "",
@@ -47,6 +50,8 @@ const ProjectOverview = () => {
           target_completion: "",
           budget: ""
         });
+        // Navigate to project-specific scoping
+        window.location.href = `/scoping/${project.id}`;
       }
     });
   };
@@ -214,7 +219,7 @@ const ProjectOverview = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                 <div>
                   <div className="text-sm font-medium">Progress</div>
                   <div className="text-2xl font-bold text-primary">{project.progress_percentage}%</div>
@@ -238,6 +243,20 @@ const ProjectOverview = () => {
                     {project.budget ? `$${project.budget.toLocaleString()}` : "Not set"}
                   </div>
                 </div>
+              </div>
+              <div className="flex gap-2 pt-2 border-t">
+                <Link to={`/scoping/${project.id}`}>
+                  <Button variant="outline" size="sm">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Configure Scoping
+                  </Button>
+                </Link>
+                <Link to={`/project/${project.id}/tracking`}>
+                  <Button variant="outline" size="sm">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    View Tracking
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
