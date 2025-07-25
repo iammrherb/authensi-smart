@@ -30,7 +30,7 @@ const navigationItems = [
     icon: Brain,
     badge: "AI",
     items: [
-      { title: "Command Center", url: "/", icon: Target, description: "AI-powered dashboard" },
+      { title: "Command Center", url: "/", icon: Target, description: "Project management hub" },
       { title: "AI Scoping Wizard", url: "/scoping", icon: Lightbulb, description: "Intelligent project scoping" },
       { title: "Smart Recommendations", url: "/recommendations", icon: Sparkles, description: "AI-driven insights" },
     ]
@@ -49,7 +49,7 @@ const navigationItems = [
     icon: BookOpen,
     items: [
       { title: "Use Case Library", url: "/use-cases", icon: BookOpen, description: "200+ pre-built use cases" },
-      { title: "Site Management", url: "/sites", icon: Building2, description: "Multi-site orchestration" },
+      { title: "Site Management", url: "/sites", icon: Building2, description: "Site configuration (Project-based)" },
       { title: "Scoping Questionnaires", url: "/questionnaires", icon: FileText, description: "Requirements capture" },
     ]
   },

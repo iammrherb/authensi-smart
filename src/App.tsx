@@ -18,6 +18,7 @@ import Designer from "./pages/Designer";
 import Tracker from "./pages/Tracker";
 import Deployment from "./pages/Deployment";
 import Dashboard from "./pages/Dashboard";
+import CommandCenter from "./pages/CommandCenter";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import Sites from "./pages/Sites";
 import Requirements from "./pages/Requirements";
@@ -66,8 +67,8 @@ const App = () => (
               <ProtectedRoute>
                 <AppLayout>
                   <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/" element={<CommandCenter />} />
+                    <Route path="/dashboard" element={<CommandCenter />} />
                     
                     {/* AI Intelligence Hub */}
                     <Route path="/scoping" element={<IntelligentScoping />} />
