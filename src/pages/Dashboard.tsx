@@ -1,12 +1,12 @@
 
-import Header from "@/components/Header";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Building2, Users, Target, Rocket, BarChart3, Settings, Brain, BookOpen } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Building2, Target, Rocket, BarChart3, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import ProjectOverview from "@/components/tracker/ProjectOverview";
+import QuickNav from "@/components/dashboard/QuickNav";
 import { useSites } from "@/hooks/useSites";
 import { useProjects } from "@/hooks/useProjects";
 
@@ -43,43 +43,26 @@ const Dashboard = () => {
       title: "Completion Rate",
       value: Math.round((sites.filter(s => s.status === 'deployed').length / Math.max(sites.length, 1)) * 100),
       total: 100,
-      icon: <BarChart3 className="h-6 w-6" />,
+      icon: <TrendingUp className="h-6 w-6" />,
       color: "text-orange-500",
       href: "/reports",
       suffix: "%"
     }
   ];
 
-  const quickActions = [
-    { title: "AI Scoping Wizard", description: "Intelligent project scoping with AI recommendations", href: "/scoping", icon: <Brain className="h-5 w-5" />, color: "bg-blue-500" },
-    { title: "Use Case Library", description: "Browse 200+ pre-built NAC use cases", href: "/use-cases", icon: <BookOpen className="h-5 w-5" />, color: "bg-green-500" },
-    { title: "Add Site", description: "Register a new deployment site", href: "/sites", icon: <Building2 className="h-5 w-5" />, color: "bg-purple-500" },
-    { title: "Create Project", description: "Start a new NAC deployment project", href: "/tracker", icon: <Plus className="h-5 w-5" />, color: "bg-orange-500" },
-    { title: "Manual Scoping", description: "Traditional requirements capture", href: "/questionnaires", icon: <Target className="h-5 w-5" />, color: "bg-indigo-500" },
-    { title: "Team Management", description: "Configure users and permissions", href: "/users", icon: <Users className="h-5 w-5" />, color: "bg-pink-500" },
-    { title: "Vendor Library", description: "Manage network vendor configurations", href: "/vendors", icon: <Settings className="h-5 w-5" />, color: "bg-cyan-500" },
-    { title: "Reports & Analytics", description: "Track deployment performance", href: "/reports", icon: <BarChart3 className="h-5 w-5" />, color: "bg-amber-500" },
-    { title: "Deployment Planner", description: "Plan and execute go-live activities", href: "/deployment", icon: <Rocket className="h-5 w-5" />, color: "bg-red-500" }
-  ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="pt-20">
-        <div className="container mx-auto px-6 py-8">
-          <div className="text-center mb-8">
-            <Badge variant="glow" className="mb-4">
-              🎯 SCOPE SLAYER Command Center
-            </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              <span className="bg-gradient-primary bg-clip-text text-transparent">NAC DESIGNER</span> • 
-              <span className="text-foreground"> DEPLOYMENT TRACKER</span>
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              🧠 <strong>AI-POWERED SCOPING</strong> • 🎯 <strong>USE CASE MAESTRO</strong> • 🚀 <strong>DEPLOYMENT MASTER</strong><br/>
-              Your ultimate command center for intelligent NAC implementations with 200+ pre-built use cases.
-            </p>
-          </div>
+    <div className="space-y-6 p-6">
+      <div className="space-y-6">
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview">Dashboard</TabsTrigger>
+            <TabsTrigger value="quick">Quick Start</TabsTrigger>
+            <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="sites">Sites</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -103,15 +86,6 @@ const Dashboard = () => {
             ))}
           </div>
 
-          <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="projects">Active Projects</TabsTrigger>
-              <TabsTrigger value="sites">Recent Sites</TabsTrigger>
-              <TabsTrigger value="actions">Quick Actions</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="overview" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card>
                   <CardHeader>
@@ -169,13 +143,17 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </div>
-            </TabsContent>
+          </TabsContent>
 
-            <TabsContent value="projects">
-              <ProjectOverview />
-            </TabsContent>
+          <TabsContent value="quick">
+            <QuickNav />
+          </TabsContent>
 
-            <TabsContent value="sites">
+          <TabsContent value="projects">
+            <ProjectOverview />
+          </TabsContent>
+
+          <TabsContent value="sites">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle>Recent Sites</CardTitle>
@@ -206,30 +184,7 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-
-            <TabsContent value="actions">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {quickActions.map((action, index) => (
-                  <Link key={index} to={action.href}>
-                    <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-                      <CardHeader>
-                        <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg ${action.color} text-white`}>
-                            {action.icon}
-                          </div>
-                          <CardTitle className="text-lg">{action.title}</CardTitle>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-muted-foreground">{action.description}</p>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
+        </Tabs>
       </div>
     </div>
   );

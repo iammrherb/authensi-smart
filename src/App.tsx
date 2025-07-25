@@ -43,7 +43,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => (
       <div className="flex-1 flex flex-col">
         <Header />
         <NavigationBreadcrumb />
-        <main className="flex-1 p-6 overflow-auto bg-background">
+        <main className="flex-1 overflow-auto bg-background">
           {children}
         </main>
       </div>
@@ -64,41 +64,33 @@ const App = () => (
               <ProtectedRoute>
                 <AppLayout>
                   <Routes>
-                    <Route path="/" element={<Index />} />
+                    <Route path="/" element={<Dashboard />} />
                     <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/admin" element={<AdminDashboard />} />
                     
-                    {/* Enhanced NAC Designer & Deployment Tracker */}
+                    {/* AI Intelligence Hub */}
                     <Route path="/scoping" element={<IntelligentScoping />} />
                     <Route path="/recommendations" element={<AIRecommendations />} />
-                    <Route path="/use-cases" element={<UseCaseLibrary />} />
-                    <Route path="/projects/:id" element={<ProjectDetails />} />
                     
-                    {/* Existing Pages */}
-                    <Route path="/designer" element={<Designer />} />
+                    {/* Project Management */}
                     <Route path="/tracker" element={<Tracker />} />
                     <Route path="/deployment" element={<Deployment />} />
+                    <Route path="/reports" element={<Reports />} />
+                    <Route path="/projects/:id" element={<ProjectDetails />} />
+                    
+                    {/* Knowledge & Resources */}
+                    <Route path="/use-cases" element={<UseCaseLibrary />} />
                     <Route path="/sites" element={<Sites />} />
                     <Route path="/questionnaires" element={<Questionnaires />} />
-                    <Route path="/requirements" element={<Requirements />} />
-                    <Route path="/reports" element={<Reports />} />
                     
-                    {/* Admin Routes */}
-                    <Route path="/vendors" element={
-                      <ProtectedRoute requiredRoles={['project_owner']}>
-                        <Vendors />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/users" element={
-                      <ProtectedRoute requiredRoles={['project_owner', 'project_manager']}>
-                        <Users />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/settings" element={
-                      <ProtectedRoute requiredRoles={['project_owner']}>
-                        <Settings />
-                      </ProtectedRoute>
-                    } />
+                    {/* Administration */}
+                    <Route path="/users" element={<Users />} />
+                    <Route path="/vendors" element={<Vendors />} />
+                    <Route path="/settings" element={<Settings />} />
+                    
+                    {/* Legacy/Deprecated Routes */}
+                    <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/designer" element={<Designer />} />
+                    <Route path="/requirements" element={<Requirements />} />
                     
                     <Route path="*" element={<NotFound />} />
                   </Routes>
