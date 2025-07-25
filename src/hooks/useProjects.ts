@@ -18,6 +18,28 @@ export interface Project {
   updated_at: string;
   created_by?: string;
   project_manager?: string;
+  
+  // Enhanced project fields
+  project_type?: string;
+  primary_country?: string;
+  primary_region?: string;
+  timezone?: string;
+  project_owner?: string;
+  technical_owner?: string;
+  portnox_owner?: string;
+  additional_stakeholders?: string[];
+  enable_bulk_sites?: boolean;
+  bulk_sites_data?: any[];
+  enable_bulk_users?: boolean;
+  enable_auto_vendors?: boolean;
+  industry?: string;
+  deployment_type?: string;
+  security_level?: string;
+  total_sites?: number;
+  total_endpoints?: number;
+  compliance_frameworks?: string[];
+  pain_points?: string[];
+  success_criteria?: string[];
 }
 
 export interface ProjectSite {

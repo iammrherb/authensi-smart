@@ -19,23 +19,23 @@ import {
 import { format } from 'date-fns';
 import { useCreateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
+import { useCountries, useRegionsByCountry } from '@/hooks/useCountriesRegions';
+import { useBulkSiteTemplates } from '@/hooks/useBulkSiteTemplates';
 import AIWorkflowEngine from '@/components/ai/AIWorkflowEngine';
 
-// Country data for dropdowns
-const countries = [
-  { code: 'US', name: 'United States', regions: ['Northeast', 'Southeast', 'Midwest', 'Southwest', 'West'] },
-  { code: 'CA', name: 'Canada', regions: ['Ontario', 'Quebec', 'British Columbia', 'Alberta', 'Other'] },
-  { code: 'GB', name: 'United Kingdom', regions: ['England', 'Scotland', 'Wales', 'Northern Ireland'] },
-  { code: 'AU', name: 'Australia', regions: ['New South Wales', 'Victoria', 'Queensland', 'Western Australia', 'Other'] },
-  { code: 'DE', name: 'Germany', regions: ['North Rhine-Westphalia', 'Bavaria', 'Baden-Württemberg', 'Other'] },
-  { code: 'FR', name: 'France', regions: ['Île-de-France', 'Auvergne-Rhône-Alpes', 'Provence-Alpes-Côte', 'Other'] },
-  { code: 'JP', name: 'Japan', regions: ['Kanto', 'Kansai', 'Chubu', 'Kyushu', 'Other'] },
-  { code: 'SG', name: 'Singapore', regions: ['Central', 'North', 'South', 'East', 'West'] },
-  { code: 'OTHER', name: 'Other', regions: ['Custom Region'] }
+// Industry and compliance options
+const industries = [
+  'Healthcare', 'Finance', 'Education', 'Government', 'Manufacturing', 
+  'Retail', 'Technology', 'Energy', 'Transportation', 'Other'
+];
+
+const complianceFrameworks = [
+  'SOX', 'HIPAA', 'PCI-DSS', 'ISO 27001', 'NIST', 'GDPR', 'SOC 2', 'FedRAMP', 'Other'
 ];
 
 const timezones = [
-  'UTC', 'EST', 'CST', 'MST', 'PST', 'GMT', 'CET', 'JST', 'AEST', 'IST'
+  'UTC', 'EST', 'CST', 'MST', 'PST', 'GMT', 'CET', 'JST', 'AEST', 'IST',
+  'PST', 'PDT', 'EDT', 'CDT', 'MDT', 'HST', 'AKST', 'AST', 'NST'
 ];
 
 interface EnhancedProjectFormData {
@@ -116,6 +116,11 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
     enable_auto_vendors: false
   });
 
+  // Data hooks
+  const { data: countries = [] } = useCountries();
+  const { data: regions = [] } = useRegionsByCountry(formData.primary_country);
+  const { data: bulkTemplates = [] } = useBulkSiteTemplates();
+  
   const { mutate: createProject, isPending } = useCreateProject();
   const { toast } = useToast();
 
@@ -260,7 +265,7 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
     }));
   };
 
-  const selectedCountry = countries.find(c => c.code === formData.primary_country);
+  // Remove this line as it's no longer needed
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -355,8 +360,8 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
                   </SelectTrigger>
                   <SelectContent>
                     {countries.map((country) => (
-                      <SelectItem key={country.code} value={country.code}>
-                        {country.name}
+                      <SelectItem key={country.country_code} value={country.country_code}>
+                        {country.country_name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -365,22 +370,22 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
 
               <div>
                 <Label htmlFor="primary_region">Primary Region</Label>
-                <Select 
-                  value={formData.primary_region} 
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, primary_region: value }))}
-                  disabled={!selectedCountry}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select region" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {selectedCountry?.regions.map((region) => (
-                      <SelectItem key={region} value={region}>
-                        {region}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <Select 
+                    value={formData.primary_region} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, primary_region: value }))}
+                    disabled={!formData.primary_country}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select region" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {regions.map((region) => (
+                        <SelectItem key={region.region_name} value={region.region_name}>
+                          {region.region_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
               </div>
 
               <div>

@@ -77,6 +77,75 @@ export type Database = {
         }
         Relationships: []
       }
+      bulk_site_templates: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          csv_headers: Json
+          default_values: Json
+          field_mappings: Json
+          id: string
+          template_description: string | null
+          template_name: string
+          updated_at: string
+          validation_rules: Json
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          csv_headers?: Json
+          default_values?: Json
+          field_mappings?: Json
+          id?: string
+          template_description?: string | null
+          template_name: string
+          updated_at?: string
+          validation_rules?: Json
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          csv_headers?: Json
+          default_values?: Json
+          field_mappings?: Json
+          id?: string
+          template_description?: string | null
+          template_name?: string
+          updated_at?: string
+          validation_rules?: Json
+        }
+        Relationships: []
+      }
+      countries_regions: {
+        Row: {
+          country_code: string
+          country_name: string
+          created_at: string
+          id: string
+          region_name: string
+          timezone: string | null
+          updated_at: string
+        }
+        Insert: {
+          country_code: string
+          country_name: string
+          created_at?: string
+          id?: string
+          region_name: string
+          timezone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          country_code?: string
+          country_name?: string
+          created_at?: string
+          id?: string
+          region_name?: string
+          timezone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       implementation_checklists: {
         Row: {
           assigned_to: string | null
@@ -750,7 +819,9 @@ export type Database = {
       projects: {
         Row: {
           actual_completion: string | null
+          additional_stakeholders: Json | null
           budget: number | null
+          bulk_sites_data: Json | null
           client_name: string | null
           compliance_frameworks: string[] | null
           created_at: string
@@ -758,6 +829,9 @@ export type Database = {
           current_phase: string | null
           deployment_type: string | null
           description: string | null
+          enable_auto_vendors: boolean | null
+          enable_bulk_sites: boolean | null
+          enable_bulk_users: boolean | null
           id: string
           industry: string | null
           integration_requirements: Json | null
@@ -765,21 +839,30 @@ export type Database = {
           name: string
           pain_points: Json | null
           poc_status: string | null
+          portnox_owner: string | null
+          primary_country: string | null
+          primary_region: string | null
           progress_percentage: number | null
           project_manager: string | null
+          project_owner: string | null
+          project_type: string | null
           security_level: string | null
           start_date: string | null
           status: string | null
           success_criteria: Json | null
           target_completion: string | null
+          technical_owner: string | null
           template_id: string | null
+          timezone: string | null
           total_endpoints: number | null
           total_sites: number | null
           updated_at: string
         }
         Insert: {
           actual_completion?: string | null
+          additional_stakeholders?: Json | null
           budget?: number | null
+          bulk_sites_data?: Json | null
           client_name?: string | null
           compliance_frameworks?: string[] | null
           created_at?: string
@@ -787,6 +870,9 @@ export type Database = {
           current_phase?: string | null
           deployment_type?: string | null
           description?: string | null
+          enable_auto_vendors?: boolean | null
+          enable_bulk_sites?: boolean | null
+          enable_bulk_users?: boolean | null
           id?: string
           industry?: string | null
           integration_requirements?: Json | null
@@ -794,21 +880,30 @@ export type Database = {
           name: string
           pain_points?: Json | null
           poc_status?: string | null
+          portnox_owner?: string | null
+          primary_country?: string | null
+          primary_region?: string | null
           progress_percentage?: number | null
           project_manager?: string | null
+          project_owner?: string | null
+          project_type?: string | null
           security_level?: string | null
           start_date?: string | null
           status?: string | null
           success_criteria?: Json | null
           target_completion?: string | null
+          technical_owner?: string | null
           template_id?: string | null
+          timezone?: string | null
           total_endpoints?: number | null
           total_sites?: number | null
           updated_at?: string
         }
         Update: {
           actual_completion?: string | null
+          additional_stakeholders?: Json | null
           budget?: number | null
+          bulk_sites_data?: Json | null
           client_name?: string | null
           compliance_frameworks?: string[] | null
           created_at?: string
@@ -816,6 +911,9 @@ export type Database = {
           current_phase?: string | null
           deployment_type?: string | null
           description?: string | null
+          enable_auto_vendors?: boolean | null
+          enable_bulk_sites?: boolean | null
+          enable_bulk_users?: boolean | null
           id?: string
           industry?: string | null
           integration_requirements?: Json | null
@@ -823,14 +921,21 @@ export type Database = {
           name?: string
           pain_points?: Json | null
           poc_status?: string | null
+          portnox_owner?: string | null
+          primary_country?: string | null
+          primary_region?: string | null
           progress_percentage?: number | null
           project_manager?: string | null
+          project_owner?: string | null
+          project_type?: string | null
           security_level?: string | null
           start_date?: string | null
           status?: string | null
           success_criteria?: Json | null
           target_completion?: string | null
+          technical_owner?: string | null
           template_id?: string | null
+          timezone?: string | null
           total_endpoints?: number | null
           total_sites?: number | null
           updated_at?: string
