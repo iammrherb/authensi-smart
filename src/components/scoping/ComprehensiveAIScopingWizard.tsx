@@ -127,6 +127,60 @@ interface ComprehensiveScopingData {
       };
     };
   };
+
+  // Project Assignments & Team Structure
+  project_assignments: {
+    project_manager: string;
+    technical_lead: string;
+    lead_engineer: string;
+    security_architect: string;
+    network_engineer: string;
+    test_engineer: string;
+    implementation_team: Array<{name: string; role: string; skills: string[]; availability: string;}>;
+    vendor_contacts: Array<{vendor: string; contact_name: string; contact_email: string; role: string;}>;
+    client_stakeholders: Array<{name: string; role: string; department: string; involvement_level: string;}>;
+    escalation_contacts: Array<{name: string; role: string; contact_info: string; escalation_type: string;}>;
+  };
+
+  // Comprehensive Project Planning
+  comprehensive_planning: {
+    deployment_phases: Array<{
+      phase_name: string;
+      duration_weeks: number;
+      start_date: string;
+      end_date: string;
+      prerequisites: string[];
+      deliverables: string[];
+      success_criteria: string[];
+      assigned_team: string[];
+      risks: string[];
+      mitigation_strategies: string[];
+    }>;
+    site_deployment_order: Array<{
+      site_name: string;
+      priority: number;
+      complexity_level: string;
+      estimated_duration: number;
+      dependencies: string[];
+      assigned_engineer: string;
+    }>;
+    testing_strategy: {
+      test_phases: string[];
+      test_environments: string[];
+      acceptance_criteria: string[];
+      testing_timeline: Array<{phase: string; duration: number; resources: string[];}>;
+    };
+    risk_management: {
+      identified_risks: Array<{risk: string; impact: string; probability: string; mitigation: string; owner: string;}>;
+      contingency_plans: Array<{scenario: string; response_plan: string; resources_needed: string[];}>;
+    };
+    quality_assurance: {
+      review_checkpoints: string[];
+      approval_gates: string[];
+      documentation_requirements: string[];
+      compliance_checkpoints: string[];
+    };
+  };
 }
 
 interface ComprehensiveAIScopingWizardProps {
@@ -186,6 +240,17 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
           project_manager_weeks: 0, lead_engineer_weeks: 0, engineer_weeks: 0, testing_weeks: 0
         }
       }
+    },
+    project_assignments: {
+      project_manager: '', technical_lead: '', lead_engineer: '', security_architect: '',
+      network_engineer: '', test_engineer: '', implementation_team: [], vendor_contacts: [],
+      client_stakeholders: [], escalation_contacts: []
+    },
+    comprehensive_planning: {
+      deployment_phases: [], site_deployment_order: [],
+      testing_strategy: { test_phases: [], test_environments: [], acceptance_criteria: [], testing_timeline: [] },
+      risk_management: { identified_risks: [], contingency_plans: [] },
+      quality_assurance: { review_checkpoints: [], approval_gates: [], documentation_requirements: [], compliance_checkpoints: [] }
     }
   });
 
@@ -218,7 +283,15 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
       description: "System integrations, compliance frameworks, and performance needs"
     },
     {
-      id: 5, title: "AI Analysis & Recommendations", icon: Brain,
+      id: 5, title: "Project Assignments", icon: Users,
+      description: "Team assignments, stakeholders, and project roles"
+    },
+    {
+      id: 6, title: "Comprehensive Planning", icon: Clock,
+      description: "Deployment phases, testing strategy, and risk management"
+    },
+    {
+      id: 7, title: "AI Analysis & Recommendations", icon: Brain,
       description: "Intelligent analysis, recommendations, and project planning"
     }
   ];
@@ -557,6 +630,10 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
       case 4:
         return renderIntegrationCompliance();
       case 5:
+        return renderProjectAssignments();
+      case 6:
+        return renderComprehensivePlanning();
+      case 7:
         return renderAIAnalysisRecommendations();
       default:
         return null;
@@ -1029,6 +1106,586 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
             }
           }))}
         />
+      </div>
+    </div>
+  );
+
+  const renderProjectAssignments = () => (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label>Project Manager</Label>
+          <Input
+            placeholder="Enter project manager name"
+            value={formData.project_assignments.project_manager}
+            onChange={(e) => setFormData(prev => ({
+              ...prev,
+              project_assignments: { ...prev.project_assignments, project_manager: e.target.value }
+            }))}
+          />
+        </div>
+        <div>
+          <Label>Technical Lead</Label>
+          <Input
+            placeholder="Enter technical lead name"
+            value={formData.project_assignments.technical_lead}
+            onChange={(e) => setFormData(prev => ({
+              ...prev,
+              project_assignments: { ...prev.project_assignments, technical_lead: e.target.value }
+            }))}
+          />
+        </div>
+        <div>
+          <Label>Lead Engineer</Label>
+          <Input
+            placeholder="Enter lead engineer name"
+            value={formData.project_assignments.lead_engineer}
+            onChange={(e) => setFormData(prev => ({
+              ...prev,
+              project_assignments: { ...prev.project_assignments, lead_engineer: e.target.value }
+            }))}
+          />
+        </div>
+        <div>
+          <Label>Security Architect</Label>
+          <Input
+            placeholder="Enter security architect name"
+            value={formData.project_assignments.security_architect}
+            onChange={(e) => setFormData(prev => ({
+              ...prev,
+              project_assignments: { ...prev.project_assignments, security_architect: e.target.value }
+            }))}
+          />
+        </div>
+        <div>
+          <Label>Network Engineer</Label>
+          <Input
+            placeholder="Enter network engineer name"
+            value={formData.project_assignments.network_engineer}
+            onChange={(e) => setFormData(prev => ({
+              ...prev,
+              project_assignments: { ...prev.project_assignments, network_engineer: e.target.value }
+            }))}
+          />
+        </div>
+        <div>
+          <Label>Test Engineer</Label>
+          <Input
+            placeholder="Enter test engineer name"
+            value={formData.project_assignments.test_engineer}
+            onChange={(e) => setFormData(prev => ({
+              ...prev,
+              project_assignments: { ...prev.project_assignments, test_engineer: e.target.value }
+            }))}
+          />
+        </div>
+      </div>
+
+      <Separator />
+
+      <div>
+        <Label className="text-lg font-semibold">Implementation Team</Label>
+        <p className="text-sm text-muted-foreground mb-3">Add team members who will be involved in the implementation</p>
+        {formData.project_assignments.implementation_team.map((member, index) => (
+          <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-2 p-3 border rounded">
+            <Input
+              placeholder="Name"
+              value={member.name}
+              onChange={(e) => {
+                const updated = [...formData.project_assignments.implementation_team];
+                updated[index] = { ...member, name: e.target.value };
+                setFormData(prev => ({
+                  ...prev,
+                  project_assignments: { ...prev.project_assignments, implementation_team: updated }
+                }));
+              }}
+            />
+            <Input
+              placeholder="Role"
+              value={member.role}
+              onChange={(e) => {
+                const updated = [...formData.project_assignments.implementation_team];
+                updated[index] = { ...member, role: e.target.value };
+                setFormData(prev => ({
+                  ...prev,
+                  project_assignments: { ...prev.project_assignments, implementation_team: updated }
+                }));
+              }}
+            />
+            <Input
+              placeholder="Skills (comma separated)"
+              value={member.skills.join(', ')}
+              onChange={(e) => {
+                const updated = [...formData.project_assignments.implementation_team];
+                updated[index] = { ...member, skills: e.target.value.split(',').map(s => s.trim()) };
+                setFormData(prev => ({
+                  ...prev,
+                  project_assignments: { ...prev.project_assignments, implementation_team: updated }
+                }));
+              }}
+            />
+            <div className="flex gap-2">
+              <Input
+                placeholder="Availability"
+                value={member.availability}
+                onChange={(e) => {
+                  const updated = [...formData.project_assignments.implementation_team];
+                  updated[index] = { ...member, availability: e.target.value };
+                  setFormData(prev => ({
+                    ...prev,
+                    project_assignments: { ...prev.project_assignments, implementation_team: updated }
+                  }));
+                }}
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const updated = formData.project_assignments.implementation_team.filter((_, i) => i !== index);
+                  setFormData(prev => ({
+                    ...prev,
+                    project_assignments: { ...prev.project_assignments, implementation_team: updated }
+                  }));
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        ))}
+        <Button
+          variant="outline"
+          onClick={() => setFormData(prev => ({
+            ...prev,
+            project_assignments: {
+              ...prev.project_assignments,
+              implementation_team: [...prev.project_assignments.implementation_team, { name: '', role: '', skills: [], availability: '' }]
+            }
+          }))}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Team Member
+        </Button>
+      </div>
+
+      <Separator />
+
+      <div>
+        <Label className="text-lg font-semibold">Client Stakeholders</Label>
+        <p className="text-sm text-muted-foreground mb-3">Add key client stakeholders and their involvement</p>
+        {formData.project_assignments.client_stakeholders.map((stakeholder, index) => (
+          <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-2 p-3 border rounded">
+            <Input
+              placeholder="Name"
+              value={stakeholder.name}
+              onChange={(e) => {
+                const updated = [...formData.project_assignments.client_stakeholders];
+                updated[index] = { ...stakeholder, name: e.target.value };
+                setFormData(prev => ({
+                  ...prev,
+                  project_assignments: { ...prev.project_assignments, client_stakeholders: updated }
+                }));
+              }}
+            />
+            <Input
+              placeholder="Role"
+              value={stakeholder.role}
+              onChange={(e) => {
+                const updated = [...formData.project_assignments.client_stakeholders];
+                updated[index] = { ...stakeholder, role: e.target.value };
+                setFormData(prev => ({
+                  ...prev,
+                  project_assignments: { ...prev.project_assignments, client_stakeholders: updated }
+                }));
+              }}
+            />
+            <Input
+              placeholder="Department"
+              value={stakeholder.department}
+              onChange={(e) => {
+                const updated = [...formData.project_assignments.client_stakeholders];
+                updated[index] = { ...stakeholder, department: e.target.value };
+                setFormData(prev => ({
+                  ...prev,
+                  project_assignments: { ...prev.project_assignments, client_stakeholders: updated }
+                }));
+              }}
+            />
+            <div className="flex gap-2">
+              <Select
+                value={stakeholder.involvement_level}
+                onValueChange={(value) => {
+                  const updated = [...formData.project_assignments.client_stakeholders];
+                  updated[index] = { ...stakeholder, involvement_level: value };
+                  setFormData(prev => ({
+                    ...prev,
+                    project_assignments: { ...prev.project_assignments, client_stakeholders: updated }
+                  }));
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Involvement" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const updated = formData.project_assignments.client_stakeholders.filter((_, i) => i !== index);
+                  setFormData(prev => ({
+                    ...prev,
+                    project_assignments: { ...prev.project_assignments, client_stakeholders: updated }
+                  }));
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        ))}
+        <Button
+          variant="outline"
+          onClick={() => setFormData(prev => ({
+            ...prev,
+            project_assignments: {
+              ...prev.project_assignments,
+              client_stakeholders: [...prev.project_assignments.client_stakeholders, { name: '', role: '', department: '', involvement_level: '' }]
+            }
+          }))}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Stakeholder
+        </Button>
+      </div>
+    </div>
+  );
+
+  const renderComprehensivePlanning = () => (
+    <div className="space-y-6">
+      <div>
+        <Label className="text-lg font-semibold">Deployment Phases</Label>
+        <p className="text-sm text-muted-foreground mb-3">Define the project phases with detailed planning</p>
+        {formData.comprehensive_planning.deployment_phases.map((phase, index) => (
+          <Card key={index} className="p-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <Label>Phase Name</Label>
+                <Input
+                  placeholder="e.g., Discovery & Planning"
+                  value={phase.phase_name}
+                  onChange={(e) => {
+                    const updated = [...formData.comprehensive_planning.deployment_phases];
+                    updated[index] = { ...phase, phase_name: e.target.value };
+                    setFormData(prev => ({
+                      ...prev,
+                      comprehensive_planning: { ...prev.comprehensive_planning, deployment_phases: updated }
+                    }));
+                  }}
+                />
+              </div>
+              <div>
+                <Label>Duration (weeks)</Label>
+                <Input
+                  type="number"
+                  value={phase.duration_weeks}
+                  onChange={(e) => {
+                    const updated = [...formData.comprehensive_planning.deployment_phases];
+                    updated[index] = { ...phase, duration_weeks: parseInt(e.target.value) || 0 };
+                    setFormData(prev => ({
+                      ...prev,
+                      comprehensive_planning: { ...prev.comprehensive_planning, deployment_phases: updated }
+                    }));
+                  }}
+                />
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Label>Start Date</Label>
+                  <Input
+                    type="date"
+                    value={phase.start_date}
+                    onChange={(e) => {
+                      const updated = [...formData.comprehensive_planning.deployment_phases];
+                      updated[index] = { ...phase, start_date: e.target.value };
+                      setFormData(prev => ({
+                        ...prev,
+                        comprehensive_planning: { ...prev.comprehensive_planning, deployment_phases: updated }
+                      }));
+                    }}
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-6"
+                  onClick={() => {
+                    const updated = formData.comprehensive_planning.deployment_phases.filter((_, i) => i !== index);
+                    setFormData(prev => ({
+                      ...prev,
+                      comprehensive_planning: { ...prev.comprehensive_planning, deployment_phases: updated }
+                    }));
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>Prerequisites</Label>
+                <Textarea
+                  placeholder="Enter prerequisites (one per line)"
+                  value={phase.prerequisites.join('\n')}
+                  onChange={(e) => {
+                    const updated = [...formData.comprehensive_planning.deployment_phases];
+                    updated[index] = { ...phase, prerequisites: e.target.value.split('\n').filter(p => p.trim()) };
+                    setFormData(prev => ({
+                      ...prev,
+                      comprehensive_planning: { ...prev.comprehensive_planning, deployment_phases: updated }
+                    }));
+                  }}
+                />
+              </div>
+              <div>
+                <Label>Deliverables</Label>
+                <Textarea
+                  placeholder="Enter deliverables (one per line)"
+                  value={phase.deliverables.join('\n')}
+                  onChange={(e) => {
+                    const updated = [...formData.comprehensive_planning.deployment_phases];
+                    updated[index] = { ...phase, deliverables: e.target.value.split('\n').filter(d => d.trim()) };
+                    setFormData(prev => ({
+                      ...prev,
+                      comprehensive_planning: { ...prev.comprehensive_planning, deployment_phases: updated }
+                    }));
+                  }}
+                />
+              </div>
+            </div>
+          </Card>
+        ))}
+        <Button
+          variant="outline"
+          onClick={() => setFormData(prev => ({
+            ...prev,
+            comprehensive_planning: {
+              ...prev.comprehensive_planning,
+              deployment_phases: [...prev.comprehensive_planning.deployment_phases, {
+                phase_name: '', duration_weeks: 0, start_date: '', end_date: '',
+                prerequisites: [], deliverables: [], success_criteria: [], assigned_team: [],
+                risks: [], mitigation_strategies: []
+              }]
+            }
+          }))}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Phase
+        </Button>
+      </div>
+
+      <Separator />
+
+      <div>
+        <Label className="text-lg font-semibold">Risk Management</Label>
+        <p className="text-sm text-muted-foreground mb-3">Identify and plan for project risks</p>
+        {formData.comprehensive_planning.risk_management.identified_risks.map((risk, index) => (
+          <Card key={index} className="p-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+              <div>
+                <Label>Risk Description</Label>
+                <Input
+                  placeholder="Describe the risk"
+                  value={risk.risk}
+                  onChange={(e) => {
+                    const updated = [...formData.comprehensive_planning.risk_management.identified_risks];
+                    updated[index] = { ...risk, risk: e.target.value };
+                    setFormData(prev => ({
+                      ...prev,
+                      comprehensive_planning: {
+                        ...prev.comprehensive_planning,
+                        risk_management: { ...prev.comprehensive_planning.risk_management, identified_risks: updated }
+                      }
+                    }));
+                  }}
+                />
+              </div>
+              <div>
+                <Label>Impact</Label>
+                <Select
+                  value={risk.impact}
+                  onValueChange={(value) => {
+                    const updated = [...formData.comprehensive_planning.risk_management.identified_risks];
+                    updated[index] = { ...risk, impact: value };
+                    setFormData(prev => ({
+                      ...prev,
+                      comprehensive_planning: {
+                        ...prev.comprehensive_planning,
+                        risk_management: { ...prev.comprehensive_planning.risk_management, identified_risks: updated }
+                      }
+                    }));
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Impact" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="critical">Critical</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Probability</Label>
+                <Select
+                  value={risk.probability}
+                  onValueChange={(value) => {
+                    const updated = [...formData.comprehensive_planning.risk_management.identified_risks];
+                    updated[index] = { ...risk, probability: value };
+                    setFormData(prev => ({
+                      ...prev,
+                      comprehensive_planning: {
+                        ...prev.comprehensive_planning,
+                        risk_management: { ...prev.comprehensive_planning.risk_management, identified_risks: updated }
+                      }
+                    }));
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Probability" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Label>Risk Owner</Label>
+                  <Input
+                    placeholder="Owner"
+                    value={risk.owner}
+                    onChange={(e) => {
+                      const updated = [...formData.comprehensive_planning.risk_management.identified_risks];
+                      updated[index] = { ...risk, owner: e.target.value };
+                      setFormData(prev => ({
+                        ...prev,
+                        comprehensive_planning: {
+                          ...prev.comprehensive_planning,
+                          risk_management: { ...prev.comprehensive_planning.risk_management, identified_risks: updated }
+                        }
+                      }));
+                    }}
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-6"
+                  onClick={() => {
+                    const updated = formData.comprehensive_planning.risk_management.identified_risks.filter((_, i) => i !== index);
+                    setFormData(prev => ({
+                      ...prev,
+                      comprehensive_planning: {
+                        ...prev.comprehensive_planning,
+                        risk_management: { ...prev.comprehensive_planning.risk_management, identified_risks: updated }
+                      }
+                    }));
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div>
+              <Label>Mitigation Strategy</Label>
+              <Textarea
+                placeholder="Describe how to mitigate this risk"
+                value={risk.mitigation}
+                onChange={(e) => {
+                  const updated = [...formData.comprehensive_planning.risk_management.identified_risks];
+                  updated[index] = { ...risk, mitigation: e.target.value };
+                  setFormData(prev => ({
+                    ...prev,
+                    comprehensive_planning: {
+                      ...prev.comprehensive_planning,
+                      risk_management: { ...prev.comprehensive_planning.risk_management, identified_risks: updated }
+                    }
+                  }));
+                }}
+              />
+            </div>
+          </Card>
+        ))}
+        <Button
+          variant="outline"
+          onClick={() => setFormData(prev => ({
+            ...prev,
+            comprehensive_planning: {
+              ...prev.comprehensive_planning,
+              risk_management: {
+                ...prev.comprehensive_planning.risk_management,
+                identified_risks: [...prev.comprehensive_planning.risk_management.identified_risks, {
+                  risk: '', impact: '', probability: '', mitigation: '', owner: ''
+                }]
+              }
+            }
+          }))}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Risk
+        </Button>
+      </div>
+
+      <Separator />
+
+      <div>
+        <Label className="text-lg font-semibold">Testing Strategy</Label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label>Test Phases</Label>
+            <Textarea
+              placeholder="Enter test phases (one per line)"
+              value={formData.comprehensive_planning.testing_strategy.test_phases.join('\n')}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                comprehensive_planning: {
+                  ...prev.comprehensive_planning,
+                  testing_strategy: {
+                    ...prev.comprehensive_planning.testing_strategy,
+                    test_phases: e.target.value.split('\n').filter(p => p.trim())
+                  }
+                }
+              }))}
+            />
+          </div>
+          <div>
+            <Label>Test Environments</Label>
+            <Textarea
+              placeholder="Enter test environments (one per line)"
+              value={formData.comprehensive_planning.testing_strategy.test_environments.join('\n')}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                comprehensive_planning: {
+                  ...prev.comprehensive_planning,
+                  testing_strategy: {
+                    ...prev.comprehensive_planning.testing_strategy,
+                    test_environments: e.target.value.split('\n').filter(e => e.trim())
+                  }
+                }
+              }))}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
