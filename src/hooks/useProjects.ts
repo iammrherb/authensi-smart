@@ -57,10 +57,54 @@ export const useProjects = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('projects')
-        .select('*')
+        .select(`
+          id,
+          name,
+          client_name,
+          description,
+          industry,
+          compliance_frameworks,
+          deployment_type,
+          security_level,
+          total_sites,
+          total_endpoints,
+          status,
+          current_phase,
+          start_date,
+          target_completion,
+          actual_completion,
+          progress_percentage,
+          success_criteria,
+          pain_points,
+          integration_requirements,
+          created_by,
+          created_at,
+          updated_at,
+          project_manager,
+          project_type,
+          primary_country,
+          primary_region,
+          timezone,
+          project_owner,
+          technical_owner,
+          portnox_owner,
+          additional_stakeholders,
+          enable_bulk_sites,
+          bulk_sites_data,
+          enable_bulk_users,
+          enable_auto_vendors,
+          budget,
+          poc_status,
+          template_id,
+          migration_scope,
+          integration_requirements
+        `)
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching projects:', error);
+        throw error;
+      }
       return data as Project[];
     },
   });
