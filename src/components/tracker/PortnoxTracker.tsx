@@ -2,50 +2,42 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import ProjectOverview from "./ProjectOverview";
-import DeploymentPhases from "./DeploymentPhases";
-import ResourceTracking from "./ResourceTracking";
-import AnalyticsDashboard from "./AnalyticsDashboard";
+import UnifiedProjectTracker from "./UnifiedProjectTracker";
 import ScopingWorkflow from "./ScopingWorkflow";
 import TestManagement from "./TestManagement";
 import ChecklistManager from "./ChecklistManager";
-import POCManager from "./POCManager";
 import ReportingDashboard from "./ReportingDashboard";
 import TimelineManager from "./TimelineManager";
 import PostSalesHandoff from "./PostSalesHandoff";
+import ResourceTracking from "./ResourceTracking";
+import AnalyticsDashboard from "./AnalyticsDashboard";
 
 const PortnoxTracker = () => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("projects");
 
   const tabs = [
-    { id: "overview", label: "Project Overview", icon: "📋" },
-    { id: "scoping", label: "Scoping & Use Cases", icon: "🎯" },
-    { id: "poc", label: "POC Management", icon: "🧪" },
-    { id: "phases", label: "Deployment Phases", icon: "🔄" },
+    { id: "projects", label: "Unified Project Hub", icon: "🎯" },
+    { id: "scoping", label: "Scoping & Requirements", icon: "📋" },
+    { id: "testing", label: "Testing & Validation", icon: "✅" },
+    { id: "checklist", label: "Implementation Tasks", icon: "📝" },
     { id: "timeline", label: "Timeline & Milestones", icon: "📅" },
-    { id: "testing", label: "Test Management", icon: "✅" },
-    { id: "checklist", label: "Implementation Checklist", icon: "📝" },
-    { id: "resources", label: "Resource Tracking", icon: "👥" },
-    { id: "handoff", label: "Post-Sales Handoff", icon: "🤝" },
-    { id: "reporting", label: "Reports & Analytics", icon: "📊" },
+    { id: "resources", label: "Team & Resources", icon: "👥" },
+    { id: "handoff", label: "Handoff & Transition", icon: "🤝" },
+    { id: "reporting", label: "Analytics & Reports", icon: "📊" },
   ];
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case "overview":
-        return <ProjectOverview />;
+      case "projects":
+        return <UnifiedProjectTracker />;
       case "scoping":
         return <ScopingWorkflow />;
-      case "poc":
-        return <POCManager />;
-      case "phases":
-        return <DeploymentPhases />;
-      case "timeline":
-        return <TimelineManager />;
       case "testing":
         return <TestManagement />;
       case "checklist":
         return <ChecklistManager />;
+      case "timeline":
+        return <TimelineManager />;
       case "resources":
         return <ResourceTracking />;
       case "handoff":
@@ -53,7 +45,7 @@ const PortnoxTracker = () => {
       case "reporting":
         return <ReportingDashboard />;
       default:
-        return <ProjectOverview />;
+        return <UnifiedProjectTracker />;
     }
   };
 
@@ -84,7 +76,7 @@ const PortnoxTracker = () => {
         </CardHeader>
         <CardContent>
           {/* Enhanced Tab Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {tabs.map((tab, index) => (
               <Button
                 key={tab.id}
@@ -93,7 +85,7 @@ const PortnoxTracker = () => {
                   activeTab === tab.id 
                     ? "bg-gradient-primary text-primary-foreground shadow-glow scale-105 border-0" 
                     : "hover:bg-accent/60 hover:border-primary/20 hover:shadow-md hover:scale-102 border border-border/50"
-                } ${index < 5 ? 'lg:col-span-1' : 'col-span-1'}`}
+                }`}
                 onClick={() => setActiveTab(tab.id)}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
