@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import EnhancedProjectWorkflow from "./EnhancedProjectWorkflow";
+import UnifiedProjectManager from "./UnifiedProjectManager";
 import ScopingWorkflow from "./ScopingWorkflow";
 import TestManagement from "./TestManagement";
 import ChecklistManager from "./ChecklistManager";
@@ -29,7 +29,7 @@ const PortnoxTracker = () => {
   const renderTabContent = () => {
     switch (activeTab) {
       case "projects":
-        return <EnhancedProjectWorkflow />;
+        return <UnifiedProjectManager />;
       case "scoping":
         return <ScopingWorkflow />;
       case "testing":
@@ -45,7 +45,7 @@ const PortnoxTracker = () => {
       case "analytics":
         return <AnalyticsDashboard />;
       default:
-        return <EnhancedProjectWorkflow />;
+        return <UnifiedProjectManager />;
     }
   };
 
