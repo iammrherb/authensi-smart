@@ -13,7 +13,7 @@ import NavigationBreadcrumb from "./components/NavigationBreadcrumb";
 
 // Page imports
 import Index from "./pages/Index";
-import Auth from "./pages/Auth";
+
 import Designer from "./pages/Designer";
 import Tracker from "./pages/Tracker";
 import Deployment from "./pages/Deployment";
@@ -62,7 +62,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/auth" element={<Auth />} />
+            
             <Route path="/*" element={
               <ProtectedRoute>
                 <AppLayout>
