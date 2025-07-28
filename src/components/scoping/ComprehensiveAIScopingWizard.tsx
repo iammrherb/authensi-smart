@@ -46,13 +46,57 @@ interface ComprehensiveScopingData {
     site_count: number;
     network_complexity: "Simple" | "Moderate" | "Complex" | "Very Complex";
     existing_vendors: {
+      // Network Infrastructure
       wired_switches: string[];
       wireless_aps: string[];
-      firewalls: string[];
       routers: string[];
+      
+      // Security Infrastructure  
+      firewalls: string[];
       vpn_solutions: string[];
+      edr_xdr: string[];
+      siem_mdr: string[];
+      
+      // Monitoring & Management
       monitoring_tools: string[];
+      device_inventory_tools: string[];
     };
+    
+    // Site-specific inventory assignments
+    site_inventory: Array<{
+      site_name: string;
+      site_location: string;
+      vendors_assigned: {
+        wired_switches: string[];
+        wireless_aps: string[];
+        firewalls: string[];
+        routers: string[];
+        vpn_solutions: string[];
+        monitoring_tools: string[];
+        device_inventory_tools: string[];
+      };
+      device_counts: {
+        corporate_laptops: number;
+        desktop_workstations: number;
+        mobile_devices: number;
+        tablets: number;
+        iot_devices: number;
+        printers_mfps: number;
+        security_cameras: number;
+        voip_phones: number;
+        medical_devices: number;
+        industrial_controls: number;
+        pos_systems: number;
+        digital_signage: number;
+        custom_devices: Array<{name: string; count: number; description: string;}>;
+      };
+      priority: "Low" | "Medium" | "High" | "Critical";
+      deployment_order: number;
+      estimated_complexity: "Simple" | "Moderate" | "Complex" | "Very Complex";
+      assigned_engineer: string;
+      go_live_date: string;
+      special_requirements: string[];
+    }>;
     device_inventory: {
       corporate_laptops: number;
       desktop_workstations: number;
@@ -205,9 +249,11 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
     network_infrastructure: {
       topology_type: 'Segmented', site_count: 1, network_complexity: 'Moderate',
       existing_vendors: {
-        wired_switches: [], wireless_aps: [], firewalls: [], routers: [],
-        vpn_solutions: [], monitoring_tools: []
+        wired_switches: [], wireless_aps: [], routers: [],
+        firewalls: [], vpn_solutions: [], edr_xdr: [], siem_mdr: [],
+        monitoring_tools: [], device_inventory_tools: []
       },
+      site_inventory: [],
       device_inventory: {
         corporate_laptops: 0, desktop_workstations: 0, mobile_devices: 0, tablets: 0,
         iot_devices: 0, printers_mfps: 0, security_cameras: 0, voip_phones: 0,
@@ -308,14 +354,113 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
     "NIST", "FedRAMP", "FISMA", "CMMC", "NERC CIP", "21 CFR Part 11"
   ];
 
-  const vendorsByCategory = {
-    wired_switches: vendors.filter(v => v.category === "Switches" || v.vendor_type === "Network Switch"),
-    wireless_aps: vendors.filter(v => v.category === "Wireless" || v.vendor_type === "Wireless AP"),
-    firewalls: vendors.filter(v => v.category === "Security" || v.vendor_type === "Firewall"),
-    routers: vendors.filter(v => v.category === "Routing" || v.vendor_type === "Router"),
-    vpn_solutions: vendors.filter(v => v.category === "VPN" || v.vendor_type === "VPN"),
-    monitoring_tools: vendors.filter(v => v.category === "Monitoring" || v.vendor_type === "Network Monitoring")
+  // Comprehensive Vendor Lists
+  const networkVendors = {
+    wired_switches: [
+      "Cisco", "Aruba (HPE)", "Juniper Networks", "Extreme Networks", "Dell EMC",
+      "Huawei", "D-Link", "Netgear", "TP-Link", "Ubiquiti", "Meraki", "Brocade",
+      "Allied Telesis", "Alcatel-Lucent Enterprise", "Adtran", "ZyXEL", "3Com",
+      "Foundry Networks", "Force10", "Nortel", "H3C", "Planet Technology"
+    ],
+    wireless_aps: [
+      "Cisco Meraki", "Aruba (HPE)", "Ubiquiti", "Ruckus (CommScope)", "Extreme Networks",
+      "Fortinet", "SonicWall", "Cambium Networks", "Motorola Solutions", "Ericsson",
+      "Aerohive (Extreme)", "Mist (Juniper)", "Lancom", "EnGenius", "D-Link",
+      "Netgear", "TP-Link", "Linksys", "Xirrus", "Symbol (Zebra)", "Proxim"
+    ],
+    routers: [
+      "Cisco", "Juniper Networks", "Huawei", "Mikrotik", "Ubiquiti", "Fortinet",
+      "SonicWall", "pfSense", "VyOS", "Arista", "Extreme Networks", "Dell EMC",
+      "HPE", "Alcatel-Lucent", "ZyXEL", "Netgate", "Peplink", "Cradlepoint"
+    ]
   };
+
+  const securityVendors = {
+    firewalls: [
+      "Palo Alto Networks", "Fortinet", "Check Point", "Cisco ASA/FTD", "SonicWall",
+      "Juniper SRX", "pfSense", "WatchGuard", "Barracuda", "Sophos", "Zscaler",
+      "Forcepoint", "McAfee", "Untangle", "IPFire", "OPNsense", "Smoothwall",
+      "Endian", "ClearOS", "Kerio Control", "Cyberoam", "Array Networks"
+    ],
+    vpn_solutions: [
+      "Cisco AnyConnect", "Palo Alto GlobalProtect", "Fortinet FortiClient", "Pulse Secure",
+      "OpenVPN", "WireGuard", "NordLayer", "Perimeter 81", "Zscaler Private Access",
+      "Microsoft Always On VPN", "SonicWall NetExtender", "Check Point Endpoint",
+      "F5 BIG-IP Edge", "Array SSL VPN", "Barracuda SSL VPN", "Kemp LoadMaster",
+      "Citrix Gateway", "VMware Tunnel", "Tunnelbear for Business", "ExpressVPN for Business"
+    ],
+    edr_xdr: [
+      "CrowdStrike Falcon", "Microsoft Defender for Endpoint", "SentinelOne", "Carbon Black",
+      "Cortex XDR", "Trend Micro", "Symantec Endpoint", "McAfee MVISION", "Bitdefender GravityZone",
+      "Kaspersky Endpoint", "ESET PROTECT", "Sophos Intercept X", "Malwarebytes Endpoint",
+      "Cybereason", "FireEye Endpoint", "Cylance", "Tanium", "Qualys VMDR",
+      "Rapid7 InsightIDR", "Elastic Security", "Chronicle Security", "Splunk Enterprise Security"
+    ],
+    siem_mdr: [
+      "Splunk Enterprise Security", "IBM QRadar", "Microsoft Sentinel", "ArcSight (Micro Focus)",
+      "LogRhythm", "Rapid7 InsightIDR", "Elastic Security", "Chronicle Security",
+      "Securonix", "Exabeam", "Sumo Logic", "AlienVault (AT&T)", "McAfee ESM",
+      "RSA NetWitness", "Fortinet FortiSIEM", "ManageEngine Log360", "SolarWinds Security Event Manager",
+      "Graylog", "OSSIM", "Wazuh", "OSSEC", "ELK Stack", "Datadog Security Monitoring"
+    ]
+  };
+
+  const identityProviders = [
+    // Cloud Identity Providers
+    "Microsoft Azure AD/Entra ID", "Google Workspace", "Okta", "Auth0", "AWS IAM Identity Center",
+    "OneLogin", "Ping Identity", "ForgeRock", "IBM Security Verify", "Oracle Identity Cloud",
+    "Duo Security", "RSA SecurID", "CyberArk Identity", "SailPoint IdentityNow",
+    
+    // On-Premises Identity
+    "Microsoft Active Directory", "OpenLDAP", "Apache Directory Server", "389 Directory Server",
+    "Novell eDirectory", "Oracle Internet Directory", "IBM Security Directory Server",
+    "CA Directory", "Sun Java System Directory Server", "FreeIPA",
+    
+    // Federation & SSO
+    "ADFS", "Shibboleth", "SimpleSAMLphp", "Keycloak", "WSO2 Identity Server",
+    "MiniOrange", "JumpCloud", "Centrify", "BeyondTrust", "Thycotic Secret Server"
+  ];
+
+  const mfaProviders = [
+    "Microsoft Authenticator", "Google Authenticator", "Okta Verify", "Duo Security",
+    "RSA SecurID", "Symantec VIP", "Authy", "YubiKey", "FIDO2/WebAuthn",
+    "Ping Identity", "ForgeRock", "CyberArk", "OneLogin", "Auth0 Guardian",
+    "IBM Security Verify", "Cisco Duo", "Entrust", "HID Global", "Gemalto",
+    "SMS/Voice OTP", "Hardware Tokens", "Smart Cards", "Biometric Authentication"
+  ];
+
+  const monitoringTools = [
+    // Network Monitoring
+    "SolarWinds NPM", "PRTG Network Monitor", "ManageEngine OpManager", "Nagios",
+    "Zabbix", "LibreNMS", "Cacti", "Observium", "WhatsUp Gold", "Auvik",
+    "Datadog", "New Relic", "AppDynamics", "Dynatrace", "ThousandEyes",
+    
+    // Infrastructure Monitoring
+    "VMware vRealize", "Microsoft SCOM", "IBM Tivoli", "CA Spectrum",
+    "HP OpenView", "BMC TrueSight", "Splunk Infrastructure Monitoring",
+    "Elastic Observability", "Prometheus + Grafana", "InfluxDB + Telegraf",
+    
+    // Application Performance
+    "AppDynamics", "New Relic", "Dynatrace", "Splunk APM", "Datadog APM",
+    "Elastic APM", "Jaeger", "Zipkin", "OpenTelemetry", "Instana"
+  ];
+
+  const deviceInventoryTools = [
+    // Asset Management
+    "Microsoft SCCM", "Lansweeper", "ManageEngine AssetExplorer", "ServiceNow ITAM",
+    "IBM Maximo", "Flexera", "Snow Software", "Device42", "Spiceworks", "PDQ Inventory",
+    "OCS Inventory", "GLPI", "InvGate Assets", "Alloy Discovery", "Network Detective",
+    
+    // Mobile Device Management
+    "Microsoft Intune", "VMware Workspace ONE", "Jamf Pro", "IBM MaaS360",
+    "Citrix Endpoint Management", "BlackBerry UEM", "SOTI MobiControl", "42Gears SureMDM",
+    "Hexnode", "ManageEngine Mobile Device Manager Plus", "Miradore", "Scalefusion",
+    
+    // Network Discovery
+    "Nmap", "Advanced IP Scanner", "Angry IP Scanner", "Network Scanner", "Fing",
+    "NetCrunch Tools", "SoftPerfect Network Scanner", "LanSweeper Network Discovery",
+    "ManageEngine OpUtils", "SolarWinds Network Discovery", "Spiceworks Network Scanner"
+  ];
 
   const authenticationMethods = [
     "802.1X with Certificates", "802.1X with Credentials", "MAC Authentication Bypass",
@@ -323,12 +468,6 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
     "Mobile Device Certificates", "Guest Self-Registration", "Sponsored Guest Access",
     "Certificate-Based Device Authentication", "Active Directory Integration",
     "LDAP Authentication", "RADIUS Authentication", "OAuth 2.0", "OpenID Connect"
-  ];
-
-  const identityProviders = [
-    "Microsoft Active Directory", "Azure AD/Entra ID", "Okta", "Google Workspace",
-    "Ping Identity", "ForgeRock", "OneLogin", "IBM Security Verify", "RSA SecurID",
-    "CyberArk", "SailPoint", "Centrify", "LDAP", "Custom RADIUS"
   ];
 
   const integrationSystems = [
@@ -833,29 +972,115 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
       </div>
 
       <Tabs defaultValue="vendors" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="vendors">Network Vendors</TabsTrigger>
           <TabsTrigger value="devices">Device Inventory</TabsTrigger>
+          <TabsTrigger value="sites">Site Assignments</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="vendors" className="space-y-4">
-          {Object.entries(vendorsByCategory).map(([category, categoryVendors]) => (
-            <div key={category}>
-              <Label className="capitalize">{category.replace('_', ' ')}</Label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
-                {categoryVendors.map((vendor) => (
-                  <div key={vendor.id} className="flex items-center space-x-2">
+        <TabsContent value="vendors" className="space-y-6">
+          {/* Network Infrastructure Vendors */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Network className="h-5 w-5" />
+              Network Infrastructure
+            </h3>
+            
+            {Object.entries(networkVendors).map(([category, vendorList]) => (
+              <div key={category} className="space-y-2">
+                <Label className="text-base font-medium capitalize">{category.replace('_', ' ')}</Label>
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                  {vendorList.map((vendorName) => (
+                    <div key={vendorName} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`network-${category}-${vendorName}`}
+                        checked={formData.network_infrastructure.existing_vendors[category as keyof typeof formData.network_infrastructure.existing_vendors]?.includes(vendorName) || false}
+                        onCheckedChange={(checked) => {
+                          setFormData(prev => {
+                            const newVendors = { ...prev.network_infrastructure.existing_vendors };
+                            const categoryKey = category as keyof typeof newVendors;
+                            if (checked) {
+                              newVendors[categoryKey] = [...(newVendors[categoryKey] || []), vendorName];
+                            } else {
+                              newVendors[categoryKey] = (newVendors[categoryKey] || []).filter(v => v !== vendorName);
+                            }
+                            return {
+                              ...prev,
+                              network_infrastructure: { ...prev.network_infrastructure, existing_vendors: newVendors }
+                            };
+                          });
+                        }}
+                      />
+                      <Label htmlFor={`network-${category}-${vendorName}`} className="text-sm">{vendorName}</Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Security Vendors */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Security Infrastructure
+            </h3>
+            
+            {Object.entries(securityVendors).map(([category, vendorList]) => (
+              <div key={category} className="space-y-2">
+                <Label className="text-base font-medium capitalize">{category.replace('_', ' ')}</Label>
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                  {vendorList.map((vendorName) => (
+                    <div key={vendorName} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`security-${category}-${vendorName}`}
+                        checked={formData.network_infrastructure.existing_vendors[category as keyof typeof formData.network_infrastructure.existing_vendors]?.includes(vendorName) || false}
+                        onCheckedChange={(checked) => {
+                          setFormData(prev => {
+                            const newVendors = { ...prev.network_infrastructure.existing_vendors };
+                            const categoryKey = category as keyof typeof newVendors;
+                            if (checked) {
+                              newVendors[categoryKey] = [...(newVendors[categoryKey] || []), vendorName];
+                            } else {
+                              newVendors[categoryKey] = (newVendors[categoryKey] || []).filter(v => v !== vendorName);
+                            }
+                            return {
+                              ...prev,
+                              network_infrastructure: { ...prev.network_infrastructure, existing_vendors: newVendors }
+                            };
+                          });
+                        }}
+                      />
+                      <Label htmlFor={`security-${category}-${vendorName}`} className="text-sm">{vendorName}</Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Monitoring & Management Tools */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Monitor className="h-5 w-5" />
+              Monitoring & Management
+            </h3>
+            
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Monitoring Tools</Label>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                {monitoringTools.map((vendorName) => (
+                  <div key={vendorName} className="flex items-center space-x-2">
                     <Checkbox
-                      id={`${category}-${vendor.id}`}
-                      checked={formData.network_infrastructure.existing_vendors[category as keyof typeof formData.network_infrastructure.existing_vendors].includes(vendor.vendor_name)}
+                      id={`monitoring-${vendorName}`}
+                      checked={formData.network_infrastructure.existing_vendors.monitoring_tools?.includes(vendorName) || false}
                       onCheckedChange={(checked) => {
                         setFormData(prev => {
                           const newVendors = { ...prev.network_infrastructure.existing_vendors };
-                          const categoryKey = category as keyof typeof newVendors;
                           if (checked) {
-                            newVendors[categoryKey] = [...newVendors[categoryKey], vendor.vendor_name];
+                            newVendors.monitoring_tools = [...(newVendors.monitoring_tools || []), vendorName];
                           } else {
-                            newVendors[categoryKey] = newVendors[categoryKey].filter(v => v !== vendor.vendor_name);
+                            newVendors.monitoring_tools = (newVendors.monitoring_tools || []).filter(v => v !== vendorName);
                           }
                           return {
                             ...prev,
@@ -864,12 +1089,41 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
                         });
                       }}
                     />
-                    <Label htmlFor={`${category}-${vendor.id}`} className="text-sm">{vendor.vendor_name}</Label>
+                    <Label htmlFor={`monitoring-${vendorName}`} className="text-sm">{vendorName}</Label>
                   </div>
                 ))}
               </div>
             </div>
-          ))}
+
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Device Inventory Tools</Label>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                {deviceInventoryTools.map((vendorName) => (
+                  <div key={vendorName} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`inventory-${vendorName}`}
+                      checked={formData.network_infrastructure.existing_vendors.monitoring_tools?.includes(vendorName) || false}
+                      onCheckedChange={(checked) => {
+                        setFormData(prev => {
+                          const newVendors = { ...prev.network_infrastructure.existing_vendors };
+                          if (checked) {
+                            newVendors.monitoring_tools = [...(newVendors.monitoring_tools || []), vendorName];
+                          } else {
+                            newVendors.monitoring_tools = (newVendors.monitoring_tools || []).filter(v => v !== vendorName);
+                          }
+                          return {
+                            ...prev,
+                            network_infrastructure: { ...prev.network_infrastructure, existing_vendors: newVendors }
+                          };
+                        });
+                      }}
+                    />
+                    <Label htmlFor={`inventory-${vendorName}`} className="text-sm">{vendorName}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </TabsContent>
         
         <TabsContent value="devices" className="space-y-4">
@@ -895,6 +1149,324 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
               </div>
             ))}
           </div>
+        </TabsContent>
+
+        <TabsContent value="sites" className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Building2 className="h-5 w-5" />
+              Site-Specific Vendor & Inventory Assignments
+            </h3>
+            <Button
+              onClick={() => {
+                const newSite = {
+                  site_name: `Site ${formData.network_infrastructure.site_inventory.length + 1}`,
+                  site_location: '',
+                  vendors_assigned: {
+                    wired_switches: [],
+                    wireless_aps: [],
+                    firewalls: [],
+                    routers: [],
+                    vpn_solutions: [],
+                    monitoring_tools: [],
+                    device_inventory_tools: []
+                  },
+                  device_counts: {
+                    corporate_laptops: 0,
+                    desktop_workstations: 0,
+                    mobile_devices: 0,
+                    tablets: 0,
+                    iot_devices: 0,
+                    printers_mfps: 0,
+                    security_cameras: 0,
+                    voip_phones: 0,
+                    medical_devices: 0,
+                    industrial_controls: 0,
+                    pos_systems: 0,
+                    digital_signage: 0,
+                    custom_devices: []
+                  },
+                  priority: "Medium" as const,
+                  deployment_order: formData.network_infrastructure.site_inventory.length + 1,
+                  estimated_complexity: "Moderate" as const,
+                  assigned_engineer: '',
+                  go_live_date: '',
+                  special_requirements: []
+                };
+                setFormData(prev => ({
+                  ...prev,
+                  network_infrastructure: {
+                    ...prev.network_infrastructure,
+                    site_inventory: [...prev.network_infrastructure.site_inventory, newSite]
+                  }
+                }));
+              }}
+              className="mb-4"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Site
+            </Button>
+          </div>
+
+          {formData.network_infrastructure.site_inventory.length === 0 ? (
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                No sites configured yet. Click "Add Site" to create site-specific vendor and inventory assignments.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <div className="space-y-6">
+              {formData.network_infrastructure.site_inventory.map((site, siteIndex) => (
+                <Card key={siteIndex} className="p-4">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="grid grid-cols-2 gap-4 flex-1">
+                      <div>
+                        <Label>Site Name</Label>
+                        <Input
+                          value={site.site_name}
+                          onChange={(e) => {
+                            const updatedSites = [...formData.network_infrastructure.site_inventory];
+                            updatedSites[siteIndex].site_name = e.target.value;
+                            setFormData(prev => ({
+                              ...prev,
+                              network_infrastructure: {
+                                ...prev.network_infrastructure,
+                                site_inventory: updatedSites
+                              }
+                            }));
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <Label>Location</Label>
+                        <Input
+                          value={site.site_location}
+                          onChange={(e) => {
+                            const updatedSites = [...formData.network_infrastructure.site_inventory];
+                            updatedSites[siteIndex].site_location = e.target.value;
+                            setFormData(prev => ({
+                              ...prev,
+                              network_infrastructure: {
+                                ...prev.network_infrastructure,
+                                site_inventory: updatedSites
+                              }
+                            }));
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        const updatedSites = formData.network_infrastructure.site_inventory.filter((_, i) => i !== siteIndex);
+                        setFormData(prev => ({
+                          ...prev,
+                          network_infrastructure: {
+                            ...prev.network_infrastructure,
+                            site_inventory: updatedSites
+                          }
+                        }));
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  <Tabs defaultValue="site-vendors" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="site-vendors">Assigned Vendors</TabsTrigger>
+                      <TabsTrigger value="site-devices">Device Inventory</TabsTrigger>
+                      <TabsTrigger value="site-details">Deployment Details</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="site-vendors" className="space-y-4">
+                      {Object.entries(networkVendors).map(([category, vendorList]) => (
+                        <div key={category} className="space-y-2">
+                          <Label className="text-sm font-medium capitalize">{category.replace('_', ' ')}</Label>
+                          <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                            {vendorList.map((vendorName) => (
+                              <div key={vendorName} className="flex items-center space-x-1">
+                                <Checkbox
+                                  id={`site-${siteIndex}-${category}-${vendorName}`}
+                                  checked={site.vendors_assigned[category as keyof typeof site.vendors_assigned]?.includes(vendorName) || false}
+                                  onCheckedChange={(checked) => {
+                                    const updatedSites = [...formData.network_infrastructure.site_inventory];
+                                    const categoryKey = category as keyof typeof site.vendors_assigned;
+                                    if (checked) {
+                                      updatedSites[siteIndex].vendors_assigned[categoryKey] = [
+                                        ...(updatedSites[siteIndex].vendors_assigned[categoryKey] || []),
+                                        vendorName
+                                      ];
+                                    } else {
+                                      updatedSites[siteIndex].vendors_assigned[categoryKey] = 
+                                        (updatedSites[siteIndex].vendors_assigned[categoryKey] || []).filter(v => v !== vendorName);
+                                    }
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      network_infrastructure: {
+                                        ...prev.network_infrastructure,
+                                        site_inventory: updatedSites
+                                      }
+                                    }));
+                                  }}
+                                />
+                                <Label htmlFor={`site-${siteIndex}-${category}-${vendorName}`} className="text-xs">{vendorName}</Label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </TabsContent>
+
+                    <TabsContent value="site-devices" className="space-y-4">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {Object.entries(site.device_counts).filter(([key]) => key !== 'custom_devices').map(([deviceType, count]) => (
+                          <div key={deviceType}>
+                            <Label className="text-sm capitalize">{deviceType.replace('_', ' ')}</Label>
+                            <Input
+                              type="number"
+                              value={count as number}
+                              onChange={(e) => {
+                                const updatedSites = [...formData.network_infrastructure.site_inventory];
+                                const deviceKey = deviceType as keyof typeof site.device_counts;
+                                if (deviceKey !== 'custom_devices') {
+                                  (updatedSites[siteIndex].device_counts as any)[deviceKey] = parseInt(e.target.value) || 0;
+                                }
+                                setFormData(prev => ({
+                                  ...prev,
+                                  network_infrastructure: {
+                                    ...prev.network_infrastructure,
+                                    site_inventory: updatedSites
+                                  }
+                                }));
+                              }}
+                              min="0"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="site-details" className="space-y-4">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                          <Label>Priority</Label>
+                          <Select
+                            value={site.priority}
+                            onValueChange={(value: "Low" | "Medium" | "High" | "Critical") => {
+                              const updatedSites = [...formData.network_infrastructure.site_inventory];
+                              updatedSites[siteIndex].priority = value;
+                              setFormData(prev => ({
+                                ...prev,
+                                network_infrastructure: {
+                                  ...prev.network_infrastructure,
+                                  site_inventory: updatedSites
+                                }
+                              }));
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Low">Low</SelectItem>
+                              <SelectItem value="Medium">Medium</SelectItem>
+                              <SelectItem value="High">High</SelectItem>
+                              <SelectItem value="Critical">Critical</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label>Deployment Order</Label>
+                          <Input
+                            type="number"
+                            value={site.deployment_order}
+                            onChange={(e) => {
+                              const updatedSites = [...formData.network_infrastructure.site_inventory];
+                              updatedSites[siteIndex].deployment_order = parseInt(e.target.value) || 1;
+                              setFormData(prev => ({
+                                ...prev,
+                                network_infrastructure: {
+                                  ...prev.network_infrastructure,
+                                  site_inventory: updatedSites
+                                }
+                              }));
+                            }}
+                            min="1"
+                          />
+                        </div>
+                        <div>
+                          <Label>Complexity</Label>
+                          <Select
+                            value={site.estimated_complexity}
+                            onValueChange={(value: "Simple" | "Moderate" | "Complex" | "Very Complex") => {
+                              const updatedSites = [...formData.network_infrastructure.site_inventory];
+                              updatedSites[siteIndex].estimated_complexity = value;
+                              setFormData(prev => ({
+                                ...prev,
+                                network_infrastructure: {
+                                  ...prev.network_infrastructure,
+                                  site_inventory: updatedSites
+                                }
+                              }));
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Simple">Simple</SelectItem>
+                              <SelectItem value="Moderate">Moderate</SelectItem>
+                              <SelectItem value="Complex">Complex</SelectItem>
+                              <SelectItem value="Very Complex">Very Complex</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label>Go Live Date</Label>
+                          <Input
+                            type="date"
+                            value={site.go_live_date}
+                            onChange={(e) => {
+                              const updatedSites = [...formData.network_infrastructure.site_inventory];
+                              updatedSites[siteIndex].go_live_date = e.target.value;
+                              setFormData(prev => ({
+                                ...prev,
+                                network_infrastructure: {
+                                  ...prev.network_infrastructure,
+                                  site_inventory: updatedSites
+                                }
+                              }));
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label>Assigned Engineer</Label>
+                        <Input
+                          value={site.assigned_engineer}
+                          onChange={(e) => {
+                            const updatedSites = [...formData.network_infrastructure.site_inventory];
+                            updatedSites[siteIndex].assigned_engineer = e.target.value;
+                            setFormData(prev => ({
+                              ...prev,
+                              network_infrastructure: {
+                                ...prev.network_infrastructure,
+                                site_inventory: updatedSites
+                              }
+                            }));
+                          }}
+                          placeholder="Engineer name or email"
+                        />
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </Card>
+              ))}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>
