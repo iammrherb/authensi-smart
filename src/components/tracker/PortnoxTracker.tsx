@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import UnifiedProjectTracker from "./UnifiedProjectTracker";
+import EnhancedProjectWorkflow from "./EnhancedProjectWorkflow";
 import ScopingWorkflow from "./ScopingWorkflow";
 import TestManagement from "./TestManagement";
 import ChecklistManager from "./ChecklistManager";
@@ -16,20 +16,20 @@ const PortnoxTracker = () => {
   const [activeTab, setActiveTab] = useState("projects");
 
   const tabs = [
-    { id: "projects", label: "Unified Project Hub", icon: "🎯" },
-    { id: "scoping", label: "Scoping & Requirements", icon: "📋" },
+    { id: "projects", label: "Project Workflow", icon: "🎯" },
+    { id: "scoping", label: "Scoping & Analysis", icon: "🔍" },
     { id: "testing", label: "Testing & Validation", icon: "✅" },
     { id: "checklist", label: "Implementation Tasks", icon: "📝" },
     { id: "timeline", label: "Timeline & Milestones", icon: "📅" },
     { id: "resources", label: "Team & Resources", icon: "👥" },
     { id: "handoff", label: "Handoff & Transition", icon: "🤝" },
-    { id: "reporting", label: "Analytics & Reports", icon: "📊" },
+    { id: "analytics", label: "Analytics & Insights", icon: "📊" },
   ];
 
   const renderTabContent = () => {
     switch (activeTab) {
       case "projects":
-        return <UnifiedProjectTracker />;
+        return <EnhancedProjectWorkflow />;
       case "scoping":
         return <ScopingWorkflow />;
       case "testing":
@@ -42,10 +42,10 @@ const PortnoxTracker = () => {
         return <ResourceTracking />;
       case "handoff":
         return <PostSalesHandoff />;
-      case "reporting":
-        return <ReportingDashboard />;
+      case "analytics":
+        return <AnalyticsDashboard />;
       default:
-        return <UnifiedProjectTracker />;
+        return <EnhancedProjectWorkflow />;
     }
   };
 
@@ -56,11 +56,11 @@ const PortnoxTracker = () => {
         <CardHeader className="pb-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <CardTitle className="text-3xl bg-gradient-primary bg-clip-text text-transparent mb-2">
-                Deployment Management Suite
+              <CardTitle className="text-3xl bg-gradient-primary bg-clip-text text-transparent mb-2 animate-fade-in">
+                NAC Tracker Management Suite
               </CardTitle>
-              <p className="text-muted-foreground">
-                Comprehensive tools for enterprise NAC implementation success
+              <p className="text-muted-foreground animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                Comprehensive project lifecycle management from scoping to deployment
               </p>
             </div>
             <div className="flex items-center gap-3">

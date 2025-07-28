@@ -35,8 +35,8 @@ const Header = () => {
             <div className="flex items-center space-x-2">
               <Brain className="h-7 w-7 text-primary animate-pulse-glow" />
               <div>
-                <h1 className="text-xl font-bold text-navigation-foreground">AI NAC DESIGNER</h1>
-                <p className="text-sm text-navigation-foreground/80">Intelligent Network Access Control Platform</p>
+                <h1 className="text-xl font-bold text-navigation-foreground animate-fade-in">NAC TRACKER</h1>
+                <p className="text-sm text-navigation-foreground/80 animate-fade-in" style={{ animationDelay: '0.1s' }}>Intelligent Project & Deployment Management</p>
               </div>
             </div>
           </Link>

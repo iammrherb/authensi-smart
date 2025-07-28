@@ -31,7 +31,7 @@ const Auth = () => {
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary/20 border-t-primary mx-auto mb-4"></div>
             <Shield className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-primary animate-pulse" />
           </div>
-          <p className="text-muted-foreground animate-pulse">Initializing Portnox ZTAC Platform...</p>
+          <p className="text-muted-foreground animate-pulse">Initializing NAC Tracker Platform...</p>
         </div>
       </div>
     );
@@ -75,11 +75,11 @@ const Auth = () => {
               className="h-12 w-auto"
             />
             <div>
-              <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                NAC DESIGNER
+              <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent animate-fade-in">
+                NAC TRACKER
               </div>
-              <div className="text-sm text-muted-foreground font-medium">
-                Maestro • 🧠 AI-Powered • 🎯 Use Case Maestro • 🚀 Deployment Master
+              <div className="text-sm text-muted-foreground font-medium animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                🧠 AI-Powered • 🎯 Workflow Master • 📊 Analytics • 🚀 Deployment Expert
               </div>
             </div>
           </div>
@@ -125,8 +125,8 @@ const Auth = () => {
               <div className="text-center lg:hidden">
                 <div className="flex items-center justify-center gap-3 mb-4">
                   <img src={portnoxLogo} alt="Portnox" className="h-8 w-auto" />
-                  <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                    NAC DESIGNER
+                  <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent animate-fade-in">
+                    NAC TRACKER
                   </span>
                 </div>
               </div>
