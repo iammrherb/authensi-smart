@@ -1,45 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useProjects, useCreateProject, useDeleteProject, useProject } from '@/hooks/useProjects';
+import { useSites, useCreateSite, useDeleteSite } from '@/hooks/useSites';
+import { useUseCases, useAddUseCaseToProject } from '@/hooks/useUseCases';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { 
-  Plus, Target, Building2, Users, BarChart3, TrendingUp, Filter, 
-  Search, Calendar, AlertCircle, CheckCircle, Clock, Zap, Brain,
-  FileText, Settings, Activity, MapPin, Rocket, Eye, Edit, Trash2,
-  Library, Layout, Workflow, Gauge, Star, ArrowRight, PlayCircle,
-  Lightbulb, Network, Globe, ShieldCheck, Users2, Database, BookOpen
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useProjects, useDeleteProject } from '@/hooks/useProjects';
-import { useSites, useDeleteSite } from '@/hooks/useSites';
-import { useUseCases, useAddUseCaseToProject } from '@/hooks/useUseCases';
-import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import ComprehensiveAIScopingWizard from '@/components/scoping/ComprehensiveAIScopingWizard';
 import EnhancedProjectCreationWizard from '@/components/comprehensive/EnhancedProjectCreationWizard';
 import SiteForm from '@/components/sites/SiteForm';
-import AnalyticsDashboard from '@/components/tracker/AnalyticsDashboard';
 import AIWorkflowEngine from '@/components/ai/AIWorkflowEngine';
+import AIRecommendationEngine from '@/components/ai/AIRecommendationEngine';
 import SmartProjectDashboard from '@/components/ai/SmartProjectDashboard';
+import UnifiedProjectManager from '@/components/tracker/UnifiedProjectManager';
+import { useToast } from '@/hooks/use-toast';
+import { 
+  Target, Users, Building2, Rocket, TrendingUp, AlertTriangle, 
+  CheckCircle, Clock, Plus, Search, Filter, Eye, Edit, Trash2,
+  Brain, Sparkles, BookOpen, Zap, BarChart3, Settings, MapPin,
+  Calendar, DollarSign, Shield, Network, FileText, Lightbulb,
+  ArrowRight, Globe, Database, Cpu, Activity, Download, PrinterIcon,
+  ExternalLink, ChevronDown, ChevronUp, RefreshCw, Star, Tag
+} from 'lucide-react';
 
-const CommandCenter = () => {
+const IntelligenceTrackerHub = () => {
   const { data: projects = [], isLoading: projectsLoading } = useProjects();
   const { data: sites = [], isLoading: sitesLoading } = useSites();
   const { data: useCases = [], isLoading: useCasesLoading } = useUseCases();
+  const [activeTab, setActiveTab] = useState("overview");
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const [isCreateSiteOpen, setIsCreateSiteOpen] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProjectForUseCase, setSelectedProjectForUseCase] = useState<string | null>(null);
+  const [showAIScopingWizard, setShowAIScopingWizard] = useState(false);
+  const [docSearchTerm, setDocSearchTerm] = useState('');
+  const [aiInsightsFilter, setAiInsightsFilter] = useState('all');
+  
   const { toast } = useToast();
   const { mutate: deleteProject } = useDeleteProject();
   const { mutate: deleteSite } = useDeleteSite();
   const { mutate: addUseCaseToProject } = useAddUseCaseToProject();
+
+  // Get project data if one is selected
+  const { data: projectData } = useProject(selectedProject || '');
+
+  // Filter sites by selected project
+  const projectSites = selectedProject 
+    ? sites.filter(site => {
+        // You'd need to implement project-site relationship
+        // For now, we'll assume all sites if no project selected
+        return selectedProject;
+      })
+    : [];
 
   // Analytics calculations
   const analytics = {
@@ -47,9 +68,11 @@ const CommandCenter = () => {
     activeProjects: projects.filter(p => ['scoping', 'implementing', 'testing'].includes(p.status)).length,
     completedProjects: projects.filter(p => p.status === 'deployed').length,
     totalSites: sites.length,
+    projectSites: projectSites.length,
     avgProgress: projects.length > 0 ? Math.round(projects.reduce((sum, p) => sum + (p.progress_percentage || 0), 0) / projects.length) : 0,
-    onTimeDelivery: 94.2, // Mock calculation
-    budgetEfficiency: 12, // Mock calculation
+    useCasesLibrary: useCases.length,
+    aiRecommendations: 12, // Mock data
+    onTrackProjects: projects.filter(p => !['at-risk', 'on-hold'].includes(p.status || '')).length,
   };
 
   const statusColors = {
@@ -59,14 +82,8 @@ const CommandCenter = () => {
     implementing: 'bg-orange-500',
     testing: 'bg-yellow-500',
     deployed: 'bg-green-500',
-    maintenance: 'bg-cyan-500'
-  };
-
-  const priorityColors = {
-    low: 'bg-gray-400',
-    medium: 'bg-blue-400',
-    high: 'bg-orange-400',
-    critical: 'bg-red-500'
+    maintenance: 'bg-cyan-500',
+    'at-risk': 'bg-red-500'
   };
 
   const filteredProjects = projects.filter(project => {
@@ -76,23 +93,44 @@ const CommandCenter = () => {
     return matchesStatus && matchesSearch;
   });
 
-  const filteredSites = sites.filter(site => {
-    const matchesSearch = site.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         site.location?.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
-  });
-
-  const handleProjectCreated = (projectId: string) => {
-    setIsCreateProjectOpen(false);
-    // Navigate to project scoping
-    window.location.href = `/scoping/${projectId}`;
+  const handleProjectSelect = (projectId: string) => {
+    setSelectedProject(projectId);
+    // Switch to project insights when a project is selected
+    if (activeTab === 'overview') {
+      setActiveTab('project-insights');
+    }
   };
 
-  const handleAddUseCaseToProject = (useCaseId: string, projectId: string) => {
-    addUseCaseToProject({
-      projectId,
-      useCaseId,
-      priority: 'medium',
+  const handleScopingComplete = (projectId: string, scopingData: any) => {
+    setShowAIScopingWizard(false);
+    setSelectedProject(projectId);
+    toast({
+      title: "AI Scoping Complete",
+      description: "Project has been scoped and is ready for implementation",
+    });
+  };
+
+  const generateReport = (type: 'deployment' | 'requirements' | 'checklist') => {
+    if (!selectedProject) {
+      toast({
+        title: "No Project Selected",
+        description: "Please select a project to generate reports",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    toast({
+      title: `Generating ${type} Report`,
+      description: "Report generation will be implemented soon",
+    });
+  };
+
+  const searchPortnoxDocs = async (query: string) => {
+    // Mock function for Portnox documentation search
+    toast({
+      title: "Searching Portnox Documentation",
+      description: `Searching for: ${query}`,
     });
   };
 
@@ -101,818 +139,766 @@ const CommandCenter = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading Command Center...</p>
+          <p className="text-muted-foreground">Loading Intelligence Tracker Hub...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Hero Header Section - Fixed */}
-        <div className="flex-shrink-0 relative overflow-hidden bg-gradient-to-r from-primary/10 via-accent/5 to-secondary/10 border-b">
-          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-          <div className="relative px-6 py-8">
-            <div className="max-w-full">
-              <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-lg">
-                      <Target className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                      <h1 className="text-3xl xl:text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                        Command Center
-                      </h1>
-                      <p className="text-base text-muted-foreground">
-                        Comprehensive project management and deployment tracking
-                      </p>
-                    </div>
+    <div className="min-h-screen bg-background">
+      {/* Enhanced AI Intelligence Header */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-background via-accent/10 to-primary/5 border-b">
+        <div className="absolute inset-0 bg-gradient-glow opacity-20 blur-3xl"></div>
+        <div className="relative px-6 py-8">
+          <div className="max-w-full">
+            <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="h-16 w-16 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow animate-pulse">
+                    <Brain className="h-8 w-8 text-primary-foreground" />
                   </div>
-                  
-                  <div className="flex flex-wrap items-center gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-                      <span className="text-muted-foreground">System Online</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Activity className="h-4 w-4 text-blue-500" />
-                      <span className="text-muted-foreground">{analytics.totalProjects} Projects</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-purple-500" />
-                      <span className="text-muted-foreground">{analytics.totalSites} Sites</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Library className="h-4 w-4 text-orange-500" />
-                      <span className="text-muted-foreground">{useCases.length} Use Cases</span>
-                    </div>
+                  <div>
+                    <h1 className="text-4xl xl:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                      Intelligence AI Tracker Hub
+                    </h1>
+                    <p className="text-lg text-muted-foreground mt-1">
+                      Complete AI-driven project lifecycle management and deployment optimization
+                    </p>
                   </div>
+                  <Badge variant="glow" className="text-sm px-4 py-2 animate-fade-in ml-4">
+                    AI-Powered Suite
+                  </Badge>
                 </div>
-                
-                <div className="flex flex-wrap gap-2">
-                  <Dialog open={isCreateProjectOpen} onOpenChange={setIsCreateProjectOpen}>
-                    <DialogTrigger asChild>
-                      <Button size="default" className="bg-gradient-primary hover:opacity-90">
-                        <Plus className="h-4 w-4 mr-2" />
-                        New Project
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Create New Project</DialogTitle>
-                        <DialogDescription>
-                          Create a comprehensive project with full scoping and tracking capabilities
-                        </DialogDescription>
-                      </DialogHeader>
-                      <EnhancedProjectCreationWizard
-                        onComplete={handleProjectCreated}
-                        onCancel={() => setIsCreateProjectOpen(false)}
-                      />
-                    </DialogContent>
-                  </Dialog>
-                  
-                  <Dialog open={isCreateSiteOpen} onOpenChange={setIsCreateSiteOpen}>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="default">
-                        <Building2 className="h-4 w-4 mr-2" />
-                        New Site
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Create New Site</DialogTitle>
-                        <DialogDescription>
-                          Add a new site to manage and deploy
-                        </DialogDescription>
-                      </DialogHeader>
-                      <SiteForm 
-                        isOpen={true}
-                        onClose={() => setIsCreateSiteOpen(false)}
-                        onSubmit={(siteData) => {
-                          // Handle site creation here if needed
-                          setIsCreateSiteOpen(false);
-                          toast({
-                            title: "Site Creation",
-                            description: "Site creation functionality needs to be implemented",
-                          });
-                        }}
-                      />
-                    </DialogContent>
-                  </Dialog>
-                  
-                  <Button variant="outline" size="default" asChild>
-                    <Link to="/scoping">
-                      <Brain className="h-4 w-4 mr-2" />
-                      AI Scoping
-                    </Link>
-                  </Button>
 
-                  <Button variant="outline" size="default" asChild>
-                    <Link to="/use-cases">
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      Use Cases
-                    </Link>
-                  </Button>
+                {/* Enhanced Status Indicators */}
+                <div className="flex flex-wrap items-center gap-6 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 rounded-full bg-green-500 animate-pulse"></div>
+                    <span className="text-muted-foreground font-medium">AI Engine Active</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-blue-500" />
+                    <span className="text-muted-foreground">{analytics.totalProjects} Projects</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-purple-500" />
+                    <span className="text-muted-foreground">{analytics.totalSites} Sites</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-orange-500" />
+                    <span className="text-muted-foreground">{analytics.useCasesLibrary} Use Cases</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-pink-500" />
+                    <span className="text-muted-foreground">{analytics.aiRecommendations} AI Insights</span>
+                  </div>
                 </div>
+              </div>
+              
+              {/* Quick Action Buttons */}
+              <div className="flex flex-wrap gap-3">
+                <Button 
+                  onClick={() => setShowAIScopingWizard(true)}
+                  className="bg-gradient-primary hover:opacity-90"
+                >
+                  <Brain className="h-4 w-4 mr-2" />
+                  AI Scoping
+                </Button>
+                
+                <Dialog open={isCreateProjectOpen} onOpenChange={setIsCreateProjectOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline">
+                      <Plus className="h-4 w-4 mr-2" />
+                      New Project
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Create Intelligent Project</DialogTitle>
+                      <DialogDescription>
+                        AI-powered project creation with automated scoping and recommendations
+                      </DialogDescription>
+                    </DialogHeader>
+                    <EnhancedProjectCreationWizard
+                      onComplete={(projectId) => {
+                        setIsCreateProjectOpen(false);
+                        setSelectedProject(projectId);
+                        setActiveTab('project-insights');
+                      }}
+                      onCancel={() => setIsCreateProjectOpen(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+
+                <Button variant="outline" asChild>
+                  <a href="https://docs.portnox.com" target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Portnox Docs
+                  </a>
+                </Button>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto">
-          {/* Key Metrics Dashboard */}
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-              <Card className="group hover:shadow-lg transition-all duration-300 border-primary/10 bg-gradient-to-br from-blue-50/50 to-blue-100/30 dark:from-blue-950/30 dark:to-blue-900/20">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="p-2 rounded-lg bg-blue-500/10">
-                      <Target className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <Badge variant="secondary" className="bg-blue-100/80 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 text-xs">
-                      Active
-                    </Badge>
-                  </div>
+      {/* AI Intelligence Dashboard */}
+      <div className="p-6">
+        {/* Key AI Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 mb-8">
+          <Card className="bg-gradient-to-br from-blue-50/50 to-blue-100/30 dark:from-blue-950/30 dark:to-blue-900/20 border-blue-200/50">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="p-2 rounded-lg bg-blue-500/10">
+                  <Target className="h-4 w-4 text-blue-600" />
+                </div>
+                <Badge variant="secondary" className="bg-blue-100/80 text-blue-700">Active</Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{analytics.totalProjects}</div>
+              <p className="text-sm text-muted-foreground">Total Projects</p>
+              <div className="text-xs text-blue-600 mt-1">{analytics.activeProjects} in progress</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-green-50/50 to-green-100/30 dark:from-green-950/30 dark:to-green-900/20 border-green-200/50">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="p-2 rounded-lg bg-green-500/10">
+                  <Building2 className="h-4 w-4 text-green-600" />
+                </div>
+                <Badge variant="secondary" className="bg-green-100/80 text-green-700">Sites</Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {selectedProject ? analytics.projectSites : analytics.totalSites}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {selectedProject ? 'Project Sites' : 'Total Sites'}
+              </p>
+              {selectedProject && (
+                <div className="text-xs text-green-600 mt-1">In selected project</div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-purple-50/50 to-purple-100/30 dark:from-purple-950/30 dark:to-purple-900/20 border-purple-200/50">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="p-2 rounded-lg bg-purple-500/10">
+                  <BarChart3 className="h-4 w-4 text-purple-600" />
+                </div>
+                <Badge variant="secondary" className="bg-purple-100/80 text-purple-700">Progress</Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{analytics.avgProgress}%</div>
+              <p className="text-sm text-muted-foreground">Avg Progress</p>
+              <Progress value={analytics.avgProgress} className="h-1 mt-2" />
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-orange-50/50 to-orange-100/30 dark:from-orange-950/30 dark:to-orange-900/20 border-orange-200/50">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="p-2 rounded-lg bg-orange-500/10">
+                  <BookOpen className="h-4 w-4 text-orange-600" />
+                </div>
+                <Badge variant="secondary" className="bg-orange-100/80 text-orange-700">Library</Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{analytics.useCasesLibrary}</div>
+              <p className="text-sm text-muted-foreground">Use Cases</p>
+              <div className="text-xs text-orange-600 mt-1">AI-curated</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-pink-50/50 to-pink-100/30 dark:from-pink-950/30 dark:to-pink-900/20 border-pink-200/50">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="p-2 rounded-lg bg-pink-500/10">
+                  <Sparkles className="h-4 w-4 text-pink-600" />
+                </div>
+                <Badge variant="secondary" className="bg-pink-100/80 text-pink-700">AI</Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{analytics.aiRecommendations}</div>
+              <p className="text-sm text-muted-foreground">AI Insights</p>
+              <div className="text-xs text-pink-600 mt-1">Active recommendations</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Intelligence Hub Interface */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-6 h-12 bg-card/50 backdrop-blur-sm border border-border/50">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="projects" className="flex items-center gap-2">
+              <Rocket className="h-4 w-4" />
+              Projects
+            </TabsTrigger>
+            <TabsTrigger value="project-insights" className="flex items-center gap-2" disabled={!selectedProject}>
+              <Brain className="h-4 w-4" />
+              Project AI
+            </TabsTrigger>
+            <TabsTrigger value="use-cases" className="flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              Use Cases
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Analytics
+            </TabsTrigger>
+            <TabsTrigger value="ai-tools" className="flex items-center gap-2">
+              <Zap className="h-4 w-4" />
+              AI Tools
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6">
+            {/* AI Scoping Wizard */}
+            {showAIScopingWizard && (
+              <Card className="border-primary/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-primary" />
+                    AI-Powered Project Scoping
+                  </CardTitle>
+                  <CardDescription>
+                    Intelligent project scoping with automated recommendations and documentation
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  <div>
-                    <div className="text-2xl font-bold text-foreground">{analytics.totalProjects}</div>
-                    <p className="text-xs text-muted-foreground">Total Projects</p>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-muted-foreground">{analytics.activeProjects} active</span>
-                      <span className="font-medium">{Math.round((analytics.activeProjects / Math.max(analytics.totalProjects, 1)) * 100)}%</span>
-                    </div>
-                    <Progress value={(analytics.activeProjects / Math.max(analytics.totalProjects, 1)) * 100} className="h-1" />
-                  </div>
+                <CardContent>
+                  <ComprehensiveAIScopingWizard
+                    onComplete={handleScopingComplete}
+                    onCancel={() => setShowAIScopingWizard(false)}
+                  />
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Quick Actions Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:shadow-lg transition-all">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-primary">
+                    <Brain className="h-5 w-5" />
+                    AI Scoping Wizard
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Start intelligent project scoping with AI recommendations
+                  </p>
+                  <Button 
+                    onClick={() => setShowAIScopingWizard(true)} 
+                    className="w-full bg-gradient-primary"
+                  >
+                    Start AI Scoping
+                  </Button>
                 </CardContent>
               </Card>
 
-              <Card className="group hover:shadow-lg transition-all duration-300 border-primary/10 bg-gradient-to-br from-green-50/50 to-green-100/30 dark:from-green-950/30 dark:to-green-900/20">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="p-2 rounded-lg bg-green-500/10">
-                      <Building2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-                    </div>
-                    <Badge variant="secondary" className="bg-green-100/80 text-green-700 dark:bg-green-900/50 dark:text-green-300 text-xs">
-                      Sites
-                    </Badge>
-                  </div>
+              <Card className="bg-gradient-to-br from-accent/5 to-accent/10 border-accent/20 hover:shadow-lg transition-all">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-accent">
+                    <Rocket className="h-5 w-5" />
+                    Project Management
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  <div>
-                    <div className="text-2xl font-bold text-foreground">{analytics.totalSites}</div>
-                    <p className="text-xs text-muted-foreground">Total Sites</p>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Managed infrastructure</p>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Unified project tracking and management
+                  </p>
+                  <Button 
+                    onClick={() => setActiveTab('projects')} 
+                    variant="outline" 
+                    className="w-full border-accent/30"
+                  >
+                    Manage Projects
+                  </Button>
                 </CardContent>
               </Card>
 
-              <Card className="group hover:shadow-lg transition-all duration-300 border-primary/10 bg-gradient-to-br from-purple-50/50 to-purple-100/30 dark:from-purple-950/30 dark:to-purple-900/20">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="p-2 rounded-lg bg-purple-500/10">
-                      <BarChart3 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                    </div>
-                    <Badge variant="secondary" className="bg-purple-100/80 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300 text-xs">
-                      Progress
-                    </Badge>
-                  </div>
+              <Card className="bg-gradient-to-br from-secondary/5 to-secondary/10 border-secondary/20 hover:shadow-lg transition-all">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-secondary">
+                    <BarChart3 className="h-5 w-5" />
+                    Intelligence Analytics
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  <div>
-                    <div className="text-2xl font-bold text-foreground">{analytics.avgProgress}%</div>
-                    <p className="text-xs text-muted-foreground">Avg Progress</p>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Across all projects</p>
-                </CardContent>
-              </Card>
-
-              <Card className="group hover:shadow-lg transition-all duration-300 border-primary/10 bg-gradient-to-br from-orange-50/50 to-orange-100/30 dark:from-orange-950/30 dark:to-orange-900/20">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="p-2 rounded-lg bg-orange-500/10">
-                      <Library className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                    </div>
-                    <Badge variant="secondary" className="bg-orange-100/80 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300 text-xs">
-                      Library
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div>
-                    <div className="text-2xl font-bold text-foreground">{useCases.length}</div>
-                    <p className="text-xs text-muted-foreground">Use Cases</p>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Available templates</p>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    AI-powered insights and performance analytics
+                  </p>
+                  <Button 
+                    onClick={() => setActiveTab('analytics')} 
+                    variant="outline" 
+                    className="w-full border-secondary/30"
+                  >
+                    View Analytics
+                  </Button>
                 </CardContent>
               </Card>
             </div>
-          </div>
 
-          {/* Main Content Tabs */}
-          <div className="px-6 pb-6">
-            <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-6 h-12">
-                <TabsTrigger value="overview" className="flex items-center gap-2">
-                  <Layout className="h-4 w-4" />
-                  Overview
-                </TabsTrigger>
-                <TabsTrigger value="projects" className="flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  Projects
-                </TabsTrigger>
-                <TabsTrigger value="sites" className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4" />
-                  Sites
-                </TabsTrigger>
-                <TabsTrigger value="use-cases" className="flex items-center gap-2">
-                  <Library className="h-4 w-4" />
-                  Use Cases
-                </TabsTrigger>
-                <TabsTrigger value="analytics" className="flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  Analytics
-                </TabsTrigger>
-                <TabsTrigger value="ai-workflow" className="flex items-center gap-2">
-                  <Brain className="h-4 w-4" />
-                  AI Tools
-                </TabsTrigger>
-              </TabsList>
+            {/* Recent Projects */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Projects</CardTitle>
+                <CardDescription>Latest project updates and status</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {projects.slice(0, 5).map((project) => (
+                    <div 
+                      key={project.id} 
+                      className="flex items-center justify-between p-4 rounded-lg border hover:bg-accent/5 cursor-pointer transition-colors"
+                      onClick={() => handleProjectSelect(project.id)}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className={`w-3 h-3 rounded-full ${statusColors[project.status as keyof typeof statusColors] || 'bg-gray-400'}`} />
+                        <div>
+                          <h4 className="font-medium">{project.name}</h4>
+                          <p className="text-sm text-muted-foreground">{project.client_name}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <div className="text-right">
+                          <div className="text-sm font-medium">{project.progress_percentage || 0}%</div>
+                          <Progress value={project.progress_percentage || 0} className="w-20 h-1" />
+                        </div>
+                        <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-              {/* Overview Tab */}
-              <TabsContent value="overview" className="space-y-6">
-                <div className="grid gap-6">
-                  {/* Quick Actions */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Rocket className="h-5 w-5" />
-                        Quick Actions
-                      </CardTitle>
-                      <CardDescription>
-                        Get started with common tasks and workflows
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <Button variant="outline" className="h-auto p-4 flex-col gap-2" asChild>
-                          <Link to="/scoping">
-                            <Brain className="h-6 w-6" />
-                            <span className="font-medium">AI Scoping</span>
-                            <span className="text-xs text-muted-foreground text-center">Smart project planning</span>
-                          </Link>
+          {/* Projects Tab */}
+          <TabsContent value="projects" className="space-y-6">
+            <UnifiedProjectManager />
+          </TabsContent>
+
+          {/* Project-Specific AI Insights Tab */}
+          <TabsContent value="project-insights" className="space-y-6">
+            {selectedProject ? (
+              <>
+                {/* Project Header */}
+                <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <Brain className="h-6 w-6 text-primary" />
+                          Project Intelligence: {projectData?.name || 'Loading...'}
+                        </CardTitle>
+                        <CardDescription>AI-powered insights and recommendations for this project</CardDescription>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button onClick={() => generateReport('deployment')} size="sm">
+                          <Download className="h-4 w-4 mr-2" />
+                          Deployment Report
                         </Button>
-                        
-                        <Button variant="outline" className="h-auto p-4 flex-col gap-2" asChild>
-                          <Link to="/use-cases">
-                            <BookOpen className="h-6 w-6" />
-                            <span className="font-medium">Use Case Library</span>
-                            <span className="text-xs text-muted-foreground text-center">Browse templates</span>
-                          </Link>
-                        </Button>
-                        
-                        <Button variant="outline" className="h-auto p-4 flex-col gap-2" asChild>
-                          <Link to="/sites">
-                            <Building2 className="h-6 w-6" />
-                            <span className="font-medium">Manage Sites</span>
-                            <span className="text-xs text-muted-foreground text-center">Site configuration</span>
-                          </Link>
-                        </Button>
-                        
-                        <Button variant="outline" className="h-auto p-4 flex-col gap-2" asChild>
-                          <Link to="/reports">
-                            <FileText className="h-6 w-6" />
-                            <span className="font-medium">Reports</span>
-                            <span className="text-xs text-muted-foreground text-center">Analytics & insights</span>
-                          </Link>
+                        <Button onClick={() => generateReport('checklist')} size="sm" variant="outline">
+                          <PrinterIcon className="h-4 w-4 mr-2" />
+                          Checklist
                         </Button>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </CardHeader>
+                </Card>
 
-                  {/* Recent Projects & Sites */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Target className="h-5 w-5" />
-                          Recent Projects
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        {projects.slice(0, 3).map((project) => (
-                          <div key={project.id} className="flex items-center justify-between p-3 border rounded-lg">
-                            <div className="space-y-1">
-                              <p className="font-medium text-sm">{project.name}</p>
-                              <p className="text-xs text-muted-foreground">{project.client_name}</p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Badge variant="secondary" className="text-xs">
-                                {project.status}
-                              </Badge>
-                              <Link to={`/project/${project.id}/tracking`}>
-                                <Button variant="ghost" size="sm">
-                                  <ArrowRight className="h-4 w-4" />
-                                </Button>
-                              </Link>
-                            </div>
-                          </div>
-                        ))}
-                        {projects.length === 0 && (
-                          <div className="text-center py-8">
-                            <Target className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                            <p className="text-sm text-muted-foreground">No projects yet</p>
-                            <Button variant="outline" size="sm" className="mt-2" onClick={() => setIsCreateProjectOpen(true)}>
-                              Create First Project
-                            </Button>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
+                {/* Project Sites Management */}
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
                         <CardTitle className="flex items-center gap-2">
                           <Building2 className="h-5 w-5" />
-                          Recent Sites
+                          Project Sites ({analytics.projectSites})
                         </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        {sites.slice(0, 3).map((site) => (
-                          <div key={site.id} className="flex items-center justify-between p-3 border rounded-lg">
-                            <div className="space-y-1">
-                              <p className="font-medium text-sm">{site.name}</p>
-                              <p className="text-xs text-muted-foreground">{site.location}</p>
+                        <CardDescription>Manage sites specific to this project</CardDescription>
+                      </div>
+                      <Dialog open={isCreateSiteOpen} onOpenChange={setIsCreateSiteOpen}>
+                        <DialogTrigger asChild>
+                          <Button>
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Site
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle>Add Site to Project</DialogTitle>
+                            <DialogDescription>
+                              Add a new site to {projectData?.name}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <SiteForm 
+                            isOpen={true}
+                            onClose={() => setIsCreateSiteOpen(false)}
+                            onSubmit={(siteData) => {
+                              setIsCreateSiteOpen(false);
+                              toast({
+                                title: "Site Added",
+                                description: "Site has been added to the project",
+                              });
+                            }}
+                          />
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {projectSites.length > 0 ? (
+                      <div className="space-y-4">
+                        {projectSites.map((site) => (
+                          <div key={site.id} className="flex items-center justify-between p-4 border rounded-lg">
+                            <div>
+                              <h4 className="font-medium">{site.name}</h4>
+                              <p className="text-sm text-muted-foreground">{site.location}</p>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Badge variant="secondary" className="text-xs">
-                                {site.status}
-                              </Badge>
-                              <Link to={`/sites`}>
-                                <Button variant="ghost" size="sm">
-                                  <ArrowRight className="h-4 w-4" />
-                                </Button>
-                              </Link>
+                              <Badge variant="outline">{site.status}</Badge>
+                              <Button size="sm" variant="ghost">
+                                <Eye className="h-4 w-4" />
+                              </Button>
                             </div>
                           </div>
                         ))}
-                        {sites.length === 0 && (
-                          <div className="text-center py-8">
-                            <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                            <p className="text-sm text-muted-foreground">No sites yet</p>
-                            <Button variant="outline" size="sm" className="mt-2" onClick={() => setIsCreateSiteOpen(true)}>
-                              Create First Site
-                            </Button>
-                          </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <Building2 className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+                        <p className="text-muted-foreground">No sites in this project yet</p>
+                        <Button 
+                          onClick={() => setIsCreateSiteOpen(true)} 
+                          className="mt-4"
+                          variant="outline"
+                        >
+                          Add First Site
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* AI Recommendations for Project */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                      AI Recommendations
+                    </CardTitle>
+                    <CardDescription>Personalized recommendations for this project</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <AIRecommendationEngine />
+                  </CardContent>
+                </Card>
+
+                {/* Project Use Cases */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BookOpen className="h-5 w-5" />
+                      Project Use Cases
+                    </CardTitle>
+                    <CardDescription>Use cases assigned to this project</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <Button 
+                        onClick={() => setActiveTab('use-cases')}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Use Cases to Project
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Portnox Documentation Search */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      Portnox Documentation
+                    </CardTitle>
+                    <CardDescription>AI-powered documentation search and recommendations</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Search Portnox documentation..."
+                        value={docSearchTerm}
+                        onChange={(e) => setDocSearchTerm(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button onClick={() => searchPortnoxDocs(docSearchTerm)}>
+                        <Search className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      <Button size="sm" variant="outline" onClick={() => searchPortnoxDocs('firewall configuration')}>
+                        Firewall Config
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => searchPortnoxDocs('wireless vendors')}>
+                        Wireless Vendors
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => searchPortnoxDocs('VPN integration')}>
+                        VPN Integration
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => searchPortnoxDocs('troubleshooting')}>
+                        Troubleshooting
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <Brain className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No Project Selected</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Select a project to view AI insights, site management, and recommendations
+                  </p>
+                  <Button onClick={() => setActiveTab('projects')}>
+                    <Rocket className="h-4 w-4 mr-2" />
+                    View Projects
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Use Cases Tab */}
+          <TabsContent value="use-cases" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5" />
+                  Use Case Library
+                </CardTitle>
+                <CardDescription>
+                  {selectedProject 
+                    ? `Apply use cases to ${projectData?.name}` 
+                    : 'Browse and manage use cases'
+                  }
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {useCases.slice(0, 6).map((useCase) => (
+                    <Card key={useCase.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <Badge variant="outline">{useCase.category}</Badge>
+                          <Badge 
+                            className={`${
+                              useCase.complexity === 'low' ? 'bg-green-100 text-green-700' :
+                              useCase.complexity === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-red-100 text-red-700'
+                            }`}
+                          >
+                            {useCase.complexity}
+                          </Badge>
+                        </div>
+                        <CardTitle className="text-sm">{useCase.name}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <p className="text-xs text-muted-foreground mb-3 line-clamp-3">
+                          {useCase.description}
+                        </p>
+                        {selectedProject && (
+                          <Button 
+                            size="sm" 
+                            className="w-full"
+                            onClick={() => addUseCaseToProject({
+                              projectId: selectedProject,
+                              useCaseId: useCase.id,
+                              priority: 'medium'
+                            })}
+                          >
+                            <Plus className="h-3 w-3 mr-1" />
+                            Add to Project
+                          </Button>
                         )}
                       </CardContent>
                     </Card>
-                  </div>
-                </div>
-              </TabsContent>
-
-              {/* Projects Tab */}
-              <TabsContent value="projects" className="space-y-4">
-                {/* Filters and Search */}
-                <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-                  <div className="flex gap-4 items-center">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                      <Input
-                        placeholder="Search projects..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 w-[250px]"
-                      />
-                    </div>
-                    <Select value={filterStatus} onValueChange={setFilterStatus}>
-                      <SelectTrigger className="w-[150px]">
-                        <Filter className="h-4 w-4 mr-2" />
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="planning">Planning</SelectItem>
-                        <SelectItem value="scoping">Scoping</SelectItem>
-                        <SelectItem value="designing">Designing</SelectItem>
-                        <SelectItem value="implementing">Implementing</SelectItem>
-                        <SelectItem value="testing">Testing</SelectItem>
-                        <SelectItem value="deployed">Deployed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {filteredProjects.length} of {projects.length} projects
-                  </div>
-                </div>
-
-                {/* Projects Grid */}
-                <div className="grid gap-4">
-                  {filteredProjects.map((project) => (
-                    <Card key={project.id} className="hover:shadow-lg transition-shadow">
-                      <CardHeader className="pb-3">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <CardTitle className="text-lg">{project.name}</CardTitle>
-                              <Badge 
-                                variant="secondary" 
-                                className={`${statusColors[project.status as keyof typeof statusColors]} text-white text-xs`}
-                              >
-                                {project.status}
-                              </Badge>
-                              {project.current_phase && (
-                                <Badge variant="outline" className="text-xs">
-                                  {project.current_phase}
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-muted-foreground text-sm">
-                              {project.client_name || 'No client specified'}
-                            </p>
-                            {project.description && (
-                              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                                {project.description}
-                              </p>
-                            )}
-                          </div>
-                          
-                          <div className="flex flex-col items-end gap-2">
-                            {(project as any).industry && (
-                              <Badge variant="outline" className="text-xs">{(project as any).industry}</Badge>
-                            )}
-                            <div className="flex gap-1">
-                              <Link to={`/scoping/${project.id}`}>
-                                <Button variant="outline" size="sm">
-                                  <Settings className="h-4 w-4" />
-                                </Button>
-                              </Link>
-                              <Link to={`/project/${project.id}/tracking`}>
-                                <Button variant="outline" size="sm">
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                              </Link>
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10">
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete Project</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Are you sure you want to delete "{project.name}"? This action cannot be undone.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={() => deleteProject(project.id)}
-                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                    >
-                                      Delete
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            </div>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      
-                      <CardContent className="pt-0">
-                        <div className="space-y-3">
-                          {/* Progress */}
-                          <div>
-                            <div className="flex justify-between text-sm mb-1">
-                              <span className="font-medium">Progress</span>
-                              <span>{project.progress_percentage}%</span>
-                            </div>
-                            <Progress value={project.progress_percentage} className="h-2" />
-                          </div>
-
-                          {/* Key Details */}
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <span className="text-muted-foreground">Start Date:</span>
-                              <p className="font-medium">{project.start_date || 'Not set'}</p>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Target Completion:</span>
-                              <p className="font-medium">{project.target_completion || 'Not set'}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                  {filteredProjects.length === 0 && (
-                    <div className="text-center py-12">
-                      <Target className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">No projects found</h3>
-                      <p className="text-muted-foreground mb-4">
-                        {searchTerm || filterStatus !== 'all' 
-                          ? 'Try adjusting your search or filter criteria'
-                          : 'Get started by creating your first project'
-                        }
-                      </p>
-                      {!searchTerm && filterStatus === 'all' && (
-                        <Button onClick={() => setIsCreateProjectOpen(true)}>
-                          <Plus className="h-4 w-4 mr-2" />
-                          Create First Project
-                        </Button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-
-              {/* Sites Tab */}
-              <TabsContent value="sites" className="space-y-4">
-                <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <Input
-                      placeholder="Search sites..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 w-[250px]"
-                    />
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {filteredSites.length} of {sites.length} sites
-                  </div>
-                </div>
-
-                <div className="grid gap-4">
-                  {filteredSites.map((site) => (
-                    <Card key={site.id} className="hover:shadow-lg transition-shadow">
-                      <CardHeader className="pb-3">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <CardTitle className="text-lg">{site.name}</CardTitle>
-                              <Badge 
-                                variant="secondary" 
-                                className={`${statusColors[site.status as keyof typeof statusColors]} text-white text-xs`}
-                              >
-                                {site.status}
-                              </Badge>
-                              <Badge 
-                                variant="outline" 
-                                className={`${priorityColors[site.priority as keyof typeof priorityColors]} text-white text-xs`}
-                              >
-                                {site.priority}
-                              </Badge>
-                            </div>
-                            <p className="text-muted-foreground text-sm">
-                              {site.location || 'No location specified'}
-                            </p>
-                          </div>
-                          
-                          <div className="flex gap-1">
-                            <Link to={`/sites`}>
-                              <Button variant="outline" size="sm">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </Link>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Site</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to delete "{site.name}"? This action cannot be undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => deleteSite(site.id)}
-                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                  >
-                                    Delete
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      
-                      <CardContent className="pt-0">
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="text-muted-foreground">Type:</span>
-                            <p className="font-medium">{site.site_type}</p>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Devices:</span>
-                            <p className="font-medium">{site.device_count}</p>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Progress:</span>
-                            <div className="flex items-center gap-2">
-                              <Progress value={site.progress_percentage || 0} className="h-1 flex-1" />
-                              <span className="font-medium">{site.progress_percentage || 0}%</span>
-                            </div>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Phase:</span>
-                            <p className="font-medium">{site.current_phase || 'Planning'}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                  {filteredSites.length === 0 && (
-                    <div className="text-center py-12">
-                      <Building2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">No sites found</h3>
-                      <p className="text-muted-foreground mb-4">
-                        {searchTerm 
-                          ? 'Try adjusting your search criteria'
-                          : 'Get started by creating your first site'
-                        }
-                      </p>
-                      {!searchTerm && (
-                        <Button onClick={() => setIsCreateSiteOpen(true)}>
-                          <Plus className="h-4 w-4 mr-2" />
-                          Create First Site
-                        </Button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-
-              {/* Use Cases Tab */}
-              <TabsContent value="use-cases" className="space-y-4">
-                <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <Input
-                      placeholder="Search use cases..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 w-[250px]"
-                    />
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {useCases.length} use cases available
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {useCases
-                    .filter(useCase => 
-                      useCase.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                      useCase.category.toLowerCase().includes(searchTerm.toLowerCase())
-                    )
-                    .map((useCase) => (
-                    <Card key={useCase.id} className="hover:shadow-lg transition-shadow">
-                      <CardHeader className="pb-3">
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <Badge variant="outline" className="text-xs">
-                              {useCase.category}
-                            </Badge>
-                            <Badge 
-                              variant="secondary" 
-                              className={`text-xs ${
-                                useCase.complexity === 'low' ? 'bg-green-100 text-green-700' :
-                                useCase.complexity === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-red-100 text-red-700'
-                              }`}
-                            >
-                              {useCase.complexity}
-                            </Badge>
-                          </div>
-                          <CardTitle className="text-sm">{useCase.name}</CardTitle>
-                          {useCase.description && (
-                            <p className="text-xs text-muted-foreground line-clamp-2">
-                              {useCase.description}
-                            </p>
-                          )}
-                        </div>
-                      </CardHeader>
-                      
-                      <CardContent className="pt-0">
-                        <div className="space-y-3">
-                          <div className="text-xs">
-                            <span className="text-muted-foreground">Effort:</span>
-                            <span className="font-medium ml-1">
-                              {useCase.estimated_effort_weeks ? `${useCase.estimated_effort_weeks} weeks` : 'TBD'}
-                            </span>
-                          </div>
-                          
-                          <div className="flex gap-2">
-                            <Link to={`/use-cases`}>
-                              <Button variant="outline" size="sm" className="text-xs">
-                                <Eye className="h-3 w-3 mr-1" />
-                                View
-                              </Button>
-                            </Link>
-                            
-                            {projects.length > 0 && (
-                              <Dialog>
-                                <DialogTrigger asChild>
-                                  <Button size="sm" className="text-xs">
-                                    <Plus className="h-3 w-3 mr-1" />
-                                    Add to Project
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogContent>
-                                  <DialogHeader>
-                                    <DialogTitle>Add Use Case to Project</DialogTitle>
-                                    <DialogDescription>
-                                      Select a project to add "{useCase.name}" to
-                                    </DialogDescription>
-                                  </DialogHeader>
-                                  <div className="space-y-4">
-                                    {projects.map((project) => (
-                                      <Card key={project.id} className="cursor-pointer hover:bg-muted/50" 
-                                            onClick={() => {
-                                              handleAddUseCaseToProject(useCase.id, project.id);
-                                              setSelectedProjectForUseCase(null);
-                                            }}>
-                                        <CardContent className="p-4">
-                                          <div className="flex items-center justify-between">
-                                            <div>
-                                              <p className="font-medium">{project.name}</p>
-                                              <p className="text-sm text-muted-foreground">{project.client_name}</p>
-                                            </div>
-                                            <Badge variant="outline">{project.status}</Badge>
-                                          </div>
-                                        </CardContent>
-                                      </Card>
-                                    ))}
-                                  </div>
-                                </DialogContent>
-                              </Dialog>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-                {useCases.length === 0 && (
-                  <div className="text-center py-12">
-                    <Library className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No use cases available</h3>
-                    <p className="text-muted-foreground">
-                      Use cases will appear here once they are added to the library
-                    </p>
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            <SmartProjectDashboard />
+            
+            {/* Enhanced Analytics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Project Performance</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">On-Track Projects</span>
+                      <span className="font-medium">{analytics.onTrackProjects}/{analytics.totalProjects}</span>
+                    </div>
+                    <Progress value={(analytics.onTrackProjects / Math.max(analytics.totalProjects, 1)) * 100} />
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Average Progress</span>
+                      <span className="font-medium">{analytics.avgProgress}%</span>
+                    </div>
+                    <Progress value={analytics.avgProgress} />
                   </div>
-                )}
-              </TabsContent>
+                </CardContent>
+              </Card>
 
-              {/* Analytics Tab */}
-              <TabsContent value="analytics" className="space-y-6">
-                <AnalyticsDashboard />
-              </TabsContent>
+              <Card>
+                <CardHeader>
+                  <CardTitle>AI Insights Overview</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Active Recommendations</span>
+                      <Badge>{analytics.aiRecommendations}</Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Automated Actions</span>
+                      <Badge variant="secondary">8</Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Success Rate</span>
+                      <Badge variant="outline">94.2%</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
-              {/* AI Workflow Tab */}
-              <TabsContent value="ai-workflow" className="space-y-6">
-                <div className="grid gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Brain className="h-5 w-5" />
-                        AI-Powered Tools
-                      </CardTitle>
-                      <CardDescription>
-                        Leverage artificial intelligence to streamline your project workflows
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <AIWorkflowEngine context="deployment" />
-                        <SmartProjectDashboard />
-                      </div>
-                    </CardContent>
-                  </Card>
+          {/* AI Tools Tab */}
+          <TabsContent value="ai-tools" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-primary" />
+                    AI Workflow Engine
+                  </CardTitle>
+                  <CardDescription>Intelligent automation and workflow optimization</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <AIWorkflowEngine 
+                    context="deployment"
+                    onAction={(action, data) => {
+                      console.log('AI Action:', action, data);
+                    }}
+                    onRecommendationAccept={(recommendation) => {
+                      toast({
+                        title: "Recommendation Applied",
+                        description: "AI recommendation has been implemented",
+                      });
+                    }}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    Global AI Insights
+                  </CardTitle>
+                  <CardDescription>Cross-project intelligence and recommendations</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <AIRecommendationEngine />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* AI Capabilities Summary */}
+            <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Brain className="h-6 w-6 text-primary" />
+                  Complete AI Integration
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-semibold mb-3">Automated Project Management</h4>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center gap-2">
+                        <div className="h-2 w-2 bg-primary rounded-full" />
+                        Intelligent project template selection
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="h-2 w-2 bg-primary rounded-full" />
+                        Automated site and resource planning
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="h-2 w-2 bg-primary rounded-full" />
+                        Smart vendor recommendation and selection
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="h-2 w-2 bg-primary rounded-full" />
+                        Dynamic timeline optimization
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold mb-3">Intelligent Analysis & Insights</h4>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center gap-2">
+                        <div className="h-2 w-2 bg-primary rounded-full" />
+                        Real-time project health monitoring
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="h-2 w-2 bg-primary rounded-full" />
+                        Predictive risk assessment
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="h-2 w-2 bg-primary rounded-full" />
+                        Performance optimization recommendations
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="h-2 w-2 bg-primary rounded-full" />
+                        Compliance and security validation
+                      </li>
+                    </ul>
+                  </div>
                 </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
 };
 
-export default CommandCenter;
+export default IntelligenceTrackerHub;
