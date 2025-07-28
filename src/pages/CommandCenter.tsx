@@ -90,98 +90,175 @@ const CommandCenter = () => {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Command Center</h1>
-          <p className="text-muted-foreground">
-            Comprehensive project management and deployment tracking
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <Dialog open={isCreateProjectOpen} onOpenChange={setIsCreateProjectOpen}>
-            <DialogTrigger asChild>
-              <Button size="lg" className="bg-gradient-primary hover:opacity-90">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Project
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Create New Project</DialogTitle>
-                <DialogDescription>
-                  Create a comprehensive project with full scoping and tracking capabilities
-                </DialogDescription>
-              </DialogHeader>
-              <EnhancedProjectCreationWizard
-                onComplete={handleProjectCreated}
-                onCancel={() => setIsCreateProjectOpen(false)}
-              />
-            </DialogContent>
-          </Dialog>
-          
-          <Button variant="outline" asChild>
-            <Link to="/scoping">
-              <Brain className="h-4 w-4 mr-2" />
-              AI Scoping
-            </Link>
-          </Button>
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+      {/* Hero Header Section */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-accent/5 to-secondary/10 border-b">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="relative px-6 py-12">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-xl bg-gradient-primary flex items-center justify-center shadow-lg">
+                    <Target className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                      Command Center
+                    </h1>
+                    <p className="text-lg text-muted-foreground mt-1">
+                      Comprehensive project management and deployment tracking
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex flex-wrap items-center gap-6 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span className="text-muted-foreground">System Online</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-blue-500" />
+                    <span className="text-muted-foreground">{analytics.totalProjects} Active Projects</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-purple-500" />
+                    <span className="text-muted-foreground">{analytics.totalSites} Sites Managed</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Dialog open={isCreateProjectOpen} onOpenChange={setIsCreateProjectOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="lg" className="bg-gradient-primary hover:opacity-90 shadow-xl">
+                      <Plus className="h-5 w-5 mr-2" />
+                      Create Project
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Create New Project</DialogTitle>
+                      <DialogDescription>
+                        Create a comprehensive project with full scoping and tracking capabilities
+                      </DialogDescription>
+                    </DialogHeader>
+                    <EnhancedProjectCreationWizard
+                      onComplete={handleProjectCreated}
+                      onCancel={() => setIsCreateProjectOpen(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+                
+                <Button variant="outline" size="lg" asChild className="border-primary/20 hover:bg-primary/5">
+                  <Link to="/scoping">
+                    <Brain className="h-5 w-5 mr-2" />
+                    AI Scoping
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Key Metrics Dashboard */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border-l-4 border-l-blue-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
-            <Target className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{analytics.totalProjects}</div>
-            <p className="text-xs text-muted-foreground">
-              {analytics.activeProjects} active
-            </p>
-            <Progress value={(analytics.activeProjects / Math.max(analytics.totalProjects, 1)) * 100} className="mt-2" />
-          </CardContent>
-        </Card>
+      <div className="px-6 py-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="group hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/50 dark:to-blue-900/30">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="p-2 rounded-lg bg-blue-500/10">
+                    <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
+                    Active
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <div className="text-3xl font-bold text-foreground">{analytics.totalProjects}</div>
+                  <p className="text-sm text-muted-foreground">Total Projects</p>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">{analytics.activeProjects} active</span>
+                    <span className="font-medium">{Math.round((analytics.activeProjects / Math.max(analytics.totalProjects, 1)) * 100)}%</span>
+                  </div>
+                  <Progress value={(analytics.activeProjects / Math.max(analytics.totalProjects, 1)) * 100} className="h-1.5" />
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="border-l-4 border-l-green-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{analytics.onTimeDelivery}%</div>
-            <p className="text-xs text-muted-foreground">On-time delivery</p>
-          </CardContent>
-        </Card>
+            <Card className="group hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/50 dark:to-green-900/30">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="p-2 rounded-lg bg-green-500/10">
+                    <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300">
+                    Success
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <div className="text-3xl font-bold text-foreground">{analytics.onTimeDelivery}%</div>
+                  <p className="text-sm text-muted-foreground">Success Rate</p>
+                </div>
+                <p className="text-xs text-muted-foreground">On-time delivery performance</p>
+              </CardContent>
+            </Card>
 
-        <Card className="border-l-4 border-l-purple-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Progress</CardTitle>
-            <BarChart3 className="h-4 w-4 text-purple-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{analytics.avgProgress}%</div>
-            <p className="text-xs text-muted-foreground">Across all projects</p>
-          </CardContent>
-        </Card>
+            <Card className="group hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-950/50 dark:to-purple-900/30">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="p-2 rounded-lg bg-purple-500/10">
+                    <BarChart3 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300">
+                    Progress
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <div className="text-3xl font-bold text-foreground">{analytics.avgProgress}%</div>
+                  <p className="text-sm text-muted-foreground">Avg Progress</p>
+                </div>
+                <p className="text-xs text-muted-foreground">Across all active projects</p>
+              </CardContent>
+            </Card>
 
-        <Card className="border-l-4 border-l-orange-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Budget Efficiency</CardTitle>
-            <TrendingUp className="h-4 w-4 text-orange-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{analytics.budgetEfficiency}%</div>
-            <p className="text-xs text-muted-foreground">Under budget avg</p>
-          </CardContent>
-        </Card>
+            <Card className="group hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-950/50 dark:to-orange-900/30">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="p-2 rounded-lg bg-orange-500/10">
+                    <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <Badge variant="secondary" className="bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300">
+                    Budget
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <div className="text-3xl font-bold text-foreground">{analytics.budgetEfficiency}%</div>
+                  <p className="text-sm text-muted-foreground">Budget Efficiency</p>
+                </div>
+                <p className="text-xs text-muted-foreground">Under budget average</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="projects" className="space-y-6">
+      <div className="px-6 pb-8">
+        <div className="max-w-7xl mx-auto">
+          <Tabs defaultValue="projects" className="space-y-8">
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="projects">Project Overview</TabsTrigger>
           <TabsTrigger value="ai-workflow">AI Workflow</TabsTrigger>
@@ -475,9 +552,11 @@ const CommandCenter = () => {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
-    </div>
-  );
-};
+            </Tabs>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
 export default CommandCenter;
