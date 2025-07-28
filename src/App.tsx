@@ -40,14 +40,16 @@ import IntelligenceTrackerHub from "./pages/IntelligenceTrackerHub";
 const queryClient = new QueryClient();
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => (
-  <SidebarProvider defaultOpen={true}>
+  <SidebarProvider defaultOpen={false}>
     <div className="min-h-screen flex w-full bg-background">
       <AppSidebar />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         <Header />
         <NavigationBreadcrumb />
-        <main className="flex-1 overflow-auto bg-background">
-          {children}
+        <main className="flex-1 overflow-hidden bg-background">
+          <div className="h-full overflow-auto p-4">
+            {children}
+          </div>
         </main>
       </div>
     </div>
