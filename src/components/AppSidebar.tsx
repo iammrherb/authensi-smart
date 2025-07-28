@@ -26,21 +26,14 @@ import { useAuth } from "@/contexts/AuthContext";
 // Navigation structure with AI-focused organization
 const navigationItems = [
   {
-    title: "AI Intelligence Hub",
+    title: "Intelligence Tracker Hub",
     icon: Brain,
-    badge: "AI",
+    badge: "AI+",
     items: [
       { title: "Command Center", url: "/", icon: Target, description: "Project management hub" },
+      { title: "Intelligence Hub", url: "/intelligence", icon: Brain, description: "AI-powered project intelligence" },
       { title: "AI Scoping Wizard", url: "/scoping", icon: Lightbulb, description: "Intelligent project scoping" },
-      { title: "Smart Recommendations", url: "/recommendations", icon: Sparkles, description: "AI-driven insights" },
-    ]
-  },
-  {
-    title: "Project Management",
-    icon: Rocket,
-    items: [
-      { title: "POC Tracker", url: "/tracker", icon: Zap, description: "Implementation tracking" },
-      { title: "Deployment Master", url: "/deployment", icon: Rocket, description: "Go-live management" },
+      { title: "Project Tracker", url: "/tracker", icon: Zap, description: "Unified project tracking" },
       { title: "Analytics Hub", url: "/reports", icon: BarChart3, description: "Performance insights" },
     ]
   },
@@ -69,7 +62,7 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { isAdmin } = useAuth();
-  const [openGroups, setOpenGroups] = useState<string[]>(["AI Intelligence Hub", "Project Management"]);
+  const [openGroups, setOpenGroups] = useState<string[]>(["Intelligence Tracker Hub", "Knowledge & Resources"]);
 
   const isActive = (path: string) => location.pathname === path;
   
@@ -122,12 +115,12 @@ export function AppSidebar() {
                   Start AI Scoping
                 </Link>
               </SidebarMenuButton>
-              <SidebarMenuButton asChild className="w-full justify-start text-left hover:bg-white/20 border border-white/20">
-                <Link to="/recommendations">
-                  <Brain className="h-4 w-4 mr-2" />
-                  Get AI Insights
-                </Link>
-              </SidebarMenuButton>
+                <SidebarMenuButton asChild className="w-full justify-start text-left hover:bg-white/20 border border-white/20">
+                  <Link to="/intelligence">
+                    <Brain className="h-4 w-4 mr-2" />
+                    Intelligence Hub
+                  </Link>
+                </SidebarMenuButton>
             </div>
           </div>
         )}

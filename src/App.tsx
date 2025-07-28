@@ -35,7 +35,7 @@ import ProjectScoping from "./pages/ProjectScoping";
 import ProjectTracking from "./pages/ProjectTracking";
 import UseCaseLibrary from "./pages/UseCaseLibrary";
 import ProjectDetails from "./pages/ProjectDetails";
-import AIRecommendations from "./pages/AIRecommendations";
+import IntelligenceTrackerHub from "./pages/IntelligenceTrackerHub";
 
 const queryClient = new QueryClient();
 
@@ -70,10 +70,11 @@ const App = () => (
                     <Route path="/" element={<CommandCenter />} />
                     <Route path="/dashboard" element={<CommandCenter />} />
                     
-                    {/* AI Intelligence Hub */}
+                    {/* Intelligence Tracker Hub */}
+                    <Route path="/intelligence" element={<IntelligenceTrackerHub />} />
                     <Route path="/scoping" element={<IntelligentScoping />} />
                     <Route path="/scoping/:projectId" element={<ProjectScoping />} />
-                    <Route path="/recommendations" element={<AIRecommendations />} />
+                    <Route path="/recommendations" element={<IntelligenceTrackerHub />} />
                     
                     {/* Project Management */}
                     <Route path="/tracker" element={<Tracker />} />
