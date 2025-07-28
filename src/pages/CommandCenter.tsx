@@ -188,7 +188,18 @@ const CommandCenter = () => {
                           Add a new site to manage and deploy
                         </DialogDescription>
                       </DialogHeader>
-                      <SiteForm />
+                      <SiteForm 
+                        isOpen={true}
+                        onClose={() => setIsCreateSiteOpen(false)}
+                        onSubmit={(siteData) => {
+                          // Handle site creation here if needed
+                          setIsCreateSiteOpen(false);
+                          toast({
+                            title: "Site Creation",
+                            description: "Site creation functionality needs to be implemented",
+                          });
+                        }}
+                      />
                     </DialogContent>
                   </Dialog>
                   
@@ -889,7 +900,7 @@ const CommandCenter = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <AIWorkflowEngine context="command-center" />
+                        <AIWorkflowEngine context="deployment" />
                         <SmartProjectDashboard />
                       </div>
                     </CardContent>
