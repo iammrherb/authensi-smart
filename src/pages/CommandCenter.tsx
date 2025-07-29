@@ -295,37 +295,66 @@ const CommandCenter = () => {
       {/* Main Content Area with Fixed Height */}
       <div className="flex-1 overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-          <div className="flex-shrink-0 border-b bg-background">
-            <TabsList className="grid w-full grid-cols-6 h-10 bg-transparent border-none">
-              <TabsTrigger value="overview" className="flex items-center gap-1 text-xs">
-                <Target className="h-3 w-3" />
-                Overview
-              </TabsTrigger>
-              <TabsTrigger value="projects" className="flex items-center gap-1 text-xs">
-                <Rocket className="h-3 w-3" />
-                Projects
-              </TabsTrigger>
-              <TabsTrigger value="project-insights" className="flex items-center gap-1 text-xs" disabled={!selectedProject}>
-                <Brain className="h-3 w-3" />
-                Project AI
-              </TabsTrigger>
-              <TabsTrigger value="use-cases" className="flex items-center gap-1 text-xs">
-                <BookOpen className="h-3 w-3" />
-                Use Cases
-              </TabsTrigger>
-              <TabsTrigger value="analytics" className="flex items-center gap-1 text-xs">
-                <BarChart3 className="h-3 w-3" />
-                Analytics
-              </TabsTrigger>
-              <TabsTrigger value="ai-tools" className="flex items-center gap-1 text-xs">
-                <Zap className="h-3 w-3" />
-                AI Tools
-              </TabsTrigger>
-            </TabsList>
+          <div className="flex-shrink-0 border-b bg-gradient-to-r from-card/50 to-accent/10">
+            <div className="px-4 py-3">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-lg font-semibold text-foreground">Command Center Dashboard</h2>
+                <div className="flex items-center space-x-2">
+                  <Badge variant="outline" className="text-xs">
+                    Real-time Updates
+                  </Badge>
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                </div>
+              </div>
+              <TabsList className="grid w-full grid-cols-6 h-12 bg-muted/50 p-1 rounded-xl">
+                <TabsTrigger value="overview" className="flex items-center gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg transition-all">
+                  <Target className="h-4 w-4" />
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">Overview</span>
+                    <span className="text-xs opacity-70">Dashboard</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger value="projects" className="flex items-center gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg transition-all">
+                  <Rocket className="h-4 w-4" />
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">Projects</span>
+                    <span className="text-xs opacity-70">Management</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger value="project-insights" className="flex items-center gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg transition-all" disabled={!selectedProject}>
+                  <Brain className="h-4 w-4" />
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">Project AI</span>
+                    <span className="text-xs opacity-70">Insights</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger value="use-cases" className="flex items-center gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg transition-all">
+                  <BookOpen className="h-4 w-4" />
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">Use Cases</span>
+                    <span className="text-xs opacity-70">Library</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger value="analytics" className="flex items-center gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg transition-all">
+                  <BarChart3 className="h-4 w-4" />
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">Analytics</span>
+                    <span className="text-xs opacity-70">Reports</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger value="ai-tools" className="flex items-center gap-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg transition-all">
+                  <Zap className="h-4 w-4" />
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">AI Tools</span>
+                    <span className="text-xs opacity-70">Automation</span>
+                  </div>
+                </TabsTrigger>
+              </TabsList>
+            </div>
           </div>
           
-          <div className="flex-1 overflow-y-auto">
-            <div className="p-4">
+          <div className="flex-1 overflow-y-auto bg-gradient-to-br from-background via-background to-accent/5">
+            <div className="p-6">
               {/* Overview Tab */}
               <TabsContent value="overview" className="space-y-4">
                 {/* AI Scoping Wizard */}
