@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAI, AIProvider } from '@/hooks/useAI';
 import { 
   Bot, 
   Send, 
@@ -18,7 +19,6 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-type AIProvider = 'openai' | 'claude' | 'gemini';
 type MessageRole = 'user' | 'assistant' | 'system';
 
 interface Message {
@@ -40,6 +40,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
   projectId,
   className 
 }) => {
+  const { generateCompletion, isLoading: aiLoading } = useAI();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -83,18 +84,30 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const userInput = inputValue;
     setInputValue('');
     setIsLoading(true);
 
     try {
-      // TODO: Implement actual AI API calls
-      // For now, simulate response
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const contextualPrompt = `${contextPrompts[context]}
+      ${projectId ? `Project ID: ${projectId}` : ''}
       
+      User Question: ${userInput}
+      
+      Please provide helpful, accurate, and actionable advice for Portnox NAC deployments, security best practices, troubleshooting, and configuration guidance. Be specific and practical in your responses.`;
+
+      const response = await generateCompletion({
+        prompt: contextualPrompt,
+        context: context,
+        provider: selectedProvider,
+        temperature: 0.7,
+        maxTokens: 2000
+      });
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `I understand you're asking about "${userMessage.content}". As your Portnox AI assistant, I'm here to help with NAC deployment, troubleshooting, and best practices. This response is currently simulated - full AI integration coming soon!`,
+        content: response?.content || "I apologize, but I'm unable to process your request at the moment. Please check your AI provider configuration in Settings and try again.",
         timestamp: new Date(),
         provider: selectedProvider
       };
@@ -102,6 +115,14 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: "I encountered an error while processing your request. Please check your AI provider settings in the Settings page and try again.",
+        timestamp: new Date(),
+        provider: selectedProvider
+      };
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }

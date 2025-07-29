@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHasRole } from "@/hooks/useUserRoles";
 import EnhancedUserManagement from "@/components/admin/EnhancedUserManagement";
-import { Settings as SettingsIcon, User, Bell, Shield, Database, Globe, Users } from "lucide-react";
+import AISettings from "@/components/ai/AISettings";
+import { Settings as SettingsIcon, User, Bell, Shield, Database, Globe, Users, Brain } from "lucide-react";
 
 const Settings = () => {
   const { data: isAdmin } = useHasRole('super_admin', 'global');
@@ -35,7 +36,7 @@ const Settings = () => {
           </div>
 
           <Tabs defaultValue="general" className="space-y-6">
-            <TabsList className={`grid w-full ${(isAdmin || canManageUsers) ? 'grid-cols-6' : 'grid-cols-5'}`}>
+            <TabsList className={`grid w-full ${(isAdmin || canManageUsers) ? 'grid-cols-7' : 'grid-cols-6'}`}>
               <TabsTrigger value="general" className="flex items-center space-x-2">
                 <SettingsIcon className="h-4 w-4" />
                 <span>General</span>
@@ -55,6 +56,10 @@ const Settings = () => {
               <TabsTrigger value="data" className="flex items-center space-x-2">
                 <Database className="h-4 w-4" />
                 <span>Data</span>
+              </TabsTrigger>
+              <TabsTrigger value="ai" className="flex items-center space-x-2">
+                <Brain className="h-4 w-4" />
+                <span>AI</span>
               </TabsTrigger>
               {(isAdmin || canManageUsers) && (
                 <TabsTrigger value="users" className="flex items-center space-x-2">
@@ -270,6 +275,10 @@ const Settings = () => {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="ai" className="space-y-6">
+              <AISettings />
             </TabsContent>
 
             {(isAdmin || canManageUsers) && (
