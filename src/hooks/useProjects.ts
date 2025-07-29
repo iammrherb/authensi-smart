@@ -96,8 +96,7 @@ export const useProjects = () => {
           budget,
           poc_status,
           template_id,
-          migration_scope,
-          integration_requirements
+          migration_scope
         `)
         .order('created_at', { ascending: false });
       

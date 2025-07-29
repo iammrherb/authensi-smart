@@ -5,169 +5,76 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
-import { CheckCircle, XCircle, AlertCircle, Plus, Search, ExternalLink } from "lucide-react";
-
-interface Vendor {
-  id: string;
-  name: string;
-  category: "NAC" | "Network" | "Security" | "Identity" | "Cloud";
-  logo?: string;
-  status: "certified" | "compatible" | "testing" | "unsupported";
-  integrationLevel: "native" | "api" | "limited" | "none";
-  supportedFeatures: string[];
-  certifications: string[];
-  useCases: string[];
-  documentation: { title: string; url: string; type: "setup" | "api" | "best-practices" }[];
-  contactInfo: {
-    support: string;
-    sales: string;
-    technical: string;
-  };
-  notes: string;
-  lastUpdated: string;
-}
+import { useVendors, useCreateVendor, type Vendor } from "@/hooks/useVendors";
+import { CheckCircle, XCircle, AlertCircle, Plus, Search, ExternalLink, Edit, Trash2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const VendorManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
-
-  const vendors: Vendor[] = [
-    {
-      id: "portnox",
-      name: "Portnox",
-      category: "NAC",
-      status: "certified",
-      integrationLevel: "native",
-      supportedFeatures: ["Device Discovery", "Policy Engine", "Guest Management", "IoT Security", "Compliance Reporting"],
-      certifications: ["SOC 2", "ISO 27001", "FedRAMP Ready"],
-      useCases: ["Zero Trust", "IoT Security", "BYOD", "Guest Access", "Compliance"],
-      documentation: [
-        { title: "Admin Guide", url: "#", type: "setup" },
-        { title: "API Reference", url: "#", type: "api" },
-        { title: "Best Practices", url: "#", type: "best-practices" }
-      ],
-      contactInfo: {
-        support: "support@portnox.com",
-        sales: "sales@portnox.com",
-        technical: "tech@portnox.com"
-      },
-      notes: "Primary NAC solution with full feature support",
-      lastUpdated: "2024-01-15"
-    },
-    {
-      id: "cisco-ise",
-      name: "Cisco ISE",
-      category: "NAC",
-      status: "compatible",
-      integrationLevel: "api",
-      supportedFeatures: ["Policy Management", "Device Profiling", "Guest Portal", "TrustSec Integration"],
-      certifications: ["Common Criteria", "FIPS 140-2"],
-      useCases: ["Enterprise NAC", "TrustSec", "Guest Management", "Device Compliance"],
-      documentation: [
-        { title: "Integration Guide", url: "#", type: "setup" },
-        { title: "pxGrid API", url: "#", type: "api" }
-      ],
-      contactInfo: {
-        support: "tac@cisco.com",
-        sales: "sales@cisco.com",
-        technical: "technical@cisco.com"
-      },
-      notes: "Strong enterprise features, complex deployment",
-      lastUpdated: "2024-01-10"
-    },
-    {
-      id: "aruba-clearpass",
-      name: "Aruba ClearPass",
-      category: "NAC",
-      status: "compatible",
-      integrationLevel: "api",
-      supportedFeatures: ["Policy Manager", "Guest", "OnBoard", "OnGuard"],
-      certifications: ["Common Criteria EAL4+"],
-      useCases: ["BYOD", "Guest Access", "IoT Onboarding", "Policy Enforcement"],
-      documentation: [
-        { title: "ClearPass Integration", url: "#", type: "setup" },
-        { title: "REST API Guide", url: "#", type: "api" }
-      ],
-      contactInfo: {
-        support: "support@arubanetworks.com",
-        sales: "sales@arubanetworks.com",
-        technical: "technical@arubanetworks.com"
-      },
-      notes: "Excellent for wireless-first environments",
-      lastUpdated: "2024-01-12"
-    },
-    {
-      id: "fortinet-fortigate",
-      name: "Fortinet FortiGate",
-      category: "Security",
-      status: "compatible",
-      integrationLevel: "api",
-      supportedFeatures: ["Firewall", "UTM", "SD-WAN", "Security Fabric"],
-      certifications: ["NSS Labs", "ICSA Labs"],
-      useCases: ["Network Security", "UTM", "SD-WAN", "Security Fabric Integration"],
-      documentation: [
-        { title: "FortiOS Integration", url: "#", type: "setup" },
-        { title: "FortiAPI Guide", url: "#", type: "api" }
-      ],
-      contactInfo: {
-        support: "support@fortinet.com",
-        sales: "sales@fortinet.com",
-        technical: "technical@fortinet.com"
-      },
-      notes: "Strong security features, good API support",
-      lastUpdated: "2024-01-08"
-    },
-    {
-      id: "microsoft-ad",
-      name: "Microsoft Active Directory",
-      category: "Identity",
-      status: "certified",
-      integrationLevel: "native",
-      supportedFeatures: ["LDAP", "Kerberos", "Group Policy", "Certificate Services"],
-      certifications: ["FIPS 140-2", "Common Criteria"],
-      useCases: ["User Authentication", "Group Management", "Certificate Management", "SSO"],
-      documentation: [
-        { title: "AD Integration Guide", url: "#", type: "setup" },
-        { title: "LDAP Configuration", url: "#", type: "best-practices" }
-      ],
-      contactInfo: {
-        support: "support@microsoft.com",
-        sales: "sales@microsoft.com",
-        technical: "technical@microsoft.com"
-      },
-      notes: "Essential for enterprise identity management",
-      lastUpdated: "2024-01-14"
-    }
-  ];
+  
+  const { data: vendors = [], isLoading } = useVendors();
+  const createVendor = useCreateVendor();
 
   const filteredVendors = vendors.filter(vendor => {
-    const matchesSearch = vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = vendor.vendor_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          vendor.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         vendor.supportedFeatures.some(feature => 
-                           feature.toLowerCase().includes(searchTerm.toLowerCase())
-                         );
+                         vendor.vendor_type.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || vendor.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const getStatusIcon = (status: Vendor["status"]) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
-      case "certified": return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case "compatible": return <CheckCircle className="h-4 w-4 text-blue-500" />;
-      case "testing": return <AlertCircle className="h-4 w-4 text-yellow-500" />;
-      case "unsupported": return <XCircle className="h-4 w-4 text-red-500" />;
+      case "active": return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case "deprecated": return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+      case "end-of-life": return <XCircle className="h-4 w-4 text-red-500" />;
+      default: return <CheckCircle className="h-4 w-4 text-green-500" />;
     }
   };
 
-  const getStatusColor = (status: Vendor["status"]) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case "certified": return "bg-green-100 text-green-800";
-      case "compatible": return "bg-blue-100 text-blue-800";
-      case "testing": return "bg-yellow-100 text-yellow-800";
-      case "unsupported": return "bg-red-100 text-red-800";
+      case "active": return "bg-green-100 text-green-800";
+      case "deprecated": return "bg-yellow-100 text-yellow-800";
+      case "end-of-life": return "bg-red-100 text-red-800";
+      default: return "bg-green-100 text-green-800";
     }
   };
+
+  const getUniqueCategories = () => {
+    const categories = vendors.map(v => v.category);
+    return [...new Set(categories)];
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-6 w-32" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-5 w-16" />
+                  <Skeleton className="h-5 w-20" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="h-4 w-3/4" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -191,13 +98,16 @@ const VendorManagement = () => {
       </div>
 
       <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="NAC">NAC</TabsTrigger>
-          <TabsTrigger value="Network">Network</TabsTrigger>
-          <TabsTrigger value="Security">Security</TabsTrigger>
-          <TabsTrigger value="Identity">Identity</TabsTrigger>
-          <TabsTrigger value="Cloud">Cloud</TabsTrigger>
+        <TabsList className="grid w-full auto-cols-max grid-flow-col">
+          <TabsTrigger value="all">All ({vendors.length})</TabsTrigger>
+          {getUniqueCategories().map(category => {
+            const count = vendors.filter(v => v.category === category).length;
+            return (
+              <TabsTrigger key={category} value={category}>
+                {category} ({count})
+              </TabsTrigger>
+            );
+          })}
         </TabsList>
 
         <TabsContent value={selectedCategory} className="space-y-4">
@@ -206,12 +116,15 @@ const VendorManagement = () => {
               <Card key={vendor.id} className="hover:shadow-lg transition-all duration-200">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{vendor.name}</CardTitle>
+                    <CardTitle className="text-lg">{vendor.vendor_name}</CardTitle>
                     {getStatusIcon(vendor.status)}
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary" className="text-xs">
                       {vendor.category}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {vendor.vendor_type}
                     </Badge>
                     <Badge className={`text-xs ${getStatusColor(vendor.status)}`}>
                       {vendor.status}
@@ -220,21 +133,21 @@ const VendorManagement = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Integration Level</p>
-                    <p className="text-sm capitalize">{vendor.integrationLevel}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Support Level</p>
+                    <p className="text-sm capitalize">{vendor.support_level || 'Not specified'}</p>
                   </div>
                   
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Key Features</p>
+                    <p className="text-sm font-medium text-muted-foreground">Models</p>
                     <div className="flex flex-wrap gap-1 mt-1">
-                      {vendor.supportedFeatures.slice(0, 3).map((feature, index) => (
+                      {vendor.models?.slice(0, 2).map((model: any, index: number) => (
                         <Badge key={index} variant="outline" className="text-xs">
-                          {feature}
+                          {typeof model === 'string' ? model : model.name || 'Model'}
                         </Badge>
                       ))}
-                      {vendor.supportedFeatures.length > 3 && (
+                      {vendor.models?.length > 2 && (
                         <Badge variant="outline" className="text-xs">
-                          +{vendor.supportedFeatures.length - 3} more
+                          +{vendor.models.length - 2} more
                         </Badge>
                       )}
                     </div>
@@ -254,11 +167,11 @@ const VendorManagement = () => {
                     <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
-                          {vendor.name}
+                          {vendor.vendor_name}
                           {getStatusIcon(vendor.status)}
                         </DialogTitle>
                         <DialogDescription>
-                          Complete vendor details including capabilities, certifications, and integration status.
+                          Complete vendor details including capabilities, models, and integration status.
                         </DialogDescription>
                       </DialogHeader>
                       
@@ -266,102 +179,103 @@ const VendorManagement = () => {
                         <div className="space-y-6">
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <h4 className="font-semibold mb-2">Category & Status</h4>
+                              <h4 className="font-semibold mb-2">Category & Type</h4>
                               <div className="space-y-2">
                                 <Badge>{selectedVendor.category}</Badge>
+                                <Badge variant="outline">{selectedVendor.vendor_type}</Badge>
                                 <Badge className={getStatusColor(selectedVendor.status)}>
                                   {selectedVendor.status}
                                 </Badge>
                               </div>
                             </div>
                             <div>
-                              <h4 className="font-semibold mb-2">Integration Level</h4>
-                              <p className="capitalize">{selectedVendor.integrationLevel}</p>
+                              <h4 className="font-semibold mb-2">Support Level</h4>
+                              <p className="capitalize">{selectedVendor.support_level || 'Not specified'}</p>
                             </div>
                           </div>
 
-                          <div>
-                            <h4 className="font-semibold mb-2">Supported Features</h4>
-                            <div className="flex flex-wrap gap-2">
-                              {selectedVendor.supportedFeatures.map((feature, index) => (
-                                <Badge key={index} variant="secondary">
-                                  {feature}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div>
-                            <h4 className="font-semibold mb-2">Certifications</h4>
-                            <div className="flex flex-wrap gap-2">
-                              {selectedVendor.certifications.map((cert, index) => (
-                                <Badge key={index} variant="outline">
-                                  {cert}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div>
-                            <h4 className="font-semibold mb-2">Use Cases</h4>
-                            <div className="flex flex-wrap gap-2">
-                              {selectedVendor.useCases.map((useCase, index) => (
-                                <Badge key={index} variant="secondary">
-                                  {useCase}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div>
-                            <h4 className="font-semibold mb-2">Documentation</h4>
-                            <div className="space-y-2">
-                              {selectedVendor.documentation.map((doc, index) => (
-                                <div key={index} className="flex items-center justify-between p-2 bg-muted/50 rounded">
-                                  <div>
-                                    <span className="font-medium">{doc.title}</span>
-                                    <Badge variant="outline" className="ml-2 text-xs">
-                                      {doc.type}
-                                    </Badge>
-                                  </div>
-                                  <Button variant="ghost" size="sm">
-                                    <ExternalLink className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div>
-                            <h4 className="font-semibold mb-2">Contact Information</h4>
-                            <div className="grid grid-cols-3 gap-4 text-sm">
-                              <div>
-                                <p className="font-medium">Support</p>
-                                <p className="text-muted-foreground">{selectedVendor.contactInfo.support}</p>
-                              </div>
-                              <div>
-                                <p className="font-medium">Sales</p>
-                                <p className="text-muted-foreground">{selectedVendor.contactInfo.sales}</p>
-                              </div>
-                              <div>
-                                <p className="font-medium">Technical</p>
-                                <p className="text-muted-foreground">{selectedVendor.contactInfo.technical}</p>
-                              </div>
-                            </div>
-                          </div>
-
-                          {selectedVendor.notes && (
+                          {selectedVendor.models && selectedVendor.models.length > 0 && (
                             <div>
-                              <h4 className="font-semibold mb-2">Notes</h4>
-                              <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded">
-                                {selectedVendor.notes}
-                              </p>
+                              <h4 className="font-semibold mb-2">Supported Models</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {selectedVendor.models.map((model: any, index: number) => (
+                                  <Badge key={index} variant="secondary">
+                                    {typeof model === 'string' ? model : model.name || `Model ${index + 1}`}
+                                  </Badge>
+                                ))}
+                              </div>
                             </div>
                           )}
 
-                          <div className="text-xs text-muted-foreground">
-                            Last updated: {selectedVendor.lastUpdated}
-                          </div>
+                          {selectedVendor.supported_protocols && selectedVendor.supported_protocols.length > 0 && (
+                            <div>
+                              <h4 className="font-semibold mb-2">Supported Protocols</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {selectedVendor.supported_protocols.map((protocol: any, index: number) => (
+                                  <Badge key={index} variant="outline">
+                                    {typeof protocol === 'string' ? protocol : protocol.name || `Protocol ${index + 1}`}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {selectedVendor.integration_methods && selectedVendor.integration_methods.length > 0 && (
+                            <div>
+                              <h4 className="font-semibold mb-2">Integration Methods</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {selectedVendor.integration_methods.map((method: any, index: number) => (
+                                  <Badge key={index} variant="secondary">
+                                    {typeof method === 'string' ? method : method.name || `Method ${index + 1}`}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {selectedVendor.known_limitations && selectedVendor.known_limitations.length > 0 && (
+                            <div>
+                              <h4 className="font-semibold mb-2">Known Limitations</h4>
+                              <div className="space-y-2">
+                                {selectedVendor.known_limitations.map((limitation: any, index: number) => (
+                                  <div key={index} className="p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
+                                    {typeof limitation === 'string' ? limitation : limitation.description || `Limitation ${index + 1}`}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {selectedVendor.documentation_links && selectedVendor.documentation_links.length > 0 && (
+                            <div>
+                              <h4 className="font-semibold mb-2">Documentation</h4>
+                              <div className="space-y-2">
+                                {selectedVendor.documentation_links.map((doc: any, index: number) => (
+                                  <div key={index} className="flex items-center justify-between p-2 bg-muted/50 rounded">
+                                    <div>
+                                      <span className="font-medium">
+                                        {typeof doc === 'string' ? 'Documentation' : doc.title || `Document ${index + 1}`}
+                                      </span>
+                                      {doc.type && (
+                                        <Badge variant="outline" className="ml-2 text-xs">
+                                          {doc.type}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    <Button variant="ghost" size="sm">
+                                      <ExternalLink className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {selectedVendor.last_tested_date && (
+                            <div className="text-xs text-muted-foreground">
+                              Last tested: {new Date(selectedVendor.last_tested_date).toLocaleDateString()}
+                            </div>
+                          )}
                         </div>
                       )}
                     </DialogContent>
@@ -370,6 +284,16 @@ const VendorManagement = () => {
               </Card>
             ))}
           </div>
+          
+          {filteredVendors.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">No vendors found matching your criteria.</p>
+              <Button variant="outline" className="mt-4">
+                <Plus className="h-4 w-4 mr-2" />
+                Add New Vendor
+              </Button>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>
