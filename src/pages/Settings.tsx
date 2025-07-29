@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHasRole } from "@/hooks/useUserRoles";
 import EnhancedUserManagement from "@/components/admin/EnhancedUserManagement";
+import InvitationManagement from "@/components/admin/InvitationManagement";
+import CustomRoleManager from "@/components/admin/CustomRoleManager";
 import AISettings from "@/components/ai/AISettings";
 import { Settings as SettingsIcon, User, Bell, Shield, Database, Globe, Users, Brain } from "lucide-react";
 
@@ -36,35 +38,31 @@ const Settings = () => {
           </div>
 
           <Tabs defaultValue="general" className="space-y-6">
-            <TabsList className={`grid w-full ${(isAdmin || canManageUsers) ? 'grid-cols-7' : 'grid-cols-6'}`}>
-              <TabsTrigger value="general" className="flex items-center space-x-2">
+            <TabsList className="flex flex-wrap justify-center lg:grid lg:grid-cols-6 gap-1">
+              <TabsTrigger value="general" className="flex items-center space-x-2 text-sm">
                 <SettingsIcon className="h-4 w-4" />
-                <span>General</span>
+                <span className="hidden sm:inline">General</span>
               </TabsTrigger>
-              <TabsTrigger value="notifications" className="flex items-center space-x-2">
-                <Bell className="h-4 w-4" />
-                <span>Notifications</span>
-              </TabsTrigger>
-              <TabsTrigger value="security" className="flex items-center space-x-2">
+              <TabsTrigger value="security" className="flex items-center space-x-2 text-sm">
                 <Shield className="h-4 w-4" />
-                <span>Security</span>
+                <span className="hidden sm:inline">Security</span>
               </TabsTrigger>
-              <TabsTrigger value="integrations" className="flex items-center space-x-2">
+              <TabsTrigger value="integrations" className="flex items-center space-x-2 text-sm">
                 <Globe className="h-4 w-4" />
-                <span>Integrations</span>
+                <span className="hidden sm:inline">Integrations</span>
               </TabsTrigger>
-              <TabsTrigger value="data" className="flex items-center space-x-2">
+              <TabsTrigger value="data" className="flex items-center space-x-2 text-sm">
                 <Database className="h-4 w-4" />
-                <span>Data</span>
+                <span className="hidden sm:inline">Data</span>
               </TabsTrigger>
-              <TabsTrigger value="ai" className="flex items-center space-x-2">
+              <TabsTrigger value="ai" className="flex items-center space-x-2 text-sm">
                 <Brain className="h-4 w-4" />
-                <span>AI</span>
+                <span className="hidden sm:inline">AI</span>
               </TabsTrigger>
               {(isAdmin || canManageUsers) && (
-                <TabsTrigger value="users" className="flex items-center space-x-2">
+                <TabsTrigger value="admin" className="flex items-center space-x-2 text-sm">
                   <Users className="h-4 w-4" />
-                  <span>Users</span>
+                  <span className="hidden sm:inline">Admin</span>
                 </TabsTrigger>
               )}
             </TabsList>
@@ -135,43 +133,6 @@ const Settings = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="notifications" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Notification Preferences</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Project milestone alerts</Label>
-                      <p className="text-sm text-muted-foreground">Get notified when projects reach milestones</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Site deployment updates</Label>
-                      <p className="text-sm text-muted-foreground">Notifications for site deployment status changes</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Questionnaire submissions</Label>
-                      <p className="text-sm text-muted-foreground">Alert when questionnaires are completed</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Weekly summary reports</Label>
-                      <p className="text-sm text-muted-foreground">Receive weekly progress summaries</p>
-                    </div>
-                    <Switch />
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
 
             <TabsContent value="security" className="space-y-6">
               <Card>
@@ -282,18 +243,35 @@ const Settings = () => {
             </TabsContent>
 
             {(isAdmin || canManageUsers) && (
-              <TabsContent value="users" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Users className="h-5 w-5" />
-                      <span>User Management</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <EnhancedUserManagement />
-                  </CardContent>
-                </Card>
+              <TabsContent value="admin" className="space-y-6">
+                <div className="grid gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>User Management</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <EnhancedUserManagement />
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>User Invitations</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <InvitationManagement />
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Custom Roles</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <CustomRoleManager />
+                    </CardContent>
+                  </Card>
+                </div>
               </TabsContent>
             )}
           </Tabs>

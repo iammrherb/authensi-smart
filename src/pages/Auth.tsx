@@ -240,15 +240,21 @@ const Auth = () => {
                   {isLoading ? (
                     <div className="flex items-center gap-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent"></div>
-                      {isLoading ? 'Signing In...' : 'Sign In'}
+                      Signing In...
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
-                      {isLoading ? 'Signing In...' : 'Sign In'}
+                      Sign In
                     </div>
                   )}
                 </Button>
               </form>
+
+              <div className="text-center mt-4">
+                <p className="text-sm text-muted-foreground">
+                  Need an account? Contact your administrator for an invitation.
+                </p>
+              </div>
 
             </CardContent>
           </Card>
