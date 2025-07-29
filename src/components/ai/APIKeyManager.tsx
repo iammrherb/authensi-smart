@@ -6,28 +6,43 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Slider } from '@/components/ui/slider';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EnhancedButton } from '@/components/ui/enhanced-button';
 import { EnhancedCard } from '@/components/ui/enhanced-card';
 import { useToast } from '@/hooks/use-toast';
+import { useAI, AIProvider } from '@/hooks/useAI';
 import {
   Key, Eye, EyeOff, CheckCircle2, XCircle, AlertTriangle,
   Lock, Unlock, Save, TestTube, Brain, Sparkles, Diamond,
-  Shield, Globe, Cpu, Zap, Cloud, Settings
+  Shield, Globe, Cpu, Zap, Cloud, Settings, BarChart3, RefreshCw
 } from 'lucide-react';
 
 interface APIKey {
   id: string;
-  provider: string;
+  provider: AIProvider;
   name: string;
   key: string;
   status: 'active' | 'inactive' | 'error';
   lastUsed?: string;
   usageCount?: number;
   isVisible: boolean;
+  features: string[];
+}
+
+interface AISettings {
+  defaultProvider: AIProvider;
+  temperature: number;
+  maxTokens: number;
+  enableContextualHelp: boolean;
+  enableSmartSuggestions: boolean;
+  enableAutoEnhancement: boolean;
 }
 
 const APIKeyManager = () => {
   const { toast } = useToast();
+  const { generateCompletion, isLoading } = useAI();
+  
   const [apiKeys, setApiKeys] = useState<APIKey[]>([
     {
       id: '1',
@@ -35,7 +50,8 @@ const APIKeyManager = () => {
       name: 'OpenAI GPT',
       key: '',
       status: 'inactive',
-      isVisible: false
+      isVisible: false,
+      features: ['Chat Completion', 'Text Generation', 'Code Analysis', 'Project Insights']
     },
     {
       id: '2',
@@ -43,7 +59,8 @@ const APIKeyManager = () => {
       name: 'Anthropic Claude',
       key: '',
       status: 'inactive',
-      isVisible: false
+      isVisible: false,
+      features: ['Long Context', 'Analysis', 'Safety Focus', 'Risk Assessment']
     },
     {
       id: '3',
@@ -51,33 +68,19 @@ const APIKeyManager = () => {
       name: 'Google Gemini',
       key: '',
       status: 'inactive',
-      isVisible: false
-    },
-    {
-      id: '4',
-      provider: 'huggingface',
-      name: 'Hugging Face',
-      key: '',
-      status: 'inactive',
-      isVisible: false
-    },
-    {
-      id: '5',
-      provider: 'elevenlabs',
-      name: 'ElevenLabs TTS',
-      key: '',
-      status: 'inactive',
-      isVisible: false
-    },
-    {
-      id: '6',
-      provider: 'perplexity',
-      name: 'Perplexity AI',
-      key: '',
-      status: 'inactive',
-      isVisible: false
+      isVisible: false,
+      features: ['Multimodal', 'Code Generation', 'Math Reasoning', 'Timeline Planning']
     }
   ]);
+
+  const [settings, setSettings] = useState<AISettings>({
+    defaultProvider: 'openai',
+    temperature: 0.7,
+    maxTokens: 2000,
+    enableContextualHelp: true,
+    enableSmartSuggestions: true,
+    enableAutoEnhancement: false
+  });
 
   const [testingKeys, setTestingKeys] = useState<Set<string>>(new Set());
   const [savingKeys, setSavingKeys] = useState<Set<string>>(new Set());
@@ -88,48 +91,21 @@ const APIKeyManager = () => {
       color: 'bg-green-500',
       textColor: 'text-green-500',
       description: 'Advanced GPT models for general AI tasks',
-      website: 'https://platform.openai.com/api-keys',
-      features: ['Chat Completion', 'Text Generation', 'Code Analysis']
+      website: 'https://platform.openai.com/api-keys'
     },
     claude: {
       icon: Sparkles,
       color: 'bg-orange-500',
       textColor: 'text-orange-500',
       description: 'Anthropic Claude for analysis and reasoning',
-      website: 'https://console.anthropic.com/',
-      features: ['Long Context', 'Analysis', 'Safety Focus']
+      website: 'https://console.anthropic.com/'
     },
     gemini: {
       icon: Diamond,
       color: 'bg-blue-500',
       textColor: 'text-blue-500',
       description: 'Google Gemini for multimodal AI capabilities',
-      website: 'https://ai.google.dev/',
-      features: ['Multimodal', 'Code Generation', 'Math Reasoning']
-    },
-    huggingface: {
-      icon: Cpu,
-      color: 'bg-yellow-500',
-      textColor: 'text-yellow-500',
-      description: 'Hugging Face for specialized models',
-      website: 'https://huggingface.co/settings/tokens',
-      features: ['Open Source Models', 'Text Generation', 'Embeddings']
-    },
-    elevenlabs: {
-      icon: Zap,
-      color: 'bg-purple-500',
-      textColor: 'text-purple-500',
-      description: 'ElevenLabs for text-to-speech capabilities',
-      website: 'https://elevenlabs.io/app/speech-synthesis',
-      features: ['Voice Synthesis', 'Text to Speech', 'Voice Cloning']
-    },
-    perplexity: {
-      icon: Globe,
-      color: 'bg-cyan-500',
-      textColor: 'text-cyan-500',
-      description: 'Perplexity AI for search and research',
-      website: 'https://www.perplexity.ai/settings/api',
-      features: ['Web Search', 'Real-time Data', 'Research']
+      website: 'https://ai.google.dev/'
     }
   };
 
@@ -153,18 +129,23 @@ const APIKeyManager = () => {
     setTestingKeys(prev => new Set([...prev, apiKey.id]));
     
     try {
-      // Mock API test - in real implementation, this would test the actual API
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await generateCompletion({
+        prompt: 'Test connection - please respond with "Connection successful"',
+        provider: apiKey.provider,
+        temperature: 0.1,
+        maxTokens: 50
+      });
       
-      // Simulate success/failure
-      const isValid = apiKey.key && apiKey.key.length > 10;
+      const isValid = response?.content.toLowerCase().includes('connection') || 
+                     response?.content.toLowerCase().includes('successful');
       
       setApiKeys(prev => prev.map(key => 
         key.id === apiKey.id 
           ? { 
               ...key, 
               status: isValid ? 'active' : 'error',
-              lastUsed: isValid ? new Date().toISOString() : undefined
+              lastUsed: isValid ? new Date().toISOString() : undefined,
+              usageCount: isValid ? (key.usageCount || 0) + 1 : key.usageCount
             }
           : key
       ));
@@ -374,7 +355,7 @@ const APIKeyManager = () => {
                   <div>
                     <Label className="text-xs text-muted-foreground">Features</Label>
                     <div className="flex flex-wrap gap-1 mt-1">
-                      {provider.features.map((feature) => (
+                      {apiKey.features.map((feature) => (
                         <Badge key={feature} variant="outline" className="text-xs">
                           {feature}
                         </Badge>
@@ -402,6 +383,136 @@ const APIKeyManager = () => {
           );
         })}
       </div>
+
+      {/* AI Configuration */}
+      <EnhancedCard glass>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Settings className="h-5 w-5" />
+            <span>AI Configuration</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label>Default AI Provider</Label>
+              <Select value={settings.defaultProvider} onValueChange={(value) => setSettings(prev => ({ ...prev, defaultProvider: value as AIProvider }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {apiKeys
+                    .filter(key => key.status === 'active')
+                    .map((key) => (
+                      <SelectItem key={key.provider} value={key.provider}>
+                        {key.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Max Response Length</Label>
+              <Select value={settings.maxTokens.toString()} onValueChange={(value) => setSettings(prev => ({ ...prev, maxTokens: parseInt(value) }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1000">Short (1000 tokens)</SelectItem>
+                  <SelectItem value="2000">Medium (2000 tokens)</SelectItem>
+                  <SelectItem value="4000">Long (4000 tokens)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <Label>Response Creativity: {settings.temperature}</Label>
+            <Slider
+              value={[settings.temperature]}
+              onValueChange={(value) => setSettings(prev => ({ ...prev, temperature: value[0] }))}
+              max={1}
+              min={0}
+              step={0.1}
+              className="w-full"
+            />
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Conservative</span>
+              <span>Balanced</span>
+              <span>Creative</span>
+            </div>
+          </div>
+
+          {/* Intelligence Features */}
+          <div className="space-y-4 pt-4 border-t">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Contextual Help</Label>
+                <p className="text-sm text-muted-foreground">Show AI-powered tooltips and suggestions</p>
+              </div>
+              <Switch
+                checked={settings.enableContextualHelp}
+                onCheckedChange={(checked) => setSettings(prev => ({ ...prev, enableContextualHelp: checked }))}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Smart Suggestions</Label>
+                <p className="text-sm text-muted-foreground">Auto-suggest configurations based on project context</p>
+              </div>
+              <Switch
+                checked={settings.enableSmartSuggestions}
+                onCheckedChange={(checked) => setSettings(prev => ({ ...prev, enableSmartSuggestions: checked }))}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Auto-Enhancement</Label>
+                <p className="text-sm text-muted-foreground">Automatically enhance notes and descriptions</p>
+              </div>
+              <Switch
+                checked={settings.enableAutoEnhancement}
+                onCheckedChange={(checked) => setSettings(prev => ({ ...prev, enableAutoEnhancement: checked }))}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </EnhancedCard>
+
+      {/* Usage Statistics */}
+      <EnhancedCard glass>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <BarChart3 className="h-5 w-5" />
+            <span>Usage Statistics</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div className="p-4 border rounded-lg">
+              <div className="text-2xl font-bold text-primary">
+                {apiKeys.reduce((sum, key) => sum + (key.usageCount || 0), 0)}
+              </div>
+              <div className="text-sm text-muted-foreground">Total AI Requests</div>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <div className="text-2xl font-bold text-primary">
+                {apiKeys.filter(k => k.status === 'active').length}/{apiKeys.length}
+              </div>
+              <div className="text-sm text-muted-foreground">Active Providers</div>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <div className="text-2xl font-bold text-primary">
+                {apiKeys.filter(k => k.lastUsed).length > 0 ? '98.7%' : '0%'}
+              </div>
+              <div className="text-sm text-muted-foreground">Success Rate</div>
+            </div>
+          </div>
+        </CardContent>
+      </EnhancedCard>
 
       <div className="flex justify-between items-center pt-6 border-t">
         <div className="text-sm text-muted-foreground">

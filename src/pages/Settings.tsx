@@ -240,10 +240,7 @@ const Settings = () => {
             </TabsContent>
 
             <TabsContent value="ai" className="space-y-6">
-              <div className="space-y-8">
-                <APIKeyManager />
-                <AISettings />
-              </div>
+              <APIKeyManager />
             </TabsContent>
 
             {(isAdmin || canManageUsers) && (
