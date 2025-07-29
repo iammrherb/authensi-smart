@@ -1,22 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '@/components/Header';
-import ComprehensiveAIScopingWizard from '@/components/scoping/ComprehensiveAIScopingWizard';
+import AIScopingDialog from '@/components/scoping/AIScopingDialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Brain, Target, Zap, CheckCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Brain, Target, Zap, CheckCircle, Plus, FileText, History } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const IntelligentScoping = () => {
   const navigate = useNavigate();
+  const [showScopingDialog, setShowScopingDialog] = useState(false);
+  const [savedSessions, setSavedSessions] = useState<any[]>([]);
 
-  const handleScopingComplete = (projectId: string, scopingData: any) => {
-    // Navigate to the project tracker with the new project
-    navigate(`/projects/${projectId}`);
+  const handleCreateProject = (scopingData: any) => {
+    // Navigate to project creation with scoping data pre-filled
+    navigate('/projects/create', { 
+      state: { 
+        scopingData,
+        fromScoping: true 
+      } 
+    });
   };
 
-  const handleCancel = () => {
-    navigate('/');
-  };
+  React.useEffect(() => {
+    // Load saved scoping sessions
+    const saved = localStorage.getItem('scopingSessions');
+    if (saved) {
+      setSavedSessions(JSON.parse(saved));
+    }
+  }, []);
 
   const features = [
     {
@@ -79,10 +91,77 @@ const IntelligentScoping = () => {
               ))}
             </div>
 
-            {/* Comprehensive Scoping Wizard */}
-            <ComprehensiveAIScopingWizard 
-              onComplete={handleScopingComplete}
-              onCancel={handleCancel}
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                onClick={() => setShowScopingDialog(true)}
+                className="flex items-center gap-2"
+              >
+                <Plus className="h-5 w-5" />
+                Start New AI Scoping
+              </Button>
+              
+              {savedSessions.length > 0 && (
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  onClick={() => {/* TODO: Show saved sessions */}}
+                  className="flex items-center gap-2"
+                >
+                  <History className="h-5 w-5" />
+                  View Saved Sessions ({savedSessions.length})
+                </Button>
+              )}
+            </div>
+
+            {/* Saved Sessions Preview */}
+            {savedSessions.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-2xl font-semibold text-center">Recent Scoping Sessions</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {savedSessions.slice(0, 3).map((session, index) => (
+                    <Card key={session.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <FileText className="h-5 w-5" />
+                          {session.name}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(session.createdAt).toLocaleDateString()}
+                          </p>
+                          <div className="flex gap-2">
+                            <Badge variant="outline">
+                              {session.data.organization?.industry || 'General'}
+                            </Badge>
+                            <Badge variant="outline">
+                              {session.data.network_infrastructure?.site_count || 0} Sites
+                            </Badge>
+                          </div>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="w-full"
+                            onClick={() => handleCreateProject(session.data)}
+                          >
+                            Create Project
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* AI Scoping Dialog */}
+            <AIScopingDialog
+              isOpen={showScopingDialog}
+              onClose={() => setShowScopingDialog(false)}
+              onCreateProject={handleCreateProject}
             />
           </div>
         </div>
