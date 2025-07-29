@@ -13,6 +13,7 @@ import EnhancedUserManagement from "@/components/admin/EnhancedUserManagement";
 import InvitationManagement from "@/components/admin/InvitationManagement";
 import CustomRoleManager from "@/components/admin/CustomRoleManager";
 import AISettings from "@/components/ai/AISettings";
+import APIKeyManager from "@/components/ai/APIKeyManager";
 import { Settings as SettingsIcon, User, Bell, Shield, Database, Globe, Users, Brain } from "lucide-react";
 
 const Settings = () => {
@@ -239,7 +240,10 @@ const Settings = () => {
             </TabsContent>
 
             <TabsContent value="ai" className="space-y-6">
-              <AISettings />
+              <div className="space-y-8">
+                <APIKeyManager />
+                <AISettings />
+              </div>
             </TabsContent>
 
             {(isAdmin || canManageUsers) && (

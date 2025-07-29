@@ -52,47 +52,122 @@ const SmartProjectInsights: React.FC<SmartProjectInsightsProps> = ({
     recommendations?: string;
     risks?: string;
     timeline?: string;
+    optimization?: string;
+    compliance?: string;
+    troubleshooting?: string;
+    nextSteps?: string;
   }>({});
   const [activeTab, setActiveTab] = useState('summary');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [refreshingTab, setRefreshingTab] = useState<string | null>(null);
   
   const { 
     generateProjectSummary, 
     generateRecommendations, 
     generateCompletion,
+    troubleshootIssue,
+    enhanceNotes,
     isLoading 
   } = useAI();
 
-  const generateInsights = async () => {
-    setIsGenerating(true);
+  const generateInsights = async (specificTab?: string) => {
+    setIsGenerating(!specificTab);
+    if (specificTab) setRefreshingTab(specificTab);
     
     try {
-      // Generate different types of insights in parallel
-      const [summaryResult, recommendationsResult, risksResult, timelineResult] = await Promise.allSettled([
-        generateProjectSummary(projectData),
-        generateRecommendations(projectData, useCases, vendors),
-        generateCompletion({
-          prompt: `Analyze potential risks and challenges for this Portnox NAC project: ${JSON.stringify(projectData, null, 2)}. Provide risk assessment and mitigation strategies.`,
-          context: 'risk_analysis',
-          provider: 'claude'
-        }),
-        generateCompletion({
-          prompt: `Create a detailed implementation timeline for this Portnox NAC project: ${JSON.stringify(projectData, null, 2)}. Include phases, milestones, and dependencies.`,
-          context: 'timeline_planning',
-          provider: 'gemini'
-        })
-      ]);
+      const promises: Promise<any>[] = [];
+      const insightTypes: string[] = [];
 
-      setInsights({
-        summary: summaryResult.status === 'fulfilled' ? summaryResult.value : 'Failed to generate summary',
-        recommendations: recommendationsResult.status === 'fulfilled' ? recommendationsResult.value : 'Failed to generate recommendations',
-        risks: risksResult.status === 'fulfilled' ? risksResult.value?.content : 'Failed to generate risk analysis',
-        timeline: timelineResult.status === 'fulfilled' ? timelineResult.value?.content : 'Failed to generate timeline'
+      if (!specificTab || specificTab === 'summary') {
+        promises.push(generateProjectSummary(projectData));
+        insightTypes.push('summary');
+      }
+      
+      if (!specificTab || specificTab === 'recommendations') {
+        promises.push(generateRecommendations(projectData, useCases, vendors));
+        insightTypes.push('recommendations');
+      }
+      
+      if (!specificTab || specificTab === 'risks') {
+        promises.push(generateCompletion({
+          prompt: `Analyze potential risks and challenges for this Portnox NAC project: ${JSON.stringify(projectData, null, 2)}. Provide comprehensive risk assessment with specific mitigation strategies, timeline impact, and resource requirements.`,
+          context: 'risk_analysis',
+          provider: 'claude',
+          temperature: 0.3
+        }));
+        insightTypes.push('risks');
+      }
+      
+      if (!specificTab || specificTab === 'timeline') {
+        promises.push(generateCompletion({
+          prompt: `Create a detailed implementation timeline for this Portnox NAC project: ${JSON.stringify(projectData, null, 2)}. Include phases, milestones, dependencies, resource allocation, and critical path analysis.`,
+          context: 'timeline_planning',
+          provider: 'gemini',
+          temperature: 0.4
+        }));
+        insightTypes.push('timeline');
+      }
+      
+      if (!specificTab || specificTab === 'optimization') {
+        promises.push(generateCompletion({
+          prompt: `Analyze optimization opportunities for this Portnox NAC project: ${JSON.stringify(projectData, null, 2)}. Focus on performance, cost reduction, efficiency gains, and best practices implementation.`,
+          context: 'optimization_analysis',
+          provider: 'openai',
+          temperature: 0.6
+        }));
+        insightTypes.push('optimization');
+      }
+      
+      if (!specificTab || specificTab === 'compliance') {
+        promises.push(generateCompletion({
+          prompt: `Evaluate compliance requirements and strategies for this Portnox NAC project: ${JSON.stringify(projectData, null, 2)}. Include regulatory frameworks, security standards, audit requirements, and documentation needs.`,
+          context: 'compliance_analysis',
+          provider: 'claude',
+          temperature: 0.2
+        }));
+        insightTypes.push('compliance');
+      }
+      
+      if (!specificTab || specificTab === 'troubleshooting') {
+        promises.push(troubleshootIssue(
+          `Common implementation challenges for ${projectData.deployment_type} deployment in ${projectData.industry} industry`,
+          { projectData, useCases, vendors }
+        ));
+        insightTypes.push('troubleshooting');
+      }
+      
+      if (!specificTab || specificTab === 'nextSteps') {
+        promises.push(generateCompletion({
+          prompt: `Generate actionable next steps for this Portnox NAC project: ${JSON.stringify(projectData, null, 2)}. Provide immediate actions, short-term goals, and long-term strategic recommendations with clear ownership and timelines.`,
+          context: 'next_steps',
+          provider: 'gemini',
+          temperature: 0.5
+        }));
+        insightTypes.push('nextSteps');
+      }
+
+      const results = await Promise.allSettled(promises);
+      
+      const newInsights = { ...insights };
+      results.forEach((result, index) => {
+        const insightType = insightTypes[index];
+        if (result.status === 'fulfilled') {
+          if (insightType === 'summary' || insightType === 'recommendations') {
+            newInsights[insightType as keyof typeof newInsights] = result.value;
+          } else {
+            newInsights[insightType as keyof typeof newInsights] = result.value?.content || result.value;
+          }
+        } else {
+          newInsights[insightType as keyof typeof newInsights] = `Failed to generate ${insightType.replace(/([A-Z])/g, ' $1').toLowerCase()}`;
+        }
       });
+
+      setInsights(newInsights);
     } catch (error) {
       console.error('Error generating insights:', error);
     } finally {
       setIsGenerating(false);
+      setRefreshingTab(null);
     }
   };
 
@@ -107,28 +182,64 @@ const SmartProjectInsights: React.FC<SmartProjectInsightsProps> = ({
       label: 'Executive Summary',
       icon: FileText,
       content: insights.summary,
-      color: 'text-blue-500'
+      color: 'text-blue-500',
+      description: 'Comprehensive project overview'
     },
     {
       id: 'recommendations',
       label: 'AI Recommendations',
       icon: Lightbulb,
       content: insights.recommendations,
-      color: 'text-yellow-500'
+      color: 'text-yellow-500',
+      description: 'Smart suggestions and optimizations'
     },
     {
       id: 'risks',
       label: 'Risk Analysis',
       icon: AlertTriangle,
       content: insights.risks,
-      color: 'text-red-500'
+      color: 'text-red-500',
+      description: 'Potential challenges and mitigation'
     },
     {
       id: 'timeline',
       label: 'Smart Timeline',
       icon: Clock,
       content: insights.timeline,
-      color: 'text-green-500'
+      color: 'text-green-500',
+      description: 'Implementation schedule and milestones'
+    },
+    {
+      id: 'optimization',
+      label: 'Optimization',
+      icon: TrendingUp,
+      content: insights.optimization,
+      color: 'text-purple-500',
+      description: 'Performance and efficiency improvements'
+    },
+    {
+      id: 'compliance',
+      label: 'Compliance',
+      icon: CheckCircle,
+      content: insights.compliance,
+      color: 'text-indigo-500',
+      description: 'Regulatory and security standards'
+    },
+    {
+      id: 'troubleshooting',
+      label: 'Troubleshooting',
+      icon: Zap,
+      content: insights.troubleshooting,
+      color: 'text-orange-500',
+      description: 'Common issues and solutions'
+    },
+    {
+      id: 'nextSteps',
+      label: 'Next Steps',
+      icon: Target,
+      content: insights.nextSteps,
+      color: 'text-cyan-500',
+      description: 'Actionable recommendations'
     }
   ];
 
@@ -152,7 +263,7 @@ const SmartProjectInsights: React.FC<SmartProjectInsightsProps> = ({
           </CardTitle>
           
           <EnhancedButton
-            onClick={generateInsights}
+            onClick={() => generateInsights()}
             disabled={isGenerating || isLoading}
             loading={isGenerating || isLoading}
             variant="outline"
@@ -203,39 +314,83 @@ const SmartProjectInsights: React.FC<SmartProjectInsightsProps> = ({
 
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 mb-6">
             {insightTabs.map((tab) => (
-              <TabsTrigger key={tab.id} value={tab.id} className="text-xs">
-                <tab.icon className={`h-4 w-4 mr-1 ${tab.color}`} />
-                {tab.label}
-              </TabsTrigger>
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`p-3 rounded-lg text-left transition-all hover:scale-105 border ${
+                  activeTab === tab.id 
+                    ? 'border-primary bg-primary/10' 
+                    : 'border-border bg-card hover:bg-accent/50'
+                }`}
+              >
+                <div className="flex items-center space-x-2 mb-1">
+                  <tab.icon className={`h-4 w-4 ${tab.color}`} />
+                  <span className="text-xs font-medium truncate">{tab.label}</span>
+                </div>
+                <p className="text-xs text-muted-foreground line-clamp-2">
+                  {tab.description}
+                </p>
+              </button>
             ))}
-          </TabsList>
+          </div>
 
           {insightTabs.map((tab) => (
-            <TabsContent key={tab.id} value={tab.id}>
-              <ScrollArea className="h-[400px] mt-4">
+            <div key={tab.id} className={activeTab === tab.id ? 'block' : 'hidden'}>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <tab.icon className={`h-5 w-5 ${tab.color}`} />
+                  <h3 className="text-lg font-semibold">{tab.label}</h3>
+                  <Badge variant="outline" className="text-xs">
+                    {tab.description}
+                  </Badge>
+                </div>
+                <EnhancedButton
+                  onClick={() => generateInsights(tab.id)}
+                  disabled={refreshingTab === tab.id || isGenerating}
+                  loading={refreshingTab === tab.id}
+                  variant="ghost"
+                  size="sm"
+                >
+                  <RefreshCw className="h-3 w-3 mr-1" />
+                  Refresh
+                </EnhancedButton>
+              </div>
+              
+              <ScrollArea className="h-[500px]">
                 <div className="prose prose-sm dark:prose-invert max-w-none">
-                  {(isGenerating || isLoading) ? (
-                    <div className="flex items-center justify-center py-12">
+                  {(refreshingTab === tab.id || (isGenerating && !tab.content)) ? (
+                    <div className="flex items-center justify-center py-16">
                       <div className="text-center">
-                        <div className="loading-spinner mx-auto mb-4" />
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
                         <p className="text-muted-foreground">AI is analyzing your project...</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Generating {tab.label.toLowerCase()}
+                        </p>
                       </div>
                     </div>
                   ) : tab.content ? (
-                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed p-4 bg-card/50 rounded-lg">
                       {tab.content}
                     </div>
                   ) : (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <tab.icon className={`h-12 w-12 mx-auto mb-4 ${tab.color} opacity-50`} />
-                      <p>No insights available. Click "Refresh Insights" to generate AI analysis.</p>
+                    <div className="text-center py-16 text-muted-foreground">
+                      <tab.icon className={`h-16 w-16 mx-auto mb-4 ${tab.color} opacity-30`} />
+                      <p className="text-lg font-medium mb-2">No {tab.label} Available</p>
+                      <p className="text-sm mb-4">{tab.description}</p>
+                      <EnhancedButton
+                        onClick={() => generateInsights(tab.id)}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Generate {tab.label}
+                      </EnhancedButton>
                     </div>
                   )}
                 </div>
               </ScrollArea>
-            </TabsContent>
+            </div>
           ))}
         </Tabs>
       </CardContent>
