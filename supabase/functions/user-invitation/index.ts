@@ -44,7 +44,16 @@ serve(async (req) => {
     }
 
     const url = new URL(req.url);
-    const action = url.pathname.split('/').pop();
+    const pathParts = url.pathname.split('/');
+    const action = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+    
+    console.log('Request details:', {
+      method: req.method,
+      pathname: url.pathname,
+      pathParts,
+      action,
+      searchParams: url.search
+    });
 
     if (req.method === 'POST') {
       if (action === 'invite') {
