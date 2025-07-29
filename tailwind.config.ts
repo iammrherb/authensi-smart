@@ -156,13 +156,27 @@ export default {
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-secondary': 'var(--gradient-secondary)',
-				'gradient-glow': 'var(--gradient-glow)'
+				'gradient-glow': 'var(--gradient-glow)',
+				'gradient-hero': 'var(--gradient-hero)',
+				'gradient-card': 'var(--gradient-card)',
+				'gradient-button': 'var(--gradient-button)',
+				'gradient-accent': 'var(--gradient-accent)'
 			},
 			boxShadow: {
 				'glow': 'var(--shadow-glow)',
-				'elevated': 'var(--shadow-elevated)'
+				'elevated': 'var(--shadow-elevated)',
+				'subtle': 'var(--shadow-subtle)',
+				'hover': 'var(--shadow-hover)'
+			},
+			transitionTimingFunction: {
+				'spring': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+				'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
+				'bounce': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)'
 			},
 			animationDelay: {
+				'100': '0.1s',
+				'200': '0.2s',
+				'300': '0.3s',
 				'2000': '2s',
 				'4000': '4s'
 			},
