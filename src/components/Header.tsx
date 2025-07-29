@@ -1,14 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogOut, Brain, ArrowLeft, Target, Zap, BarChart3, BookOpen, Building2, Users, Settings, Sparkles, Shield, Network, FileText } from "lucide-react";
+import { useHasRole } from "@/hooks/useUserRoles";
+import { LogOut, Brain, ArrowLeft, Target, Zap, BarChart3, BookOpen, Building2, Settings, Sparkles, Shield, Network, FileText } from "lucide-react";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
 import portnoxLogo from "@/assets/portnox-logo.png";
 
 const Header = () => {
-  const { user, signOut, isAdmin } = useAuth();
+  const { user, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // Check if user has admin privileges
+  const { data: isAdmin } = useHasRole('super_admin', 'global');
+  const { data: canManageUsers } = useHasRole('product_manager', 'global');
   
   const showBackButton = location.pathname !== '/dashboard' && location.pathname !== '/';
 
@@ -24,7 +29,6 @@ const Header = () => {
   ];
 
   const adminItems = [
-    { title: "Users", url: "/users", icon: Users, active: ["/users"], description: "User Management" },
     { title: "Settings", url: "/settings", icon: Settings, active: ["/settings"], description: "System Configuration" },
   ];
 
@@ -140,11 +144,13 @@ const Header = () => {
               })}
             </div>
             
-            {isAdmin && (
+            {(isAdmin || canManageUsers) && (
               <div className="flex items-center space-x-1 ml-4 pl-4 border-l border-nav-border/50">
                 <div className="flex items-center space-x-2 px-3 py-1 bg-accent-bold/20 rounded-lg">
                   <Shield className="h-3 w-3 text-accent-foreground" />
-                  <span className="text-xs font-medium text-accent-foreground">Admin</span>
+                  <span className="text-xs font-medium text-accent-foreground">
+                    {isAdmin ? 'Super Admin' : 'Manager'}
+                  </span>
                 </div>
                 {adminItems.map((item) => {
                   const isActive = isItemActive(item);

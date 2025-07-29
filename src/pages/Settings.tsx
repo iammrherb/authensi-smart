@@ -8,9 +8,14 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings as SettingsIcon, User, Bell, Shield, Database, Globe } from "lucide-react";
+import { useHasRole } from "@/hooks/useUserRoles";
+import EnhancedUserManagement from "@/components/admin/EnhancedUserManagement";
+import { Settings as SettingsIcon, User, Bell, Shield, Database, Globe, Users } from "lucide-react";
 
 const Settings = () => {
+  const { data: isAdmin } = useHasRole('super_admin', 'global');
+  const { data: canManageUsers } = useHasRole('product_manager', 'global');
+  
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -30,7 +35,7 @@ const Settings = () => {
           </div>
 
           <Tabs defaultValue="general" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className={`grid w-full ${(isAdmin || canManageUsers) ? 'grid-cols-6' : 'grid-cols-5'}`}>
               <TabsTrigger value="general" className="flex items-center space-x-2">
                 <SettingsIcon className="h-4 w-4" />
                 <span>General</span>
@@ -51,6 +56,12 @@ const Settings = () => {
                 <Database className="h-4 w-4" />
                 <span>Data</span>
               </TabsTrigger>
+              {(isAdmin || canManageUsers) && (
+                <TabsTrigger value="users" className="flex items-center space-x-2">
+                  <Users className="h-4 w-4" />
+                  <span>Users</span>
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="general" className="space-y-6">
@@ -260,6 +271,22 @@ const Settings = () => {
                 </CardContent>
               </Card>
             </TabsContent>
+
+            {(isAdmin || canManageUsers) && (
+              <TabsContent value="users" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Users className="h-5 w-5" />
+                      <span>User Management</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <EnhancedUserManagement />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
           </Tabs>
 
           <div className="mt-8 flex justify-end">

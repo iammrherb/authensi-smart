@@ -17,12 +17,12 @@ const AdminDashboard = () => {
   // Initialize global admin if none exists
   useEffect(() => {
     const initializeGlobalAdmin = async () => {
-      if (!user || !hasRole('project_owner')) return;
+      if (!user || !hasRole('super_admin')) return;
 
       try {
         // Check if user already has global admin role
         const hasGlobalAdmin = allUserRoles?.some(
-          role => role.role === 'project_owner' && role.scope_type === 'global'
+          role => role.role === 'super_admin' && role.scope_type === 'global'
         );
 
         if (!hasGlobalAdmin) {
@@ -83,7 +83,7 @@ const AdminDashboard = () => {
     }
   ];
 
-  if (!hasRole('project_owner') && !hasRole('project_manager')) {
+  if (!hasRole('super_admin') && !hasRole('product_manager')) {
     return (
       <div className="container mx-auto px-6 py-8">
         <div className="text-center py-20">
@@ -193,13 +193,13 @@ const AdminDashboard = () => {
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Admins</span>
                 <span className="font-medium">
-                  {allUserRoles?.filter(role => role.role === 'project_owner').length || 0}
+                  {allUserRoles?.filter(role => role.role === 'super_admin').length || 0}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Project Managers</span>
                 <span className="font-medium">
-                  {allUserRoles?.filter(role => role.role === 'project_manager').length || 0}
+                  {allUserRoles?.filter(role => role.role === 'product_manager').length || 0}
                 </span>
               </div>
             </div>

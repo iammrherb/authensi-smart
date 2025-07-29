@@ -38,16 +38,28 @@ const UserManagement = ({ scopeType = 'global', scopeId, scopeName }: UserManage
   const removeRole = useRemoveRole();
 
   const roleLabels: Record<AppRole, string> = {
-    project_owner: 'Project Owner',
-    project_manager: 'Project Manager',
+    super_admin: 'Super Admin',
+    project_creator: 'Project Creator',
+    project_viewer: 'Project Viewer',
+    product_manager: 'Product Manager',
+    sales_engineer: 'Sales Engineer',
+    technical_account_manager: 'Technical Account Manager',
+    technical_seller: 'Technical Seller',
+    sales: 'Sales',
     lead_engineer: 'Lead Engineer',
     engineer: 'Engineer',
     viewer: 'Viewer'
   };
 
   const roleDescriptions: Record<AppRole, string> = {
-    project_owner: 'Full access to all project/site functionality and user management',
-    project_manager: 'Manage projects, sites, and assign team members',
+    super_admin: 'Full access to all project/site functionality and user management',
+    project_creator: 'Can create and manage projects they create',
+    project_viewer: 'Read-only access to assigned projects',
+    product_manager: 'Full project lifecycle management with scoping and tracking',
+    sales_engineer: 'Technical sales with scoping and project creation capabilities',
+    technical_account_manager: 'Manage specific projects, stakeholders, and implementation phases',
+    technical_seller: 'Pre-sales technical activities and project scoping',
+    sales: 'Sales activities with basic scoping capabilities',
     lead_engineer: 'Technical lead with access to all engineering tasks',
     engineer: 'Execute engineering tasks and update project status',
     viewer: 'Read-only access to view project and site information'
@@ -55,13 +67,19 @@ const UserManagement = ({ scopeType = 'global', scopeId, scopeName }: UserManage
 
   const getRoleColor = (role: AppRole): string => {
     const colors = {
-      project_owner: 'destructive',
-      project_manager: 'success',
+      super_admin: 'destructive',
+      project_creator: 'default',
+      project_viewer: 'outline',
+      product_manager: 'success',
+      sales_engineer: 'default',
+      technical_account_manager: 'default',
+      technical_seller: 'secondary',
+      sales: 'secondary',
       lead_engineer: 'default',
       engineer: 'secondary',
       viewer: 'outline'
     };
-    return colors[role];
+    return colors[role] || 'outline';
   };
 
   const handleCreateUser = async () => {
@@ -102,11 +120,12 @@ const UserManagement = ({ scopeType = 'global', scopeId, scopeName }: UserManage
 
       // Assign the initial role
       try {
-        await supabase.rpc('assign_initial_user_role', {
-          _user_id: authData.user.id,
-          _role: newUserRole,
-          _scope_type: scopeType,
-          _scope_id: scopeId
+        // Use the direct mutation instead of the RPC function
+        await assignRole.mutateAsync({
+          user_id: authData.user.id,
+          role: newUserRole,
+          scope_type: scopeType,
+          scope_id: scopeId
         });
 
         toast({

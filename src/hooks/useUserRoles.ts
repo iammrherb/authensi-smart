@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-export type AppRole = 'project_owner' | 'project_manager' | 'lead_engineer' | 'engineer' | 'viewer';
+export type AppRole = 'super_admin' | 'project_creator' | 'project_viewer' | 'product_manager' | 'sales_engineer' | 'technical_account_manager' | 'technical_seller' | 'sales' | 'lead_engineer' | 'engineer' | 'viewer';
 export type ScopeType = 'global' | 'project' | 'site';
 
 export interface UserRole {
