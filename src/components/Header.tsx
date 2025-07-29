@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useHasRole } from "@/hooks/useUserRoles";
-import { LogOut, Brain, ArrowLeft, Target, Zap, BarChart3, BookOpen, Building2, Settings, Sparkles, Shield, Network, FileText, ChevronDown, User, Users } from "lucide-react";
+import { LogOut, Brain, ArrowLeft, Target, Zap, BarChart3, BookOpen, Building2, Settings, Sparkles, Shield, Network, FileText, ChevronDown, User, Users, Rocket } from "lucide-react";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -22,6 +22,7 @@ const Header = () => {
     { title: "Command Center", url: "/", icon: Target, active: ["/", "/dashboard"], description: "AI Hub & Overview" },
     { title: "AI Scoping", url: "/scoping", icon: Sparkles, active: ["/scoping"], description: "Intelligent Project Scoping" },
     { title: "Project Tracker", url: "/tracker", icon: Zap, active: ["/tracker", "/project"], description: "Live Project Management" },
+    { title: "Implementation", url: "/implementation", icon: Rocket, active: ["/implementation"], description: "Deployment Center" },
     { title: "Analytics", url: "/reports", icon: BarChart3, active: ["/reports"], description: "Performance Insights" },
   ];
 

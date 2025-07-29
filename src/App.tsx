@@ -36,6 +36,7 @@ import ProjectTracking from "./pages/ProjectTracking";
 import UseCaseLibrary from "./pages/UseCaseLibrary";
 import ProjectDetails from "./pages/ProjectDetails";
 import IntelligenceTrackerHub from "./pages/IntelligenceTrackerHub";
+import ImplementationCenter from "./pages/ImplementationCenter";
 
 const queryClient = new QueryClient();
 
@@ -75,6 +76,7 @@ const App = () => (
                     {/* Project Management */}
                     <Route path="/tracker" element={<Tracker />} />
                     <Route path="/project/:projectId/tracking" element={<ProjectTracking />} />
+                    <Route path="/implementation" element={<ImplementationCenter />} />
                     <Route path="/deployment" element={<Deployment />} />
                     <Route path="/reports" element={<Reports />} />
                     <Route path="/projects/:id" element={<ProjectDetails />} />
