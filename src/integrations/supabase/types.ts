@@ -146,6 +146,39 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_roles: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_system_role: boolean | null
+          name: string
+          permissions: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_system_role?: boolean | null
+          name: string
+          permissions?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_system_role?: boolean | null
+          name?: string
+          permissions?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       implementation_checklists: {
         Row: {
           assigned_to: string | null
@@ -1383,11 +1416,68 @@ export type Database = {
         }
         Relationships: []
       }
+      user_invitations: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string | null
+          custom_role_id: string | null
+          email: string
+          expires_at: string
+          id: string
+          invitation_token: string
+          invited_by: string
+          metadata: Json | null
+          scope_id: string | null
+          scope_type: string
+          status: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          custom_role_id?: string | null
+          email: string
+          expires_at?: string
+          id?: string
+          invitation_token: string
+          invited_by: string
+          metadata?: Json | null
+          scope_id?: string | null
+          scope_type?: string
+          status?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          custom_role_id?: string | null
+          email?: string
+          expires_at?: string
+          id?: string
+          invitation_token?: string
+          invited_by?: string
+          metadata?: Json | null
+          scope_id?: string | null
+          scope_type?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_invitations_custom_role_id_fkey"
+            columns: ["custom_role_id"]
+            isOneToOne: false
+            referencedRelation: "custom_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           assigned_at: string
           assigned_by: string | null
           created_at: string
+          custom_role_id: string | null
           id: string
           role: Database["public"]["Enums"]["app_role"]
           scope_id: string | null
@@ -1399,6 +1489,7 @@ export type Database = {
           assigned_at?: string
           assigned_by?: string | null
           created_at?: string
+          custom_role_id?: string | null
           id?: string
           role: Database["public"]["Enums"]["app_role"]
           scope_id?: string | null
@@ -1410,6 +1501,7 @@ export type Database = {
           assigned_at?: string
           assigned_by?: string | null
           created_at?: string
+          custom_role_id?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           scope_id?: string | null
@@ -1417,7 +1509,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_custom_role_id_fkey"
+            columns: ["custom_role_id"]
+            isOneToOne: false
+            referencedRelation: "custom_roles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vendor_library: {
         Row: {
@@ -1495,6 +1595,16 @@ export type Database = {
         Args: { _user_id: string }
         Returns: undefined
       }
+      has_permission: {
+        Args: {
+          user_id: string
+          resource: Database["public"]["Enums"]["resource_type"]
+          permission: Database["public"]["Enums"]["permission_type"]
+          scope_type?: string
+          scope_id?: string
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _user_id: string
@@ -1530,6 +1640,17 @@ export type Database = {
         | "lead_engineer"
         | "engineer"
         | "viewer"
+      permission_type: "read" | "write" | "update" | "delete" | "admin"
+      resource_type:
+        | "projects"
+        | "sites"
+        | "users"
+        | "vendors"
+        | "use_cases"
+        | "requirements"
+        | "test_cases"
+        | "reports"
+        | "settings"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1669,6 +1790,18 @@ export const Constants = {
         "lead_engineer",
         "engineer",
         "viewer",
+      ],
+      permission_type: ["read", "write", "update", "delete", "admin"],
+      resource_type: [
+        "projects",
+        "sites",
+        "users",
+        "vendors",
+        "use_cases",
+        "requirements",
+        "test_cases",
+        "reports",
+        "settings",
       ],
     },
   },
