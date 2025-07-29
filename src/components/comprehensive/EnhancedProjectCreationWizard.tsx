@@ -90,11 +90,11 @@ const projectTemplates = {
     description: "Upgrade existing Portnox deployment",
     icon: Layers,
     defaultValues: {
-      timeline: "2-6 months",
-      sites: "Current sites",
-      endpoints: "Current endpoints",
-      requirements: ["Compatibility Assessment", "Upgrade Planning", "Testing Procedures", "Rollback Planning"],
-      painPoints: ["Version compatibility", "Feature migration", "Minimal disruption"]
+      timeline: "2-4 months",
+      sites: "Current deployment",
+      endpoints: "Existing count",
+      requirements: ["Current State Assessment", "Upgrade Planning", "Testing & Validation", "Training Updates"],
+      painPoints: ["Minimal downtime required", "Feature compatibility", "Training updates needed"]
     }
   }
 };
@@ -450,9 +450,9 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
 
       if (enhanced) {
         const enhancedLines = enhanced.split('\n').filter(line => line.trim());
-        setFormData(prev => ({ 
-          ...prev, 
-          pain_points: enhancedLines 
+        setFormData(prev => ({
+          ...prev,
+          pain_points: enhancedLines
         }));
         toast({
           title: "Pain Points Enhanced",
@@ -750,12 +750,15 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
                 <Label>Start Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal mt-1">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal mt-1"
+                    >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formData.start_date ? format(formData.start_date, "PPP") : "Select start date"}
+                      {formData.start_date ? format(formData.start_date, "PPP") : "Pick a date"}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent className="w-auto p-0">
                     <Calendar
                       mode="single"
                       selected={formData.start_date}
@@ -770,12 +773,15 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
                 <Label>Target Completion</Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal mt-1">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal mt-1"
+                    >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formData.target_completion ? format(formData.target_completion, "PPP") : "Select completion date"}
+                      {formData.target_completion ? format(formData.target_completion, "PPP") : "Pick a date"}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent className="w-auto p-0">
                     <Calendar
                       mode="single"
                       selected={formData.target_completion}
@@ -792,36 +798,47 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
       case 3:
         return (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="project_owner">Project Owner *</Label>
+                <Label htmlFor="project_manager">Project Manager</Label>
+                <Input
+                  id="project_manager"
+                  value={formData.project_manager || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, project_manager: e.target.value }))}
+                  placeholder="Project manager email"
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="project_owner">Project Owner</Label>
                 <Input
                   id="project_owner"
-                  value={formData.project_owner}
+                  value={formData.project_owner || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, project_owner: e.target.value }))}
-                  placeholder="email@company.com"
+                  placeholder="Project owner email"
                   className="mt-1"
                 />
               </div>
 
               <div>
-                <Label htmlFor="technical_owner">Technical Owner *</Label>
+                <Label htmlFor="technical_owner">Technical Owner</Label>
                 <Input
                   id="technical_owner"
-                  value={formData.technical_owner}
+                  value={formData.technical_owner || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, technical_owner: e.target.value }))}
-                  placeholder="tech@company.com"
+                  placeholder="Technical owner email"
                   className="mt-1"
                 />
               </div>
 
               <div>
-                <Label htmlFor="portnox_owner">Portnox Owner *</Label>
+                <Label htmlFor="portnox_owner">Portnox Owner</Label>
                 <Input
                   id="portnox_owner"
-                  value={formData.portnox_owner}
+                  value={formData.portnox_owner || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, portnox_owner: e.target.value }))}
-                  placeholder="consultant@portnox.com"
+                  placeholder="Portnox representative email"
                   className="mt-1"
                 />
               </div>
@@ -829,18 +846,16 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
 
             <div>
               <Label>Additional Stakeholders</Label>
-              <p className="text-sm text-muted-foreground mb-2">
-                Add other team members and specify whether to create user accounts or just add as contacts
-              </p>
-              <div className="space-y-4">
-                <div className="flex gap-2">
+              <div className="space-y-3 mt-3">
+                <div className="grid grid-cols-12 gap-2">
                   <Input
                     placeholder="Email address"
                     value={newStakeholder.email}
                     onChange={(e) => setNewStakeholder(prev => ({ ...prev, email: e.target.value }))}
+                    className="col-span-4"
                   />
                   <Select value={newStakeholder.role} onValueChange={(value) => setNewStakeholder(prev => ({ ...prev, role: value as any }))}>
-                    <SelectTrigger className="w-40">
+                    <SelectTrigger className="col-span-2">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -849,41 +864,45 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
                       <SelectItem value="product_manager">Product Manager</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Button onClick={addStakeholder} size="sm">
+                  <div className="flex items-center space-x-2 col-span-2">
+                    <Checkbox
+                      id="createUser"
+                      checked={newStakeholder.createUser}
+                      onCheckedChange={(checked) => setNewStakeholder(prev => ({ ...prev, createUser: checked as boolean }))}
+                    />
+                    <Label htmlFor="createUser" className="text-sm">Create User</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 col-span-2">
+                    <Checkbox
+                      id="sendInvitation"
+                      checked={newStakeholder.sendInvitation}
+                      onCheckedChange={(checked) => setNewStakeholder(prev => ({ ...prev, sendInvitation: checked as boolean }))}
+                    />
+                    <Label htmlFor="sendInvitation" className="text-sm">Send Invitation</Label>
+                  </div>
+                  <Button onClick={addStakeholder} size="sm" className="col-span-2">
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
+                
                 {formData.additional_stakeholders.length > 0 && (
                   <div className="space-y-2">
                     {formData.additional_stakeholders.map((stakeholder, index) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium">{stakeholder.email}</span>
-                            <Badge variant={stakeholder.role === 'contact' ? 'outline' : 'secondary'} className="text-xs">
-                              {stakeholder.role === 'contact' ? 'Contact' : stakeholder.role}
-                            </Badge>
-                          </div>
-                          <div className="flex gap-2 mt-1">
-                            {stakeholder.createUser && (
-                              <div className="flex items-center gap-1">
-                                <UserPlus className="h-3 w-3 text-green-600" />
-                                <span className="text-xs text-green-600">Create User</span>
-                              </div>
-                            )}
-                            {stakeholder.sendInvitation && (
-                              <div className="flex items-center gap-1">
-                                <Mail className="h-3 w-3 text-blue-600" />
-                                <span className="text-xs text-blue-600">Send Invitation</span>
-                              </div>
-                            )}
+                        <div className="flex items-center gap-3">
+                          <div>
+                            <div className="font-medium">{stakeholder.email}</div>
+                            <div className="text-sm text-muted-foreground">
+                              Role: {stakeholder.role} | 
+                              {stakeholder.createUser ? ' Create User' : ' Contact Only'} |
+                              {stakeholder.sendInvitation ? ' Send Invitation' : ' No Invitation'}
+                            </div>
                           </div>
                         </div>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => removeStakeholder(index)}
-                          className="h-6 w-6 p-0"
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -901,10 +920,7 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
           <div className="space-y-6">
             <div>
               <Label>Compliance Frameworks</Label>
-              <p className="text-sm text-muted-foreground mb-4">
-                Select all applicable compliance frameworks for this project
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-3">
                 {complianceOptions.map((framework) => (
                   <Button
                     key={framework}
@@ -925,156 +941,190 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
                   </Button>
                 ))}
               </div>
-              {formData.compliance_frameworks.length > 0 && (
-                <div className="mt-4">
-                  <p className="text-sm font-medium mb-2">Selected Frameworks:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {formData.compliance_frameworks.map((framework) => (
-                      <Badge key={framework} variant="secondary">
-                        {framework}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
-            <Separator />
+            <div>
+              <div className="flex items-center justify-between">
+                <Label>Requirements</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={enhancePainPointsWithAI}
+                  disabled={isEnhancingPainPoints}
+                  className="flex items-center gap-2"
+                >
+                  <Brain className="h-4 w-4" />
+                  AI Enhance
+                </Button>
+              </div>
+              
+              <div className="space-y-3 mt-3">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Add new requirement..."
+                    value={newRequirement}
+                    onChange={(e) => setNewRequirement(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && newRequirement.trim()) {
+                        addItem('requirements', newRequirement);
+                        setNewRequirement('');
+                      }
+                    }}
+                  />
+                  <Button
+                    onClick={() => {
+                      if (newRequirement.trim()) {
+                        addItem('requirements', newRequirement);
+                        setNewRequirement('');
+                      }
+                    }}
+                    size="sm"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {requirements.length > 0 && (
+                  <div>
+                    <Label className="text-sm text-muted-foreground">From Requirements Library:</Label>
+                    <Select onValueChange={addRequirementFromLibrary}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Select from library..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {requirements.map((req) => (
+                          <SelectItem key={req.id} value={req.id}>
+                            {req.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  {formData.requirements.map((requirement, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
+                      <span className="text-sm">{requirement}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeItem('requirements', index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <Label>Pain Points & Challenges</Label>
+              <div className="flex items-center justify-between">
+                <Label>Pain Points</Label>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={enhancePainPointsWithAI}
                   disabled={isEnhancingPainPoints || formData.pain_points.length === 0}
-                  className="flex items-center gap-1"
+                  className="flex items-center gap-2"
                 >
-                  {isEnhancingPainPoints ? (
-                    <Brain className="h-3 w-3 animate-pulse" />
-                  ) : (
-                    <Sparkles className="h-3 w-3" />
-                  )}
-                  <span className="text-xs">AI Enhance</span>
+                  <Brain className="h-4 w-4" />
+                  {isEnhancingPainPoints ? 'Enhancing...' : 'AI Enhance'}
                 </Button>
               </div>
-              <p className="text-sm text-muted-foreground mb-2">
-                What are the key challenges this project aims to address?
-              </p>
-              <div className="space-y-2">
+              
+              <div className="space-y-3 mt-3">
                 <div className="flex gap-2">
                   <Input
-                    placeholder="Enter a pain point..."
+                    placeholder="Add new pain point..."
+                    value={newPainPoint}
+                    onChange={(e) => setNewPainPoint(e.target.value)}
                     onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        addItem('pain_points', e.currentTarget.value);
-                        e.currentTarget.value = '';
+                      if (e.key === 'Enter' && newPainPoint.trim()) {
+                        addItem('pain_points', newPainPoint);
+                        setNewPainPoint('');
                       }
                     }}
                   />
                   <Button
-                    type="button"
-                    variant="outline"
-                    onClick={(e) => {
-                      const input = e.currentTarget.parentElement?.querySelector('input') as HTMLInputElement;
-                      if (input) {
-                        addItem('pain_points', input.value);
-                        input.value = '';
+                    onClick={() => {
+                      if (newPainPoint.trim()) {
+                        addItem('pain_points', newPainPoint);
+                        setNewPainPoint('');
                       }
                     }}
+                    size="sm"
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
-                {formData.pain_points.length > 0 && (
-                  <div className="space-y-1">
-                    {formData.pain_points.map((point, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
-                        <span className="text-sm">{point}</span>
+
+                {painPoints.length > 0 && (
+                  <div>
+                    <Label className="text-sm text-muted-foreground">From Pain Points Library:</Label>
+                    <Select onValueChange={addPainPointFromLibrary}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Select from library..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {painPoints.map((point) => (
+                          <SelectItem key={point.id} value={point.id}>
+                            {point.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  {formData.pain_points.map((painPoint, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
+                      <span className="text-sm">{painPoint}</span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowAddPainPointToLibrary(painPoint)}
+                          title="Add to library"
+                        >
+                          <Upload className="h-4 w-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => removeItem('pain_points', index)}
-                          className="h-6 w-6 p-0"
                         >
                           <X className="h-4 w-4" />
                         </Button>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+                    </div>
+                  ))}
+                </div>
 
-            <div>
-              <Label>Project Requirements</Label>
-              <p className="text-sm text-muted-foreground mb-2">
-                Select requirements from the library or add custom ones
-              </p>
-              <div className="space-y-4">
-                <div className="flex gap-2">
-                  <Select onValueChange={(reqId) => addRequirementFromLibrary(reqId)}>
-                    <SelectTrigger className="flex-1">
-                      <SelectValue placeholder="Select from requirements library..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {requirements?.map((req) => (
-                        <SelectItem key={req.id} value={req.id}>
-                          <div className="flex flex-col">
-                            <span>{req.title}</span>
-                            <span className="text-xs text-muted-foreground">{req.category}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button type="button" variant="outline">
-                    Browse Library
-                  </Button>
-                </div>
-                
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Enter a custom requirement..."
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        addItem('requirements', e.currentTarget.value);
-                        e.currentTarget.value = '';
-                      }
-                    }}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={(e) => {
-                      const input = e.currentTarget.parentElement?.querySelector('input') as HTMLInputElement;
-                      if (input) {
-                        addItem('requirements', input.value);
-                        input.value = '';
-                      }
-                    }}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                {formData.requirements.length > 0 && (
-                  <div className="space-y-1">
-                    {formData.requirements.map((requirement, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
-                        <span className="text-sm">{requirement}</span>
+                {showAddPainPointToLibrary && (
+                  <div className="p-3 border rounded-lg bg-card">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">Add "{showAddPainPointToLibrary}" to library?</span>
+                      <div className="flex gap-2">
                         <Button
-                          variant="ghost"
                           size="sm"
-                          onClick={() => removeItem('requirements', index)}
-                          className="h-6 w-6 p-0"
+                          onClick={() => handleAddToLibrary('pain_point', showAddPainPointToLibrary)}
                         >
-                          <X className="h-4 w-4" />
+                          Add
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowAddPainPointToLibrary(null)}
+                        >
+                          Cancel
                         </Button>
                       </div>
-                    ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -1092,35 +1142,11 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
                   checked={formData.enable_bulk_sites}
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, enable_bulk_sites: checked as boolean }))}
                 />
-                <Label htmlFor="enable_bulk_sites" className="text-sm font-medium">
-                  Enable Bulk Site Creation
-                </Label>
+                <Label htmlFor="enable_bulk_sites" className="font-medium">Enable Bulk Site Creation</Label>
               </div>
-              {formData.enable_bulk_sites && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-sm">Bulk Site Creation Options</CardTitle>
-                    <CardDescription>
-                      Configure how sites will be created for this project
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex gap-4">
-                      <Button variant="outline" className="flex-1">
-                        <Upload className="h-4 w-4 mr-2" />
-                        Upload CSV
-                      </Button>
-                      <Button variant="outline" className="flex-1">
-                        <Download className="h-4 w-4 mr-2" />
-                        Download Template
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Upload a CSV file with site information or use our auto-generation wizard
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
+              <p className="text-sm text-muted-foreground ml-6">
+                Allow importing multiple sites from CSV files or templates
+              </p>
 
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -1128,10 +1154,11 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
                   checked={formData.enable_bulk_users}
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, enable_bulk_users: checked as boolean }))}
                 />
-                <Label htmlFor="enable_bulk_users" className="text-sm font-medium">
-                  Enable Bulk User Creation
-                </Label>
+                <Label htmlFor="enable_bulk_users" className="font-medium">Enable Bulk User Creation</Label>
               </div>
+              <p className="text-sm text-muted-foreground ml-6">
+                Allow importing multiple users from external systems or CSV files
+              </p>
 
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -1139,43 +1166,47 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
                   checked={formData.enable_auto_vendors}
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, enable_auto_vendors: checked as boolean }))}
                 />
-                <Label htmlFor="enable_auto_vendors" className="text-sm font-medium">
-                  Auto-Configure Common Vendors
-                </Label>
+                <Label htmlFor="enable_auto_vendors" className="font-medium">Enable Auto Vendor Configuration</Label>
               </div>
+              <p className="text-sm text-muted-foreground ml-6">
+                Automatically configure vendor settings based on site requirements
+              </p>
             </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Post-Creation Actions</CardTitle>
-                <CardDescription>
-                  What happens after project creation
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
-                    <span>Project will be created with all specified settings</span>
-                  </div>
-                  <div className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
-                    <span>You'll be redirected to the AI Scoping Wizard</span>
-                  </div>
-                  <div className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
-                    <span>Comprehensive questionnaire will be generated</span>
-                  </div>
-                  <div className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
-                    <span>Project tracking dashboard will be configured</span>
-                  </div>
+            <Separator />
+
+            <div className="bg-muted p-4 rounded-lg">
+              <h4 className="font-medium mb-2">Project Summary</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <strong>Project Name:</strong> {formData.name || 'Not specified'}
                 </div>
-              </CardContent>
-            </Card>
+                <div>
+                  <strong>Client:</strong> {formData.client_name || 'Not specified'}
+                </div>
+                <div>
+                  <strong>Industry:</strong> {formData.industry || 'Not specified'}
+                </div>
+                <div>
+                  <strong>Type:</strong> {formData.project_type ? projectTemplates[formData.project_type].title : 'Not specified'}
+                </div>
+                <div>
+                  <strong>Sites:</strong> {formData.total_sites || 0}
+                </div>
+                <div>
+                  <strong>Endpoints:</strong> {formData.total_endpoints || 0}
+                </div>
+                <div>
+                  <strong>Requirements:</strong> {formData.requirements.length}
+                </div>
+                <div>
+                  <strong>Pain Points:</strong> {formData.pain_points.length}
+                </div>
+              </div>
+            </div>
           </div>
         );
-
+      
       default:
         return null;
     }
@@ -1256,7 +1287,8 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
               
               return (
                 <div key={step.id} className="flex items-center space-x-2">
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 transition-colors
+                  <div className={`
+                    flex items-center justify-center w-8 h-8 rounded-full border-2 transition-colors
                     ${isCompleted ? 'bg-primary border-primary text-primary-foreground' : ''}
                     ${isCurrent ? 'border-primary text-primary' : ''}
                     ${!isCompleted && !isCurrent ? 'border-muted-foreground text-muted-foreground' : ''}
