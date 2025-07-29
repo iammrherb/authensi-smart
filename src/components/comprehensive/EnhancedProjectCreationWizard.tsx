@@ -14,7 +14,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { 
   CalendarIcon, ArrowLeft, ArrowRight, CheckCircle, Briefcase, Building2, 
-  Users, Shield, Target, Globe, MapPin, Plus, X, Upload, Download, UserPlus, Mail
+  Users, Shield, Target, Globe, MapPin, Plus, X, Upload, Download, UserPlus, Mail,
+  Sparkles, Brain, FileText, Settings, Zap, RefreshCw, ArrowUpRight, Layers
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useCreateProject } from '@/hooks/useProjects';
@@ -23,6 +24,7 @@ import { useCountries, useRegionsByCountry } from '@/hooks/useCountriesRegions';
 import { useBulkSiteTemplates } from '@/hooks/useBulkSiteTemplates';
 import { useRequirements } from '@/hooks/useRequirements';
 import { AppRole } from '@/hooks/useUserRoles';
+import { useAI } from '@/hooks/useAI';
 import AIWorkflowEngine from '@/components/ai/AIWorkflowEngine';
 
 interface StakeholderEntry {
@@ -46,6 +48,70 @@ const timezones = [
   'UTC', 'EST', 'CST', 'MST', 'PST', 'GMT', 'CET', 'JST', 'AEST', 'IST',
   'PST', 'PDT', 'EDT', 'CDT', 'MDT', 'HST', 'AKST', 'AST', 'NST'
 ];
+
+// Project Templates
+const projectTemplates = {
+  poc: {
+    title: "Proof of Concept",
+    description: "Test Portnox NAC capabilities in a controlled environment",
+    icon: Sparkles,
+    defaultValues: {
+      timeline: "3-6 months",
+      sites: "1-3",
+      endpoints: "50-500",
+      requirements: ["Lab Environment Setup", "Basic Policy Testing", "User Acceptance Testing", "Documentation"],
+      painPoints: ["Need to validate technology", "Limited budget for testing", "Proof required before full deployment"]
+    }
+  },
+  implementation: {
+    title: "Full Implementation",
+    description: "Complete NAC deployment across your organization",
+    icon: Settings,
+    defaultValues: {
+      timeline: "6-18 months",
+      sites: "Multiple",
+      endpoints: "1000+",
+      requirements: ["Network Infrastructure Assessment", "Policy Framework Design", "User Training", "Go-Live Support"],
+      painPoints: ["Complex network environment", "Multiple stakeholders", "Business continuity requirements"]
+    }
+  },
+  expansion: {
+    title: "Network Expansion",
+    description: "Extend existing NAC deployment to new sites or segments",
+    icon: ArrowUpRight,
+    defaultValues: {
+      timeline: "3-9 months",
+      sites: "New locations",
+      endpoints: "Variable",
+      requirements: ["Site Assessment", "Configuration Replication", "Testing & Validation", "User Onboarding"],
+      painPoints: ["Maintaining consistency", "Remote site challenges", "Resource allocation"]
+    }
+  },
+  migration: {
+    title: "Technology Migration",
+    description: "Migrate from existing NAC solution to Portnox",
+    icon: RefreshCw,
+    defaultValues: {
+      timeline: "6-12 months",
+      sites: "Existing coverage",
+      endpoints: "Current deployment",
+      requirements: ["Legacy System Analysis", "Migration Planning", "Parallel Testing", "Cutover Planning"],
+      painPoints: ["Zero downtime requirement", "Legacy system dependencies", "User impact minimization"]
+    }
+  },
+  upgrade: {
+    title: "System Upgrade",
+    description: "Upgrade existing Portnox deployment",
+    icon: Zap,
+    defaultValues: {
+      timeline: "2-6 months",
+      sites: "Current sites",
+      endpoints: "Current endpoints",
+      requirements: ["Compatibility Assessment", "Upgrade Planning", "Testing Procedures", "Rollback Planning"],
+      painPoints: ["Version compatibility", "Feature migration", "Minimal disruption"]
+    }
+  }
+};
 
 interface EnhancedProjectFormData {
   // Basic Information
@@ -133,6 +199,13 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
   
   const { mutate: createProject, isPending } = useCreateProject();
   const { toast } = useToast();
+  const { enhanceNotes, generateProjectSummary, isLoading: aiLoading } = useAI();
+
+  // AI-related state
+  const [businessSummary, setBusinessSummary] = useState('');
+  const [aiEnhancedPainPoints, setAiEnhancedPainPoints] = useState('');
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [isEnhancingPainPoints, setIsEnhancingPainPoints] = useState(false);
 
   const steps = [
     {
@@ -167,13 +240,6 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
     }
   ];
 
-  const projectTypes = [
-    { value: 'poc', label: 'Proof of Concept', description: 'Initial validation and testing' },
-    { value: 'implementation', label: 'Full Implementation', description: 'Complete deployment across organization' },
-    { value: 'expansion', label: 'Expansion', description: 'Extending existing NAC deployment' },
-    { value: 'migration', label: 'Migration', description: 'Moving from existing NAC solution' },
-    { value: 'upgrade', label: 'Upgrade', description: 'Upgrading current Portnox deployment' }
-  ];
 
   const industries = [
     "Financial Services", "Healthcare", "Government", "Education", "Manufacturing",
@@ -274,6 +340,95 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
         ...prev,
         requirements: [...prev.requirements, requirement.title]
       }));
+    }
+  };
+
+  // Apply project template
+  const applyProjectTemplate = (templateKey: keyof typeof projectTemplates) => {
+    const template = projectTemplates[templateKey];
+    setFormData(prev => ({
+      ...prev,
+      project_type: templateKey,
+      pain_points: [...prev.pain_points, ...template.defaultValues.painPoints],
+      requirements: [...prev.requirements, ...template.defaultValues.requirements]
+    }));
+  };
+
+  // Generate AI business summary
+  const generateBusinessSummary = async () => {
+    if (!formData.client_name || !formData.industry) {
+      toast({
+        title: "Missing Information",
+        description: "Please provide client name and industry first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsGeneratingSummary(true);
+    try {
+      const summary = await generateProjectSummary({
+        name: formData.name,
+        client_name: formData.client_name,
+        industry: formData.industry,
+        project_type: formData.project_type,
+        deployment_type: formData.deployment_type,
+        security_level: formData.security_level,
+        total_sites: formData.total_sites,
+        total_endpoints: formData.total_endpoints
+      });
+
+      if (summary) {
+        setBusinessSummary(summary);
+        toast({
+          title: "Business Summary Generated",
+          description: "AI has created a comprehensive business summary for your project."
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to Generate Summary",
+        description: "Unable to generate AI summary. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingSummary(false);
+    }
+  };
+
+  // Enhance pain points with AI
+  const enhancePainPointsWithAI = async () => {
+    if (formData.pain_points.length === 0) {
+      toast({
+        title: "No Pain Points",
+        description: "Please add some pain points first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsEnhancingPainPoints(true);
+    try {
+      const enhanced = await enhanceNotes(
+        formData.pain_points.join('\n'),
+        `Project Type: ${formData.project_type}, Industry: ${formData.industry}, Client: ${formData.client_name}`
+      );
+
+      if (enhanced) {
+        setAiEnhancedPainPoints(enhanced);
+        toast({
+          title: "Pain Points Enhanced",
+          description: "AI has provided detailed analysis and recommendations for your pain points."
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to Enhance",
+        description: "Unable to enhance pain points. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsEnhancingPainPoints(false);
     }
   };
 
@@ -400,36 +555,81 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
 
               <div>
                 <Label htmlFor="client_name">Client/Organization *</Label>
-                <Input
-                  id="client_name"
-                  value={formData.client_name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, client_name: e.target.value }))}
-                  placeholder="e.g., Acme Corporation"
-                  className="mt-1"
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="client_name"
+                    value={formData.client_name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, client_name: e.target.value }))}
+                    placeholder="e.g., Acme Corporation"
+                    className="mt-1 flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={generateBusinessSummary}
+                    disabled={isGeneratingSummary || !formData.client_name || !formData.industry}
+                    className="mt-1"
+                  >
+                    {isGeneratingSummary ? (
+                      <Brain className="h-4 w-4 animate-pulse" />
+                    ) : (
+                      <Sparkles className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                {businessSummary && (
+                  <Card className="mt-2 p-3 bg-primary/5 border-primary/20">
+                    <div className="flex items-start gap-2">
+                      <Brain className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-primary">AI Business Summary</Label>
+                        <div className="text-sm text-muted-foreground whitespace-pre-wrap">
+                          {businessSummary}
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                )}
               </div>
 
               <div>
-                <Label>Project Type *</Label>
-                <RadioGroup 
-                  value={formData.project_type} 
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, project_type: value as any }))}
-                  className="mt-2"
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {projectTypes.map((type) => (
-                      <div key={type.value} className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
-                        <RadioGroupItem value={type.value} id={type.value} className="mt-1" />
-                        <div className="flex-1">
-                          <label htmlFor={type.value} className="text-sm font-medium cursor-pointer">
-                            {type.label}
-                          </label>
-                          <p className="text-xs text-muted-foreground">{type.description}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </RadioGroup>
+                <Label>Project Type & Template *</Label>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Choose a project type to automatically populate relevant requirements and pain points
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {Object.entries(projectTemplates).map(([key, template]) => {
+                    const IconComponent = template.icon;
+                    const isSelected = formData.project_type === key;
+                    return (
+                      <Card 
+                        key={key} 
+                        className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                          isSelected ? 'ring-2 ring-primary bg-primary/5' : 'hover:bg-muted/50'
+                        }`}
+                        onClick={() => applyProjectTemplate(key as keyof typeof projectTemplates)}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-3">
+                            <div className={`p-2 rounded-lg ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                              <IconComponent className="h-4 w-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-sm">{template.title}</h4>
+                              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                {template.description}
+                              </p>
+                              <div className="mt-2 text-xs text-muted-foreground">
+                                <div>Timeline: {template.defaultValues.timeline}</div>
+                                <div>Scope: {template.defaultValues.sites}</div>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
               </div>
 
               <div>
@@ -763,7 +963,24 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
             <Separator />
 
             <div>
-              <Label>Pain Points & Challenges</Label>
+              <div className="flex items-center justify-between mb-2">
+                <Label>Pain Points & Challenges</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={enhancePainPointsWithAI}
+                  disabled={isEnhancingPainPoints || formData.pain_points.length === 0}
+                  className="flex items-center gap-1"
+                >
+                  {isEnhancingPainPoints ? (
+                    <Brain className="h-3 w-3 animate-pulse" />
+                  ) : (
+                    <Sparkles className="h-3 w-3" />
+                  )}
+                  <span className="text-xs">AI Enhance</span>
+                </Button>
+              </div>
               <p className="text-sm text-muted-foreground mb-2">
                 What are the key challenges this project aims to address?
               </p>
@@ -808,6 +1025,19 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
                       </div>
                     ))}
                   </div>
+                )}
+                {aiEnhancedPainPoints && (
+                  <Card className="mt-3 p-3 bg-primary/5 border-primary/20">
+                    <div className="flex items-start gap-2">
+                      <Brain className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-primary">AI Enhanced Analysis</Label>
+                        <div className="text-sm text-muted-foreground whitespace-pre-wrap">
+                          {aiEnhancedPainPoints}
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
                 )}
               </div>
             </div>
