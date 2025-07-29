@@ -18,30 +18,10 @@ const Header = () => {
   
   const showBackButton = location.pathname !== '/dashboard' && location.pathname !== '/';
 
-  const primaryNavItems = [
-    { title: "Command Center", url: "/", icon: Target, active: ["/", "/dashboard"], description: "AI Hub & Overview" },
-    { title: "AI Scoping", url: "/scoping", icon: Sparkles, active: ["/scoping"], description: "Intelligent Project Scoping" },
-    { title: "Project Tracker", url: "/tracker", icon: Zap, active: ["/tracker", "/project"], description: "Live Project Management" },
-    { title: "Analytics", url: "/reports", icon: BarChart3, active: ["/reports"], description: "Performance Insights" },
-  ];
-
-  const secondaryNavItems = [
-    { title: "Use Cases", url: "/use-cases", icon: BookOpen, active: ["/use-cases"], description: "Knowledge Library" },
-    { title: "Sites", url: "/sites", icon: Building2, active: ["/sites"], description: "Network Sites" },
-    { title: "Requirements", url: "/requirements", icon: FileText, active: ["/requirements"], description: "Project Requirements" },
-    { title: "Vendors", url: "/vendors", icon: Network, active: ["/vendors"], description: "Vendor Management" },
-  ];
-
-  const isItemActive = (item: any) => {
-    return item.active.some((path: string) => 
-      location.pathname === path || location.pathname.startsWith(path + "/")
-    );
-  };
 
   return (
     <header className="sticky top-0 z-50 border-b bg-gradient-to-r from-nav-background via-nav-background to-nav-background/95 backdrop-blur supports-[backdrop-filter]:bg-nav-background/80 shadow-elevated">
-      {/* Main Header */}
-      <div className="h-20 flex items-center justify-between px-6">
+      <div className="h-16 flex items-center justify-between px-6">
         <div className="flex items-center space-x-6">
           {showBackButton && (
             <Button
@@ -57,17 +37,17 @@ const Header = () => {
           
           <div className="flex items-center space-x-4">
             <Link to="/" className="flex items-center space-x-4 hover:opacity-80 transition-opacity group">
-              <img src={portnoxLogo} alt="Portnox" className="h-10 w-auto" />
+              <img src={portnoxLogo} alt="Portnox" className="h-8 w-auto" />
               <div className="flex items-center space-x-3">
-                <div className="p-2 rounded-xl bg-gradient-primary shadow-glow">
-                  <Brain className="h-6 w-6 text-primary-foreground animate-pulse" />
+                <div className="p-1.5 rounded-lg bg-gradient-primary shadow-glow">
+                  <Brain className="h-5 w-5 text-primary-foreground animate-pulse" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                  <h1 className="text-lg font-bold bg-gradient-primary bg-clip-text text-transparent">
                     Intelligence Tracker Hub
                   </h1>
-                  <p className="text-sm text-nav-foreground/70">
-                    AI-Powered Project & Deployment Management
+                  <p className="text-xs text-nav-foreground/70">
+                    AI-Powered Project Management
                   </p>
                 </div>
               </div>
@@ -77,7 +57,7 @@ const Header = () => {
         
         <div className="flex items-center space-x-4">
           {/* Enhanced AI Status */}
-          <div className="flex items-center space-x-3 px-4 py-2 bg-gradient-glow rounded-xl border border-nav-border/50 shadow-card">
+          <div className="flex items-center space-x-3 px-3 py-1.5 bg-gradient-glow rounded-lg border border-nav-border/50 shadow-card">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-glow"></div>
               <span className="text-sm font-medium text-nav-foreground">AI Engine</span>
@@ -145,68 +125,6 @@ const Header = () => {
             </DropdownMenu>
           )}
         </div>
-      </div>
-
-      {/* Primary Navigation - No Scrolling */}
-      <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5"></div>
-        <nav className="relative px-6 py-3">
-          <div className="flex items-center justify-between">
-            {/* Primary Navigation Items */}
-            <div className="flex items-center space-x-1">
-              {primaryNavItems.map((item) => {
-                const isActive = isItemActive(item);
-                return (
-                  <Link
-                    key={item.url}
-                    to={item.url}
-                    className={`group relative flex items-center space-x-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
-                      isActive
-                        ? 'bg-gradient-primary text-primary-foreground shadow-glow' 
-                        : 'text-nav-foreground/80 hover:text-nav-foreground hover:bg-nav-hover/50'
-                    }`}
-                  >
-                    <item.icon className={`h-4 w-4 transition-transform group-hover:scale-110 ${isActive ? 'text-primary-foreground' : ''}`} />
-                    <div className="flex flex-col">
-                      <span className="font-semibold">{item.title}</span>
-                      <span className={`text-xs ${isActive ? 'text-primary-foreground/80' : 'text-nav-foreground/50'}`}>
-                        {item.description}
-                      </span>
-                    </div>
-                    {isActive && (
-                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-primary-foreground rounded-full"></div>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-            
-            {/* Secondary Navigation Dropdown */}
-            <div className="flex items-center space-x-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center space-x-2 text-nav-foreground/80 hover:text-nav-foreground hover:bg-nav-hover/50">
-                    <BookOpen className="h-4 w-4" />
-                    <span className="font-medium">Resources</span>
-                    <ChevronDown className="h-3 w-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>Resource Management</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {secondaryNavItems.map((item) => (
-                    <DropdownMenuItem key={item.url} asChild>
-                      <Link to={item.url} className="flex items-center space-x-2">
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        </nav>
       </div>
     </header>
   );

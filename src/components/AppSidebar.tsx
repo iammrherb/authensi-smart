@@ -26,24 +26,25 @@ import { useAuth } from "@/contexts/AuthContext";
 // Navigation structure with AI-focused organization
 const navigationItems = [
   {
-    title: "Intelligence Tracker Hub",
-    icon: Brain,
+    title: "Core Navigation",
+    icon: Target,
     badge: "AI+",
     items: [
-      { title: "Command Center", url: "/", icon: Target, description: "Project management hub" },
-      { title: "Intelligence Tracker Hub", url: "/intelligence", icon: Brain, description: "Unified AI-powered intelligence & project management" },
-      { title: "AI Scoping Wizard", url: "/scoping", icon: Lightbulb, description: "Intelligent project scoping" },
-      { title: "Project Tracker", url: "/tracker", icon: Zap, description: "Unified project tracking" },
-      { title: "Analytics Hub", url: "/reports", icon: BarChart3, description: "Performance insights" },
+      { title: "Command Center", url: "/", icon: Target, description: "AI Hub & Overview" },
+      { title: "AI Scoping", url: "/scoping", icon: Sparkles, description: "Intelligent Project Scoping" },
+      { title: "Project Tracker", url: "/tracker", icon: Zap, description: "Live Project Management" },
+      { title: "Analytics", url: "/reports", icon: BarChart3, description: "Performance Insights" },
     ]
   },
   {
     title: "Knowledge & Resources",
     icon: BookOpen,
     items: [
-      { title: "Use Case Library", url: "/use-cases", icon: BookOpen, description: "200+ pre-built use cases" },
-      { title: "Site Management", url: "/sites", icon: Building2, description: "Site configuration (Project-based)" },
-      { title: "Scoping Questionnaires", url: "/questionnaires", icon: FileText, description: "Requirements capture" },
+      { title: "Use Cases", url: "/use-cases", icon: BookOpen, description: "Knowledge Library" },
+      { title: "Sites", url: "/sites", icon: Building2, description: "Network Sites" },
+      { title: "Requirements", url: "/requirements", icon: FileText, description: "Project Requirements" },
+      { title: "Vendors", url: "/vendors", icon: Network, description: "Vendor Management" },
+      { title: "Questionnaires", url: "/questionnaires", icon: FileText, description: "Requirements capture" },
     ]
   },
   {
@@ -51,7 +52,6 @@ const navigationItems = [
     icon: Settings,
     items: [
       { title: "Team Management", url: "/users", icon: Users, description: "User & role management" },
-      { title: "Vendor Library", url: "/vendors", icon: Archive, description: "Vendor configurations" },
       { title: "System Settings", url: "/settings", icon: Settings, description: "Platform configuration" },
     ]
   }
@@ -62,7 +62,7 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { isAdmin } = useAuth();
-  const [openGroups, setOpenGroups] = useState<string[]>(["Intelligence Tracker Hub", "Knowledge & Resources"]);
+  const [openGroups, setOpenGroups] = useState<string[]>(["Core Navigation", "Knowledge & Resources"]);
 
   const isActive = (path: string) => location.pathname === path;
   
