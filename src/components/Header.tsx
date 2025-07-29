@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useHasRole } from "@/hooks/useUserRoles";
-import { LogOut, Brain, ArrowLeft, Target, Zap, BarChart3, BookOpen, Building2, Settings, Sparkles, Shield, Network, FileText } from "lucide-react";
+import { LogOut, Brain, ArrowLeft, Target, Zap, BarChart3, BookOpen, Building2, Settings, Sparkles, Shield, Network, FileText, ChevronDown, User, Users } from "lucide-react";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import portnoxLogo from "@/assets/portnox-logo.png";
 
 const Header = () => {
@@ -17,19 +18,18 @@ const Header = () => {
   
   const showBackButton = location.pathname !== '/dashboard' && location.pathname !== '/';
 
-  const navigationItems = [
+  const primaryNavItems = [
     { title: "Command Center", url: "/", icon: Target, active: ["/", "/dashboard"], description: "AI Hub & Overview" },
     { title: "AI Scoping", url: "/scoping", icon: Sparkles, active: ["/scoping"], description: "Intelligent Project Scoping" },
     { title: "Project Tracker", url: "/tracker", icon: Zap, active: ["/tracker", "/project"], description: "Live Project Management" },
     { title: "Analytics", url: "/reports", icon: BarChart3, active: ["/reports"], description: "Performance Insights" },
+  ];
+
+  const secondaryNavItems = [
     { title: "Use Cases", url: "/use-cases", icon: BookOpen, active: ["/use-cases"], description: "Knowledge Library" },
     { title: "Sites", url: "/sites", icon: Building2, active: ["/sites"], description: "Network Sites" },
     { title: "Requirements", url: "/requirements", icon: FileText, active: ["/requirements"], description: "Project Requirements" },
     { title: "Vendors", url: "/vendors", icon: Network, active: ["/vendors"], description: "Vendor Management" },
-  ];
-
-  const adminItems = [
-    { title: "Settings", url: "/settings", icon: Settings, active: ["/settings"], description: "System Configuration" },
   ];
 
   const isItemActive = (item: any) => {
@@ -87,43 +87,80 @@ const Header = () => {
             </div>
           </div>
 
+          {/* User Profile Dropdown */}
           {user && (
-            <>
-              <div className="text-right">
-                <p className="text-sm font-medium text-nav-foreground">
-                  {user.email?.split('@')[0]}
-                </p>
-                <p className="text-xs text-nav-foreground/60">
-                  {user.user_metadata?.role || 'User'}
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={signOut}
-                className="border-destructive/30 text-destructive hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all duration-200"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
-            </>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center space-x-2 hover:bg-nav-hover">
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-nav-foreground">
+                      {user.email?.split('@')[0]}
+                    </p>
+                    <p className="text-xs text-nav-foreground/60">
+                      {isAdmin ? 'Super Admin' : (canManageUsers ? 'Manager' : 'User')}
+                    </p>
+                  </div>
+                  <ChevronDown className="h-4 w-4 text-nav-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel className="flex items-center space-x-2">
+                  <User className="h-4 w-4" />
+                  <span>Account</span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                
+                <DropdownMenuItem asChild>
+                  <Link to="/settings" className="flex items-center space-x-2">
+                    <Settings className="h-4 w-4" />
+                    <span>Settings & Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                
+                {(isAdmin || canManageUsers) && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings?tab=users" className="flex items-center space-x-2">
+                      <Users className="h-4 w-4" />
+                      <span>User Management</span>
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                
+                {isAdmin && (
+                  <DropdownMenuItem className="flex items-center space-x-2 text-purple-600">
+                    <Shield className="h-4 w-4" />
+                    <span>Impersonate User</span>
+                  </DropdownMenuItem>
+                )}
+                
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={signOut}
+                  className="flex items-center space-x-2 text-destructive focus:text-destructive"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Sign Out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>
 
-      {/* Stunning Navigation Bar */}
+      {/* Primary Navigation - No Scrolling */}
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5"></div>
         <nav className="relative px-6 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-1 overflow-x-auto">
-              {navigationItems.map((item) => {
+            {/* Primary Navigation Items */}
+            <div className="flex items-center space-x-1">
+              {primaryNavItems.map((item) => {
                 const isActive = isItemActive(item);
                 return (
                   <Link
                     key={item.url}
                     to={item.url}
-                    className={`group relative flex items-center space-x-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 whitespace-nowrap ${
+                    className={`group relative flex items-center space-x-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
                       isActive
                         ? 'bg-gradient-primary text-primary-foreground shadow-glow' 
                         : 'text-nav-foreground/80 hover:text-nav-foreground hover:bg-nav-hover/50'
@@ -144,36 +181,30 @@ const Header = () => {
               })}
             </div>
             
-            {(isAdmin || canManageUsers) && (
-              <div className="flex items-center space-x-1 ml-4 pl-4 border-l border-nav-border/50">
-                <div className="flex items-center space-x-2 px-3 py-1 bg-accent-bold/20 rounded-lg">
-                  <Shield className="h-3 w-3 text-accent-foreground" />
-                  <span className="text-xs font-medium text-accent-foreground">
-                    {isAdmin ? 'Super Admin' : 'Manager'}
-                  </span>
-                </div>
-                {adminItems.map((item) => {
-                  const isActive = isItemActive(item);
-                  return (
-                    <Link
-                      key={item.url}
-                      to={item.url}
-                      className={`group relative flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 whitespace-nowrap ${
-                        isActive
-                          ? 'bg-accent-bold text-accent-foreground shadow-card' 
-                          : 'text-nav-foreground/70 hover:text-nav-foreground hover:bg-accent-bold/10'
-                      }`}
-                    >
-                      <item.icon className={`h-4 w-4 transition-transform group-hover:scale-110`} />
-                      <span>{item.title}</span>
-                      {isActive && (
-                        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-accent-foreground rounded-full"></div>
-                      )}
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
+            {/* Secondary Navigation Dropdown */}
+            <div className="flex items-center space-x-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center space-x-2 text-nav-foreground/80 hover:text-nav-foreground hover:bg-nav-hover/50">
+                    <BookOpen className="h-4 w-4" />
+                    <span className="font-medium">Resources</span>
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Resource Management</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {secondaryNavItems.map((item) => (
+                    <DropdownMenuItem key={item.url} asChild>
+                      <Link to={item.url} className="flex items-center space-x-2">
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </nav>
       </div>

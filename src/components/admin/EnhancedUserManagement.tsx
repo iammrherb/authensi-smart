@@ -331,13 +331,16 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="password">Password *</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      value={newUserPassword}
-                      onChange={(e) => setNewUserPassword(e.target.value)}
-                      placeholder="Secure password"
-                    />
+                    <form>
+                      <Input
+                        id="password"
+                        type="password"
+                        value={newUserPassword}
+                        onChange={(e) => setNewUserPassword(e.target.value)}
+                        placeholder="Secure password"
+                        autoComplete="new-password"
+                      />
+                    </form>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="role">Initial Role</Label>

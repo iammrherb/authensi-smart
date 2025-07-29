@@ -194,7 +194,7 @@ serve(async (req) => {
         // Get pending invitations for approval
         const { data: invitations, error } = await supabaseClient
           .from('user_invitations')
-          .select('*, custom_roles(*), invited_by_profile:profiles!invited_by(*)')
+          .select('*, custom_roles(*)')
           .eq('status', 'pending')
           .order('created_at', { ascending: false });
 
