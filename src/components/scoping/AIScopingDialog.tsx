@@ -193,7 +193,7 @@ const AIScopingDialog: React.FC<AIScopingDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl max-h-[95vh] overflow-hidden">
+      <DialogContent className="max-w-7xl max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Brain className="h-6 w-6 text-blue-500" />
@@ -204,7 +204,7 @@ const AIScopingDialog: React.FC<AIScopingDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-y-auto max-h-[80vh]">
           <ComprehensiveAIScopingWizard
             onComplete={handleScopingComplete}
             onCancel={onClose}
