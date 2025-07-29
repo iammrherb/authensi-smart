@@ -15,8 +15,10 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { 
   CalendarIcon, ArrowLeft, ArrowRight, CheckCircle, Briefcase, Building2, 
   Users, Shield, Target, Globe, MapPin, Plus, X, Upload, Download, UserPlus, Mail,
-  Sparkles, Brain, FileText, Settings, Zap, RefreshCw, ArrowUpRight, Layers
+  Sparkles, Brain, FileText, Settings, Zap, RefreshCw, ArrowUpRight, Layers, Network
 } from 'lucide-react';
+import BulkSiteCreator from '@/components/sites/BulkSiteCreator';
+import BulkUserCreator from '@/components/users/BulkUserCreator';
 import { format } from 'date-fns';
 import { useCreateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
@@ -130,6 +132,7 @@ interface EnhancedProjectFormData {
   enable_bulk_sites: boolean;
   enable_bulk_users: boolean;
   enable_auto_vendors: boolean;
+  bulk_sites_data?: any[];
 }
 
 interface Props {
@@ -189,6 +192,12 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
   const [isEnhancingPainPoints, setIsEnhancingPainPoints] = useState(false);
   const [showAddPainPointToLibrary, setShowAddPainPointToLibrary] = useState<string | null>(null);
   const [showAddRecommendationToLibrary, setShowAddRecommendationToLibrary] = useState<string | null>(null);
+  
+  // Bulk operations state
+  const [showBulkSiteCreator, setShowBulkSiteCreator] = useState(false);
+  const [showBulkUserCreator, setShowBulkUserCreator] = useState(false);
+  const [bulkSiteLoading, setBulkSiteLoading] = useState(false);
+  const [bulkUserLoading, setBulkUserLoading] = useState(false);
 
   const steps = [
     {
@@ -497,6 +506,54 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
     } finally {
       setIsEnhancingPainPoints(false);
     }
+  };
+
+  // Generate sites automatically based on count
+  const generateSitesFromCount = () => {
+    if (!formData.total_sites || formData.total_sites <= 1) return;
+    
+    const generatedSites = Array.from({ length: formData.total_sites }, (_, index) => ({
+      name: `Site ${index + 1}`,
+      location: `Location ${index + 1}`,
+      device_count: Math.floor(formData.total_endpoints! / formData.total_sites!),
+      site_type: 'office'
+    }));
+    
+    setFormData(prev => ({
+      ...prev,
+      bulk_sites_data: generatedSites
+    }));
+    
+    toast({
+      title: "Sites Generated",
+      description: `${formData.total_sites} sites have been auto-generated.`
+    });
+  };
+
+  // Handle bulk site submission
+  const handleBulkSiteSubmit = (sites: any[]) => {
+    setFormData(prev => ({
+      ...prev,
+      bulk_sites_data: sites
+    }));
+    setShowBulkSiteCreator(false);
+    toast({
+      title: "Sites Prepared",
+      description: `${sites.length} sites are ready for project creation.`
+    });
+  };
+
+  // Handle bulk user submission
+  const handleBulkUserSubmit = (users: any[]) => {
+    setFormData(prev => ({
+      ...prev,
+      additional_stakeholders: [...prev.additional_stakeholders, ...users]
+    }));
+    setShowBulkUserCreator(false);
+    toast({
+      title: "Users Added",
+      description: `${users.length} users have been added to the project team.`
+    });
   };
 
   const renderStepContent = () => {
