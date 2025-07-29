@@ -31,7 +31,7 @@ import {
   ExternalLink, ChevronDown, ChevronUp, RefreshCw, Star, Tag
 } from 'lucide-react';
 
-const IntelligenceTrackerHub = () => {
+const CommandCenter = () => {
   const { data: projects = [], isLoading: projectsLoading } = useProjects();
   const { data: sites = [], isLoading: sitesLoading } = useSites();
   const { data: useCases = [], isLoading: useCasesLoading } = useUseCases();
@@ -850,4 +850,4 @@ const IntelligenceTrackerHub = () => {
   );
 };
 
-export default IntelligenceTrackerHub;
+export default CommandCenter;
