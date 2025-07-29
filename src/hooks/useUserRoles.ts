@@ -15,6 +15,18 @@ export interface UserRole {
   assigned_at: string;
   created_at: string;
   updated_at: string;
+  user_profile?: {
+    id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+  } | null;
+  assigned_by_profile?: {
+    id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+  } | null;
 }
 
 export interface AssignRoleData {
@@ -24,11 +36,12 @@ export interface AssignRoleData {
   scope_id?: string;
 }
 
-// Fetch user roles for a specific scope
+// Fetch user roles for a specific scope with user email information
 export const useUserRoles = (scopeType?: ScopeType, scopeId?: string) => {
   return useQuery({
     queryKey: ['user-roles', scopeType, scopeId],
     queryFn: async () => {
+      // First get the user roles
       let query = supabase
         .from('user_roles')
         .select('*');
@@ -41,10 +54,37 @@ export const useUserRoles = (scopeType?: ScopeType, scopeId?: string) => {
         query = query.eq('scope_id', scopeId);
       }
       
-      const { data, error } = await query.order('created_at', { ascending: false });
+      const { data: roles, error } = await query.order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data as UserRole[];
+      
+      if (!roles || roles.length === 0) {
+        return [];
+      }
+
+      // Get all unique user IDs
+      const userIds = [...new Set([
+        ...roles.map(role => role.user_id),
+        ...roles.map(role => role.assigned_by).filter(Boolean)
+      ])];
+
+      // Fetch user profiles for all users
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, email, first_name, last_name')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Create a map for quick lookup
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+
+      // Combine roles with profile data
+      return roles.map(role => ({
+        ...role,
+        user_profile: profileMap.get(role.user_id) || null,
+        assigned_by_profile: role.assigned_by ? profileMap.get(role.assigned_by) || null : null
+      }));
     },
   });
 };

@@ -130,7 +130,10 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
   // Filter roles based on search term
   const filteredRoles = userRoles.filter(role => {
     const searchLower = searchTerm.toLowerCase();
-    return role.user_id.toLowerCase().includes(searchLower) ||
+    const userEmail = role.user_profile?.email || '';
+    const userName = `${role.user_profile?.first_name || ''} ${role.user_profile?.last_name || ''}`.trim();
+    return userEmail.toLowerCase().includes(searchLower) ||
+           userName.toLowerCase().includes(searchLower) ||
            role.role.toLowerCase().includes(searchLower);
   });
 
@@ -491,8 +494,15 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
                   return (
                     <TableRow key={userRole.id}>
                       <TableCell>
-                        <div className="font-medium">
-                          {userRole.user_id.slice(0, 8)}...
+                        <div>
+                          <div className="font-medium">
+                            {userRole.user_profile?.email || userRole.user_id.slice(0, 8) + '...'}
+                          </div>
+                          {userRole.user_profile?.first_name && (
+                            <div className="text-sm text-muted-foreground">
+                              {userRole.user_profile.first_name} {userRole.user_profile.last_name}
+                            </div>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -523,7 +533,8 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
                       </TableCell>
                       <TableCell>
                         <div className="text-sm text-muted-foreground">
-                          {userRole.assigned_by?.slice(0, 8) || 'System'}
+                          {userRole.assigned_by_profile?.email || 
+                           (userRole.assigned_by ? userRole.assigned_by.slice(0, 8) + '...' : 'System')}
                         </div>
                       </TableCell>
                       {canManage && (
