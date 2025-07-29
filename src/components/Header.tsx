@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useHasRole } from "@/hooks/useUserRoles";
-import { LogOut, Brain, ArrowLeft, Target, Zap, BarChart3, BookOpen, Building2, Settings, Sparkles, Shield, Network, FileText, ChevronDown, User, Users, Rocket } from "lucide-react";
+import { LogOut, Brain, ArrowLeft, Target, Zap, BarChart3, BookOpen, Building2, Settings, Sparkles, Shield, Network, FileText, ChevronDown, User, Users, Rocket, FolderOpen } from "lucide-react";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -27,6 +27,7 @@ const Header = () => {
   ];
 
   const secondaryNavItems = [
+    { title: "Resources", url: "/resources", icon: FolderOpen, active: ["/resources"], description: "Resource Center" },
     { title: "Use Cases", url: "/use-cases", icon: BookOpen, active: ["/use-cases"], description: "Knowledge Library" },
     { title: "Sites", url: "/sites", icon: Building2, active: ["/sites"], description: "Network Sites" },
     { title: "Requirements", url: "/requirements", icon: FileText, active: ["/requirements"], description: "Project Requirements" },

@@ -37,6 +37,7 @@ import UseCaseLibrary from "./pages/UseCaseLibrary";
 import ProjectDetails from "./pages/ProjectDetails";
 import IntelligenceTrackerHub from "./pages/IntelligenceTrackerHub";
 import ImplementationCenter from "./pages/ImplementationCenter";
+import Resources from "./pages/Resources";
 
 const queryClient = new QueryClient();
 
@@ -82,6 +83,7 @@ const App = () => (
                     <Route path="/projects/:id" element={<ProjectDetails />} />
                     
                     {/* Knowledge & Resources */}
+                    <Route path="/resources" element={<Resources />} />
                     <Route path="/use-cases" element={<UseCaseLibrary />} />
                     <Route path="/sites" element={<Sites />} />
                     <Route path="/questionnaires" element={<Questionnaires />} />
