@@ -23,47 +23,35 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Comprehensive navigation structure with full Intelligence Hub
+// Navigation structure with AI-focused organization
 const navigationItems = [
   {
-    title: "Intelligence Hub",
+    title: "Intelligence Tracker Hub",
     icon: Brain,
     badge: "AI+",
     items: [
-      { title: "Command Center", url: "/", icon: Target, description: "AI Hub & Overview" },
-      { title: "Intelligence Tracker", url: "/intelligence", icon: Brain, description: "AI Intelligence Hub" },
-      { title: "AI Scoping", url: "/scoping", icon: Sparkles, description: "Intelligent Project Scoping" },
-      { title: "Smart Dashboard", url: "/dashboard", icon: TrendingUp, description: "AI-Powered Insights" },
-      { title: "Project Tracker", url: "/tracker", icon: Zap, description: "Live Project Management" },
-    ]
-  },
-  {
-    title: "Project Management",
-    icon: Target,
-    items: [
-      { title: "Project Details", url: "/project-details", icon: FileText, description: "Detailed project view" },
-      { title: "Project Tracking", url: "/project-tracking", icon: BarChart3, description: "Progress tracking" },
-      { title: "Deployment", url: "/deployment", icon: Rocket, description: "Deployment planning" },
-      { title: "Designer", url: "/designer", icon: Lightbulb, description: "Architecture designer" },
-      { title: "Analytics", url: "/reports", icon: BarChart3, description: "Performance insights" },
+      { title: "Command Center", url: "/", icon: Target, description: "Project management hub" },
+      { title: "Intelligence Tracker Hub", url: "/intelligence", icon: Brain, description: "Unified AI-powered intelligence & project management" },
+      { title: "AI Scoping Wizard", url: "/scoping", icon: Lightbulb, description: "Intelligent project scoping" },
+      { title: "Project Tracker", url: "/tracker", icon: Zap, description: "Unified project tracking" },
+      { title: "Analytics Hub", url: "/reports", icon: BarChart3, description: "Performance insights" },
     ]
   },
   {
     title: "Knowledge & Resources",
     icon: BookOpen,
     items: [
-      { title: "Use Case Library", url: "/use-cases", icon: BookOpen, description: "Knowledge library" },
-      { title: "Sites Management", url: "/sites", icon: Building2, description: "Network sites" },
-      { title: "Requirements", url: "/requirements", icon: FileText, description: "Project requirements" },
-      { title: "Questionnaires", url: "/questionnaires", icon: FileText, description: "Requirements capture" },
-      { title: "Vendors", url: "/vendors", icon: Network, description: "Vendor management" },
+      { title: "Use Case Library", url: "/use-cases", icon: BookOpen, description: "200+ pre-built use cases" },
+      { title: "Site Management", url: "/sites", icon: Building2, description: "Site configuration (Project-based)" },
+      { title: "Scoping Questionnaires", url: "/questionnaires", icon: FileText, description: "Requirements capture" },
     ]
   },
   {
     title: "Administration",
     icon: Settings,
     items: [
-      { title: "User Management", url: "/users", icon: Users, description: "User & role management" },
+      { title: "Team Management", url: "/users", icon: Users, description: "User & role management" },
+      { title: "Vendor Library", url: "/vendors", icon: Archive, description: "Vendor configurations" },
       { title: "System Settings", url: "/settings", icon: Settings, description: "Platform configuration" },
     ]
   }
@@ -74,7 +62,7 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { isAdmin } = useAuth();
-  const [openGroups, setOpenGroups] = useState<string[]>(["Core Navigation", "Knowledge & Resources"]);
+  const [openGroups, setOpenGroups] = useState<string[]>(["Intelligence Tracker Hub", "Knowledge & Resources"]);
 
   const isActive = (path: string) => location.pathname === path;
   
