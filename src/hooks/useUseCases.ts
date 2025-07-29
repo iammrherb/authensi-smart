@@ -199,3 +199,112 @@ export const useAddUseCaseToProject = () => {
     },
   });
 };
+
+export const useSiteUseCases = (siteId: string) => {
+  return useQuery({
+    queryKey: ['site-use-cases', siteId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_use_cases')
+        .select(`
+          *,
+          use_case_library (*)
+        `)
+        .eq('site_id', siteId)
+        .order('priority', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!siteId,
+  });
+};
+
+export const useAddUseCaseToSite = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({
+      siteId,
+      useCaseId,
+      priority,
+      implementationNotes
+    }: {
+      siteId: string;
+      useCaseId: string;
+      priority: 'critical' | 'high' | 'medium' | 'low';
+      implementationNotes?: string;
+    }) => {
+      const { data, error } = await supabase
+        .from('site_use_cases')
+        .insert([{
+          site_id: siteId,
+          use_case_id: useCaseId,
+          priority,
+          implementation_notes: implementationNotes,
+        }])
+        .select()
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['site-use-cases'] });
+      toast({
+        title: "Success",
+        description: "Use case added to site successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: "Failed to add use case to site: " + error.message,
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useBulkImportUseCases = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (useCases: Omit<UseCase, 'id' | 'created_at' | 'updated_at'>[]) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User must be authenticated');
+      }
+
+      const useCasesWithCreator = useCases.map(useCase => ({
+        ...useCase,
+        created_by: user.id,
+      }));
+
+      const { data, error } = await supabase
+        .from('use_case_library')
+        .insert(useCasesWithCreator)
+        .select();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['use-cases'] });
+      toast({
+        title: "Success",
+        description: `${data?.length || 0} use cases imported successfully`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: "Failed to import use cases: " + error.message,
+        variant: "destructive",
+      });
+    },
+  });
+};

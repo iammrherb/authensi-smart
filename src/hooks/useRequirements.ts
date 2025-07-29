@@ -168,3 +168,112 @@ export const useAddRequirementToProject = () => {
     },
   });
 };
+
+export const useSiteRequirements = (siteId: string) => {
+  return useQuery({
+    queryKey: ['site-requirements', siteId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_requirements')
+        .select(`
+          *,
+          requirements_library (*)
+        `)
+        .eq('site_id', siteId)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!siteId,
+  });
+};
+
+export const useAddRequirementToSite = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({
+      siteId,
+      requirementId,
+      implementationApproach,
+      targetDate
+    }: {
+      siteId: string;
+      requirementId: string;
+      implementationApproach?: string;
+      targetDate?: string;
+    }) => {
+      const { data, error } = await supabase
+        .from('site_requirements')
+        .insert([{
+          site_id: siteId,
+          requirement_id: requirementId,
+          implementation_approach: implementationApproach,
+          target_date: targetDate,
+        }])
+        .select()
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['site-requirements'] });
+      toast({
+        title: "Success",
+        description: "Requirement added to site successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: "Failed to add requirement to site: " + error.message,
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useBulkImportRequirements = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (requirements: Omit<Requirement, 'id' | 'created_at' | 'updated_at'>[]) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User must be authenticated');
+      }
+
+      const requirementsWithCreator = requirements.map(requirement => ({
+        ...requirement,
+        created_by: user.id,
+      }));
+
+      const { data, error } = await supabase
+        .from('requirements_library')
+        .insert(requirementsWithCreator)
+        .select();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['requirements'] });
+      toast({
+        title: "Success",
+        description: `${data?.length || 0} requirements imported successfully`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: "Failed to import requirements: " + error.message,
+        variant: "destructive",
+      });
+    },
+  });
+};

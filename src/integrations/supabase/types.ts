@@ -1194,6 +1194,109 @@ export type Database = {
         }
         Relationships: []
       }
+      site_requirements: {
+        Row: {
+          assigned_to: string | null
+          completion_date: string | null
+          created_at: string
+          id: string
+          implementation_approach: string | null
+          requirement_id: string
+          site_id: string
+          status: string | null
+          target_date: string | null
+          updated_at: string
+          verification_notes: string | null
+          verification_status: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          completion_date?: string | null
+          created_at?: string
+          id?: string
+          implementation_approach?: string | null
+          requirement_id: string
+          site_id: string
+          status?: string | null
+          target_date?: string | null
+          updated_at?: string
+          verification_notes?: string | null
+          verification_status?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          completion_date?: string | null
+          created_at?: string
+          id?: string
+          implementation_approach?: string | null
+          requirement_id?: string
+          site_id?: string
+          status?: string | null
+          target_date?: string | null
+          updated_at?: string
+          verification_notes?: string | null
+          verification_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_requirements_requirement_id_fkey"
+            columns: ["requirement_id"]
+            isOneToOne: false
+            referencedRelation: "requirements_library"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_use_cases: {
+        Row: {
+          actual_completion: string | null
+          assigned_to: string | null
+          created_at: string
+          id: string
+          implementation_notes: string | null
+          priority: string
+          site_id: string
+          status: string | null
+          target_completion: string | null
+          updated_at: string
+          use_case_id: string
+        }
+        Insert: {
+          actual_completion?: string | null
+          assigned_to?: string | null
+          created_at?: string
+          id?: string
+          implementation_notes?: string | null
+          priority: string
+          site_id: string
+          status?: string | null
+          target_completion?: string | null
+          updated_at?: string
+          use_case_id: string
+        }
+        Update: {
+          actual_completion?: string | null
+          assigned_to?: string | null
+          created_at?: string
+          id?: string
+          implementation_notes?: string | null
+          priority?: string
+          site_id?: string
+          status?: string | null
+          target_completion?: string | null
+          updated_at?: string
+          use_case_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_use_cases_use_case_id_fkey"
+            columns: ["use_case_id"]
+            isOneToOne: false
+            referencedRelation: "use_case_library"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sites: {
         Row: {
           address: string | null
