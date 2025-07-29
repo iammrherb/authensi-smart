@@ -14,14 +14,23 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { 
   CalendarIcon, ArrowLeft, ArrowRight, CheckCircle, Briefcase, Building2, 
-  Users, Shield, Target, Globe, MapPin, Plus, X, Upload, Download
+  Users, Shield, Target, Globe, MapPin, Plus, X, Upload, Download, UserPlus, Mail
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useCreateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
 import { useCountries, useRegionsByCountry } from '@/hooks/useCountriesRegions';
 import { useBulkSiteTemplates } from '@/hooks/useBulkSiteTemplates';
+import { useRequirements } from '@/hooks/useRequirements';
+import { AppRole } from '@/hooks/useUserRoles';
 import AIWorkflowEngine from '@/components/ai/AIWorkflowEngine';
+
+interface StakeholderEntry {
+  email: string;
+  role: AppRole | 'contact';
+  createUser: boolean;
+  sendInvitation: boolean;
+}
 
 // Industry and compliance options
 const industries = [
@@ -64,7 +73,7 @@ interface EnhancedProjectFormData {
   project_owner: string;
   technical_owner: string;
   portnox_owner: string;
-  additional_stakeholders: string[];
+  additional_stakeholders: StakeholderEntry[];
   
   // Framework & Compliance
   compliance_frameworks: string[];
@@ -120,6 +129,7 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
   const { data: countries = [] } = useCountries();
   const { data: regions = [] } = useRegionsByCountry(formData.primary_country);
   const { data: bulkTemplates = [] } = useBulkSiteTemplates();
+  const { data: requirements = [] } = useRequirements();
   
   const { mutate: createProject, isPending } = useCreateProject();
   const { toast } = useToast();
@@ -199,6 +209,7 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
   const handleCreateProject = async () => {
     const projectData = {
       ...formData,
+      additional_stakeholders: formData.additional_stakeholders.map(s => `${s.email}:${s.role}:${s.createUser}:${s.sendInvitation}`),
       start_date: formData.start_date?.toISOString().split('T')[0],
       target_completion: formData.target_completion?.toISOString().split('T')[0],
       status: 'planning' as const,
@@ -224,20 +235,11 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
     });
   };
 
-  const addStakeholder = (email: string) => {
-    if (email.trim() && !formData.additional_stakeholders.includes(email.trim())) {
+  const addStakeholder = (stakeholder: StakeholderEntry) => {
+    if (stakeholder.email.trim() && !formData.additional_stakeholders.some(s => s.email === stakeholder.email.trim())) {
       setFormData(prev => ({
         ...prev,
-        additional_stakeholders: [...prev.additional_stakeholders, email.trim()]
-      }));
-    }
-  };
-
-  const addStakeholderWithRole = (email: string, role: string) => {
-    if (email.trim() && !formData.additional_stakeholders.includes(`${email.trim()}:${role}`)) {
-      setFormData(prev => ({
-        ...prev,
-        additional_stakeholders: [...prev.additional_stakeholders, `${email.trim()}:${role}`]
+        additional_stakeholders: [...prev.additional_stakeholders, stakeholder]
       }));
     }
   };
@@ -266,19 +268,11 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
   };
 
   const addRequirementFromLibrary = (requirementId: string) => {
-    const requirementMap: { [key: string]: string } = {
-      'auth-001': 'Multi-Factor Authentication',
-      'net-001': 'Network Segmentation', 
-      'sec-001': 'Zero Trust Architecture',
-      'comp-001': 'HIPAA Compliance',
-      'comp-002': 'PCI-DSS Compliance'
-    };
-    
-    const requirement = requirementMap[requirementId];
-    if (requirement && !formData.requirements.includes(requirement)) {
+    const requirement = requirements?.find(r => r.id === requirementId);
+    if (requirement && !formData.requirements.includes(requirement.title)) {
       setFormData(prev => ({
         ...prev,
-        requirements: [...prev.requirements, requirement]
+        requirements: [...prev.requirements, requirement.title]
       }));
     }
   };
@@ -292,7 +286,100 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
     }));
   };
 
-  // Remove this line as it's no longer needed
+  // Stakeholder form component
+  const StakeholderForm: React.FC<{ onAdd: (stakeholder: StakeholderEntry) => void }> = ({ onAdd }) => {
+    const [email, setEmail] = useState('');
+    const [role, setRole] = useState<AppRole | 'contact'>('contact');
+    const [createUser, setCreateUser] = useState(false);
+    const [sendInvitation, setSendInvitation] = useState(false);
+
+    const handleAdd = () => {
+      if (email.trim()) {
+        onAdd({ email: email.trim(), role, createUser, sendInvitation });
+        setEmail('');
+        setRole('contact');
+        setCreateUser(false);
+        setSendInvitation(false);
+      }
+    };
+
+    const roleOptions: { value: AppRole | 'contact'; label: string }[] = [
+      { value: 'contact', label: 'Contact Only' },
+      { value: 'viewer', label: 'Viewer' },
+      { value: 'project_viewer', label: 'Project Viewer' },
+      { value: 'project_creator', label: 'Project Creator' },
+      { value: 'engineer', label: 'Engineer' },
+      { value: 'lead_engineer', label: 'Lead Engineer' },
+      { value: 'technical_account_manager', label: 'Technical Account Manager' },
+      { value: 'sales_engineer', label: 'Sales Engineer' },
+      { value: 'super_admin', label: 'Super Admin' }
+    ];
+
+    return (
+      <Card className="p-4">
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="stakeholder-email">Email Address</Label>
+            <Input
+              id="stakeholder-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="stakeholder@company.com"
+              className="mt-1"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="stakeholder-role">Role</Label>
+            <Select value={role} onValueChange={(value) => setRole(value as AppRole | 'contact')}>
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                {roleOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {role !== 'contact' && (
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="create-user"
+                  checked={createUser}
+                  onCheckedChange={(checked) => setCreateUser(checked as boolean)}
+                />
+                <Label htmlFor="create-user" className="text-sm">
+                  Create user account and assign role
+                </Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="send-invitation"
+                  checked={sendInvitation}
+                  onCheckedChange={(checked) => setSendInvitation(checked as boolean)}
+                />
+                <Label htmlFor="send-invitation" className="text-sm">
+                  Send invitation email
+                </Label>
+              </div>
+            </div>
+          )}
+
+          <Button onClick={handleAdd} disabled={!email.trim()} className="w-full">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Stakeholder
+          </Button>
+        </div>
+      </Card>
+    );
+  };
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -591,58 +678,34 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
             <div>
               <Label>Additional Stakeholders</Label>
               <p className="text-sm text-muted-foreground mb-2">
-                Add other team members who should have visibility into this project
+                Add other team members and specify whether to create user accounts or just add as contacts
               </p>
               <div className="space-y-4">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="stakeholder@company.com"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        addStakeholder(e.currentTarget.value);
-                        e.currentTarget.value = '';
-                      }
-                    }}
-                  />
-                  <Select onValueChange={(role) => {
-                    const input = document.querySelector('input[placeholder="stakeholder@company.com"]') as HTMLInputElement;
-                    if (input?.value) {
-                      addStakeholderWithRole(input.value, role);
-                      input.value = '';
-                    }
-                  }}>
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="contact">Contact Only</SelectItem>
-                      <SelectItem value="viewer">Viewer</SelectItem>
-                      <SelectItem value="contributor">Contributor</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={(e) => {
-                      const input = e.currentTarget.parentElement?.querySelector('input') as HTMLInputElement;
-                      if (input) {
-                        addStakeholder(input.value);
-                        input.value = '';
-                      }
-                    }}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
+                <StakeholderForm onAdd={addStakeholder} />
                 {formData.additional_stakeholders.length > 0 && (
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     {formData.additional_stakeholders.map((stakeholder, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
+                      <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                         <div className="flex-1">
-                          <span className="text-sm">{stakeholder}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium">{stakeholder.email}</span>
+                            <Badge variant={stakeholder.role === 'contact' ? 'outline' : 'secondary'} className="text-xs">
+                              {stakeholder.role === 'contact' ? 'Contact' : stakeholder.role}
+                            </Badge>
+                          </div>
                           <div className="flex gap-2 mt-1">
-                            <Badge variant="outline" className="text-xs">Contact</Badge>
+                            {stakeholder.createUser && (
+                              <div className="flex items-center gap-1">
+                                <UserPlus className="h-3 w-3 text-green-600" />
+                                <span className="text-xs text-green-600">Create User</span>
+                              </div>
+                            )}
+                            {stakeholder.sendInvitation && (
+                              <div className="flex items-center gap-1">
+                                <Mail className="h-3 w-3 text-blue-600" />
+                                <span className="text-xs text-blue-600">Send Invitation</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                         <Button
@@ -761,11 +824,14 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
                       <SelectValue placeholder="Select from requirements library..." />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="auth-001">Multi-Factor Authentication</SelectItem>
-                      <SelectItem value="net-001">Network Segmentation</SelectItem>
-                      <SelectItem value="sec-001">Zero Trust Architecture</SelectItem>
-                      <SelectItem value="comp-001">HIPAA Compliance</SelectItem>
-                      <SelectItem value="comp-002">PCI-DSS Compliance</SelectItem>
+                      {requirements?.map((req) => (
+                        <SelectItem key={req.id} value={req.id}>
+                          <div className="flex flex-col">
+                            <span>{req.title}</span>
+                            <span className="text-xs text-muted-foreground">{req.category}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <Button type="button" variant="outline">
