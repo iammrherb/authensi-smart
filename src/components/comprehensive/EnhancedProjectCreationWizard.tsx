@@ -124,8 +124,9 @@ interface EnhancedProjectFormData {
   portnox_owner?: string;
   additional_stakeholders: StakeholderEntry[];
   compliance_frameworks: string[];
-  requirements: string[];
   pain_points: string[];
+  success_criteria: string[];
+  integration_requirements: string[];
   enable_bulk_sites: boolean;
   enable_bulk_users: boolean;
   enable_auto_vendors: boolean;
@@ -153,8 +154,9 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
     total_endpoints: 100,
     additional_stakeholders: [],
     compliance_frameworks: [],
-    requirements: [],
     pain_points: [],
+    success_criteria: [],
+    integration_requirements: [],
     enable_bulk_sites: false,
     enable_bulk_users: false,
     enable_auto_vendors: false
@@ -259,8 +261,34 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
 
   const handleCreateProject = async () => {
     const projectData = {
-      ...formData,
-      additional_stakeholders: formData.additional_stakeholders.map(s => `${s.email}:${s.role}:${s.createUser}:${s.sendInvitation}`),
+      name: formData.name,
+      description: formData.description,
+      client_name: formData.client_name,
+      business_domain: formData.business_domain,
+      business_website: formData.business_website,
+      business_summary: formData.business_summary,
+      project_type: formData.project_type,
+      industry: formData.industry,
+      primary_country: formData.primary_country,
+      primary_region: formData.primary_region,
+      timezone: formData.timezone,
+      deployment_type: formData.deployment_type,
+      security_level: formData.security_level,
+      total_sites: formData.total_sites,
+      total_endpoints: formData.total_endpoints,
+      budget: formData.budget,
+      project_manager: formData.project_manager,
+      project_owner: formData.project_owner,
+      technical_owner: formData.technical_owner,
+      portnox_owner: formData.portnox_owner,
+      additional_stakeholders: formData.additional_stakeholders,
+      compliance_frameworks: formData.compliance_frameworks,
+      pain_points: formData.pain_points,
+      success_criteria: formData.success_criteria,
+      integration_requirements: formData.integration_requirements,
+      enable_bulk_sites: formData.enable_bulk_sites,
+      enable_bulk_users: formData.enable_bulk_users,
+      enable_auto_vendors: formData.enable_auto_vendors,
       start_date: formData.start_date?.toISOString().split('T')[0],
       target_completion: formData.target_completion?.toISOString().split('T')[0],
       status: 'planning' as const,
@@ -303,7 +331,7 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
     }));
   };
 
-  const addItem = (field: 'pain_points' | 'requirements', value: string) => {
+  const addItem = (field: 'pain_points' | 'integration_requirements', value: string) => {
     if (value.trim()) {
       setFormData(prev => ({
         ...prev,
@@ -312,7 +340,7 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
     }
   };
 
-  const removeItem = (field: 'pain_points' | 'requirements', index: number) => {
+  const removeItem = (field: 'pain_points' | 'integration_requirements', index: number) => {
     setFormData(prev => ({
       ...prev,
       [field]: prev[field].filter((_, i) => i !== index)
@@ -321,10 +349,10 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
 
   const addRequirementFromLibrary = (requirementId: string) => {
     const requirement = requirements?.find(r => r.id === requirementId);
-    if (requirement && !formData.requirements.includes(requirement.title)) {
+    if (requirement && !formData.integration_requirements.includes(requirement.title)) {
       setFormData(prev => ({
         ...prev,
-        requirements: [...prev.requirements, requirement.title]
+        integration_requirements: [...prev.integration_requirements, requirement.title]
       }));
     }
   };
@@ -382,7 +410,7 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
       ...prev,
       project_type: templateKey,
       pain_points: [...prev.pain_points, ...template.defaultValues.painPoints],
-      requirements: [...prev.requirements, ...template.defaultValues.requirements]
+      integration_requirements: [...prev.integration_requirements, ...template.defaultValues.requirements]
     }));
   };
 
@@ -399,24 +427,25 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
 
     setIsGeneratingSummary(true);
     try {
-      const summary = await generateProjectSummary({
-        name: formData.name,
-        client_name: formData.client_name,
-        industry: formData.industry,
-        project_type: formData.project_type,
-        deployment_type: formData.deployment_type,
-        security_level: formData.security_level,
-        total_sites: formData.total_sites,
-        total_endpoints: formData.total_endpoints,
-        business_domain: formData.business_domain,
-        business_website: formData.business_website
-      });
+      const context = `Generate a brief business summary (2-3 sentences) for:
+        - Client: ${formData.client_name}
+        - Industry: ${formData.industry}
+        - Business Domain: ${formData.business_domain || 'Not specified'}
+        - Website: ${formData.business_website || 'Not specified'}
+        - Project Type: ${formData.project_type || 'Not specified'}
+        
+        Focus on business operations, industry context, and relevant compliance/security needs for NAC deployment.`;
+
+      const summary = await enhanceNotes(
+        `${formData.client_name} - ${formData.industry} organization`,
+        context
+      );
 
       if (summary) {
         setFormData(prev => ({ ...prev, business_summary: summary }));
         toast({
           title: "Business Summary Generated",
-          description: "AI has created a comprehensive business summary for your project."
+          description: "AI has created a brief business summary for your project."
         });
       }
     } catch (error) {
@@ -967,7 +996,7 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
                     onChange={(e) => setNewRequirement(e.target.value)}
                     onKeyPress={(e) => {
                       if (e.key === 'Enter' && newRequirement.trim()) {
-                        addItem('requirements', newRequirement);
+                        addItem('integration_requirements', newRequirement);
                         setNewRequirement('');
                       }
                     }}
@@ -975,7 +1004,7 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
                   <Button
                     onClick={() => {
                       if (newRequirement.trim()) {
-                        addItem('requirements', newRequirement);
+                        addItem('integration_requirements', newRequirement);
                         setNewRequirement('');
                       }
                     }}
@@ -1004,13 +1033,13 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
                 )}
 
                 <div className="space-y-2">
-                  {formData.requirements.map((requirement, index) => (
+                  {formData.integration_requirements.map((requirement, index) => (
                     <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
                       <span className="text-sm">{requirement}</span>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => removeItem('requirements', index)}
+                        onClick={() => removeItem('integration_requirements', index)}
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -1197,7 +1226,7 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
                   <strong>Endpoints:</strong> {formData.total_endpoints || 0}
                 </div>
                 <div>
-                  <strong>Requirements:</strong> {formData.requirements.length}
+                  <strong>Requirements:</strong> {formData.integration_requirements.length}
                 </div>
                 <div>
                   <strong>Pain Points:</strong> {formData.pain_points.length}

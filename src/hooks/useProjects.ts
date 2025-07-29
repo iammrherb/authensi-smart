@@ -24,10 +24,13 @@ export interface Project {
   primary_country?: string;
   primary_region?: string;
   timezone?: string;
+  business_summary?: string;
+  business_domain?: string;
+  business_website?: string;
   project_owner?: string;
   technical_owner?: string;
   portnox_owner?: string;
-  additional_stakeholders?: string[];
+  additional_stakeholders?: any[];
   enable_bulk_sites?: boolean;
   bulk_sites_data?: any[];
   enable_bulk_users?: boolean;
@@ -38,8 +41,12 @@ export interface Project {
   total_sites?: number;
   total_endpoints?: number;
   compliance_frameworks?: string[];
-  pain_points?: string[];
-  success_criteria?: string[];
+  pain_points?: any[];
+  success_criteria?: any[];
+  integration_requirements?: any[];
+  migration_scope?: any;
+  template_id?: string;
+  poc_status?: string;
 }
 
 export interface ProjectSite {
