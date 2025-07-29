@@ -281,7 +281,7 @@ const EnhancedSiteCreationWizard: React.FC<EnhancedSiteCreationWizardProps> = ({
       project_id: projectId,
       status: 'planning' as const,
       deployment_status: 'planned' as const,
-      priority: formData.deployment_config.deployment_priority,
+      priority: (formData.deployment_config.deployment_priority || 'medium') as 'low' | 'medium' | 'high' | 'critical',
       device_count: formData.network_details.device_count,
       network_segments: formData.network_details.network_segments,
       site_code: formData.site_code,

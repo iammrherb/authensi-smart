@@ -71,7 +71,7 @@ interface EnhancedProjectFormData {
   
   // Project Details
   pain_points: string[];
-  success_criteria: string[];
+  requirements: string[];
   
   // Bulk Creation Options
   enable_bulk_sites: boolean;
@@ -109,7 +109,7 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
     additional_stakeholders: [],
     compliance_frameworks: [],
     pain_points: [],
-    success_criteria: [],
+    requirements: [],
     enable_bulk_sites: false,
     bulk_sites_data: [],
     enable_bulk_users: false,
@@ -233,6 +233,15 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
     }
   };
 
+  const addStakeholderWithRole = (email: string, role: string) => {
+    if (email.trim() && !formData.additional_stakeholders.includes(`${email.trim()}:${role}`)) {
+      setFormData(prev => ({
+        ...prev,
+        additional_stakeholders: [...prev.additional_stakeholders, `${email.trim()}:${role}`]
+      }));
+    }
+  };
+
   const removeStakeholder = (index: number) => {
     setFormData(prev => ({
       ...prev,
@@ -240,7 +249,7 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
     }));
   };
 
-  const addItem = (field: 'pain_points' | 'success_criteria', value: string) => {
+  const addItem = (field: 'pain_points' | 'requirements', value: string) => {
     if (value.trim()) {
       setFormData(prev => ({
         ...prev,
@@ -249,11 +258,29 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
     }
   };
 
-  const removeItem = (field: 'pain_points' | 'success_criteria', index: number) => {
+  const removeItem = (field: 'pain_points' | 'requirements', index: number) => {
     setFormData(prev => ({
       ...prev,
       [field]: prev[field].filter((_, i) => i !== index)
     }));
+  };
+
+  const addRequirementFromLibrary = (requirementId: string) => {
+    const requirementMap: { [key: string]: string } = {
+      'auth-001': 'Multi-Factor Authentication',
+      'net-001': 'Network Segmentation', 
+      'sec-001': 'Zero Trust Architecture',
+      'comp-001': 'HIPAA Compliance',
+      'comp-002': 'PCI-DSS Compliance'
+    };
+    
+    const requirement = requirementMap[requirementId];
+    if (requirement && !formData.requirements.includes(requirement)) {
+      setFormData(prev => ({
+        ...prev,
+        requirements: [...prev.requirements, requirement]
+      }));
+    }
   };
 
   const toggleCompliance = (framework: string) => {
@@ -566,7 +593,7 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
               <p className="text-sm text-muted-foreground mb-2">
                 Add other team members who should have visibility into this project
               </p>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <div className="flex gap-2">
                   <Input
                     placeholder="stakeholder@company.com"
@@ -577,6 +604,23 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
                       }
                     }}
                   />
+                  <Select onValueChange={(role) => {
+                    const input = document.querySelector('input[placeholder="stakeholder@company.com"]') as HTMLInputElement;
+                    if (input?.value) {
+                      addStakeholderWithRole(input.value, role);
+                      input.value = '';
+                    }
+                  }}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="contact">Contact Only</SelectItem>
+                      <SelectItem value="viewer">Viewer</SelectItem>
+                      <SelectItem value="contributor">Contributor</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <Button
                     type="button"
                     variant="outline"
@@ -595,7 +639,12 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
                   <div className="space-y-1">
                     {formData.additional_stakeholders.map((stakeholder, index) => (
                       <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
-                        <span className="text-sm">{stakeholder}</span>
+                        <div className="flex-1">
+                          <span className="text-sm">{stakeholder}</span>
+                          <div className="flex gap-2 mt-1">
+                            <Badge variant="outline" className="text-xs">Contact</Badge>
+                          </div>
+                        </div>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -701,17 +750,35 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
             </div>
 
             <div>
-              <Label>Success Criteria</Label>
+              <Label>Project Requirements</Label>
               <p className="text-sm text-muted-foreground mb-2">
-                What defines success for this project?
+                Select requirements from the library or add custom ones
               </p>
-              <div className="space-y-2">
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <Select onValueChange={(reqId) => addRequirementFromLibrary(reqId)}>
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Select from requirements library..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="auth-001">Multi-Factor Authentication</SelectItem>
+                      <SelectItem value="net-001">Network Segmentation</SelectItem>
+                      <SelectItem value="sec-001">Zero Trust Architecture</SelectItem>
+                      <SelectItem value="comp-001">HIPAA Compliance</SelectItem>
+                      <SelectItem value="comp-002">PCI-DSS Compliance</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button type="button" variant="outline">
+                    Browse Library
+                  </Button>
+                </div>
+                
                 <div className="flex gap-2">
                   <Input
-                    placeholder="Enter a success criterion..."
+                    placeholder="Enter a custom requirement..."
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
-                        addItem('success_criteria', e.currentTarget.value);
+                        addItem('requirements', e.currentTarget.value);
                         e.currentTarget.value = '';
                       }
                     }}
@@ -722,7 +789,7 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
                     onClick={(e) => {
                       const input = e.currentTarget.parentElement?.querySelector('input') as HTMLInputElement;
                       if (input) {
-                        addItem('success_criteria', input.value);
+                        addItem('requirements', input.value);
                         input.value = '';
                       }
                     }}
@@ -730,15 +797,16 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
-                {formData.success_criteria.length > 0 && (
+                
+                {formData.requirements.length > 0 && (
                   <div className="space-y-1">
-                    {formData.success_criteria.map((criterion, index) => (
+                    {formData.requirements.map((requirement, index) => (
                       <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
-                        <span className="text-sm">{criterion}</span>
+                        <span className="text-sm">{requirement}</span>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => removeItem('success_criteria', index)}
+                          onClick={() => removeItem('requirements', index)}
                           className="h-6 w-6 p-0"
                         >
                           <X className="h-4 w-4" />
