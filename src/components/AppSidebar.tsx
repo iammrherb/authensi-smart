@@ -23,35 +23,47 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Navigation structure with AI-focused organization
+// Comprehensive navigation structure with full Intelligence Hub
 const navigationItems = [
   {
-    title: "Core Navigation",
-    icon: Target,
+    title: "Intelligence Hub",
+    icon: Brain,
     badge: "AI+",
     items: [
       { title: "Command Center", url: "/", icon: Target, description: "AI Hub & Overview" },
+      { title: "Intelligence Tracker", url: "/intelligence", icon: Brain, description: "AI Intelligence Hub" },
       { title: "AI Scoping", url: "/scoping", icon: Sparkles, description: "Intelligent Project Scoping" },
+      { title: "Smart Dashboard", url: "/dashboard", icon: TrendingUp, description: "AI-Powered Insights" },
       { title: "Project Tracker", url: "/tracker", icon: Zap, description: "Live Project Management" },
-      { title: "Analytics", url: "/reports", icon: BarChart3, description: "Performance Insights" },
+    ]
+  },
+  {
+    title: "Project Management",
+    icon: Target,
+    items: [
+      { title: "Project Details", url: "/project-details", icon: FileText, description: "Detailed project view" },
+      { title: "Project Tracking", url: "/project-tracking", icon: BarChart3, description: "Progress tracking" },
+      { title: "Deployment", url: "/deployment", icon: Rocket, description: "Deployment planning" },
+      { title: "Designer", url: "/designer", icon: Lightbulb, description: "Architecture designer" },
+      { title: "Analytics", url: "/reports", icon: BarChart3, description: "Performance insights" },
     ]
   },
   {
     title: "Knowledge & Resources",
     icon: BookOpen,
     items: [
-      { title: "Use Cases", url: "/use-cases", icon: BookOpen, description: "Knowledge Library" },
-      { title: "Sites", url: "/sites", icon: Building2, description: "Network Sites" },
-      { title: "Requirements", url: "/requirements", icon: FileText, description: "Project Requirements" },
-      { title: "Vendors", url: "/vendors", icon: Network, description: "Vendor Management" },
+      { title: "Use Case Library", url: "/use-cases", icon: BookOpen, description: "Knowledge library" },
+      { title: "Sites Management", url: "/sites", icon: Building2, description: "Network sites" },
+      { title: "Requirements", url: "/requirements", icon: FileText, description: "Project requirements" },
       { title: "Questionnaires", url: "/questionnaires", icon: FileText, description: "Requirements capture" },
+      { title: "Vendors", url: "/vendors", icon: Network, description: "Vendor management" },
     ]
   },
   {
     title: "Administration",
     icon: Settings,
     items: [
-      { title: "Team Management", url: "/users", icon: Users, description: "User & role management" },
+      { title: "User Management", url: "/users", icon: Users, description: "User & role management" },
       { title: "System Settings", url: "/settings", icon: Settings, description: "Platform configuration" },
     ]
   }
