@@ -23,9 +23,10 @@ import { useToast } from '@/hooks/use-toast';
 import { useCountries, useRegionsByCountry } from '@/hooks/useCountriesRegions';
 import { useBulkSiteTemplates } from '@/hooks/useBulkSiteTemplates';
 import { useRequirements } from '@/hooks/useRequirements';
+import { usePainPoints, useCreatePainPoint } from '@/hooks/usePainPoints';
+import { useRecommendations, useCreateRecommendation } from '@/hooks/useRecommendations';
 import { AppRole } from '@/hooks/useUserRoles';
 import { useAI } from '@/hooks/useAI';
-import AIWorkflowEngine from '@/components/ai/AIWorkflowEngine';
 
 interface StakeholderEntry {
   email: string;
@@ -33,21 +34,6 @@ interface StakeholderEntry {
   createUser: boolean;
   sendInvitation: boolean;
 }
-
-// Industry and compliance options
-const industries = [
-  'Healthcare', 'Finance', 'Education', 'Government', 'Manufacturing', 
-  'Retail', 'Technology', 'Energy', 'Transportation', 'Other'
-];
-
-const complianceFrameworks = [
-  'SOX', 'HIPAA', 'PCI-DSS', 'ISO 27001', 'NIST', 'GDPR', 'SOC 2', 'FedRAMP', 'Other'
-];
-
-const timezones = [
-  'UTC', 'EST', 'CST', 'MST', 'PST', 'GMT', 'CET', 'JST', 'AEST', 'IST',
-  'PST', 'PDT', 'EDT', 'CDT', 'MDT', 'HST', 'AKST', 'AST', 'NST'
-];
 
 // Project Templates
 const projectTemplates = {
@@ -102,7 +88,7 @@ const projectTemplates = {
   upgrade: {
     title: "System Upgrade",
     description: "Upgrade existing Portnox deployment",
-    icon: Zap,
+    icon: Layers,
     defaultValues: {
       timeline: "2-6 months",
       sites: "Current sites",
@@ -114,98 +100,93 @@ const projectTemplates = {
 };
 
 interface EnhancedProjectFormData {
-  // Basic Information
   name: string;
-  description: string;
-  client_name: string;
-  industry: string;
-  project_type: 'poc' | 'implementation' | 'expansion' | 'migration' | 'upgrade' | '';
-  deployment_type: string;
-  security_level: string;
-  
-  // Scope & Timeline
+  project_type?: keyof typeof projectTemplates;
+  industry?: string;
+  description?: string;
+  client_name?: string;
+  business_domain?: string;
+  business_website?: string;
+  business_summary?: string;
+  primary_country?: string;
+  primary_region?: string;
+  timezone?: string;
+  deployment_type?: string;
+  security_level?: string;
+  total_sites?: number;
+  total_endpoints?: number;
+  budget?: number;
   start_date?: Date;
   target_completion?: Date;
-  total_sites: number;
-  total_endpoints: number;
-  budget?: number;
-  
-  // Geographic & Organizational
-  primary_country: string;
-  primary_region: string;
-  timezone: string;
-  
-  // Stakeholders & Owners
-  project_owner: string;
-  technical_owner: string;
-  portnox_owner: string;
+  project_manager?: string;
+  project_owner?: string;
+  technical_owner?: string;
+  portnox_owner?: string;
   additional_stakeholders: StakeholderEntry[];
-  
-  // Framework & Compliance
   compliance_frameworks: string[];
-  
-  // Project Details
-  pain_points: string[];
   requirements: string[];
-  
-  // Bulk Creation Options
+  pain_points: string[];
   enable_bulk_sites: boolean;
-  bulk_sites_data: any[];
   enable_bulk_users: boolean;
   enable_auto_vendors: boolean;
 }
 
-interface EnhancedProjectCreationWizardProps {
+interface Props {
   onComplete?: (projectId: string) => void;
   onCancel?: () => void;
 }
 
-const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps> = ({ 
-  onComplete, 
-  onCancel 
-}) => {
+const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<EnhancedProjectFormData>({
     name: '',
-    description: '',
     client_name: '',
-    industry: '',
-    project_type: '',
+    business_domain: '',
+    business_website: '',
+    business_summary: '',
+    primary_country: '',
+    primary_region: '',
+    timezone: '',
     deployment_type: '',
     security_level: '',
     total_sites: 1,
     total_endpoints: 100,
-    primary_country: '',
-    primary_region: '',
-    timezone: 'UTC',
-    project_owner: '',
-    technical_owner: '',
-    portnox_owner: '',
     additional_stakeholders: [],
     compliance_frameworks: [],
-    pain_points: [],
     requirements: [],
+    pain_points: [],
     enable_bulk_sites: false,
-    bulk_sites_data: [],
     enable_bulk_users: false,
     enable_auto_vendors: false
   });
 
-  // Data hooks
+  const [newStakeholder, setNewStakeholder] = useState<StakeholderEntry>({
+    email: '',
+    role: 'contact',
+    createUser: false,
+    sendInvitation: false
+  });
+
+  const [newRequirement, setNewRequirement] = useState('');
+  const [newPainPoint, setNewPainPoint] = useState('');
+
   const { data: countries = [] } = useCountries();
   const { data: regions = [] } = useRegionsByCountry(formData.primary_country);
-  const { data: bulkTemplates = [] } = useBulkSiteTemplates();
+  const { data: templates = [] } = useBulkSiteTemplates();
   const { data: requirements = [] } = useRequirements();
-  
+  const { data: painPoints = [] } = usePainPoints();
+  const { data: recommendations = [] } = useRecommendations();
   const { mutate: createProject, isPending } = useCreateProject();
+  const { mutate: createPainPoint } = useCreatePainPoint();
+  const { mutate: createRecommendation } = useCreateRecommendation();
   const { toast } = useToast();
   const { enhanceNotes, generateProjectSummary, isLoading: aiLoading } = useAI();
 
   // AI-related state
-  const [businessSummary, setBusinessSummary] = useState('');
-  const [aiEnhancedPainPoints, setAiEnhancedPainPoints] = useState('');
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [isEnhancingPainPoints, setIsEnhancingPainPoints] = useState(false);
+  const [showAddPainPointToLibrary, setShowAddPainPointToLibrary] = useState<string | null>(null);
+  const [showAddRecommendationToLibrary, setShowAddRecommendationToLibrary] = useState<string | null>(null);
 
   const steps = [
     {
@@ -229,7 +210,7 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
     {
       id: 4,
       title: "Compliance & Requirements",
-      description: "Security, compliance, and success criteria",
+      description: "Security, compliance, and requirements",
       icon: Shield
     },
     {
@@ -239,7 +220,6 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
       icon: Building2
     }
   ];
-
 
   const industries = [
     "Financial Services", "Healthcare", "Government", "Education", "Manufacturing",
@@ -258,6 +238,11 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
   const complianceOptions = [
     "SOX", "HIPAA", "PCI-DSS", "GDPR", "SOC2", "ISO27001", "NIST", "FISMA", 
     "FedRAMP", "CCPA", "PIPEDA", "LGPD", "Custom"
+  ];
+
+  const timezones = [
+    'UTC', 'EST', 'CST', 'MST', 'PST', 'GMT', 'CET', 'JST', 'AEST', 'IST',
+    'PST', 'PDT', 'EDT', 'CDT', 'MDT', 'HST', 'AKST', 'AST', 'NST'
   ];
 
   const handleNext = () => {
@@ -301,12 +286,13 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
     });
   };
 
-  const addStakeholder = (stakeholder: StakeholderEntry) => {
-    if (stakeholder.email.trim() && !formData.additional_stakeholders.some(s => s.email === stakeholder.email.trim())) {
+  const addStakeholder = () => {
+    if (newStakeholder.email.trim() && !formData.additional_stakeholders.some(s => s.email === newStakeholder.email.trim())) {
       setFormData(prev => ({
         ...prev,
-        additional_stakeholders: [...prev.additional_stakeholders, stakeholder]
+        additional_stakeholders: [...prev.additional_stakeholders, newStakeholder]
       }));
+      setNewStakeholder({ email: '', role: 'contact', createUser: false, sendInvitation: false });
     }
   };
 
@@ -343,6 +329,52 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
     }
   };
 
+  const addPainPointFromLibrary = (painPointId: string) => {
+    const painPoint = painPoints?.find(p => p.id === painPointId);
+    if (painPoint && !formData.pain_points.includes(painPoint.title)) {
+      setFormData(prev => ({
+        ...prev,
+        pain_points: [...prev.pain_points, painPoint.title]
+      }));
+    }
+  };
+
+  const addRecommendationFromLibrary = (recommendationId: string) => {
+    const recommendation = recommendations?.find(r => r.id === recommendationId);
+    if (recommendation && !formData.pain_points.includes(recommendation.title)) {
+      setFormData(prev => ({
+        ...prev,
+        pain_points: [...prev.pain_points, recommendation.title]
+      }));
+    }
+  };
+
+  const handleAddToLibrary = (type: 'pain_point' | 'recommendation', item: string) => {
+    if (type === 'pain_point') {
+      createPainPoint({
+        title: item,
+        category: 'general',
+        severity: 'medium',
+        recommended_solutions: [],
+        industry_specific: []
+      });
+      setShowAddPainPointToLibrary(null);
+    } else {
+      createRecommendation({
+        title: item,
+        description: `Recommendation: ${item}`,
+        category: 'general',
+        priority: 'medium',
+        implementation_effort: 'medium',
+        prerequisites: [],
+        related_pain_points: [],
+        portnox_features: [],
+        industry_specific: []
+      });
+      setShowAddRecommendationToLibrary(null);
+    }
+  };
+
   // Apply project template
   const applyProjectTemplate = (templateKey: keyof typeof projectTemplates) => {
     const template = projectTemplates[templateKey];
@@ -375,11 +407,13 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
         deployment_type: formData.deployment_type,
         security_level: formData.security_level,
         total_sites: formData.total_sites,
-        total_endpoints: formData.total_endpoints
+        total_endpoints: formData.total_endpoints,
+        business_domain: formData.business_domain,
+        business_website: formData.business_website
       });
 
       if (summary) {
-        setBusinessSummary(summary);
+        setFormData(prev => ({ ...prev, business_summary: summary }));
         toast({
           title: "Business Summary Generated",
           description: "AI has created a comprehensive business summary for your project."
@@ -411,19 +445,23 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
     try {
       const enhanced = await enhanceNotes(
         formData.pain_points.join('\n'),
-        `Project Type: ${formData.project_type}, Industry: ${formData.industry}, Client: ${formData.client_name}`
+        `Pain points for ${formData.client_name} in ${formData.industry} industry`
       );
 
       if (enhanced) {
-        setAiEnhancedPainPoints(enhanced);
+        const enhancedLines = enhanced.split('\n').filter(line => line.trim());
+        setFormData(prev => ({ 
+          ...prev, 
+          pain_points: enhancedLines 
+        }));
         toast({
           title: "Pain Points Enhanced",
-          description: "AI has provided detailed analysis and recommendations for your pain points."
+          description: "AI has enhanced and organized your pain points."
         });
       }
     } catch (error) {
       toast({
-        title: "Failed to Enhance",
+        title: "Failed to Enhance Pain Points",
         description: "Unable to enhance pain points. Please try again.",
         variant: "destructive"
       });
@@ -432,232 +470,146 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
     }
   };
 
-  const toggleCompliance = (framework: string) => {
-    setFormData(prev => ({
-      ...prev,
-      compliance_frameworks: prev.compliance_frameworks.includes(framework)
-        ? prev.compliance_frameworks.filter(f => f !== framework)
-        : [...prev.compliance_frameworks, framework]
-    }));
-  };
-
-  // Stakeholder form component
-  const StakeholderForm: React.FC<{ onAdd: (stakeholder: StakeholderEntry) => void }> = ({ onAdd }) => {
-    const [email, setEmail] = useState('');
-    const [role, setRole] = useState<AppRole | 'contact'>('contact');
-    const [createUser, setCreateUser] = useState(false);
-    const [sendInvitation, setSendInvitation] = useState(false);
-
-    const handleAdd = () => {
-      if (email.trim()) {
-        onAdd({ email: email.trim(), role, createUser, sendInvitation });
-        setEmail('');
-        setRole('contact');
-        setCreateUser(false);
-        setSendInvitation(false);
-      }
-    };
-
-    const roleOptions: { value: AppRole | 'contact'; label: string }[] = [
-      { value: 'contact', label: 'Contact Only' },
-      { value: 'viewer', label: 'Viewer' },
-      { value: 'project_viewer', label: 'Project Viewer' },
-      { value: 'project_creator', label: 'Project Creator' },
-      { value: 'engineer', label: 'Engineer' },
-      { value: 'lead_engineer', label: 'Lead Engineer' },
-      { value: 'technical_account_manager', label: 'Technical Account Manager' },
-      { value: 'sales_engineer', label: 'Sales Engineer' },
-      { value: 'super_admin', label: 'Super Admin' }
-    ];
-
-    return (
-      <Card className="p-4">
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="stakeholder-email">Email Address</Label>
-            <Input
-              id="stakeholder-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="stakeholder@company.com"
-              className="mt-1"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="stakeholder-role">Role</Label>
-            <Select value={role} onValueChange={(value) => setRole(value as AppRole | 'contact')}>
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Select role" />
-              </SelectTrigger>
-              <SelectContent>
-                {roleOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {role !== 'contact' && (
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="create-user"
-                  checked={createUser}
-                  onCheckedChange={(checked) => setCreateUser(checked as boolean)}
-                />
-                <Label htmlFor="create-user" className="text-sm">
-                  Create user account and assign role
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="send-invitation"
-                  checked={sendInvitation}
-                  onCheckedChange={(checked) => setSendInvitation(checked as boolean)}
-                />
-                <Label htmlFor="send-invitation" className="text-sm">
-                  Send invitation email
-                </Label>
-              </div>
-            </div>
-          )}
-
-          <Button onClick={handleAdd} disabled={!email.trim()} className="w-full">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Stakeholder
-          </Button>
-        </div>
-      </Card>
-    );
-  };
-
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
         return (
           <div className="space-y-6">
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="name">Project Name *</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="e.g., Global HQ NAC Deployment"
+                  placeholder="Enter project name"
+                  className="mt-1"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="client_name">Client/Organization Name *</Label>
+                <Input
+                  id="client_name"
+                  value={formData.client_name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, client_name: e.target.value }))}
+                  placeholder="Enter client or organization name"
+                  className="mt-1"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="business_domain">Business Domain</Label>
+                <Input
+                  id="business_domain"
+                  value={formData.business_domain || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, business_domain: e.target.value }))}
+                  placeholder="e.g., Technology, Healthcare, Finance"
                   className="mt-1"
                 />
               </div>
 
               <div>
-                <Label htmlFor="client_name">Client/Organization *</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="client_name"
-                    value={formData.client_name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, client_name: e.target.value }))}
-                    placeholder="e.g., Acme Corporation"
-                    className="mt-1 flex-1"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={generateBusinessSummary}
-                    disabled={isGeneratingSummary || !formData.client_name || !formData.industry}
-                    className="mt-1"
-                  >
-                    {isGeneratingSummary ? (
-                      <Brain className="h-4 w-4 animate-pulse" />
-                    ) : (
-                      <Sparkles className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-                {businessSummary && (
-                  <Card className="mt-2 p-3 bg-primary/5 border-primary/20">
-                    <div className="flex items-start gap-2">
-                      <Brain className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium text-primary">AI Business Summary</Label>
-                        <div className="text-sm text-muted-foreground whitespace-pre-wrap">
-                          {businessSummary}
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                )}
-              </div>
-
-              <div>
-                <Label>Project Type & Template *</Label>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Choose a project type to automatically populate relevant requirements and pain points
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {Object.entries(projectTemplates).map(([key, template]) => {
-                    const IconComponent = template.icon;
-                    const isSelected = formData.project_type === key;
-                    return (
-                      <Card 
-                        key={key} 
-                        className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
-                          isSelected ? 'ring-2 ring-primary bg-primary/5' : 'hover:bg-muted/50'
-                        }`}
-                        onClick={() => applyProjectTemplate(key as keyof typeof projectTemplates)}
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex items-start gap-3">
-                            <div className={`p-2 rounded-lg ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                              <IconComponent className="h-4 w-4" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-sm">{template.title}</h4>
-                              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                                {template.description}
-                              </p>
-                              <div className="mt-2 text-xs text-muted-foreground">
-                                <div>Timeline: {template.defaultValues.timeline}</div>
-                                <div>Scope: {template.defaultValues.sites}</div>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="industry">Industry *</Label>
-                <Select value={formData.industry} onValueChange={(value) => setFormData(prev => ({ ...prev, industry: value }))}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select industry" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {industries.map((industry) => (
-                      <SelectItem key={industry} value={industry.toLowerCase().replace(/\s+/g, '-')}>
-                        {industry}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="description">Project Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Describe the project objectives, scope, and key requirements..."
-                  className="mt-1 min-h-[100px]"
+                <Label htmlFor="business_website">Business Website</Label>
+                <Input
+                  id="business_website"
+                  value={formData.business_website || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, business_website: e.target.value }))}
+                  placeholder="https://example.com"
+                  className="mt-1"
                 />
               </div>
+            </div>
+
+            {/* Project Templates */}
+            <div>
+              <Label>Project Template</Label>
+              <p className="text-sm text-muted-foreground mb-3">Choose a template to auto-populate requirements and pain points</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Object.entries(projectTemplates).map(([key, template]) => {
+                  const IconComponent = template.icon;
+                  const isSelected = formData.project_type === key;
+                  return (
+                    <Card 
+                      key={key} 
+                      className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                        isSelected ? 'ring-2 ring-primary bg-primary/5' : 'hover:bg-muted/50'
+                      }`}
+                      onClick={() => applyProjectTemplate(key as keyof typeof projectTemplates)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          <div className={`p-2 rounded-lg ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                            <IconComponent className="h-4 w-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-sm">{template.title}</h4>
+                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                              {template.description}
+                            </p>
+                            <div className="mt-2 text-xs text-muted-foreground">
+                              <div>Timeline: {template.defaultValues.timeline}</div>
+                              <div>Scope: {template.defaultValues.sites}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="industry">Industry *</Label>
+              <Select value={formData.industry} onValueChange={(value) => setFormData(prev => ({ ...prev, industry: value }))}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Select industry" />
+                </SelectTrigger>
+                <SelectContent>
+                  {industries.map((industry) => (
+                    <SelectItem key={industry} value={industry.toLowerCase().replace(/\s+/g, '-')}>
+                      {industry}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="description">Project Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Describe the project objectives, scope, and key requirements..."
+                className="mt-1 min-h-[100px]"
+              />
+            </div>
+
+            {/* AI Business Summary Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>AI Business Summary</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={generateBusinessSummary}
+                  disabled={isGeneratingSummary || !formData.client_name || !formData.industry}
+                  className="flex items-center gap-2"
+                >
+                  <Brain className="h-4 w-4" />
+                  {isGeneratingSummary ? 'Generating...' : 'Generate Summary'}
+                </Button>
+              </div>
+              {formData.business_summary && (
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-sm text-muted-foreground">{formData.business_summary}</p>
+                </div>
+              )}
             </div>
           </div>
         );
@@ -881,7 +833,26 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
                 Add other team members and specify whether to create user accounts or just add as contacts
               </p>
               <div className="space-y-4">
-                <StakeholderForm onAdd={addStakeholder} />
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Email address"
+                    value={newStakeholder.email}
+                    onChange={(e) => setNewStakeholder(prev => ({ ...prev, email: e.target.value }))}
+                  />
+                  <Select value={newStakeholder.role} onValueChange={(value) => setNewStakeholder(prev => ({ ...prev, role: value as any }))}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="contact">Contact</SelectItem>
+                      <SelectItem value="super_admin">Super Admin</SelectItem>
+                      <SelectItem value="product_manager">Product Manager</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={addStakeholder} size="sm">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
                 {formData.additional_stakeholders.length > 0 && (
                   <div className="space-y-2">
                     {formData.additional_stakeholders.map((stakeholder, index) => (
@@ -939,7 +910,15 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
                     key={framework}
                     variant={formData.compliance_frameworks.includes(framework) ? "default" : "outline"}
                     size="sm"
-                    onClick={() => toggleCompliance(framework)}
+                    onClick={() => {
+                      const isSelected = formData.compliance_frameworks.includes(framework);
+                      setFormData(prev => ({
+                        ...prev,
+                        compliance_frameworks: isSelected 
+                          ? prev.compliance_frameworks.filter(f => f !== framework)
+                          : [...prev.compliance_frameworks, framework]
+                      }));
+                    }}
                     className="justify-start"
                   >
                     {framework}
@@ -1025,19 +1004,6 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
                       </div>
                     ))}
                   </div>
-                )}
-                {aiEnhancedPainPoints && (
-                  <Card className="mt-3 p-3 bg-primary/5 border-primary/20">
-                    <div className="flex items-start gap-2">
-                      <Brain className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium text-primary">AI Enhanced Analysis</Label>
-                        <div className="text-sm text-muted-foreground whitespace-pre-wrap">
-                          {aiEnhancedPainPoints}
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
                 )}
               </div>
             </div>
@@ -1215,74 +1181,105 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
     }
   };
 
-  const calculateProgress = () => {
-    return ((currentStep - 1) / (steps.length - 1)) * 100;
-  };
-
-  const isStepComplete = (stepNumber: number) => {
-    switch (stepNumber) {
+  const canProceed = () => {
+    switch (currentStep) {
       case 1:
-        return formData.name && formData.client_name && formData.industry && formData.project_type;
+        return formData.name.trim() && formData.client_name.trim() && formData.industry;
       case 2:
         return formData.primary_country && formData.timezone && formData.deployment_type && formData.security_level;
       case 3:
-        return formData.project_owner && formData.technical_owner && formData.portnox_owner;
+        return true;
       case 4:
-        return true; // Optional step
+        return true;
       case 5:
-        return true; // Optional step
+        return true;
       default:
         return false;
     }
   };
 
-  const canProceed = isStepComplete(currentStep);
-
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="space-y-8">
       {/* Progress Header */}
       <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Enhanced Project Creation</h2>
-          <Badge variant="outline">
-            Step {currentStep} of {steps.length}
-          </Badge>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Create Enhanced Project</h2>
+            <p className="text-muted-foreground">Set up a comprehensive project with AI-powered features</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={onCancel}
+              disabled={isPending}
+            >
+              Cancel
+            </Button>
+            {currentStep === steps.length && (
+              <Button
+                onClick={handleCreateProject}
+                disabled={isPending || !canProceed()}
+                className="flex items-center gap-2"
+              >
+                {isPending ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-4 w-4" />
+                    Create Project
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
         </div>
-        
+
+        {/* Progress Bar */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span>Progress</span>
-            <span>{Math.round(calculateProgress())}%</span>
+            <span>{Math.round((currentStep / steps.length) * 100)}% Complete</span>
           </div>
-          <Progress value={calculateProgress()} className="h-2" />
+          <Progress value={(currentStep / steps.length) * 100} className="h-2" />
         </div>
 
         {/* Step Indicators */}
-        <div className="flex justify-between">
-          {steps.map((step) => (
-            <div
-              key={step.id}
-              className={`flex flex-col items-center space-y-1 flex-1 ${
-                step.id === currentStep ? 'text-primary' : 
-                step.id < currentStep ? 'text-green-600' : 'text-muted-foreground'
-              }`}
-            >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-                step.id === currentStep ? 'border-primary bg-primary/10' :
-                step.id < currentStep ? 'border-green-600 bg-green-600/10' : 'border-muted'
-              }`}>
-                {step.id < currentStep ? (
-                  <CheckCircle className="h-4 w-4" />
-                ) : (
-                  <step.icon className="h-4 w-4" />
-                )}
-              </div>
-              <div className="text-center">
-                <div className="text-xs font-medium">{step.title}</div>
-                <div className="text-xs hidden sm:block">{step.description}</div>
-              </div>
-            </div>
-          ))}
+        <div className="flex justify-center">
+          <div className="flex items-center space-x-4">
+            {steps.map((step) => {
+              const IconComponent = step.icon;
+              const isCompleted = currentStep > step.id;
+              const isCurrent = currentStep === step.id;
+              
+              return (
+                <div key={step.id} className="flex items-center space-x-2">
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 transition-colors
+                    ${isCompleted ? 'bg-primary border-primary text-primary-foreground' : ''}
+                    ${isCurrent ? 'border-primary text-primary' : ''}
+                    ${!isCompleted && !isCurrent ? 'border-muted-foreground text-muted-foreground' : ''}
+                  `}>
+                    {isCompleted ? (
+                      <CheckCircle className="h-4 w-4" />
+                    ) : (
+                      <IconComponent className="h-4 w-4" />
+                    )}
+                  </div>
+                  <div className="hidden md:block">
+                    <div className={`text-sm font-medium ${isCurrent ? 'text-primary' : 'text-muted-foreground'}`}>
+                      {step.title}
+                    </div>
+                    <div className="text-xs text-muted-foreground">{step.description}</div>
+                  </div>
+                  {step.id < steps.length && (
+                    <div className={`hidden md:block w-8 h-px ${isCompleted ? 'bg-primary' : 'bg-border'}`} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -1290,11 +1287,11 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            {React.createElement(steps[currentStep - 1].icon, { className: "h-5 w-5" })}
-            {steps[currentStep - 1].title}
+            {React.createElement(steps[currentStep - 1]?.icon || Briefcase, { className: "h-5 w-5" })}
+            {steps[currentStep - 1]?.title}
           </CardTitle>
           <CardDescription>
-            {steps[currentStep - 1].description}
+            {steps[currentStep - 1]?.description}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -1306,30 +1303,22 @@ const EnhancedProjectCreationWizard: React.FC<EnhancedProjectCreationWizardProps
       <div className="flex justify-between">
         <Button
           variant="outline"
-          onClick={currentStep === 1 ? onCancel : handlePrevious}
+          onClick={handlePrevious}
+          disabled={currentStep === 1}
           className="flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          {currentStep === 1 ? 'Cancel' : 'Previous'}
+          Previous
         </Button>
-
-        {currentStep < steps.length ? (
+        
+        {currentStep < steps.length && (
           <Button
             onClick={handleNext}
-            disabled={!canProceed}
+            disabled={!canProceed()}
             className="flex items-center gap-2"
           >
             Next
             <ArrowRight className="h-4 w-4" />
-          </Button>
-        ) : (
-          <Button
-            onClick={handleCreateProject}
-            disabled={isPending || !canProceed}
-            className="flex items-center gap-2"
-          >
-            {isPending ? 'Creating...' : 'Create Project'}
-            <CheckCircle className="h-4 w-4" />
           </Button>
         )}
       </div>

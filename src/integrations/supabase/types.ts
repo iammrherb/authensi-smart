@@ -242,6 +242,45 @@ export type Database = {
           },
         ]
       }
+      pain_points_library: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          industry_specific: Json | null
+          recommended_solutions: Json | null
+          severity: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          industry_specific?: Json | null
+          recommended_solutions?: Json | null
+          severity?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          industry_specific?: Json | null
+          recommended_solutions?: Json | null
+          severity?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       poc_activities: {
         Row: {
           activity_type: string
@@ -855,6 +894,9 @@ export type Database = {
           additional_stakeholders: Json | null
           budget: number | null
           bulk_sites_data: Json | null
+          business_domain: string | null
+          business_summary: string | null
+          business_website: string | null
           client_name: string | null
           compliance_frameworks: string[] | null
           created_at: string
@@ -896,6 +938,9 @@ export type Database = {
           additional_stakeholders?: Json | null
           budget?: number | null
           bulk_sites_data?: Json | null
+          business_domain?: string | null
+          business_summary?: string | null
+          business_website?: string | null
           client_name?: string | null
           compliance_frameworks?: string[] | null
           created_at?: string
@@ -937,6 +982,9 @@ export type Database = {
           additional_stakeholders?: Json | null
           budget?: number | null
           bulk_sites_data?: Json | null
+          business_domain?: string | null
+          business_summary?: string | null
+          business_website?: string | null
           client_name?: string | null
           compliance_frameworks?: string[] | null
           created_at?: string
@@ -982,6 +1030,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      recommendations_library: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string
+          expected_outcome: string | null
+          id: string
+          implementation_effort: string
+          industry_specific: Json | null
+          portnox_features: Json | null
+          prerequisites: Json | null
+          priority: string
+          related_pain_points: Json | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description: string
+          expected_outcome?: string | null
+          id?: string
+          implementation_effort?: string
+          industry_specific?: Json | null
+          portnox_features?: Json | null
+          prerequisites?: Json | null
+          priority?: string
+          related_pain_points?: Json | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          expected_outcome?: string | null
+          id?: string
+          implementation_effort?: string
+          industry_specific?: Json | null
+          portnox_features?: Json | null
+          prerequisites?: Json | null
+          priority?: string
+          related_pain_points?: Json | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       requirements_library: {
         Row: {
