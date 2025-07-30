@@ -198,7 +198,7 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
   const wizardSteps = [
     { id: 'basic', title: 'Basic Information', icon: Database },
     { id: 'scenario', title: 'Configuration Scenario', icon: Target },
-    { id: 'requirements', title: 'Requirements & Use Cases', icon: FileText },
+    { id: 'requirements', title: 'Requirements & Security', icon: FileText },
     { id: 'advanced', title: 'Advanced Settings', icon: Settings },
     { id: 'review', title: 'Review & Generate', icon: Wand2 }
   ];
@@ -325,7 +325,7 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
 
       toast({
         title: "Configuration Saved",
-        description: "Your 1Xer configuration has been saved successfully.",
+        description: "Your DotXer configuration has been saved successfully.",
       });
 
     } catch (error) {
@@ -577,29 +577,25 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Use Cases</h3>
-          <ScrollArea className="h-48 border rounded-md p-3">
-            <div className="space-y-2">
-              {useCases?.slice(0, 10).map(useCase => (
-                <div key={useCase.id} className="flex items-center space-x-2">
-                  <Checkbox 
-                    id={useCase.id}
-                    checked={wizardData.requirements.useCases?.includes(useCase.id)}
-                    onCheckedChange={(checked) => {
-                      const current = wizardData.requirements.useCases || [];
-                      const updated = checked 
-                        ? [...current, useCase.id]
-                        : current.filter(id => id !== useCase.id);
-                      updateWizardData('requirements', { useCases: updated });
-                    }}
-                  />
-                  <Label htmlFor={useCase.id} className="text-sm">
-                    {useCase.name}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
+          <h3 className="text-lg font-semibold">Authentication Methods</h3>
+          <div className="grid grid-cols-2 gap-3">
+            {['EAP-TLS', 'EAP-TTLS', 'PEAP', 'EAP-FAST', 'EAP-MD5', 'MAC Authentication Bypass', 'Web Authentication', 'Certificate Authentication', 'Smart Card Authentication', 'Pre-Shared Key (PSK)'].map(method => (
+              <div key={method} className="flex items-center space-x-2">
+                <Checkbox 
+                  id={method}
+                  checked={wizardData.scenario.authMethods?.includes(method)}
+                  onCheckedChange={(checked) => {
+                    const current = wizardData.scenario.authMethods || [];
+                    const updated = checked 
+                      ? [...current, method]
+                      : current.filter(m => m !== method);
+                    updateWizardData('scenario', { authMethods: updated });
+                  }}
+                />
+                <Label htmlFor={method} className="text-sm">{method}</Label>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -649,21 +645,51 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
               Add VLAN
             </Button>
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            <Input placeholder="VLAN ID" type="number" />
-            <Input placeholder="VLAN Name" />
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Purpose" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="data">Data</SelectItem>
-                <SelectItem value="voice">Voice</SelectItem>
-                <SelectItem value="guest">Guest</SelectItem>
-                <SelectItem value="iot">IoT</SelectItem>
-                <SelectItem value="quarantine">Quarantine</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="space-y-4">
+            <div className="grid grid-cols-5 gap-4">
+              <Input placeholder="VLAN ID" type="number" />
+              <Input placeholder="VLAN Name" />
+              <Input placeholder="Subnet (e.g., 192.168.10.0/24)" />
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Purpose" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="data">Data Network</SelectItem>
+                  <SelectItem value="voice">Voice/VoIP</SelectItem>
+                  <SelectItem value="guest">Guest Access</SelectItem>
+                  <SelectItem value="iot">IoT Devices</SelectItem>
+                  <SelectItem value="quarantine">Quarantine</SelectItem>
+                  <SelectItem value="management">Management</SelectItem>
+                  <SelectItem value="server">Server Network</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Security Level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="open">Open Access</SelectItem>
+                  <SelectItem value="authenticated">Authenticated Only</SelectItem>
+                  <SelectItem value="restricted">Restricted Access</SelectItem>
+                  <SelectItem value="isolated">Isolated Network</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox id="dhcp-enabled" />
+                <Label htmlFor="dhcp-enabled">DHCP Enabled</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="inter-vlan-routing" />
+                <Label htmlFor="inter-vlan-routing">Inter-VLAN Routing</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="acl-required" />
+                <Label htmlFor="acl-required">ACL Required</Label>
+              </div>
+            </div>
           </div>
         </TabsContent>
 
@@ -675,19 +701,49 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
               Add Server
             </Button>
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            <Input placeholder="Server IP" />
-            <Input placeholder="Shared Secret" type="password" />
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="primary">Primary</SelectItem>
-                <SelectItem value="secondary">Secondary</SelectItem>
-                <SelectItem value="accounting">Accounting</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="space-y-4">
+            <div className="grid grid-cols-4 gap-4">
+              <Input placeholder="Server IP/FQDN" />
+              <Input placeholder="Shared Secret" type="password" />
+              <Input placeholder="Auth Port" type="number" defaultValue="1812" />
+              <Input placeholder="Acct Port" type="number" defaultValue="1813" />
+            </div>
+            <div className="grid grid-cols-4 gap-4">
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Server Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="primary">Primary Authentication</SelectItem>
+                  <SelectItem value="secondary">Secondary Authentication</SelectItem>
+                  <SelectItem value="accounting">Accounting Only</SelectItem>
+                  <SelectItem value="both">Authentication & Accounting</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input placeholder="Timeout (sec)" type="number" defaultValue="5" />
+              <Input placeholder="Retries" type="number" defaultValue="3" />
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Authentication Method" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pap">PAP</SelectItem>
+                  <SelectItem value="chap">CHAP</SelectItem>
+                  <SelectItem value="mschap">MS-CHAP</SelectItem>
+                  <SelectItem value="mschapv2">MS-CHAPv2</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox id="dead-time" />
+                <Label htmlFor="dead-time">Enable Dead Time (120s)</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="coa-enabled" />
+                <Label htmlFor="coa-enabled">Change of Authorization (CoA)</Label>
+              </div>
+            </div>
           </div>
         </TabsContent>
 
@@ -863,7 +919,7 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold flex items-center justify-center gap-2">
           <Wand2 className="h-8 w-8 text-primary" />
-          1Xer Configuration Wizard
+          DotXer Config Gen
         </h1>
         <p className="text-muted-foreground">
           Generate comprehensive 802.1X configurations with AI-powered recommendations and industry best practices

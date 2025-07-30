@@ -28,7 +28,7 @@ const OneXerWizardPage: React.FC<OneXerWizardPageProps> = ({ projectId, siteId }
               🔧 Configuration Wizard
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              1Xer <span className="bg-gradient-primary bg-clip-text text-transparent">Configuration Wizard</span>
+              DotXer <span className="bg-gradient-primary bg-clip-text text-transparent">Config Gen</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Generate comprehensive 802.1X configurations with AI-powered recommendations, 

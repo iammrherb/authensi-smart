@@ -28,7 +28,7 @@ const Header = () => {
 
   const secondaryNavItems = [
     { title: "Resources", url: "/resources", icon: FolderOpen, active: ["/resources"], description: "Resource Center" },
-    { title: "1Xer Generator", url: "/onexer-wizard", icon: Settings, active: ["/onexer-wizard"], description: "802.1X Config Generator" },
+    { title: "DotXer Config Gen", url: "/onexer-wizard", icon: Settings, active: ["/onexer-wizard"], description: "802.1X Config Generator" },
     { title: "Use Cases", url: "/use-cases", icon: BookOpen, active: ["/use-cases"], description: "Knowledge Library" },
     { title: "Sites", url: "/sites", icon: Building2, active: ["/sites"], description: "Network Sites" },
     { title: "Requirements", url: "/requirements", icon: FileText, active: ["/requirements"], description: "Project Requirements" },
@@ -190,12 +190,12 @@ const Header = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center space-x-2 text-nav-foreground/80 hover:text-nav-foreground hover:bg-nav-hover/50">
                     <BookOpen className="h-4 w-4" />
-                    <span className="font-medium">1Xer Management</span>
+                    <span className="font-medium">Resources</span>
                     <ChevronDown className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>1Xer Resource Management</DropdownMenuLabel>
+                  <DropdownMenuLabel>Resources</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {secondaryNavItems.map((item) => (
                     <DropdownMenuItem key={item.url} asChild>
