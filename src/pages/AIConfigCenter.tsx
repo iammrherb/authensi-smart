@@ -1,24 +1,23 @@
 import React, { useState } from 'react';
-// TESTING COMPONENTS ONE BY ONE
-import OneXerConfigWizard from "@/components/config/OneXerConfigWizard";
-// import EnhancedConfigTemplateManager from "@/components/config/EnhancedConfigTemplateManager";
-// import ConfigGeneratorManager from "@/components/config/ConfigGeneratorManager";
+import ConfigWizardDialog from "@/components/config/ConfigWizardDialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, Settings, FileText, Sparkles, Zap, Target } from "lucide-react";
+import { Brain, Settings, FileText, Sparkles, Zap, Target, Plus } from "lucide-react";
 
 const AIConfigCenter = () => {
   const [activeTab, setActiveTab] = useState("wizard");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
 
   const handleConfigSave = (config: any) => {
     console.log('Configuration saved:', config);
-    // Handle save logic here
+    setIsWizardOpen(false);
   };
 
   const handleConfigCancel = () => {
-    window.history.back();
+    setIsWizardOpen(false);
   };
 
   return (
@@ -100,11 +99,20 @@ const AIConfigCenter = () => {
                   AI-powered 802.1X configuration generation with smart recommendations
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <OneXerConfigWizard 
-                  onSave={handleConfigSave}
-                  onCancel={handleConfigCancel}
-                />
+              <CardContent className="text-center space-y-6">
+                <div className="space-y-4">
+                  <p className="text-muted-foreground">
+                    Launch the comprehensive configuration wizard to generate custom 802.1X configurations with AI-powered recommendations.
+                  </p>
+                  <Button 
+                    onClick={() => setIsWizardOpen(true)}
+                    size="lg"
+                    className="bg-gradient-primary hover:opacity-90 transition-opacity"
+                  >
+                    <Plus className="h-5 w-5 mr-2" />
+                    Launch Configuration Wizard
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -148,6 +156,12 @@ const AIConfigCenter = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Configuration Wizard Dialog */}
+      <ConfigWizardDialog
+        isOpen={isWizardOpen}
+        onClose={handleConfigCancel}
+      />
     </div>
   );
 };
