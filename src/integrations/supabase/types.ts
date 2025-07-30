@@ -116,6 +116,196 @@ export type Database = {
         }
         Relationships: []
       }
+      configuration_files: {
+        Row: {
+          checksum: string | null
+          content_type: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          file_path: string | null
+          file_size: number | null
+          file_type: string | null
+          id: string
+          is_encrypted: boolean | null
+          metadata: Json | null
+          model_id: string | null
+          name: string
+          tags: Json | null
+          template_id: string | null
+          updated_at: string
+          vendor_id: string | null
+        }
+        Insert: {
+          checksum?: string | null
+          content_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          is_encrypted?: boolean | null
+          metadata?: Json | null
+          model_id?: string | null
+          name: string
+          tags?: Json | null
+          template_id?: string | null
+          updated_at?: string
+          vendor_id?: string | null
+        }
+        Update: {
+          checksum?: string | null
+          content_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          is_encrypted?: boolean | null
+          metadata?: Json | null
+          model_id?: string | null
+          name?: string
+          tags?: Json | null
+          template_id?: string | null
+          updated_at?: string
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "configuration_files_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "configuration_files_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "configuration_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "configuration_files_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_library"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      configuration_templates: {
+        Row: {
+          authentication_methods: Json | null
+          best_practices: Json | null
+          category: string
+          complexity_level: string | null
+          configuration_type: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_public: boolean | null
+          is_validated: boolean | null
+          model_id: string | null
+          name: string
+          network_requirements: Json | null
+          rating: number | null
+          required_features: Json | null
+          security_features: Json | null
+          subcategory: string | null
+          supported_scenarios: Json | null
+          tags: Json | null
+          template_content: string
+          template_variables: Json | null
+          troubleshooting_guide: Json | null
+          updated_at: string
+          usage_count: number | null
+          validation_commands: Json | null
+          validation_notes: string | null
+          vendor_id: string | null
+        }
+        Insert: {
+          authentication_methods?: Json | null
+          best_practices?: Json | null
+          category: string
+          complexity_level?: string | null
+          configuration_type: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          is_validated?: boolean | null
+          model_id?: string | null
+          name: string
+          network_requirements?: Json | null
+          rating?: number | null
+          required_features?: Json | null
+          security_features?: Json | null
+          subcategory?: string | null
+          supported_scenarios?: Json | null
+          tags?: Json | null
+          template_content: string
+          template_variables?: Json | null
+          troubleshooting_guide?: Json | null
+          updated_at?: string
+          usage_count?: number | null
+          validation_commands?: Json | null
+          validation_notes?: string | null
+          vendor_id?: string | null
+        }
+        Update: {
+          authentication_methods?: Json | null
+          best_practices?: Json | null
+          category?: string
+          complexity_level?: string | null
+          configuration_type?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          is_validated?: boolean | null
+          model_id?: string | null
+          name?: string
+          network_requirements?: Json | null
+          rating?: number | null
+          required_features?: Json | null
+          security_features?: Json | null
+          subcategory?: string | null
+          supported_scenarios?: Json | null
+          tags?: Json | null
+          template_content?: string
+          template_variables?: Json | null
+          troubleshooting_guide?: Json | null
+          updated_at?: string
+          usage_count?: number | null
+          validation_commands?: Json | null
+          validation_notes?: string | null
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "configuration_templates_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "configuration_templates_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_library"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       countries_regions: {
         Row: {
           country_code: string
@@ -241,6 +431,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      network_authentication_scenarios: {
+        Row: {
+          authentication_flow: Json
+          compliance_requirements: Json | null
+          configuration_steps: Json | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          required_components: Json | null
+          scenario_type: string
+          security_considerations: Json | null
+          troubleshooting_steps: Json | null
+          updated_at: string
+          use_cases: Json | null
+          vendor_specific_configs: Json | null
+        }
+        Insert: {
+          authentication_flow: Json
+          compliance_requirements?: Json | null
+          configuration_steps?: Json | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          required_components?: Json | null
+          scenario_type: string
+          security_considerations?: Json | null
+          troubleshooting_steps?: Json | null
+          updated_at?: string
+          use_cases?: Json | null
+          vendor_specific_configs?: Json | null
+        }
+        Update: {
+          authentication_flow?: Json
+          compliance_requirements?: Json | null
+          configuration_steps?: Json | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          required_components?: Json | null
+          scenario_type?: string
+          security_considerations?: Json | null
+          troubleshooting_steps?: Json | null
+          updated_at?: string
+          use_cases?: Json | null
+          vendor_specific_configs?: Json | null
+        }
+        Relationships: []
       }
       pain_points_library: {
         Row: {
@@ -1724,9 +1968,11 @@ export type Database = {
       vendor_library: {
         Row: {
           category: string
+          certifications: Json | null
           configuration_templates: Json | null
           created_at: string
           created_by: string | null
+          description: string | null
           documentation_links: Json | null
           firmware_requirements: Json | null
           id: string
@@ -1735,18 +1981,24 @@ export type Database = {
           last_tested_date: string | null
           models: Json | null
           portnox_compatibility: Json | null
+          portnox_documentation: Json | null
+          portnox_integration_level: string | null
           status: string | null
+          support_contact: Json | null
           support_level: string | null
           supported_protocols: Json | null
           updated_at: string
           vendor_name: string
           vendor_type: string
+          website_url: string | null
         }
         Insert: {
           category: string
+          certifications?: Json | null
           configuration_templates?: Json | null
           created_at?: string
           created_by?: string | null
+          description?: string | null
           documentation_links?: Json | null
           firmware_requirements?: Json | null
           id?: string
@@ -1755,18 +2007,24 @@ export type Database = {
           last_tested_date?: string | null
           models?: Json | null
           portnox_compatibility?: Json | null
+          portnox_documentation?: Json | null
+          portnox_integration_level?: string | null
           status?: string | null
+          support_contact?: Json | null
           support_level?: string | null
           supported_protocols?: Json | null
           updated_at?: string
           vendor_name: string
           vendor_type: string
+          website_url?: string | null
         }
         Update: {
           category?: string
+          certifications?: Json | null
           configuration_templates?: Json | null
           created_at?: string
           created_by?: string | null
+          description?: string | null
           documentation_links?: Json | null
           firmware_requirements?: Json | null
           id?: string
@@ -1775,14 +2033,80 @@ export type Database = {
           last_tested_date?: string | null
           models?: Json | null
           portnox_compatibility?: Json | null
+          portnox_documentation?: Json | null
+          portnox_integration_level?: string | null
           status?: string | null
+          support_contact?: Json | null
           support_level?: string | null
           supported_protocols?: Json | null
           updated_at?: string
           vendor_name?: string
           vendor_type?: string
+          website_url?: string | null
         }
         Relationships: []
+      }
+      vendor_models: {
+        Row: {
+          configuration_notes: string | null
+          created_at: string
+          created_by: string | null
+          documentation_links: Json | null
+          eol_date: string | null
+          eos_date: string | null
+          firmware_versions: Json | null
+          hardware_specs: Json | null
+          id: string
+          model_name: string
+          model_series: string | null
+          port_configurations: Json | null
+          supported_features: Json | null
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          configuration_notes?: string | null
+          created_at?: string
+          created_by?: string | null
+          documentation_links?: Json | null
+          eol_date?: string | null
+          eos_date?: string | null
+          firmware_versions?: Json | null
+          hardware_specs?: Json | null
+          id?: string
+          model_name: string
+          model_series?: string | null
+          port_configurations?: Json | null
+          supported_features?: Json | null
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          configuration_notes?: string | null
+          created_at?: string
+          created_by?: string | null
+          documentation_links?: Json | null
+          eol_date?: string | null
+          eos_date?: string | null
+          firmware_versions?: Json | null
+          hardware_specs?: Json | null
+          id?: string
+          model_name?: string
+          model_series?: string | null
+          port_configurations?: Json | null
+          supported_features?: Json | null
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_models_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_library"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
