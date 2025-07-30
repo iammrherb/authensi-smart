@@ -240,7 +240,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Log logout before signing out
       await logSecurityEvent('user_logout');
       
-      const { error } = await supabase.auth.signOut();
+      // Clear all sessions and sign out globally
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
+      
+      // Clear local state immediately
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      setUserRoles([]);
+      
+      // Clear any cached data in localStorage
+      localStorage.removeItem('supabase.auth.token');
+      localStorage.clear();
+      
       if (error) {
         toast({
           title: "Error",
@@ -250,15 +262,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         toast({
           title: "Success",
-          description: "Signed out successfully",
+          description: "Signed out successfully - all sessions cleared",
         });
+        
+        // Force redirect to auth page
+        window.location.href = '/auth';
       }
     } catch (error: any) {
+      // Even if there's an error, clear local state
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      setUserRoles([]);
+      localStorage.clear();
+      
       toast({
         title: "Error",
-        description: "An unexpected error occurred",
+        description: "An unexpected error occurred during logout",
         variant: "destructive"
       });
+      
+      // Still redirect to auth page
+      window.location.href = '/auth';
     }
   };
 
