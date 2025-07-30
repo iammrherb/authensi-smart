@@ -82,11 +82,6 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
   const generateWithAI = useGenerateConfigWithAI();
   const { toast } = useToast();
 
-  // Filter vendor models based on selected vendor
-  const vendorModels = allVendorModels?.filter(model => 
-    !wizardData.basic.vendor || model.vendor_id === wizardData.basic.vendor
-  );
-
   // Wizard state
   const [currentStep, setCurrentStep] = useState(0);
   const [wizardData, setWizardData] = useState<any>({
@@ -130,7 +125,10 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
     }
   });
 
-  // Predefined scenarios
+  // Filter vendor models based on selected vendor (defined after wizardData)
+  const vendorModels = allVendorModels?.filter(model => 
+    !wizardData.basic.vendor || model.vendor_id === wizardData.basic.vendor
+  );
   const configurationScenarios: ConfigurationScenario[] = [
     {
       id: 'basic-dot1x',
