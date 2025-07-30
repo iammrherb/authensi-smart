@@ -39,6 +39,7 @@ import ImplementationCenter from "./pages/ImplementationCenter";
 import Resources from "./pages/Resources";
 import OneXerWizardPage from "./pages/OneXerWizard";
 import AIConfigCenter from "./pages/AIConfigCenter";
+import ProjectMasterHub from "./pages/ProjectMasterHub";
 
 const queryClient = new QueryClient();
 
@@ -86,6 +87,11 @@ const App = () => (
               } />
               
               {/* Project Management */}
+              <Route path="/project-master-hub" element={
+                <ProtectedRoute>
+                  <ProjectMasterHub />
+                </ProtectedRoute>
+              } />
               <Route path="/tracker" element={
                 <ProtectedRoute>
                   <Tracker />

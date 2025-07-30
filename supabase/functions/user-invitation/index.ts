@@ -44,8 +44,15 @@ serve(async (req) => {
     }
 
     const url = new URL(req.url);
-    const pathParts = url.pathname.split('/');
-    const action = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+    const pathParts = url.pathname.split('/').filter(part => part);
+    
+    // Handle different endpoint patterns:
+    // /user-invitation/invite, /user-invitation/approve, /user-invitation/accept, /user-invitation/pending, /user-invitation/validate
+    let action = '';
+    
+    if (pathParts.length >= 2) {
+      action = pathParts[pathParts.length - 1];
+    }
     
     console.log('Request details:', {
       method: req.method,
@@ -243,7 +250,8 @@ serve(async (req) => {
       }
     }
 
-    throw new Error('Invalid endpoint');
+    console.error('Invalid endpoint requested:', { method: req.method, pathname: url.pathname, action });
+    throw new Error(`Invalid endpoint: ${req.method} ${url.pathname}`);
 
   } catch (error) {
     console.error('User invitation error:', error);
