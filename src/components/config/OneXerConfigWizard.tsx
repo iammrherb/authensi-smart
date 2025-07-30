@@ -75,12 +75,17 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
 }) => {
   const { data: templates } = useConfigTemplates();
   const { data: vendors } = useEnhancedVendors();
-  const { data: vendorModels } = useVendorModels();
+  const { data: allVendorModels } = useVendorModels();
   const { data: useCases } = useUseCases();
   const { data: requirements } = useRequirements();
   const createTemplate = useCreateConfigTemplate();
   const generateWithAI = useGenerateConfigWithAI();
   const { toast } = useToast();
+
+  // Filter vendor models based on selected vendor
+  const vendorModels = allVendorModels?.filter(model => 
+    !wizardData.basic.vendor || model.vendor_id === wizardData.basic.vendor
+  );
 
   // Wizard state
   const [currentStep, setCurrentStep] = useState(0);
@@ -384,37 +389,89 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
           <Label>Vendor</Label>
           <Select
             value={wizardData.basic.vendor}
-            onValueChange={(value) => updateWizardData('basic', { vendor: value })}
+            onValueChange={(value) => {
+              updateWizardData('basic', { vendor: value, model: '' }); // Reset model when vendor changes
+            }}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select vendor" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-[300px] overflow-y-auto bg-background border shadow-lg z-50">
               {vendors?.map(vendor => (
                 <SelectItem key={vendor.id} value={vendor.id}>
-                  {vendor.vendor_name}
+                  <div className="flex items-center justify-between w-full">
+                    <span>{vendor.vendor_name}</span>
+                    <Badge variant="outline" className="ml-2 text-xs">
+                      {vendor.category}
+                    </Badge>
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
         <div className="space-y-2">
-          <Label>Model (Optional)</Label>
+          <Label>Model {vendorModels && vendorModels.length > 0 ? '' : '(Optional)'}</Label>
           <Select
             value={wizardData.basic.model}
             onValueChange={(value) => updateWizardData('basic', { model: value })}
+            disabled={!wizardData.basic.vendor}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select model" />
+              <SelectValue placeholder={wizardData.basic.vendor ? "Select model" : "Select vendor first"} />
             </SelectTrigger>
-            <SelectContent>
-              {vendorModels?.filter(m => !wizardData.basic.vendor || m.vendor_id === wizardData.basic.vendor).map(model => (
+            <SelectContent className="max-h-[300px] overflow-y-auto bg-background border shadow-lg z-50">
+              {vendorModels?.map(model => (
                 <SelectItem key={model.id} value={model.id}>
-                  {model.model_name}
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">{model.model_name}</span>
+                    {model.model_series && (
+                      <span className="text-xs text-muted-foreground">{model.model_series}</span>
+                    )}
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {model.supported_features?.slice(0, 2).map((feature: string) => (
+                        <Badge key={feature} variant="outline" className="text-xs">
+                          {feature}
+                        </Badge>
+                      ))}
+                      {model.supported_features && model.supported_features.length > 2 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{model.supported_features.length - 2}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          {wizardData.basic.model && (
+            <div className="mt-2 p-2 bg-muted rounded-md">
+              {(() => {
+                const selectedModel = vendorModels?.find(m => m.id === wizardData.basic.model);
+                return selectedModel ? (
+                  <div className="text-sm">
+                    <p className="font-medium">{selectedModel.model_name}</p>
+                    {selectedModel.configuration_notes && (
+                      <p className="text-muted-foreground mt-1">{selectedModel.configuration_notes}</p>
+                    )}
+                    {selectedModel.firmware_versions && selectedModel.firmware_versions.length > 0 && (
+                      <div className="mt-2">
+                        <span className="text-xs font-medium">Supported Firmware:</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {selectedModel.firmware_versions.slice(0, 3).map((version: string) => (
+                            <Badge key={version} variant="secondary" className="text-xs">
+                              {version}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : null;
+              })()}
+            </div>
+          )}
         </div>
       </div>
 
@@ -423,8 +480,35 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
         <Input
           value={wizardData.basic.firmwareVersion}
           onChange={(e) => updateWizardData('basic', { firmwareVersion: e.target.value })}
-          placeholder="e.g., 16.12.04, 15.2(4)S7"
+          placeholder={(() => {
+            const selectedModel = vendorModels?.find(m => m.id === wizardData.basic.model);
+            if (selectedModel?.firmware_versions && selectedModel.firmware_versions.length > 0) {
+              return `e.g., ${selectedModel.firmware_versions[0]}`;
+            }
+            return "e.g., 16.12.04, 15.2(4)S7";
+          })()}
         />
+        {(() => {
+          const selectedModel = vendorModels?.find(m => m.id === wizardData.basic.model);
+          return selectedModel?.firmware_versions && selectedModel.firmware_versions.length > 0 ? (
+            <div className="mt-2">
+              <span className="text-xs text-muted-foreground">Recommended versions:</span>
+              <div className="flex flex-wrap gap-1 mt-1">
+                {selectedModel.firmware_versions.map((version: string) => (
+                  <Button
+                    key={version}
+                    variant="outline"
+                    size="sm"
+                    className="h-6 text-xs"
+                    onClick={() => updateWizardData('basic', { firmwareVersion: version })}
+                  >
+                    {version}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          ) : null;
+        })()}
       </div>
     </div>
   );

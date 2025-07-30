@@ -31,9 +31,11 @@ const navigationItems = [
     badge: "AI+",
     items: [
       { title: "Command Center", url: "/", icon: Target, description: "Project management hub" },
+      { title: "Project Master Hub", url: "/project-master-hub", icon: TrendingUp, description: "Unified project lifecycle management" },
       { title: "Intelligence Tracker Hub", url: "/intelligence", icon: Brain, description: "Unified AI-powered intelligence & project management" },
       { title: "AI Scoping Wizard", url: "/scoping", icon: Lightbulb, description: "Intelligent project scoping" },
       { title: "Project Tracker", url: "/tracker", icon: Zap, description: "Unified project tracking" },
+      { title: "AI Config Center", url: "/ai-config", icon: Sparkles, description: "AI-powered configuration generator" },
       { title: "Analytics Hub", url: "/reports", icon: BarChart3, description: "Performance insights" },
     ]
   },
@@ -116,9 +118,15 @@ export function AppSidebar() {
                 </Link>
               </SidebarMenuButton>
               <SidebarMenuButton asChild className="w-full justify-start text-xs hover:bg-primary/10 border border-primary/20 rounded-lg h-9">
-                <Link to="/intelligence" className="px-2">
-                  <Brain className="h-3 w-3 mr-2" />
-                  Intelligence Hub
+                <Link to="/project-master-hub" className="px-2">
+                  <TrendingUp className="h-3 w-3 mr-2" />
+                  Project Master
+                </Link>
+              </SidebarMenuButton>
+              <SidebarMenuButton asChild className="w-full justify-start text-xs hover:bg-primary/10 border border-primary/20 rounded-lg h-9">
+                <Link to="/ai-config" className="px-2">
+                  <Sparkles className="h-3 w-3 mr-2" />
+                  AI Config
                 </Link>
               </SidebarMenuButton>
             </div>
