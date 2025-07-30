@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import OneXerConfigWizard from "@/components/config/OneXerConfigWizard";
-import EnhancedConfigTemplateManager from "@/components/config/EnhancedConfigTemplateManager";
-import ConfigGeneratorManager from "@/components/config/ConfigGeneratorManager";
+// TEMPORARILY COMMENTING OUT PROBLEM COMPONENTS
+// import OneXerConfigWizard from "@/components/config/OneXerConfigWizard";
+// import EnhancedConfigTemplateManager from "@/components/config/EnhancedConfigTemplateManager";
+// import ConfigGeneratorManager from "@/components/config/ConfigGeneratorManager";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,8 +35,8 @@ const AIConfigCenter = () => {
                 <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center shadow-glow">
                   <Brain className="text-2xl text-primary-foreground animate-pulse" />
                 </div>
-                <Badge variant="glow" className="text-sm px-4 py-2">
-                  Intelligent Configuration Suite
+                <Badge variant="secondary" className="text-sm px-4 py-2">
+                  Intelligent Configuration Suite (DEBUGGING)
                 </Badge>
               </div>
               
@@ -47,9 +48,7 @@ const AIConfigCenter = () => {
               </h1>
               
               <p className="text-lg text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-                Revolutionary AI-powered 802.1X configuration generation. Create, manage, and deploy 
-                enterprise-grade network access control configurations with intelligent automation, 
-                best practices, and seamless integration across your entire infrastructure.
+                Temporarily disabled components to isolate JavaScript initialization error.
               </p>
 
               {/* Quick Stats */}
@@ -98,14 +97,14 @@ const AIConfigCenter = () => {
                   <CardTitle className="text-2xl">Intelligent Configuration Wizard</CardTitle>
                 </div>
                 <CardDescription className="text-base">
-                  Step-by-step guided configuration with AI-powered recommendations
+                  Component temporarily disabled for debugging
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <OneXerConfigWizard 
-                  onSave={handleConfigSave}
-                  onCancel={handleConfigCancel}
-                />
+                <p className="text-center text-muted-foreground">
+                  OneXerConfigWizard component temporarily disabled to isolate the JavaScript error.
+                  If this page loads without errors, the issue is in that component.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -118,11 +117,13 @@ const AIConfigCenter = () => {
                   <CardTitle className="text-2xl">Configuration Templates</CardTitle>
                 </div>
                 <CardDescription className="text-base">
-                  Manage and customize pre-built configuration templates for various scenarios
+                  Component temporarily disabled for debugging
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <EnhancedConfigTemplateManager />
+                <p className="text-center text-muted-foreground">
+                  EnhancedConfigTemplateManager component temporarily disabled to isolate the JavaScript error.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -135,11 +136,13 @@ const AIConfigCenter = () => {
                   <CardTitle className="text-2xl">AI Configuration Generator</CardTitle>
                 </div>
                 <CardDescription className="text-base">
-                  Advanced AI-powered configuration generation with custom requirements
+                  Component temporarily disabled for debugging
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ConfigGeneratorManager searchTerm={searchTerm} />
+                <p className="text-center text-muted-foreground">
+                  ConfigGeneratorManager component temporarily disabled to isolate the JavaScript error.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
