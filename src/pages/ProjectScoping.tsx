@@ -5,7 +5,7 @@ import { EnhancedCard } from "@/components/ui/enhanced-card";
 import { EnhancedButton } from "@/components/ui/enhanced-button";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle, Bot } from "lucide-react";
-import ComprehensiveAIScopingWizard from "@/components/scoping/ComprehensiveAIScopingWizard";
+import IntelligentAIScopingWizard from "@/components/scoping/IntelligentAIScopingWizard";
 import AIAssistant from "@/components/ai/AIAssistant";
 
 const ProjectScoping = () => {
@@ -81,7 +81,7 @@ const ProjectScoping = () => {
             </CardContent>
           </EnhancedCard>
 
-          <ComprehensiveAIScopingWizard
+          <IntelligentAIScopingWizard
             projectId={projectId!}
             onComplete={handleScopingComplete}
             onCancel={handleCancel}
