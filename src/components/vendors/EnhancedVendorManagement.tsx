@@ -10,26 +10,32 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { useVendors, useCreateVendor, type Vendor } from "@/hooks/useVendors";
+import { useEnhancedVendors, useCreateEnhancedVendor, type EnhancedVendor } from "@/hooks/useEnhancedVendors";
 import { CheckCircle, XCircle, AlertCircle, Plus, Search, ExternalLink, Edit, Trash2, Star, Globe, Phone, Mail } from "lucide-react";
 
 const EnhancedVendorManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+  const [selectedVendor, setSelectedVendor] = useState<EnhancedVendor | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  const { data: vendorsFromDB = [], isLoading } = useVendors();
-  const createVendor = useCreateVendor();
+  const { data: vendorsFromDB = [], isLoading } = useEnhancedVendors();
+  const createVendor = useCreateEnhancedVendor();
 
   // Enhanced mock data for comprehensive vendor management
-  const comprehensiveVendors: Vendor[] = [
+  const comprehensiveVendors: EnhancedVendor[] = [
     {
       id: "portnox-001",
       vendor_name: "Portnox",
       vendor_type: "Primary NAC",
       category: "NAC",
+      description: "Leading network access control solution with advanced policy management",
+      website_url: "https://www.portnox.com",
+      support_contact: { email: "support@portnox.com", phone: "+1-800-PORTNOX" },
+      certifications: ["Common Criteria", "FIPS 140-2", "ISO 27001"],
+      portnox_integration_level: "native",
+      portnox_documentation: { available: true, guides: 15, api_docs: true },
       models: ["CORE", "CLEAR", "EDGE"],
       supported_protocols: ["RADIUS", "802.1X", "MAB", "TACACS+", "LDAP"],
       integration_methods: ["Native API", "REST API", "SAML", "SCIM"],
@@ -54,6 +60,12 @@ const EnhancedVendorManagement = () => {
       vendor_name: "Cisco Meraki",
       vendor_type: "Wireless Controller",
       category: "Wireless",
+      description: "Cloud-managed wireless infrastructure with advanced analytics",
+      website_url: "https://meraki.cisco.com",
+      support_contact: { email: "support@meraki.com", phone: "+1-415-432-1000" },
+      certifications: ["FCC", "IC", "Wi-Fi 6 Certified"],
+      portnox_integration_level: "certified",
+      portnox_documentation: { available: true, guides: 8, api_docs: true },
       models: ["MR46", "MR56", "MR86", "MR46E", "MR57"],
       supported_protocols: ["802.11ax", "802.11ac", "WPA3-Enterprise", "RADSec"],
       integration_methods: ["Cloud API", "Dashboard API", "Webhook"],
@@ -77,6 +89,12 @@ const EnhancedVendorManagement = () => {
       vendor_name: "Palo Alto Networks",
       vendor_type: "Next-Gen Firewall",
       category: "Security",
+      description: "Next-generation firewall with advanced threat prevention",
+      website_url: "https://www.paloaltonetworks.com",
+      support_contact: { email: "support@paloaltonetworks.com", phone: "+1-866-320-4788" },
+      certifications: ["Common Criteria", "FIPS 140-2", "ICSA"],
+      portnox_integration_level: "certified",
+      portnox_documentation: { available: true, guides: 12, api_docs: true },
       models: ["PA-220", "PA-820", "PA-3220", "PA-5220", "VM-Series"],
       supported_protocols: ["User-ID", "GlobalProtect", "WildFire API"],
       integration_methods: ["XML API", "REST API", "User-ID Agent"],
@@ -100,6 +118,12 @@ const EnhancedVendorManagement = () => {
       vendor_name: "Microsoft Intune",
       vendor_type: "Mobile Device Management",
       category: "MDM",
+      description: "Cloud-based mobile device and application management service",
+      website_url: "https://www.microsoft.com/intune",
+      support_contact: { email: "intunesupport@microsoft.com", phone: "+1-800-Microsoft" },
+      certifications: ["SOC 2", "ISO 27001", "FedRAMP"],
+      portnox_integration_level: "certified",
+      portnox_documentation: { available: true, guides: 6, api_docs: true },
       models: ["Cloud Service"],
       supported_protocols: ["SCEP", "PKCS", "Azure AD", "Graph API"],
       integration_methods: ["Graph API", "PowerShell", "Azure Logic Apps"],

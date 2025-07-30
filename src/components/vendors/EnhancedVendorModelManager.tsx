@@ -15,7 +15,7 @@ import {
   useUpdateVendorModel, 
   useDeleteVendorModel,
   type VendorModel 
-} from "@/hooks/useVendorModels";
+} from "@/hooks/useEnhancedVendors";
 import { useEnhancedVendors } from "@/hooks/useEnhancedVendors";
 import { 
   Plus, 

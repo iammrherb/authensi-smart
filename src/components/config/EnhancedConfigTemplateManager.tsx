@@ -19,7 +19,7 @@ import {
   type ConfigTemplate 
 } from "@/hooks/useConfigTemplates";
 import { useEnhancedVendors } from "@/hooks/useEnhancedVendors";
-import { useVendorModels } from "@/hooks/useVendorModels";
+import { useVendorModels } from "@/hooks/useEnhancedVendors";
 import { 
   Plus, 
   Edit, 
