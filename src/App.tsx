@@ -38,6 +38,7 @@ import IntelligenceTrackerHub from "./pages/IntelligenceTrackerHub";
 import ImplementationCenter from "./pages/ImplementationCenter";
 import Resources from "./pages/Resources";
 import OneXerWizardPage from "./pages/OneXerWizard";
+import AIConfigCenter from "./pages/AIConfigCenter";
 
 const queryClient = new QueryClient();
 
@@ -116,15 +117,22 @@ const App = () => (
                 </ProtectedRoute>
               } />
               
-              {/* Knowledge & Resources */}
-              <Route path="/resources" element={
+              {/* AI Configuration Center */}
+              <Route path="/ai-config" element={
                 <ProtectedRoute>
-                  <Resources />
+                  <AIConfigCenter />
                 </ProtectedRoute>
               } />
               <Route path="/onexer-wizard" element={
                 <ProtectedRoute>
                   <OneXerWizardPage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Knowledge & Resources */}
+              <Route path="/resources" element={
+                <ProtectedRoute>
+                  <Resources />
                 </ProtectedRoute>
               } />
               <Route path="/use-cases" element={

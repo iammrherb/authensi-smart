@@ -22,13 +22,13 @@ const Header = () => {
     { title: "Command Center", url: "/", icon: Target, active: ["/", "/dashboard"], description: "AI Hub & Overview" },
     { title: "AI Scoping", url: "/scoping", icon: Sparkles, active: ["/scoping"], description: "Intelligent Project Scoping" },
     { title: "Project Tracker", url: "/tracker", icon: Zap, active: ["/tracker", "/project"], description: "Live Project Management" },
+    { title: "AI Config Gen1Xer", url: "/ai-config", icon: Settings, active: ["/ai-config", "/onexer-wizard"], description: "Intelligent 802.1X Config" },
     { title: "Implementation", url: "/implementation", icon: Rocket, active: ["/implementation"], description: "Deployment Center" },
     { title: "Analytics", url: "/reports", icon: BarChart3, active: ["/reports"], description: "Performance Insights" },
   ];
 
   const secondaryNavItems = [
     { title: "Resources", url: "/resources", icon: FolderOpen, active: ["/resources"], description: "Resource Center" },
-    { title: "DotXer Config Gen", url: "/onexer-wizard", icon: Settings, active: ["/onexer-wizard"], description: "802.1X Config Generator" },
     { title: "Use Cases", url: "/use-cases", icon: BookOpen, active: ["/use-cases"], description: "Knowledge Library" },
     { title: "Sites", url: "/sites", icon: Building2, active: ["/sites"], description: "Network Sites" },
     { title: "Requirements", url: "/requirements", icon: FileText, active: ["/requirements"], description: "Project Requirements" },
