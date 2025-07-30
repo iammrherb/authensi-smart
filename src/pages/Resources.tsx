@@ -60,10 +60,10 @@ const Resources = () => {
       color: "orange"
     },
     {
-      title: "Config Templates",
+      title: "1Xer Templates",
       count: 89,
       icon: <Code className="h-5 w-5" />,
-      description: "Switch and device configuration templates with AI generation",
+      description: "Advanced 802.1X configuration templates with AI generation and scenarios",
       color: "cyan"
     }
   ];
@@ -158,7 +158,7 @@ const Resources = () => {
                 </TabsTrigger>
                 <TabsTrigger value="config-generator" className="flex items-center gap-2">
                   <Code className="h-4 w-4" />
-                  <span className="hidden sm:inline">Config Gen</span>
+                  <span className="hidden sm:inline">1Xer Gen</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -227,11 +227,11 @@ const Resources = () => {
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2 mb-4">
                     <Code className="h-6 w-6 text-primary" />
-                    <h2 className="text-2xl font-bold">Configuration Generator</h2>
+                    <h2 className="text-2xl font-bold">1Xer Configuration Generator</h2>
                   </div>
                   <p className="text-muted-foreground mb-6">
-                    AI-powered configuration generator for switches and network devices. 
-                    Generate 802.1x configurations for all supported wired vendors.
+                    Advanced AI-powered 802.1X configuration generator with templates, scenarios, and industry best practices. 
+                    Generate, customize, and save configurations for all supported vendors with full lifecycle management.
                   </p>
                 </div>
                 <ConfigGeneratorManager searchTerm={searchTerm} />

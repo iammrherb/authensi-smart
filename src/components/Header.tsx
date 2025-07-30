@@ -189,12 +189,12 @@ const Header = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center space-x-2 text-nav-foreground/80 hover:text-nav-foreground hover:bg-nav-hover/50">
                     <BookOpen className="h-4 w-4" />
-                    <span className="font-medium">Resources</span>
+                    <span className="font-medium">1Xer Management</span>
                     <ChevronDown className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>Resource Management</DropdownMenuLabel>
+                  <DropdownMenuLabel>1Xer Resource Management</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {secondaryNavItems.map((item) => (
                     <DropdownMenuItem key={item.url} asChild>

@@ -287,8 +287,8 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
           <Dialog open={isAIGeneratorOpen} onOpenChange={setIsAIGeneratorOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0">
-                <Bot className="h-4 w-4 mr-2" />
-                AI Generator
+                <Wand2 className="h-4 w-4 mr-2" />
+                1Xer Wizard
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
