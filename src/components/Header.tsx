@@ -194,7 +194,11 @@ const Header = () => {
                     <ChevronDown className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent 
+                  align="end" 
+                  className="w-56 bg-background/95 backdrop-blur-sm border shadow-lg z-50"
+                  sideOffset={8}
+                >
                   <DropdownMenuLabel>1Xer Resource Management</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {secondaryNavItems.map((item) => (
