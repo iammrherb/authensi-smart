@@ -242,25 +242,45 @@ const Resources = () => {
             <div className="bg-muted/50 rounded-lg p-6 mt-8">
               <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  className="h-auto p-4 flex flex-col items-center gap-2"
+                  onClick={() => {/* Add template creation logic */}}
+                >
                   <Plus className="h-5 w-5" />
                   <span className="text-sm">New Template</span>
                 </Button>
-                <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  className="h-auto p-4 flex flex-col items-center gap-2"
+                  onClick={() => {/* Add use case creation logic */}}
+                >
                   <BookOpen className="h-5 w-5" />
                   <span className="text-sm">Add Use Case</span>
                 </Button>
-                <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  className="h-auto p-4 flex flex-col items-center gap-2"
+                  onClick={() => {/* Add requirement creation logic */}}
+                >
                   <FileText className="h-5 w-5" />
                   <span className="text-sm">New Requirement</span>
                 </Button>
-                <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  className="h-auto p-4 flex flex-col items-center gap-2"
+                  onClick={() => {/* Add vendor creation logic */}}
+                >
                   <HardDrive className="h-5 w-5" />
                   <span className="text-sm">Add Vendor</span>
                 </Button>
-                <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  className="h-auto p-4 flex flex-col items-center gap-2"
+                  onClick={() => {/* Add config creation logic */}}
+                >
                   <Code className="h-5 w-5" />
-                  <span className="text-sm">New Config</span>
+                  <span className="text-sm">New 1Xer Config</span>
                 </Button>
               </div>
             </div>
