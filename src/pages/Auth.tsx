@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
-import { Shield, Users, Building2, Eye, EyeOff, Network, Lock, Zap, CheckCircle, Mail, ArrowRight, Sparkles } from 'lucide-react';
+import { Shield, Users, Building2, Eye, EyeOff, Network, Lock, Zap, CheckCircle, Mail, ArrowRight, Sparkles, RotateCcw } from 'lucide-react';
 import portnoxLogo from '@/assets/portnox-logo.png';
 
 const Auth = () => {
@@ -17,6 +17,8 @@ const Auth = () => {
     password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
 
   // Redirect if already authenticated
   if (user) {
@@ -31,7 +33,7 @@ const Auth = () => {
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary/20 border-t-primary mx-auto mb-4"></div>
             <Shield className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 text-primary animate-pulse" />
           </div>
-          <p className="text-muted-foreground animate-pulse">Initializing NAC Tracker Platform...</p>
+          <p className="text-muted-foreground animate-pulse">Initializing Track and NAC Master Platform...</p>
         </div>
       </div>
     );
@@ -55,6 +57,14 @@ const Auth = () => {
     }));
   };
 
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: Implement password reset functionality
+    console.log('Password reset for:', resetEmail);
+    setShowResetPassword(false);
+    setResetEmail('');
+  };
+
   const features = [
     { icon: Network, text: "Zero Trust Mastery", color: "text-cyan-400" },
     { icon: Shield, text: "Security Fortress", color: "text-emerald-400" },
@@ -72,29 +82,32 @@ const Auth = () => {
             <img 
               src={portnoxLogo} 
               alt="Portnox Logo" 
-              className="h-12 w-auto"
+              className="h-20 w-auto filter drop-shadow-xl"
             />
             <div>
-              <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent animate-fade-in">
-                NAC TRACKER
+              <div className="text-4xl font-black bg-gradient-primary bg-clip-text text-transparent animate-fade-in leading-tight">
+                TRACK AND NAC MASTER
               </div>
-              <div className="text-sm text-muted-foreground font-medium animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                🧠 AI-Powered • 🎯 Workflow Master • 📊 Analytics • 🚀 Deployment Expert
+              <div className="text-lg font-bold text-muted-foreground animate-fade-in mt-2" style={{ animationDelay: '0.2s' }}>
+                Scoping Slayer • Deployment Maestro • Config Generator Supreme
+              </div>
+              <div className="text-sm font-medium text-accent animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                🧠 Unofficial Intelligence Insights and Analytics
               </div>
             </div>
           </div>
           
           <div className="space-y-6">
-            <h1 className="text-4xl font-bold leading-tight">
+            <h1 className="text-5xl font-black leading-tight">
               Welcome to the Ultimate
               <span className="bg-gradient-primary bg-clip-text text-transparent block">
-                NAC Implementation Platform
+                NAC Intelligence Platform
               </span>
             </h1>
             
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              Transform complex NAC deployments into manageable, repeatable successes with 
-              AI-powered scoping, comprehensive use case library, and intelligent tracking.
+            <p className="text-xl text-muted-foreground leading-relaxed font-medium">
+              Transform complex NAC deployments into effortless victories with our 
+              AI-powered scoping slayer, deployment maestro, and config generator supreme.
             </p>
             
             <div className="grid grid-cols-2 gap-4">
@@ -124,9 +137,9 @@ const Auth = () => {
             <CardHeader className="space-y-6 pb-8">
               <div className="text-center lg:hidden">
                 <div className="flex items-center justify-center gap-3 mb-4">
-                  <img src={portnoxLogo} alt="Portnox" className="h-8 w-auto" />
-                  <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent animate-fade-in">
-                    NAC TRACKER
+                  <img src={portnoxLogo} alt="Portnox" className="h-12 w-auto filter drop-shadow-lg" />
+                  <span className="text-2xl font-black bg-gradient-primary bg-clip-text text-transparent animate-fade-in">
+                    TRACK AND NAC MASTER
                   </span>
                 </div>
               </div>
@@ -141,42 +154,6 @@ const Auth = () => {
             </CardHeader>
 
             <CardContent className="space-y-6">
-              
-              {/* Quick Auth Options */}
-              <div className="space-y-3">
-                <Button 
-                  variant="outline" 
-                  className="w-full h-11 relative overflow-hidden group hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-blue-600/10 border-blue-200 hover:border-blue-400 transition-all"
-                  onClick={() => {/* TODO: Implement Azure auth */}}
-                >
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="w-5 h-5 bg-gradient-to-r from-blue-500 to-blue-600 rounded"></div>
-                    <span className="font-medium">Continue with Microsoft Azure</span>
-                  </div>
-                  <ArrowRight className="h-4 w-4 absolute right-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  className="w-full h-11 relative overflow-hidden group hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/20 border-primary/20 hover:border-primary/40 transition-all"
-                  onClick={() => {/* TODO: Implement Magic Link */}}
-                >
-                  <div className="flex items-center justify-center gap-3">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                    <span className="font-medium">Magic Link (Passwordless)</span>
-                  </div>
-                  <ArrowRight className="h-4 w-4 absolute right-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </div>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <Separator className="w-full" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">Or continue with email</span>
-                </div>
-              </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
 
@@ -250,7 +227,70 @@ const Auth = () => {
                 </Button>
               </form>
 
-              <div className="text-center mt-4">
+              {!showResetPassword && (
+                <div className="text-center">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowResetPassword(true)}
+                    className="text-primary hover:text-primary/80 font-medium"
+                  >
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Forgot Password?
+                  </Button>
+                </div>
+              )}
+
+              {showResetPassword && (
+                <form onSubmit={handlePasswordReset} className="space-y-4 border-t pt-4">
+                  <div className="text-center mb-4">
+                    <h3 className="font-semibold text-sm">Reset Password</h3>
+                    <p className="text-xs text-muted-foreground">Enter your email to receive reset instructions</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="resetEmail" className="text-sm font-medium">
+                      Email Address
+                    </Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="resetEmail"
+                        type="email"
+                        placeholder="Enter your email"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        required
+                        className="pl-10 h-10"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setShowResetPassword(false);
+                        setResetEmail('');
+                      }}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      size="sm"
+                      className="flex-1 bg-gradient-primary hover:opacity-90"
+                    >
+                      Send Reset Link
+                    </Button>
+                  </div>
+                </form>
+              )}
+
+              <div className="text-center mt-6">
                 <p className="text-sm text-muted-foreground">
                   Need an account? Contact your administrator for an invitation.
                 </p>
