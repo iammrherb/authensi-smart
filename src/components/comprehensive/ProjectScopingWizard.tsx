@@ -13,7 +13,7 @@ import { ChevronRight, ChevronLeft, Save, CheckCircle, AlertTriangle } from "luc
 import { useCreateProject } from "@/hooks/useProjects";
 import { useUseCases } from "@/hooks/useUseCases";
 import { useRequirements } from "@/hooks/useRequirements";
-import { useEnhancedVendors } from "@/hooks/useEnhancedVendors";
+import { useEnhancedVendors } from "@/hooks/useVendors";
 
 interface ProjectScopingData {
   // Basic Project Info

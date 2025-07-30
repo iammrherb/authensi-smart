@@ -18,7 +18,8 @@ import {
   useGenerateConfigWithAI,
   type ConfigTemplate 
 } from "@/hooks/useConfigTemplates";
-import { useEnhancedVendors, useVendorModels } from "@/hooks/useEnhancedVendors";
+import { useEnhancedVendors } from "@/hooks/useVendors";
+import { useVendorModels } from "@/hooks/useVendorModels";
 import { 
   Plus, 
   Edit, 

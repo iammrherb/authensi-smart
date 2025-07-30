@@ -18,7 +18,7 @@ import {
   Cpu, HardDrive, Printer, Camera, Phone, Tablet, Laptop
 } from 'lucide-react';
 
-import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
+import { useEnhancedVendors } from '@/hooks/useVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { useCreateProject, useUpdateProject } from '@/hooks/useProjects';

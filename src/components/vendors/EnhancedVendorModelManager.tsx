@@ -14,9 +14,9 @@ import {
   useCreateVendorModel, 
   useUpdateVendorModel, 
   useDeleteVendorModel,
-  useEnhancedVendors,
   type VendorModel 
-} from "@/hooks/useEnhancedVendors";
+} from "@/hooks/useVendorModels";
+import { useEnhancedVendors } from "@/hooks/useVendors";
 import { 
   Plus, 
   Edit, 

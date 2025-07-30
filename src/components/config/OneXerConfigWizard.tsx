@@ -41,7 +41,8 @@ import {
   Edit
 } from 'lucide-react';
 import { useConfigTemplates, useCreateConfigTemplate, useGenerateConfigWithAI } from '@/hooks/useConfigTemplates';
-import { useEnhancedVendors, useVendorModels } from '@/hooks/useEnhancedVendors';
+import { useEnhancedVendors } from '@/hooks/useVendors';
+import { useVendorModels } from '@/hooks/useVendorModels';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { useToast } from '@/hooks/use-toast';

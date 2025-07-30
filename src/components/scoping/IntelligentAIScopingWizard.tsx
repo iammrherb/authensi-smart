@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 import { useAI } from '@/hooks/useAI';
-import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
+import { useEnhancedVendors } from '@/hooks/useVendors';
 import { usePainPoints } from '@/hooks/usePainPoints';
 import { useRecommendations } from '@/hooks/useRecommendations';
 import { useCreateProject } from '@/hooks/useProjects';

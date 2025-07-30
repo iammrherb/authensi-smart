@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { useEnhancedVendors, useCreateEnhancedVendor, type EnhancedVendor } from "@/hooks/useEnhancedVendors";
+import { useEnhancedVendors, useCreateEnhancedVendor, type EnhancedVendor } from "@/hooks/useVendors";
 import { CheckCircle, XCircle, AlertCircle, Plus, Search, ExternalLink, Edit, Trash2, Star, Globe, Phone, Mail } from "lucide-react";
 
 const EnhancedVendorManagement = () => {

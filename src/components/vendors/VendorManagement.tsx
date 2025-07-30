@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
-import { useEnhancedVendors, useCreateEnhancedVendor, type EnhancedVendor } from "@/hooks/useEnhancedVendors";
+import { useEnhancedVendors, useCreateEnhancedVendor, type EnhancedVendor } from "@/hooks/useVendors";
 import { CheckCircle, XCircle, AlertCircle, Plus, Search, ExternalLink, Edit, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
