@@ -38,6 +38,7 @@ import ProjectDetails from "./pages/ProjectDetails";
 import IntelligenceTrackerHub from "./pages/IntelligenceTrackerHub";
 import ImplementationCenter from "./pages/ImplementationCenter";
 import Resources from "./pages/Resources";
+import OneXerWizardPage from "./pages/OneXerWizard";
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,7 @@ const App = () => (
                     
                     {/* Knowledge & Resources */}
                     <Route path="/resources" element={<Resources />} />
+                    <Route path="/onexer-wizard" element={<OneXerWizardPage />} />
                     <Route path="/use-cases" element={<UseCaseLibrary />} />
                     <Route path="/sites" element={<Sites />} />
                     <Route path="/questionnaires" element={<Questionnaires />} />
