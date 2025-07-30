@@ -949,9 +949,9 @@ vlan ${data.advanced.vlans.managementVlan}
                   {vendorModels.map((model) => (
                     <SelectItem key={model.id} value={model.id}>
                       {model.model_name}
-                      {model.description && (
+                      {model.configuration_notes && (
                         <span className="text-sm text-muted-foreground ml-2">
-                          - {model.description}
+                          - {model.configuration_notes}
                         </span>
                       )}
                     </SelectItem>
