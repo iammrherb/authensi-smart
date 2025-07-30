@@ -40,17 +40,12 @@ import {
   Trash2,
   Edit
 } from 'lucide-react';
-
-console.log('OneXerConfigWizard: About to import hooks');
-
 import { useConfigTemplates, useCreateConfigTemplate, useGenerateConfigWithAI } from '@/hooks/useConfigTemplates';
 import { useEnhancedVendors } from '@/hooks/useVendors';
 import { useVendorModels } from '@/hooks/useVendorModels';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { useToast } from '@/hooks/use-toast';
-
-console.log('OneXerConfigWizard: All imports completed successfully');
 
 interface OneXerConfigWizardProps {
   projectId?: string;
