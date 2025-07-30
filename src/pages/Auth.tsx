@@ -97,9 +97,9 @@ const Auth = () => {
                   <img 
                     src={portnoxLogo} 
                     alt="Portnox Logo" 
-                    className="h-24 w-auto filter drop-shadow-2xl animate-float"
+                    className="h-24 w-auto filter drop-shadow-2xl animate-float relative z-10"
                   />
-                  <div className="absolute -inset-4 bg-gradient-primary opacity-20 blur-xl rounded-full animate-pulse-glow"></div>
+                  <div className="absolute -inset-6 bg-gradient-primary opacity-5 blur-2xl rounded-full animate-pulse-glow -z-10"></div>
                 </div>
                 <div className="space-y-2">
                   <div className="font-display text-6xl lg:text-8xl font-black bg-gradient-to-r from-white via-primary-glow to-accent bg-clip-text text-transparent leading-tight tracking-tight">
@@ -202,7 +202,7 @@ const Auth = () => {
                   {/* Mobile logo */}
                   <div className="text-center lg:hidden">
                     <div className="flex items-center justify-center gap-3 mb-6">
-                      <img src={portnoxLogo} alt="Portnox" className="h-16 w-auto filter drop-shadow-lg animate-float" />
+                      <img src={portnoxLogo} alt="Portnox" className="h-16 w-auto filter drop-shadow-xl animate-float relative z-10" />
                       <span className="font-display text-3xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                         TRACK AND NAC MASTER
                       </span>
