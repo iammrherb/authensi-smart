@@ -1,235 +1,277 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { 
-  Plus, 
-  Edit, 
-  Copy, 
+  Settings, 
+  Cpu, 
   Download, 
-  Upload,
-  Code,
-  Cpu,
-  Network,
+  Upload, 
+  Copy, 
+  Eye, 
+  Edit,
+  Star,
+  Trash2,
+  Plus,
+  Search,
+  Filter,
   Zap,
-  Settings,
-  ChevronRight,
-  FileCode,
+  Code,
+  FileText,
+  Wrench,
+  Save,
+  Wand2,
+  Shield,
+  Network,
+  Database,
   Bot
-} from "lucide-react";
+} from 'lucide-react';
+import { useConfigTemplates, useCreateConfigTemplate, useUpdateConfigTemplate, useDeleteConfigTemplate, useGenerateConfigWithAI } from '@/hooks/useConfigTemplates';
+import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
+import { useVendorModels } from '@/hooks/useVendorModels';
+import { useToast } from '@/hooks/use-toast';
 
 interface ConfigGeneratorManagerProps {
   searchTerm: string;
 }
 
+const templateFormSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().optional(),
+  vendor_id: z.string().optional(),
+  model_id: z.string().optional(),
+  category: z.string().min(1, "Category is required"),
+  subcategory: z.string().optional(),
+  configuration_type: z.string().min(1, "Configuration type is required"),
+  complexity_level: z.string().min(1, "Complexity level is required"),
+  template_content: z.string().min(1, "Template content is required"),
+  template_variables: z.record(z.any()).default({}),
+  supported_scenarios: z.array(z.string()).default([]),
+  authentication_methods: z.array(z.string()).default([]),
+  required_features: z.array(z.string()).default([]),
+  network_requirements: z.record(z.any()).default({}),
+  security_features: z.array(z.string()).default([]),
+  best_practices: z.array(z.string()).default([]),
+  troubleshooting_guide: z.array(z.any()).default([]),
+  validation_commands: z.array(z.string()).default([]),
+  tags: z.array(z.string()).default([]),
+  is_public: z.boolean().default(true),
+  is_validated: z.boolean().default(false),
+  validation_notes: z.string().optional(),
+});
+
 const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchTerm }) => {
+  const { data: templates, isLoading: templatesLoading } = useConfigTemplates();
+  const { data: vendors, isLoading: vendorsLoading } = useEnhancedVendors();
+  const { data: vendorModels } = useVendorModels();
+  const createTemplate = useCreateConfigTemplate();
+  const updateTemplate = useUpdateConfigTemplate();
+  const deleteTemplate = useDeleteConfigTemplate();
+  const generateWithAI = useGenerateConfigWithAI();
+  const { toast } = useToast();
+
+  const configTypes = ["802.1x", "TACACS+", "RADSEC", "Guest Access", "VLAN Configuration", "Port Security", "Multi-Auth", "COA", "Dynamic VLAN"];
+  const complexityLevels = ["basic", "intermediate", "advanced", "expert"];
+  const configurationTypes = ["switch", "router", "firewall", "wireless"];
+  
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState("");
+  const [selectedModel, setSelectedModel] = useState("");
   const [configType, setConfigType] = useState("");
+  const [aiRequirements, setAiRequirements] = useState("");
+  const [generatedConfig, setGeneratedConfig] = useState("");
+  const [currentEditTemplate, setCurrentEditTemplate] = useState<any>(null);
 
-  // Mock configuration templates data
-  const configTemplates = [
-    {
-      id: "config-001",
-      name: "Cisco Catalyst 9300 - 802.1X Basic",
-      vendor: "Cisco",
-      model: "Catalyst 9300 Series",
-      config_type: "802.1X Authentication",
-      difficulty: "intermediate",
-      use_cases: ["Corporate Authentication", "Guest Access"],
-      description: "Basic 802.1X configuration for Cisco Catalyst 9300 switches with RADIUS authentication",
-      config_template: `! Basic 802.1X Configuration for Cisco Catalyst 9300
-! RADIUS Server Configuration
-radius server PORTNOX
- address ipv4 192.168.1.100 auth-port 1812 acct-port 1813
- key 7 $SharedSecret$
-
-! AAA Configuration  
-aaa new-model
-aaa authentication dot1x default group radius
-aaa authorization network default group radius
-aaa accounting dot1x default start-stop group radius
-
-! 802.1X Global Configuration
-dot1x system-auth-control
-dot1x critical eapol
-
-! Interface Configuration Template
-interface range GigabitEthernet1/0/1-48
- description Access Port with 802.1X
- switchport mode access
- switchport access vlan $DATA_VLAN$
- authentication event fail action authorize vlan $GUEST_VLAN$
- authentication event server dead action authorize vlan $GUEST_VLAN$
- authentication event server alive action reinitialize
- authentication host-mode multi-auth
- authentication open
- authentication order dot1x mab
- authentication priority dot1x mab
- authentication port-control auto
- authentication periodic
- authentication timer reauthenticate server
- mab
- dot1x pae authenticator
- dot1x timeout tx-period 10
- spanning-tree portfast
- spanning-tree bpduguard enable`,
-      variables: [
-        { name: "SharedSecret", description: "RADIUS shared secret", default: "SecureKey123" },
-        { name: "DATA_VLAN", description: "Data VLAN ID", default: "100" },
-        { name: "GUEST_VLAN", description: "Guest/Quarantine VLAN ID", default: "999" }
-      ],
-      created_at: "2024-01-15",
-      usage_count: 45,
-      rating: 4.8
+  const form = useForm<z.infer<typeof templateFormSchema>>({
+    resolver: zodResolver(templateFormSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      category: "",
+      configuration_type: "",
+      complexity_level: "intermediate",
+      template_content: "",
+      template_variables: {},
+      supported_scenarios: [],
+      authentication_methods: [],
+      required_features: [],
+      network_requirements: {},
+      security_features: [],
+      best_practices: [],
+      troubleshooting_guide: [],
+      validation_commands: [],
+      tags: [],
+      is_public: true,
+      is_validated: false,
     },
-    {
-      id: "config-002", 
-      name: "Aruba 2930F - Multi-Auth with MAB",
-      vendor: "Aruba",
-      model: "2930F Series",
-      config_type: "802.1X Multi-Auth",
-      difficulty: "advanced",
-      use_cases: ["BYOD", "IoT Device Authentication", "Corporate Access"],
-      description: "Advanced 802.1X configuration with multi-authentication and MAB fallback for Aruba switches",
-      config_template: `# Aruba 2930F 802.1X Multi-Auth Configuration
-# RADIUS Server Configuration
-radius-server host 192.168.1.100 key "$SharedSecret$"
-radius-server host 192.168.1.101 key "$SharedSecret$"
+  });
 
-# AAA Configuration
-aaa authentication port-access eap-radius server-group "PORTNOX"
-aaa authentication port-access mac-based server-group "PORTNOX"
-
-# Server Group Configuration  
-aaa server-group radius "PORTNOX" host 192.168.1.100
-aaa server-group radius "PORTNOX" host 192.168.1.101
-
-# Global 802.1X Settings
-aaa port-access authenticator active
-aaa port-access mac-based addr-format multi-colon
-
-# Interface Configuration
-interface 1-48
-   aaa port-access authenticator
-   aaa port-access mac-based
-   aaa port-access controlled-direction in
-   aaa port-access auth-mode multi-host
-   aaa port-access auth-order authenticator mac-based
-   untagged vlan $DATA_VLAN$
-
-# VLAN Configuration
-vlan $DATA_VLAN$
-   name "Corporate_Data"
-   
-vlan $GUEST_VLAN$
-   name "Guest_Network"
-   
-vlan $IOT_VLAN$
-   name "IoT_Devices"`,
-      variables: [
-        { name: "SharedSecret", description: "RADIUS shared secret", default: "ArubaNAC2024" },
-        { name: "DATA_VLAN", description: "Corporate Data VLAN", default: "10" },
-        { name: "GUEST_VLAN", description: "Guest VLAN", default: "20" },
-        { name: "IOT_VLAN", description: "IoT VLAN", default: "30" }
-      ],
-      created_at: "2024-01-12",
-      usage_count: 32,
-      rating: 4.6
-    },
-    {
-      id: "config-003",
-      name: "Juniper EX4300 - Dynamic VLAN Assignment",
-      vendor: "Juniper",
-      model: "EX4300 Series",
-      config_type: "Dynamic VLAN Assignment",
-      difficulty: "advanced",
-      use_cases: ["Dynamic Segmentation", "User-based VLANs", "Role-based Access"],
-      description: "Dynamic VLAN assignment based on user authentication for Juniper EX switches",
-      config_template: `# Juniper EX4300 Dynamic VLAN Configuration
-# RADIUS Configuration
-set system radius-server 192.168.1.100 port 1812
-set system radius-server 192.168.1.100 accounting-port 1813
-set system radius-server 192.168.1.100 secret "$SharedSecret$"
-set system radius-server 192.168.1.100 source-address 192.168.1.10
-
-# AAA Configuration
-set access radius-server 192.168.1.100 port 1812
-set access radius-server 192.168.1.100 accounting-port 1813
-set access radius-server 192.168.1.100 secret "$SharedSecret$"
-
-# 802.1X Configuration
-set protocols dot1x authenticator authentication-profile-name PORTNOX-AUTH
-set protocols dot1x authenticator interface all
-set protocols dot1x authenticator interface all supplicant single
-set protocols dot1x authenticator interface all retries 3
-set protocols dot1x authenticator interface all quiet-period 60
-set protocols dot1x authenticator interface all tx-period 30
-set protocols dot1x authenticator interface all supplicant-timeout 30
-set protocols dot1x authenticator interface all server-timeout 30
-set protocols dot1x authenticator interface all max-requests 2
-set protocols dot1x authenticator interface all guest-vlan $GUEST_VLAN$
-set protocols dot1x authenticator interface all server-fail-vlan $GUEST_VLAN$
-
-# Access Profile
-set access profile PORTNOX-AUTH authentication-order radius
-set access profile PORTNOX-AUTH radius authentication-server 192.168.1.100
-set access profile PORTNOX-AUTH radius accounting-server 192.168.1.100
-
-# Interface Configuration
-set interfaces ge-0/0/0 unit 0 family ethernet-switching interface-mode access
-set interfaces ge-0/0/0 unit 0 family ethernet-switching vlan members $DATA_VLAN$
-set interfaces ge-0/0/0 unit 0 family ethernet-switching filter input SECURITY-FILTER`,
-      variables: [
-        { name: "SharedSecret", description: "RADIUS shared secret", default: "JuniperNAC!" },
-        { name: "DATA_VLAN", description: "Default Data VLAN", default: "user-data" },
-        { name: "GUEST_VLAN", description: "Guest VLAN", default: "guest-access" }
-      ],
-      created_at: "2024-01-10",
-      usage_count: 18,
-      rating: 4.4
-    }
-  ];
-
-  const vendors = ["Cisco", "Aruba", "Juniper", "HP Enterprise", "Fortinet", "Extreme Networks"];
-  const configTypes = [
-    "802.1X Authentication",
-    "802.1X Multi-Auth", 
-    "Dynamic VLAN Assignment",
-    "Guest Access",
-    "IoT Device Authentication",
-    "Wireless Integration"
-  ];
-
-  const filteredTemplates = configTemplates.filter(template =>
+  // Filter templates based on search term
+  const filteredTemplates = templates?.filter(template =>
     template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    template.vendor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    template.config_type.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    template.vendor?.vendor_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    template.category.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
 
+  // Filter models based on selected vendor
+  const filteredModels = vendorModels?.filter(model => 
+    selectedVendor ? model.vendor_id === selectedVendor : true
+  ) || [];
+
+  // Helper function to get difficulty color
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case "basic": return "bg-green-100 text-green-800";
-      case "intermediate": return "bg-yellow-100 text-yellow-800";
-      case "advanced": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case 'basic': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'intermediate': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'advanced': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+      case 'expert': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
     }
   };
 
-  const handleAIGenerate = () => {
-    // This would integrate with the AI generation service
-    console.log("Generating config for:", selectedVendor, configType);
+  const handleCreateTemplate = async (values: z.infer<typeof templateFormSchema>) => {
+    try {
+      await createTemplate.mutateAsync(values);
+      setIsCreateDialogOpen(false);
+      form.reset();
+    } catch (error) {
+      console.error('Failed to create template:', error);
+    }
   };
+
+  const handleEditTemplate = (template: any) => {
+    setCurrentEditTemplate(template);
+    form.reset({
+      name: template.name,
+      description: template.description,
+      vendor_id: template.vendor_id,
+      model_id: template.model_id,
+      category: template.category,
+      subcategory: template.subcategory,
+      configuration_type: template.configuration_type,
+      complexity_level: template.complexity_level,
+      template_content: template.template_content,
+      template_variables: template.template_variables,
+      supported_scenarios: template.supported_scenarios,
+      authentication_methods: template.authentication_methods,
+      required_features: template.required_features,
+      network_requirements: template.network_requirements,
+      security_features: template.security_features,
+      best_practices: template.best_practices,
+      troubleshooting_guide: template.troubleshooting_guide,
+      validation_commands: template.validation_commands,
+      tags: template.tags,
+      is_public: template.is_public,
+      is_validated: template.is_validated,
+      validation_notes: template.validation_notes,
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateTemplate = async (values: z.infer<typeof templateFormSchema>) => {
+    if (!currentEditTemplate) return;
+    
+    try {
+      await updateTemplate.mutateAsync({ 
+        id: currentEditTemplate.id, 
+        ...values 
+      });
+      setIsEditDialogOpen(false);
+      setCurrentEditTemplate(null);
+      form.reset();
+    } catch (error) {
+      console.error('Failed to update template:', error);
+    }
+  };
+
+  const handleDeleteTemplate = async (templateId: string) => {
+    if (confirm('Are you sure you want to delete this template?')) {
+      try {
+        await deleteTemplate.mutateAsync(templateId);
+      } catch (error) {
+        console.error('Failed to delete template:', error);
+      }
+    }
+  };
+
+  const handleGenerateWithAI = async () => {
+    if (!selectedVendor || !configType || !aiRequirements) {
+      toast({
+        title: "Missing Information",
+        description: "Please select vendor, config type, and provide requirements.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const selectedVendorName = vendors?.find(v => v.id === selectedVendor)?.vendor_name || '';
+      const selectedModelName = vendorModels?.find(m => m.id === selectedModel)?.model_name || '';
+      
+      const result = await generateWithAI.mutateAsync({
+        vendor: selectedVendorName,
+        model: selectedModelName,
+        configType,
+        requirements: aiRequirements,
+      });
+
+      setGeneratedConfig(result.content);
+    } catch (error) {
+      console.error('Failed to generate config:', error);
+    }
+  };
+
+  const handleSaveGeneratedConfig = () => {
+    const selectedVendorName = vendors?.find(v => v.id === selectedVendor)?.vendor_name || '';
+    const selectedModelName = vendorModels?.find(m => m.id === selectedModel)?.model_name || '';
+    
+    form.reset({
+      name: `${selectedVendorName} ${configType} Configuration`,
+      description: `AI-generated ${configType} configuration for ${selectedVendorName}${selectedModelName ? ` ${selectedModelName}` : ''}`,
+      vendor_id: selectedVendor,
+      model_id: selectedModel || undefined,
+      category: configType,
+      configuration_type: "switch",
+      complexity_level: "intermediate",
+      template_content: generatedConfig,
+      template_variables: {},
+      supported_scenarios: [],
+      authentication_methods: [],
+      required_features: [],
+      network_requirements: {},
+      security_features: [],
+      best_practices: [],
+      troubleshooting_guide: [],
+      validation_commands: [],
+      tags: ["ai-generated", configType.toLowerCase(), selectedVendorName.toLowerCase()],
+      is_public: true,
+      is_validated: false,
+    });
+    
+    setIsAIGeneratorOpen(false);
+    setIsCreateDialogOpen(true);
+  };
+
+  if (templatesLoading || vendorsLoading) {
+    return <div className="p-6">Loading configuration templates...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -268,21 +310,25 @@ set interfaces ge-0/0/0 unit 0 family ethernet-switching filter input SECURITY-F
                         <SelectValue placeholder="Select vendor" />
                       </SelectTrigger>
                       <SelectContent>
-                        {vendors.map(vendor => (
-                          <SelectItem key={vendor} value={vendor}>{vendor}</SelectItem>
+                        {vendors?.map(vendor => (
+                          <SelectItem key={vendor.id} value={vendor.id}>
+                            {vendor.vendor_name}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Configuration Type</Label>
-                    <Select value={configType} onValueChange={setConfigType}>
+                    <Label>Model (Optional)</Label>
+                    <Select value={selectedModel} onValueChange={setSelectedModel}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select config type" />
+                        <SelectValue placeholder="Select model" />
                       </SelectTrigger>
                       <SelectContent>
-                        {configTypes.map(type => (
-                          <SelectItem key={type} value={type}>{type}</SelectItem>
+                        {filteredModels.map(model => (
+                          <SelectItem key={model.id} value={model.id}>
+                            {model.model_name}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -290,29 +336,52 @@ set interfaces ge-0/0/0 unit 0 family ethernet-switching filter input SECURITY-F
                 </div>
                 
                 <div className="space-y-2">
+                  <Label>Configuration Type</Label>
+                  <Select value={configType} onValueChange={setConfigType}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select config type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {configTypes.map(type => (
+                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
                   <Label>Requirements & Use Cases</Label>
                   <Textarea 
+                    value={aiRequirements}
+                    onChange={(e) => setAiRequirements(e.target.value)}
                     placeholder="Describe your specific requirements, network topology, VLANs, authentication methods, etc..."
                     rows={4}
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Network Parameters</Label>
-                  <div className="grid grid-cols-3 gap-4">
-                    <Input placeholder="RADIUS Server IP" />
-                    <Input placeholder="Data VLAN" />
-                    <Input placeholder="Guest VLAN" />
+                {generatedConfig && (
+                  <div className="space-y-2">
+                    <Label>Generated Configuration</Label>
+                    <Textarea 
+                      value={generatedConfig}
+                      onChange={(e) => setGeneratedConfig(e.target.value)}
+                      rows={10}
+                      className="font-mono text-sm"
+                    />
+                    <Button onClick={handleSaveGeneratedConfig} className="w-full">
+                      <Save className="h-4 w-4 mr-2" />
+                      Save as Template
+                    </Button>
                   </div>
-                </div>
+                )}
 
                 <div className="flex justify-end gap-2">
                   <Button variant="outline" onClick={() => setIsAIGeneratorOpen(false)}>
                     Cancel
                   </Button>
-                  <Button onClick={handleAIGenerate} disabled={!selectedVendor || !configType}>
+                  <Button onClick={handleGenerateWithAI} disabled={!selectedVendor || !configType || !aiRequirements || generateWithAI.isPending}>
                     <Zap className="h-4 w-4 mr-2" />
-                    Generate Configuration
+                    {generateWithAI.isPending ? 'Generating...' : 'Generate Configuration'}
                   </Button>
                 </div>
               </div>
@@ -338,45 +407,77 @@ set interfaces ge-0/0/0 unit 0 family ethernet-switching filter input SECURITY-F
                   Create a reusable configuration template for specific vendor and use case.
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Template Name</Label>
-                    <Input placeholder="e.g., Cisco 9300 Basic 802.1X" />
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleCreateTemplate)} className="space-y-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Template Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g., Cisco 9300 Basic 802.1X" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="vendor_id"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Vendor</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select vendor" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {vendors?.map(vendor => (
+                                <SelectItem key={vendor.id} value={vendor.id}>
+                                  {vendor.vendor_name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Vendor</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select vendor" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {vendors.map(vendor => (
-                          <SelectItem key={vendor} value={vendor}>{vendor}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label>Configuration Template</Label>
-                  <Textarea 
-                    placeholder="Enter the configuration template with variables like $VLAN_ID$..."
-                    rows={8}
-                    className="font-mono text-sm"
+                  <FormField
+                    control={form.control}
+                    name="template_content"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Configuration Template</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Enter the configuration template with variables like {{VLAN_ID}}..."
+                            rows={8}
+                            className="font-mono text-sm"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
 
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={() => setIsCreateDialogOpen(false)}>
-                    Create Template
-                  </Button>
-                </div>
-              </div>
+                  <div className="flex justify-end gap-2">
+                    <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={createTemplate.isPending}>
+                      {createTemplate.isPending ? 'Creating...' : 'Create Template'}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
             </DialogContent>
           </Dialog>
         </div>
@@ -392,19 +493,22 @@ set interfaces ge-0/0/0 unit 0 family ethernet-switching filter input SECURITY-F
                   <CardTitle className="text-lg">{template.name}</CardTitle>
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="secondary" className="text-xs">
-                      {template.vendor}
+                      {template.vendor?.vendor_name || 'Unknown Vendor'}
                     </Badge>
-                    <Badge className={getDifficultyColor(template.difficulty)}>
-                      {template.difficulty}
+                    <Badge className={getDifficultyColor(template.complexity_level)}>
+                      {template.complexity_level}
                     </Badge>
                   </div>
                 </div>
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" onClick={() => handleEditTemplate(template)}>
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button variant="ghost" size="sm">
                     <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => handleDeleteTemplate(template.id)}>
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -416,32 +520,21 @@ set interfaces ge-0/0/0 unit 0 family ethernet-switching filter input SECURITY-F
               <div className="space-y-2">
                 <p className="text-sm font-medium">Configuration Type:</p>
                 <Badge variant="outline" className="text-xs">
-                  {template.config_type}
+                  {template.category}
                 </Badge>
               </div>
 
               <div className="space-y-2">
-                <p className="text-sm font-medium">Use Cases:</p>
+                <p className="text-sm font-medium">Tags:</p>
                 <div className="flex flex-wrap gap-1">
-                  {template.use_cases.map((useCase, index) => (
+                  {template.tags.slice(0, 3).map((tag, index) => (
                     <Badge key={index} variant="outline" className="text-xs">
-                      {useCase}
+                      {tag}
                     </Badge>
                   ))}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Variables:</p>
-                <div className="flex flex-wrap gap-1">
-                  {template.variables.slice(0, 3).map((variable, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
-                      ${variable.name}$
-                    </Badge>
-                  ))}
-                  {template.variables.length > 3 && (
+                  {template.tags.length > 3 && (
                     <Badge variant="secondary" className="text-xs">
-                      +{template.variables.length - 3} more
+                      +{template.tags.length - 3} more
                     </Badge>
                   )}
                 </div>
@@ -455,8 +548,11 @@ set interfaces ge-0/0/0 unit 0 family ethernet-switching filter input SECURITY-F
               </div>
 
               <div className="flex justify-between items-center pt-2">
-                <Button variant="outline" size="sm">
-                  <FileCode className="h-4 w-4 mr-1" />
+                <Button variant="outline" size="sm" onClick={() => {
+                  setSelectedTemplate(template);
+                  setIsDetailDialogOpen(true);
+                }}>
+                  <Code className="h-4 w-4 mr-1" />
                   View Code
                 </Button>
                 <div className="flex gap-2">
@@ -464,7 +560,7 @@ set interfaces ge-0/0/0 unit 0 family ethernet-switching filter input SECURITY-F
                     <Download className="h-4 w-4 mr-1" />
                     Export
                   </Button>
-                  <Button size="sm">
+                  <Button size="sm" onClick={() => handleEditTemplate(template)}>
                     <Settings className="h-4 w-4 mr-1" />
                     Customize
                   </Button>
@@ -474,6 +570,39 @@ set interfaces ge-0/0/0 unit 0 family ethernet-switching filter input SECURITY-F
           </Card>
         ))}
       </div>
+
+      {/* Template Details Dialog */}
+      <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{selectedTemplate?.name}</DialogTitle>
+            <DialogDescription>{selectedTemplate?.description}</DialogDescription>
+          </DialogHeader>
+          {selectedTemplate && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium">Vendor:</p>
+                  <p className="text-sm text-muted-foreground">{selectedTemplate.vendor?.vendor_name}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Category:</p>
+                  <p className="text-sm text-muted-foreground">{selectedTemplate.category}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium mb-2">Configuration:</p>
+                <Textarea 
+                  value={selectedTemplate.template_content}
+                  readOnly
+                  rows={15}
+                  className="font-mono text-sm"
+                />
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {filteredTemplates.length === 0 && (
         <Card>
