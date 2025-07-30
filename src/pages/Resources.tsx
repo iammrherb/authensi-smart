@@ -24,7 +24,6 @@ import EnhancedVendorManagement from "@/components/vendors/EnhancedVendorManagem
 import RequirementsManagement from "@/components/requirements/RequirementsManagement";
 import UseCaseLibraryBrowser from "@/components/use-cases/UseCaseLibraryBrowser";
 import ProjectTemplatesManager from "@/components/templates/ProjectTemplatesManager";
-import ConfigGeneratorManager from "@/components/config/ConfigGeneratorManager";
 
 const Resources = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -58,13 +57,6 @@ const Resources = () => {
       icon: <HardDrive className="h-5 w-5" />,
       description: "Certified vendor integrations with Portnox documentation",
       color: "orange"
-    },
-    {
-      title: "1Xer Templates",
-      count: 89,
-      icon: <Code className="h-5 w-5" />,
-      description: "Advanced 802.1X configuration templates with AI generation and scenarios",
-      color: "cyan"
     }
   ];
 
@@ -100,7 +92,7 @@ const Resources = () => {
             </div>
 
             {/* Resource Overview Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {resourceStats.map((stat, index) => (
                 <Card 
                   key={index} 
@@ -139,7 +131,7 @@ const Resources = () => {
 
             {/* Main Resource Management Tabs */}
             <Tabs defaultValue="templates" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5 max-w-4xl mx-auto">
+              <TabsList className="grid w-full grid-cols-4 max-w-3xl mx-auto">
                 <TabsTrigger value="templates" className="flex items-center gap-2">
                   <Folder className="h-4 w-4" />
                   <span className="hidden sm:inline">Templates</span>
@@ -155,10 +147,6 @@ const Resources = () => {
                 <TabsTrigger value="vendors" className="flex items-center gap-2">
                   <HardDrive className="h-4 w-4" />
                   <span className="hidden sm:inline">Vendors</span>
-                </TabsTrigger>
-                <TabsTrigger value="config-generator" className="flex items-center gap-2">
-                  <Code className="h-4 w-4" />
-                  <span className="hidden sm:inline">1Xer Gen</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -222,26 +210,12 @@ const Resources = () => {
                 <EnhancedVendorManagement />
               </TabsContent>
 
-              {/* Config Generator Tab */}
-              <TabsContent value="config-generator" className="space-y-6">
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-2 mb-4">
-                    <Code className="h-6 w-6 text-primary" />
-                    <h2 className="text-2xl font-bold">1Xer Configuration Generator</h2>
-                  </div>
-                  <p className="text-muted-foreground mb-6">
-                    Advanced AI-powered 802.1X configuration generator with templates, scenarios, and industry best practices. 
-                    Generate, customize, and save configurations for all supported vendors with full lifecycle management.
-                  </p>
-                </div>
-                <ConfigGeneratorManager searchTerm={searchTerm} />
-              </TabsContent>
             </Tabs>
 
             {/* Quick Actions Section */}
             <div className="bg-muted/50 rounded-lg p-6 mt-8">
               <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Button 
                   variant="outline" 
                   className="h-auto p-4 flex flex-col items-center gap-2"
@@ -273,14 +247,6 @@ const Resources = () => {
                 >
                   <HardDrive className="h-5 w-5" />
                   <span className="text-sm">Add Vendor</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="h-auto p-4 flex flex-col items-center gap-2"
-                  onClick={() => {/* Add config creation logic */}}
-                >
-                  <Code className="h-5 w-5" />
-                  <span className="text-sm">New 1Xer Config</span>
                 </Button>
               </div>
             </div>
