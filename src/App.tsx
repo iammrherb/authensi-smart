@@ -4,11 +4,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 import Header from "./components/Header";
+import { AppSidebar } from "./components/AppSidebar";
 import NavigationBreadcrumb from "./components/NavigationBreadcrumb";
 
 // Page imports
@@ -43,14 +45,20 @@ import OneXerWizardPage from "./pages/OneXerWizard";
 const queryClient = new QueryClient();
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => (
-  <div className="min-h-screen flex flex-col w-full bg-background">
-    <Header />
-    <main className="flex-1 overflow-hidden bg-background pt-28">
-      <div className="h-full overflow-auto">
-        {children}
+  <SidebarProvider>
+    <div className="min-h-screen flex w-full bg-background">
+      <AppSidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Header />
+        <main className="flex-1 overflow-hidden bg-background">
+          <div className="h-full overflow-auto p-6">
+            <NavigationBreadcrumb />
+            {children}
+          </div>
+        </main>
       </div>
-    </main>
-  </div>
+    </div>
+  </SidebarProvider>
 );
 
 const App = () => (

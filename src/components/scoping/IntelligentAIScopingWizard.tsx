@@ -681,15 +681,22 @@ const IntelligentAIScopingWizard: React.FC<IntelligentAIScopingWizardProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <Card className="gradient-border">
-        <CardHeader className="text-center">
-          <CardTitle className="flex items-center justify-center gap-2 text-2xl">
-            <Brain className="h-8 w-8 text-primary" />
-            <span className="bg-gradient-primary bg-clip-text text-transparent">
-              Intelligent AI Scoping Assistant
-            </span>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3 text-2xl">
+            <div className="p-2 rounded-xl bg-gradient-primary shadow-glow">
+              <Brain className="h-6 w-6 text-primary-foreground animate-pulse" />
+            </div>
+            <div>
+              <span className="bg-gradient-primary bg-clip-text text-transparent">
+                Intelligent AI Scoping Assistant
+              </span>
+              <p className="text-sm text-muted-foreground font-normal mt-1">
+                Advanced predictive scoping with multi-stakeholder intelligence
+              </p>
+            </div>
             <Sparkles className="h-6 w-6 text-yellow-500" />
           </CardTitle>
           <p className="text-muted-foreground">
