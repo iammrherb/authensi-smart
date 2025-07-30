@@ -14,6 +14,71 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_optimization_history: {
+        Row: {
+          ai_model_used: string | null
+          changes_summary: Json | null
+          compliance_impact: Json | null
+          created_at: string | null
+          created_by: string | null
+          feedback_rating: number | null
+          id: string
+          optimization_score_after: number | null
+          optimization_score_before: number | null
+          optimization_type: string
+          optimized_config: string
+          original_config: string
+          performance_impact: Json | null
+          security_impact: Json | null
+          template_id: string | null
+          user_feedback: string | null
+        }
+        Insert: {
+          ai_model_used?: string | null
+          changes_summary?: Json | null
+          compliance_impact?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          feedback_rating?: number | null
+          id?: string
+          optimization_score_after?: number | null
+          optimization_score_before?: number | null
+          optimization_type: string
+          optimized_config: string
+          original_config: string
+          performance_impact?: Json | null
+          security_impact?: Json | null
+          template_id?: string | null
+          user_feedback?: string | null
+        }
+        Update: {
+          ai_model_used?: string | null
+          changes_summary?: Json | null
+          compliance_impact?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          feedback_rating?: number | null
+          id?: string
+          optimization_score_after?: number | null
+          optimization_score_before?: number | null
+          optimization_type?: string
+          optimized_config?: string
+          original_config?: string
+          performance_impact?: Json | null
+          security_impact?: Json | null
+          template_id?: string | null
+          user_feedback?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_optimization_history_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "configuration_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       authentication_workflows: {
         Row: {
           authentication_method: string
@@ -116,6 +181,174 @@ export type Database = {
         }
         Relationships: []
       }
+      config_generation_sessions: {
+        Row: {
+          ai_recommendations: Json | null
+          completed_at: string | null
+          completion_percentage: number | null
+          created_by: string | null
+          current_step: number | null
+          generated_config: string | null
+          id: string
+          last_activity: string | null
+          session_token: string
+          started_at: string | null
+          status: string | null
+          template_id: string | null
+          wizard_data: Json | null
+        }
+        Insert: {
+          ai_recommendations?: Json | null
+          completed_at?: string | null
+          completion_percentage?: number | null
+          created_by?: string | null
+          current_step?: number | null
+          generated_config?: string | null
+          id?: string
+          last_activity?: string | null
+          session_token: string
+          started_at?: string | null
+          status?: string | null
+          template_id?: string | null
+          wizard_data?: Json | null
+        }
+        Update: {
+          ai_recommendations?: Json | null
+          completed_at?: string | null
+          completion_percentage?: number | null
+          created_by?: string | null
+          current_step?: number | null
+          generated_config?: string | null
+          id?: string
+          last_activity?: string | null
+          session_token?: string
+          started_at?: string | null
+          status?: string | null
+          template_id?: string | null
+          wizard_data?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "config_generation_sessions_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "configuration_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      config_template_categories: {
+        Row: {
+          ai_priority_weight: number | null
+          category_type: string
+          color_scheme: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          display_order: number | null
+          icon_name: string | null
+          id: string
+          name: string
+          parent_category_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          ai_priority_weight?: number | null
+          category_type?: string
+          color_scheme?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon_name?: string | null
+          id?: string
+          name: string
+          parent_category_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          ai_priority_weight?: number | null
+          category_type?: string
+          color_scheme?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon_name?: string | null
+          id?: string
+          name?: string
+          parent_category_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "config_template_categories_parent_category_id_fkey"
+            columns: ["parent_category_id"]
+            isOneToOne: false
+            referencedRelation: "config_template_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      config_wizard_steps: {
+        Row: {
+          ai_suggestions_enabled: boolean | null
+          auto_populate_rules: Json | null
+          conditional_logic: Json | null
+          created_at: string | null
+          help_content: string | null
+          id: string
+          required_fields: Json | null
+          step_description: string | null
+          step_name: string
+          step_order: number
+          step_type: string
+          template_id: string | null
+          updated_at: string | null
+          validation_rules: Json | null
+        }
+        Insert: {
+          ai_suggestions_enabled?: boolean | null
+          auto_populate_rules?: Json | null
+          conditional_logic?: Json | null
+          created_at?: string | null
+          help_content?: string | null
+          id?: string
+          required_fields?: Json | null
+          step_description?: string | null
+          step_name: string
+          step_order: number
+          step_type?: string
+          template_id?: string | null
+          updated_at?: string | null
+          validation_rules?: Json | null
+        }
+        Update: {
+          ai_suggestions_enabled?: boolean | null
+          auto_populate_rules?: Json | null
+          conditional_logic?: Json | null
+          created_at?: string | null
+          help_content?: string | null
+          id?: string
+          required_fields?: Json | null
+          step_description?: string | null
+          step_name?: string
+          step_order?: number
+          step_type?: string
+          template_id?: string | null
+          updated_at?: string | null
+          validation_rules?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "config_wizard_steps_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "configuration_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       configuration_files: {
         Row: {
           checksum: string | null
@@ -200,20 +433,30 @@ export type Database = {
       }
       configuration_templates: {
         Row: {
+          ai_generated: boolean | null
+          ai_optimization_rules: Json | null
           authentication_methods: Json | null
+          automation_level: string | null
           best_practices: Json | null
           category: string
+          compatibility_matrix: Json | null
           complexity_level: string | null
+          config_sections: Json | null
           configuration_type: string
           created_at: string
           created_by: string | null
+          deployment_scenarios: Json | null
           description: string | null
           id: string
           is_public: boolean | null
           is_validated: boolean | null
+          last_ai_review: string | null
           model_id: string | null
           name: string
           network_requirements: Json | null
+          optimization_recommendations: Json | null
+          optimization_score: number | null
+          performance_metrics: Json | null
           rating: number | null
           required_features: Json | null
           security_features: Json | null
@@ -221,29 +464,46 @@ export type Database = {
           supported_scenarios: Json | null
           tags: Json | null
           template_content: string
+          template_dependencies: Json | null
+          template_source: string | null
+          template_structure: Json | null
           template_variables: Json | null
           troubleshooting_guide: Json | null
+          troubleshooting_scenarios: Json | null
           updated_at: string
           usage_count: number | null
           validation_commands: Json | null
           validation_notes: string | null
+          validation_rules: Json | null
+          variable_definitions: Json | null
           vendor_id: string | null
+          wizard_parameters: Json | null
         }
         Insert: {
+          ai_generated?: boolean | null
+          ai_optimization_rules?: Json | null
           authentication_methods?: Json | null
+          automation_level?: string | null
           best_practices?: Json | null
           category: string
+          compatibility_matrix?: Json | null
           complexity_level?: string | null
+          config_sections?: Json | null
           configuration_type: string
           created_at?: string
           created_by?: string | null
+          deployment_scenarios?: Json | null
           description?: string | null
           id?: string
           is_public?: boolean | null
           is_validated?: boolean | null
+          last_ai_review?: string | null
           model_id?: string | null
           name: string
           network_requirements?: Json | null
+          optimization_recommendations?: Json | null
+          optimization_score?: number | null
+          performance_metrics?: Json | null
           rating?: number | null
           required_features?: Json | null
           security_features?: Json | null
@@ -251,29 +511,46 @@ export type Database = {
           supported_scenarios?: Json | null
           tags?: Json | null
           template_content: string
+          template_dependencies?: Json | null
+          template_source?: string | null
+          template_structure?: Json | null
           template_variables?: Json | null
           troubleshooting_guide?: Json | null
+          troubleshooting_scenarios?: Json | null
           updated_at?: string
           usage_count?: number | null
           validation_commands?: Json | null
           validation_notes?: string | null
+          validation_rules?: Json | null
+          variable_definitions?: Json | null
           vendor_id?: string | null
+          wizard_parameters?: Json | null
         }
         Update: {
+          ai_generated?: boolean | null
+          ai_optimization_rules?: Json | null
           authentication_methods?: Json | null
+          automation_level?: string | null
           best_practices?: Json | null
           category?: string
+          compatibility_matrix?: Json | null
           complexity_level?: string | null
+          config_sections?: Json | null
           configuration_type?: string
           created_at?: string
           created_by?: string | null
+          deployment_scenarios?: Json | null
           description?: string | null
           id?: string
           is_public?: boolean | null
           is_validated?: boolean | null
+          last_ai_review?: string | null
           model_id?: string | null
           name?: string
           network_requirements?: Json | null
+          optimization_recommendations?: Json | null
+          optimization_score?: number | null
+          performance_metrics?: Json | null
           rating?: number | null
           required_features?: Json | null
           security_features?: Json | null
@@ -281,13 +558,20 @@ export type Database = {
           supported_scenarios?: Json | null
           tags?: Json | null
           template_content?: string
+          template_dependencies?: Json | null
+          template_source?: string | null
+          template_structure?: Json | null
           template_variables?: Json | null
           troubleshooting_guide?: Json | null
+          troubleshooting_scenarios?: Json | null
           updated_at?: string
           usage_count?: number | null
           validation_commands?: Json | null
           validation_notes?: string | null
+          validation_rules?: Json | null
+          variable_definitions?: Json | null
           vendor_id?: string | null
+          wizard_parameters?: Json | null
         }
         Relationships: [
           {
@@ -1723,6 +2007,56 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      template_usage_analytics: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          environment_details: Json | null
+          errors_encountered: Json | null
+          id: string
+          success_rate: number | null
+          template_id: string | null
+          time_to_complete: number | null
+          usage_type: string
+          user_context: Json | null
+          user_satisfaction: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          environment_details?: Json | null
+          errors_encountered?: Json | null
+          id?: string
+          success_rate?: number | null
+          template_id?: string | null
+          time_to_complete?: number | null
+          usage_type: string
+          user_context?: Json | null
+          user_satisfaction?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          environment_details?: Json | null
+          errors_encountered?: Json | null
+          id?: string
+          success_rate?: number | null
+          template_id?: string | null
+          time_to_complete?: number | null
+          usage_type?: string
+          user_context?: Json | null
+          user_satisfaction?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_usage_analytics_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "configuration_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       test_case_library: {
         Row: {
