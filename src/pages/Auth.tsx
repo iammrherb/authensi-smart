@@ -73,231 +73,302 @@ const Auth = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5 flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 items-center">
-        
-        {/* Left Side - Branding */}
-        <div className="hidden lg:block space-y-8">
-          <div className="flex items-center gap-4">
-            <img 
-              src={portnoxLogo} 
-              alt="Portnox Logo" 
-              className="h-20 w-auto filter drop-shadow-xl"
-            />
-            <div>
-              <div className="text-4xl font-black bg-gradient-primary bg-clip-text text-transparent animate-fade-in leading-tight">
-                TRACK AND NAC MASTER
-              </div>
-              <div className="text-lg font-bold text-muted-foreground animate-fade-in mt-2" style={{ animationDelay: '0.2s' }}>
-                Scoping Slayer • Deployment Maestro • Config Generator Supreme
-              </div>
-              <div className="text-sm font-medium text-accent animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                🧠 Unofficial Intelligence Insights and Analytics
-              </div>
-            </div>
-          </div>
-          
-          <div className="space-y-6">
-            <h1 className="text-5xl font-black leading-tight">
-              Welcome to the Ultimate
-              <span className="bg-gradient-primary bg-clip-text text-transparent block">
-                NAC Intelligence Platform
-              </span>
-            </h1>
-            
-            <p className="text-xl text-muted-foreground leading-relaxed font-medium">
-              Transform complex NAC deployments into effortless victories with our 
-              AI-powered scoping slayer, deployment maestro, and config generator supreme.
-            </p>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-3 p-4 rounded-lg bg-primary/5 border border-primary/10">
-                <Sparkles className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium">AI-Powered Scoping</span>
-              </div>
-              <div className="flex items-center gap-3 p-4 rounded-lg bg-accent/5 border border-accent/10">
-                <Network className="h-5 w-5 text-accent" />
-                <span className="text-sm font-medium">200+ Use Cases</span>
-              </div>
-              <div className="flex items-center gap-3 p-4 rounded-lg bg-green-500/5 border border-green-500/10">
-                <Shield className="h-5 w-5 text-green-500" />
-                <span className="text-sm font-medium">Enterprise Security</span>
-              </div>
-              <div className="flex items-center gap-3 p-4 rounded-lg bg-blue-500/5 border border-blue-500/10">
-                <CheckCircle className="h-5 w-5 text-blue-500" />
-                <span className="text-sm font-medium">Deployment Tracking</span>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      {/* Animated background elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse-glow"></div>
+        <div className="absolute bottom-20 right-20 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-conic from-primary/5 via-transparent to-accent/5 rounded-full blur-2xl animate-float"></div>
+      </div>
 
-        {/* Right Side - Auth Form */}
-        <div className="w-full max-w-md mx-auto lg:mx-0">
-          <Card className="shadow-2xl border-0 bg-card/50 backdrop-blur">
-            <CardHeader className="space-y-6 pb-8">
-              <div className="text-center lg:hidden">
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  <img src={portnoxLogo} alt="Portnox" className="h-12 w-auto filter drop-shadow-lg" />
-                  <span className="text-2xl font-black bg-gradient-primary bg-clip-text text-transparent animate-fade-in">
-                    TRACK AND NAC MASTER
-                  </span>
+      {/* Grid pattern overlay */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMzMzIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
+
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <div className="w-full max-w-7xl mx-auto grid lg:grid-cols-5 gap-8 items-center">
+          
+          {/* Left Side - Hero Branding */}
+          <div className="lg:col-span-3 space-y-8 text-center lg:text-left">
+            
+            {/* Logo and Main Title */}
+            <div className="space-y-6">
+              <div className="flex items-center justify-center lg:justify-start gap-6">
+                <div className="relative">
+                  <img 
+                    src={portnoxLogo} 
+                    alt="Portnox Logo" 
+                    className="h-24 w-auto filter drop-shadow-2xl animate-float"
+                  />
+                  <div className="absolute -inset-4 bg-gradient-primary opacity-20 blur-xl rounded-full animate-pulse-glow"></div>
                 </div>
+                <div className="space-y-2">
+                  <div className="font-display text-6xl lg:text-8xl font-black bg-gradient-to-r from-white via-primary-glow to-accent bg-clip-text text-transparent leading-tight tracking-tight">
+                    TRACK
+                  </div>
+                  <div className="font-display text-3xl lg:text-4xl font-bold text-primary-glow tracking-wide">
+                    AND NAC MASTER
+                  </div>
+                </div>
+              </div>
+
+              {/* Subtitle Tags */}
+              <div className="flex flex-wrap justify-center lg:justify-start gap-4">
+                <div className="px-6 py-3 bg-gradient-to-r from-primary/20 to-primary/10 rounded-full border border-primary/30 backdrop-blur-sm">
+                  <span className="font-tech text-lg font-bold text-primary-glow">SCOPING SLAYER</span>
+                </div>
+                <div className="px-6 py-3 bg-gradient-to-r from-accent/20 to-accent/10 rounded-full border border-accent/30 backdrop-blur-sm">
+                  <span className="font-tech text-lg font-bold text-accent">DEPLOYMENT MAESTRO</span>
+                </div>
+                <div className="px-6 py-3 bg-gradient-to-r from-green-500/20 to-green-500/10 rounded-full border border-green-500/30 backdrop-blur-sm">
+                  <span className="font-tech text-lg font-bold text-green-400">CONFIG GENERATOR SUPREME</span>
+                </div>
+              </div>
+
+              {/* AI Badge */}
+              <div className="flex justify-center lg:justify-start">
+                <div className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-cyan-500/20 rounded-2xl border border-purple-500/30 backdrop-blur-lg">
+                  <Sparkles className="h-6 w-6 text-purple-400 animate-pulse" />
+                  <span className="font-tech text-xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                    UNOFFICIAL INTELLIGENCE INSIGHTS
+                  </span>
+                  <Sparkles className="h-6 w-6 text-cyan-400 animate-pulse" />
+                </div>
+              </div>
+            </div>
+
+            {/* Main Headline */}
+            <div className="space-y-6">
+              <h1 className="font-display text-5xl lg:text-7xl font-black leading-none">
+                <span className="text-white">UNLEASH THE</span>
+                <br />
+                <span className="bg-gradient-to-r from-primary via-primary-glow to-accent bg-clip-text text-transparent">
+                  ULTIMATE NAC
+                </span>
+                <br />
+                <span className="text-white">INTELLIGENCE</span>
+              </h1>
+              
+              <p className="text-2xl lg:text-3xl font-tech font-medium text-slate-300 leading-relaxed max-w-3xl">
+                Transform complex NAC deployments into <span className="text-primary-glow font-bold">effortless victories</span> with our 
+                AI-powered arsenal of destruction and creation.
+              </p>
+            </div>
+
+            {/* Feature Grid */}
+            <div className="grid grid-cols-2 gap-6">
+              <div className="group relative p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm hover:border-primary/50 transition-all duration-500">
+                <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-500"></div>
+                <Network className="h-8 w-8 text-primary mb-4 group-hover:scale-110 transition-transform duration-300" />
+                <h3 className="font-tech text-lg font-bold text-white mb-2">ZERO TRUST MASTERY</h3>
+                <p className="text-slate-400 text-sm">Dominate network security with precision</p>
               </div>
               
-              <div className="text-center">
-                <h2 className="text-2xl font-bold">Welcome Back</h2>
-                <p className="text-muted-foreground mt-2">
-                  Access your deployment command center
-                </p>
+              <div className="group relative p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm hover:border-accent/50 transition-all duration-500">
+                <div className="absolute inset-0 bg-gradient-accent opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-500"></div>
+                <Zap className="h-8 w-8 text-accent mb-4 group-hover:scale-110 transition-transform duration-300" />
+                <h3 className="font-tech text-lg font-bold text-white mb-2">LIGHTNING DEPLOY</h3>
+                <p className="text-slate-400 text-sm">Deploy at the speed of thought</p>
               </div>
+              
+              <div className="group relative p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm hover:border-green-500/50 transition-all duration-500">
+                <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity duration-500"></div>
+                <Shield className="h-8 w-8 text-green-400 mb-4 group-hover:scale-110 transition-transform duration-300" />
+                <h3 className="font-tech text-lg font-bold text-white mb-2">SECURITY FORTRESS</h3>
+                <p className="text-slate-400 text-sm">Impenetrable protection layers</p>
+              </div>
+              
+              <div className="group relative p-6 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm hover:border-purple-500/50 transition-all duration-500">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity duration-500"></div>
+                <CheckCircle className="h-8 w-8 text-purple-400 mb-4 group-hover:scale-110 transition-transform duration-300" />
+                <h3 className="font-tech text-lg font-bold text-white mb-2">ENTERPRISE BEAST</h3>
+                <p className="text-slate-400 text-sm">Scale beyond imagination</p>
+              </div>
+            </div>
+          </div>
 
-            </CardHeader>
-
-            <CardContent className="space-y-6">
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium">
-                    Email Address
-                  </Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="john.doe@company.com"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                      autoComplete="email"
-                      className="pl-10 h-10"
-                    />
-                  </div>
+          {/* Right Side - Auth Card */}
+          <div className="lg:col-span-2">
+            <div className="relative">
+              {/* Glow effect behind card */}
+              <div className="absolute inset-0 bg-gradient-primary opacity-20 blur-3xl rounded-3xl"></div>
+              
+              <Card className="relative shadow-2xl border-0 bg-gradient-to-br from-slate-800/80 via-slate-900/80 to-slate-950/80 backdrop-blur-xl rounded-3xl overflow-hidden">
+                {/* Card glow border */}
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-3xl p-[1px]">
+                  <div className="w-full h-full bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl"></div>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium">
-                    Password
-                  </Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      required
-                      autoComplete="current-password"
-                      className="pl-10 pr-10 h-10"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-10 px-3 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? 
-                        <EyeOff className="h-4 w-4 text-muted-foreground" /> : 
-                        <Eye className="h-4 w-4 text-muted-foreground" />
-                      }
-                    </Button>
-                  </div>
-                </div>
-
-                <Button 
-                  type="submit" 
-                  className="w-full h-11 bg-gradient-primary hover:opacity-90 text-white font-semibold transition-all shadow-lg hover:shadow-xl"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent"></div>
-                      Signing In...
+                
+                <CardHeader className="relative space-y-8 pb-8 pt-12">
+                  {/* Mobile logo */}
+                  <div className="text-center lg:hidden">
+                    <div className="flex items-center justify-center gap-3 mb-6">
+                      <img src={portnoxLogo} alt="Portnox" className="h-16 w-auto filter drop-shadow-lg animate-float" />
+                      <span className="font-display text-3xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                        TRACK AND NAC MASTER
+                      </span>
                     </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      Sign In
-                    </div>
-                  )}
-                </Button>
-              </form>
-
-              {!showResetPassword && (
-                <div className="text-center">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowResetPassword(true)}
-                    className="text-primary hover:text-primary/80 font-medium"
-                  >
-                    <RotateCcw className="h-4 w-4 mr-2" />
-                    Forgot Password?
-                  </Button>
-                </div>
-              )}
-
-              {showResetPassword && (
-                <form onSubmit={handlePasswordReset} className="space-y-4 border-t pt-4">
-                  <div className="text-center mb-4">
-                    <h3 className="font-semibold text-sm">Reset Password</h3>
-                    <p className="text-xs text-muted-foreground">Enter your email to receive reset instructions</p>
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="resetEmail" className="text-sm font-medium">
-                      Email Address
-                    </Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="resetEmail"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={resetEmail}
-                        onChange={(e) => setResetEmail(e.target.value)}
-                        required
-                        className="pl-10 h-10"
-                      />
+                  <div className="text-center space-y-4">
+                    <h2 className="font-display text-4xl font-black text-white">COMMAND CENTER</h2>
+                    <div className="space-y-2">
+                      <p className="font-tech text-xl font-bold text-primary-glow">
+                        ACCESS GRANTED
+                      </p>
+                      <p className="text-slate-400 font-medium">
+                        Enter your credentials to unleash the power
+                      </p>
                     </div>
                   </div>
+                </CardHeader>
 
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setShowResetPassword(false);
-                        setResetEmail('');
-                      }}
-                      className="flex-1"
+                <CardContent className="relative space-y-8 px-8 pb-12">
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-3">
+                      <Label htmlFor="email" className="font-tech text-sm font-bold text-white uppercase tracking-wider">
+                        Email Access Key
+                      </Label>
+                      <div className="relative group">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          placeholder="commander@nexus.com"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          required
+                          autoComplete="email"
+                          className="pl-12 h-14 bg-slate-800/50 border-slate-600 focus:border-primary text-white placeholder:text-slate-500 font-tech text-lg rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label htmlFor="password" className="font-tech text-sm font-bold text-white uppercase tracking-wider">
+                        Security Protocol
+                      </Label>
+                      <div className="relative group">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                        <Input
+                          id="password"
+                          name="password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter security protocol"
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          required
+                          autoComplete="current-password"
+                          className="pl-12 pr-14 h-14 bg-slate-800/50 border-slate-600 focus:border-primary text-white placeholder:text-slate-500 font-tech text-lg rounded-xl"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-10 px-3 hover:bg-transparent text-slate-400 hover:text-primary"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? 
+                            <EyeOff className="h-5 w-5" /> : 
+                            <Eye className="h-5 w-5" />
+                          }
+                        </Button>
+                      </div>
+                    </div>
+
+                    <Button 
+                      type="submit" 
+                      className="w-full h-16 bg-gradient-primary hover:opacity-90 text-white font-tech font-black text-xl uppercase tracking-wider transition-all shadow-2xl hover:shadow-glow rounded-xl relative overflow-hidden group"
+                      disabled={isLoading}
                     >
-                      Cancel
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      {isLoading ? (
+                        <div className="flex items-center gap-3 relative z-10">
+                          <div className="animate-spin rounded-full h-6 w-6 border-3 border-current border-t-transparent"></div>
+                          INITIALIZING...
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3 relative z-10">
+                          <Shield className="h-6 w-6" />
+                          ACTIVATE SYSTEM
+                          <ArrowRight className="h-6 w-6" />
+                        </div>
+                      )}
                     </Button>
-                    <Button
-                      type="submit"
-                      size="sm"
-                      className="flex-1 bg-gradient-primary hover:opacity-90"
-                    >
-                      Send Reset Link
-                    </Button>
+                  </form>
+
+                  {!showResetPassword && (
+                    <div className="text-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowResetPassword(true)}
+                        className="text-primary hover:text-primary/80 font-tech font-bold uppercase tracking-wider"
+                      >
+                        <RotateCcw className="h-4 w-4 mr-2" />
+                        Protocol Reset
+                      </Button>
+                    </div>
+                  )}
+
+                  {showResetPassword && (
+                    <form onSubmit={handlePasswordReset} className="space-y-6 border-t border-slate-700 pt-6">
+                      <div className="text-center mb-6">
+                        <h3 className="font-tech text-lg font-bold text-white uppercase">Security Reset</h3>
+                        <p className="text-sm text-slate-400 font-tech">Enter access key for protocol reset</p>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <Label htmlFor="resetEmail" className="font-tech text-sm font-bold text-white uppercase tracking-wider">
+                          Email Access Key
+                        </Label>
+                        <div className="relative group">
+                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                          <Input
+                            id="resetEmail"
+                            type="email"
+                            placeholder="commander@nexus.com"
+                            value={resetEmail}
+                            onChange={(e) => setResetEmail(e.target.value)}
+                            required
+                            className="pl-12 h-12 bg-slate-800/50 border-slate-600 focus:border-primary text-white placeholder:text-slate-500 font-tech rounded-xl"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setShowResetPassword(false);
+                            setResetEmail('');
+                          }}
+                          className="flex-1 h-12 border-slate-600 text-slate-300 hover:bg-slate-800 font-tech font-bold uppercase"
+                        >
+                          Abort
+                        </Button>
+                        <Button
+                          type="submit"
+                          size="sm"
+                          className="flex-1 h-12 bg-gradient-primary hover:opacity-90 font-tech font-bold uppercase"
+                        >
+                          Execute Reset
+                        </Button>
+                      </div>
+                    </form>
+                  )}
+
+                  <div className="text-center pt-4 border-t border-slate-700">
+                    <p className="text-sm text-slate-400 font-tech">
+                      <span className="text-primary">ACCESS DENIED?</span> Contact your system administrator for clearance.
+                    </p>
                   </div>
-                </form>
-              )}
-
-              <div className="text-center mt-6">
-                <p className="text-sm text-muted-foreground">
-                  Need an account? Contact your administrator for an invitation.
-                </p>
-              </div>
-
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>
