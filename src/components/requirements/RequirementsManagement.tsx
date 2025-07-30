@@ -3,11 +3,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle, AlertTriangle, Clock, Plus, Search, FileText, Link as LinkIcon } from "lucide-react";
+import { CheckCircle, AlertTriangle, Clock, Plus, Search, FileText, Link as LinkIcon, Edit, Trash2, Tag } from "lucide-react";
+import { useRequirements, useCreateRequirement } from "@/hooks/useRequirements";
+import { useUseCases, useCreateUseCase } from "@/hooks/useUseCases";
+import RequirementForm from "./RequirementForm";
+import UseCaseForm from "../use-cases/UseCaseForm";
 
 interface Requirement {
   id: string;
@@ -48,6 +54,13 @@ const RequirementsManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedItem, setSelectedItem] = useState<Requirement | UseCase | null>(null);
+  const [isAddRequirementOpen, setIsAddRequirementOpen] = useState(false);
+  const [isAddUseCaseOpen, setIsAddUseCaseOpen] = useState(false);
+
+  const { data: dbRequirements = [], isLoading: loadingRequirements } = useRequirements();
+  const { data: dbUseCases = [], isLoading: loadingUseCases } = useUseCases();
+  const createRequirement = useCreateRequirement();
+  const createUseCase = useCreateUseCase();
 
   const requirements: Requirement[] = [
     {
@@ -251,6 +264,28 @@ const RequirementsManagement = () => {
     }
   };
 
+  const handleCreateRequirement = async (data: any) => {
+    try {
+      await createRequirement.mutateAsync(data);
+      setIsAddRequirementOpen(false);
+    } catch (error) {
+      console.error('Failed to create requirement:', error);
+    }
+  };
+
+  const handleCreateUseCase = async (data: any) => {
+    try {
+      await createUseCase.mutateAsync(data);
+      setIsAddUseCaseOpen(false);
+    } catch (error) {
+      console.error('Failed to create use case:', error);
+    }
+  };
+
+  // Combine database data with mock data for display
+  const allRequirements = [...(dbRequirements || []), ...requirements];
+  const allUseCases = [...(dbUseCases || []), ...useCases];
+
   return (
     <div className="space-y-6">
       {/* Controls */}
@@ -265,14 +300,41 @@ const RequirementsManagement = () => {
           />
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Requirement
-          </Button>
-          <Button variant="outline" size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Use Case
-          </Button>
+          <Dialog open={isAddRequirementOpen} onOpenChange={setIsAddRequirementOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Requirement
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Add New Requirement</DialogTitle>
+                <DialogDescription>
+                  Create a new technical, compliance, or business requirement for your projects.
+                </DialogDescription>
+              </DialogHeader>
+              <RequirementForm onSubmit={handleCreateRequirement} onCancel={() => setIsAddRequirementOpen(false)} />
+            </DialogContent>
+          </Dialog>
+          
+          <Dialog open={isAddUseCaseOpen} onOpenChange={setIsAddUseCaseOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Use Case
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Add New Use Case</DialogTitle>
+                <DialogDescription>
+                  Create a new use case with implementation details and business value.
+                </DialogDescription>
+              </DialogHeader>
+              <UseCaseForm onSubmit={handleCreateUseCase} onCancel={() => setIsAddUseCaseOpen(false)} />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
