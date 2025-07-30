@@ -28,6 +28,7 @@ const Header = () => {
 
   const secondaryNavItems = [
     { title: "Resources", url: "/resources", icon: FolderOpen, active: ["/resources"], description: "Resource Center" },
+    { title: "1Xer Generator", url: "/onexer-wizard", icon: Settings, active: ["/onexer-wizard"], description: "802.1X Config Generator" },
     { title: "Use Cases", url: "/use-cases", icon: BookOpen, active: ["/use-cases"], description: "Knowledge Library" },
     { title: "Sites", url: "/sites", icon: Building2, active: ["/sites"], description: "Network Sites" },
     { title: "Requirements", url: "/requirements", icon: FileText, active: ["/requirements"], description: "Project Requirements" },
