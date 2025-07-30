@@ -39,6 +39,8 @@ import ImplementationCenter from "./pages/ImplementationCenter";
 import Resources from "./pages/Resources";
 import OneXerWizardPage from "./pages/OneXerWizard";
 import AIConfigCenter from "./pages/AIConfigCenter";
+import SimpleTest from "./pages/SimpleTest";
+import TestAIConfigCenter from "./pages/TestAIConfigCenter";
 import ProjectMasterHub from "./pages/ProjectMasterHub";
 
 const queryClient = new QueryClient();
@@ -121,6 +123,16 @@ const App = () => (
                 <ProtectedRoute>
                   <ProjectDetails />
                 </ProtectedRoute>
+              } />
+              
+              {/* Simple Test Route */}
+              <Route path="/simple-test" element={
+                <SimpleTest />
+              } />
+              
+              {/* Test AI Config Center */}
+              <Route path="/test-ai-config" element={
+                <TestAIConfigCenter />
               } />
               
               {/* AI Configuration Center */}
