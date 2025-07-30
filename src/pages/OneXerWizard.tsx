@@ -1,5 +1,4 @@
 import React from 'react';
-import Header from "@/components/Header";
 import OneXerConfigWizard from "@/components/config/OneXerConfigWizard";
 import { Badge } from "@/components/ui/badge";
 
@@ -20,8 +19,7 @@ const OneXerWizardPage: React.FC<OneXerWizardPageProps> = ({ projectId, siteId }
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <div className="pt-20">
+      <div className="pt-8">
         <div className="container mx-auto px-6 py-8">
           <div className="text-center mb-8">
             <Badge variant="glow" className="mb-4">

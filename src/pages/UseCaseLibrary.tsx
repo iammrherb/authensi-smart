@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Header from '@/components/Header';
 import UseCaseLibraryBrowser from '@/components/use-cases/UseCaseLibraryBrowser';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -65,8 +64,7 @@ const UseCaseLibrary = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <div className="pt-20">
+      <div className="pt-8">
         <div className="container mx-auto px-6 py-8">
           <div className="space-y-8">
             {/* Hero Section */}

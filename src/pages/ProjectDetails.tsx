@@ -1,5 +1,4 @@
 import React from 'react';
-import Header from '@/components/Header';
 import EnhancedProjectTracker from '@/components/projects/EnhancedProjectTracker';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,8 +15,7 @@ const ProjectDetails = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
-        <div className="pt-20">
+        <div className="pt-8">
           <div className="container mx-auto px-6 py-8">
             <div className="animate-pulse space-y-6">
               <div className="h-8 bg-muted rounded w-1/3"></div>
@@ -37,8 +35,7 @@ const ProjectDetails = () => {
   if (!project) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
-        <div className="pt-20">
+        <div className="pt-8">
           <div className="container mx-auto px-6 py-8">
             <Card>
               <CardContent className="pt-6 text-center">
@@ -94,8 +91,7 @@ const ProjectDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <div className="pt-20">
+      <div className="pt-8">
         <div className="container mx-auto px-6 py-8">
           <div className="space-y-6">
             {/* Breadcrumb */}

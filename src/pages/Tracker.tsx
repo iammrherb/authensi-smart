@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import Header from "@/components/Header";
 import TrackerDashboard from '@/components/tracker/TrackerDashboard';
 import { useTrackerData } from '@/hooks/useTrackerData';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -23,8 +22,7 @@ const Tracker = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
-        <div className="pt-20 container mx-auto py-6 space-y-6">
+        <div className="pt-8 container mx-auto py-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => (
               <Card key={i}>
@@ -47,8 +45,7 @@ const Tracker = () => {
   if (!stats) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
-        <div className="pt-20 container mx-auto py-6">
+        <div className="pt-8 container mx-auto py-6">
           <div className="text-center text-muted-foreground">
             Unable to load tracker data
           </div>
@@ -58,11 +55,9 @@ const Tracker = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
+    <div className="min-h-screen bg-background">      
       {/* Modern Header Section */}
-      <div className="pt-20 pb-8 bg-gradient-to-br from-background via-accent/10 to-primary/5">
+      <div className="pt-8 pb-8 bg-gradient-to-br from-background via-accent/10 to-primary/5">
         <div className="container mx-auto px-6">
           <div className="relative">
             {/* Background Effects */}

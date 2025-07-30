@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Header from "@/components/Header";
 import OneXerConfigWizard from "@/components/config/OneXerConfigWizard";
 import EnhancedConfigTemplateManager from "@/components/config/EnhancedConfigTemplateManager";
 import ConfigGeneratorManager from "@/components/config/ConfigGeneratorManager";
@@ -22,11 +21,9 @@ const AIConfigCenter = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
+    <div className="min-h-screen bg-background">      
       {/* Hero Section */}
-      <div className="pt-20 pb-8 bg-gradient-to-br from-background via-accent/10 to-primary/5">
+      <div className="pt-8 pb-8 bg-gradient-to-br from-background via-accent/10 to-primary/5">
         <div className="container mx-auto px-6">
           <div className="relative">
             {/* Background Effects */}

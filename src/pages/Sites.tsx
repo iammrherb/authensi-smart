@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Header from "@/components/Header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -112,8 +111,7 @@ const Sites = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
-        <div className="pt-20 container mx-auto px-6 py-8">
+        <div className="pt-8 container mx-auto px-6 py-8">
           <div className="text-center">Loading sites...</div>
         </div>
       </div>
@@ -122,8 +120,7 @@ const Sites = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <div className="pt-20">
+      <div className="pt-8">
         <div className="container mx-auto px-6 py-8">
           <div className="text-center mb-8">
             <Badge variant="glow" className="mb-4">

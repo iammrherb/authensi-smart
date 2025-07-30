@@ -14,7 +14,6 @@ import {
   Play, Pause, CheckCircle, XCircle, RefreshCw,
   Network, Server, Database, Monitor
 } from 'lucide-react';
-import Header from '@/components/Header';
 import { useProjects } from '@/hooks/useProjects';
 import { useHasRole } from '@/hooks/useUserRoles';
 import { useAI } from '@/hooks/useAI';
@@ -272,8 +271,7 @@ const ImplementationCenter = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
-        <div className="pt-20 flex items-center justify-center h-64">
+        <div className="pt-8 flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
       </div>
@@ -282,8 +280,7 @@ const ImplementationCenter = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <div className="pt-20">
+      <div className="pt-8">
         <div className="container mx-auto px-6 py-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
