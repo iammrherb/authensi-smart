@@ -36,7 +36,7 @@ const AIConfigCenter = () => {
                   <Brain className="text-2xl text-primary-foreground animate-pulse" />
                 </div>
                 <Badge variant="secondary" className="text-sm px-4 py-2">
-                  Intelligent Configuration Suite (DEBUGGING)
+                  Intelligent Configuration Suite
                 </Badge>
               </div>
               
@@ -48,7 +48,7 @@ const AIConfigCenter = () => {
               </h1>
               
               <p className="text-lg text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-                Temporarily disabled components to isolate JavaScript initialization error.
+                Advanced AI-powered network configuration generation with intelligent recommendations and automated best practices.
               </p>
 
               {/* Quick Stats */}
@@ -97,14 +97,14 @@ const AIConfigCenter = () => {
                   <CardTitle className="text-2xl">Intelligent Configuration Wizard</CardTitle>
                 </div>
                 <CardDescription className="text-base">
-                  Component temporarily disabled for debugging
+                  AI-powered 802.1X configuration generation with smart recommendations
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-center text-muted-foreground">
-                  OneXerConfigWizard component temporarily disabled to isolate the JavaScript error.
-                  If this page loads without errors, the issue is in that component.
-                </p>
+                <OneXerConfigWizard 
+                  onSave={handleConfigSave}
+                  onCancel={handleConfigCancel}
+                />
               </CardContent>
             </Card>
           </TabsContent>
