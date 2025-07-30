@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-// TEMPORARILY COMMENTING OUT PROBLEM COMPONENTS
-// import OneXerConfigWizard from "@/components/config/OneXerConfigWizard";
+// TESTING COMPONENTS ONE BY ONE
+import OneXerConfigWizard from "@/components/config/OneXerConfigWizard";
 // import EnhancedConfigTemplateManager from "@/components/config/EnhancedConfigTemplateManager";
 // import ConfigGeneratorManager from "@/components/config/ConfigGeneratorManager";
 import { Badge } from "@/components/ui/badge";
