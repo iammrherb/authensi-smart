@@ -40,8 +40,7 @@ import {
   Bot
 } from 'lucide-react';
 import { useConfigTemplates, useCreateConfigTemplate, useUpdateConfigTemplate, useDeleteConfigTemplate, useGenerateConfigWithAI } from '@/hooks/useConfigTemplates';
-import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
-import { useVendorModels } from '@/hooks/useEnhancedVendors';
+import { useEnhancedVendors, useVendorModels } from '@/hooks/useEnhancedVendors';
 import { useToast } from '@/hooks/use-toast';
 
 interface ConfigGeneratorManagerProps {
