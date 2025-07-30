@@ -128,12 +128,34 @@ export const useCreateProject = () => {
         throw new Error('User must be authenticated to create projects');
       }
 
+      // Clean the project data to ensure arrays are properly formatted
+      const cleanedData = {
+        ...projectData,
+        created_by: user.id,
+        compliance_frameworks: Array.isArray(projectData.compliance_frameworks) 
+          ? projectData.compliance_frameworks 
+          : [],
+        additional_stakeholders: Array.isArray(projectData.additional_stakeholders) 
+          ? projectData.additional_stakeholders 
+          : [],
+        pain_points: Array.isArray(projectData.pain_points) 
+          ? projectData.pain_points 
+          : [],
+        success_criteria: Array.isArray(projectData.success_criteria) 
+          ? projectData.success_criteria 
+          : [],
+        integration_requirements: Array.isArray(projectData.integration_requirements) 
+          ? projectData.integration_requirements 
+          : [],
+        bulk_sites_data: Array.isArray(projectData.bulk_sites_data) 
+          ? projectData.bulk_sites_data 
+          : [],
+        migration_scope: projectData.migration_scope || {},
+      };
+
       const { data, error } = await supabase
         .from('projects')
-        .insert([{
-          ...projectData,
-          created_by: user.id,
-        }])
+        .insert([cleanedData])
         .select()
         .maybeSingle();
 
