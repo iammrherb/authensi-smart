@@ -20,62 +20,7 @@ const IntelligenceTrackerHub = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Enhanced Header Section */}
-      <div className="pt-8 pb-12 bg-gradient-to-br from-background via-accent/10 to-primary/5">
-        <div className="container mx-auto px-6">
-          <div className="relative">
-            {/* Background Effects */}
-            <div className="absolute inset-0 bg-gradient-glow opacity-20 blur-3xl"></div>
-            
-            <div className="relative text-center space-y-6">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="w-16 h-16 bg-gradient-primary rounded-xl flex items-center justify-center shadow-glow animate-pulse">
-                  <Brain className="h-10 w-10 text-primary-foreground" />
-                </div>
-                <Badge variant="glow" className="text-sm px-4 py-2 animate-fade-in">
-                  AI-Powered Intelligence Suite
-                </Badge>
-              </div>
-              
-              <h1 className="text-5xl md:text-7xl font-bold mb-4 animate-fade-in">
-                Intelligence 
-                <span className="bg-gradient-primary bg-clip-text text-transparent block animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                  Tracker Hub
-                </span>
-              </h1>
-              
-              <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                Complete AI-driven project management ecosystem from intelligent scoping to deployment optimization. 
-                Harness the power of machine learning for smarter NAC implementations and enhanced decision-making.
-              </p>
-
-              {/* Enhanced Quick Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8 max-w-4xl mx-auto">
-                <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center animate-fade-in hover:scale-105 transition-transform" style={{ animationDelay: '0.6s' }}>
-                  <div className="text-3xl font-bold text-primary">AI+</div>
-                  <div className="text-sm text-muted-foreground">Smart Scoping</div>
-                </div>
-                <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center animate-fade-in hover:scale-105 transition-transform" style={{ animationDelay: '0.7s' }}>
-                  <div className="text-3xl font-bold text-primary">360°</div>
-                  <div className="text-sm text-muted-foreground">Project Tracking</div>
-                </div>
-                <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center animate-fade-in hover:scale-105 transition-transform" style={{ animationDelay: '0.8s' }}>
-                  <div className="text-3xl font-bold text-primary">ML</div>
-                  <div className="text-sm text-muted-foreground">Recommendations</div>
-                </div>
-                <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center animate-fade-in hover:scale-105 transition-transform" style={{ animationDelay: '0.9s' }}>
-                  <div className="text-3xl font-bold text-primary">Real-time</div>
-                  <div className="text-sm text-muted-foreground">Analytics</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Intelligence Hub Interface */}
-      <div className="container mx-auto px-6 py-8">
+    <div className="container mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           <TabsList className="grid w-full grid-cols-4 bg-card/50 backdrop-blur-sm border border-border/50">
             <TabsTrigger 
@@ -357,7 +302,6 @@ const IntelligenceTrackerHub = () => {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
     </div>
   );
 };
