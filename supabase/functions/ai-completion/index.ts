@@ -27,7 +27,7 @@ async function callOpenAI(request: AIRequest) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-4.1-2025-04-14',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
@@ -70,7 +70,7 @@ async function callClaude(request: AIRequest) {
       'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify({
-      model: 'claude-opus-4-20250514',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: request.maxTokens || 2000,
       temperature: request.temperature || 0.7,
       system: `You are a Portnox NAC (Network Access Control) expert assistant. You help with deployment planning, troubleshooting, best practices, and recommendations. Always provide accurate, actionable advice based on enterprise network security best practices.${request.context ? ` Context: ${request.context}` : ''}`,
@@ -102,7 +102,7 @@ async function callGemini(request: AIRequest) {
     throw new Error('Gemini API key not configured');
   }
 
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${geminiApiKey}`, {
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
