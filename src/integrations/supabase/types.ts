@@ -2342,6 +2342,7 @@ export type Database = {
           scope_id: string | null
           scope_type: string
           status: string
+          updated_at: string | null
         }
         Insert: {
           approved_at?: string | null
@@ -2357,6 +2358,7 @@ export type Database = {
           scope_id?: string | null
           scope_type?: string
           status?: string
+          updated_at?: string | null
         }
         Update: {
           approved_at?: string | null
@@ -2372,6 +2374,7 @@ export type Database = {
           scope_id?: string | null
           scope_type?: string
           status?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
