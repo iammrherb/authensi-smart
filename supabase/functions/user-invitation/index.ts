@@ -44,8 +44,8 @@ serve(async (req) => {
     }
 
     const url = new URL(req.url);
-    const pathParts = url.pathname.split('/');
-    const action = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+    const pathParts = url.pathname.split('/').filter(p => p);
+    const action = pathParts[pathParts.length - 1];
     
     console.log('Request details:', {
       method: req.method,
