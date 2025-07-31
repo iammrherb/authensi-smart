@@ -2658,6 +2658,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_super_admin_emails: {
+        Args: Record<PropertyKey, never>
+        Returns: string[]
+      }
       has_permission: {
         Args: {
           user_id: string
