@@ -24,7 +24,6 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
-  const [isSignUpMode, setIsSignUpMode] = useState(false);
 
   // Redirect if already authenticated
   if (user) {
@@ -50,11 +49,7 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      if (isSignUpMode) {
-        await signUp(formData.email, formData.password, formData.firstName, formData.lastName);
-      } else {
-        await signIn(formData.email, formData.password);
-      }
+      await signIn(formData.email, formData.password);
     } finally {
       setIsLoading(false);
     }
@@ -261,73 +256,8 @@ const Auth = () => {
                 </CardHeader>
 
                 <CardContent className="relative space-y-8 px-8 pb-12">
-                  {/* Mode Toggle */}
-                  <div className="flex justify-center mb-6">
-                    <div className="inline-flex rounded-xl bg-slate-800/50 p-1 border border-slate-600">
-                      <Button
-                        type="button"
-                        variant={!isSignUpMode ? "default" : "ghost"}
-                        size="sm"
-                        onClick={() => setIsSignUpMode(false)}
-                        className={`px-6 py-2 font-tech font-bold uppercase text-sm ${
-                          !isSignUpMode 
-                            ? 'bg-gradient-primary text-white' 
-                            : 'text-slate-400 hover:text-white hover:bg-slate-700'
-                        }`}
-                      >
-                        Sign In
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={isSignUpMode ? "default" : "ghost"}
-                        size="sm"
-                        onClick={() => setIsSignUpMode(true)}
-                        className={`px-6 py-2 font-tech font-bold uppercase text-sm ${
-                          isSignUpMode 
-                            ? 'bg-gradient-primary text-white' 
-                            : 'text-slate-400 hover:text-white hover:bg-slate-700'
-                        }`}
-                      >
-                        Sign Up
-                      </Button>
-                    </div>
-                  </div>
 
                   <form onSubmit={handleSubmit} className="space-y-6">
-                    {isSignUpMode && (
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-3">
-                          <Label htmlFor="firstName" className="font-tech text-sm font-bold text-white uppercase tracking-wider">
-                            First Name
-                          </Label>
-                          <Input
-                            id="firstName"
-                            name="firstName"
-                            type="text"
-                            placeholder="John"
-                            value={formData.firstName}
-                            onChange={handleInputChange}
-                            required={isSignUpMode}
-                            className="h-12 bg-slate-800/50 border-slate-600 focus:border-primary text-white placeholder:text-slate-500 font-tech rounded-xl"
-                          />
-                        </div>
-                        <div className="space-y-3">
-                          <Label htmlFor="lastName" className="font-tech text-sm font-bold text-white uppercase tracking-wider">
-                            Last Name
-                          </Label>
-                          <Input
-                            id="lastName"
-                            name="lastName"
-                            type="text"
-                            placeholder="Doe"
-                            value={formData.lastName}
-                            onChange={handleInputChange}
-                            required={isSignUpMode}
-                            className="h-12 bg-slate-800/50 border-slate-600 focus:border-primary text-white placeholder:text-slate-500 font-tech rounded-xl"
-                          />
-                        </div>
-                      </div>
-                    )}
 
                     <div className="space-y-3">
                       <Label htmlFor="email" className="font-tech text-sm font-bold text-white uppercase tracking-wider">
@@ -359,11 +289,11 @@ const Auth = () => {
                           id="password"
                           name="password"
                           type={showPassword ? "text" : "password"}
-                          placeholder={isSignUpMode ? "Create security protocol" : "Enter security protocol"}
+                          placeholder="Enter security protocol"
                           value={formData.password}
                           onChange={handleInputChange}
                           required
-                          autoComplete={isSignUpMode ? "new-password" : "current-password"}
+                          autoComplete="current-password"
                           className="pl-12 pr-14 h-14 bg-slate-800/50 border-slate-600 focus:border-primary text-white placeholder:text-slate-500 font-tech text-lg rounded-xl"
                         />
                         <Button
@@ -390,19 +320,19 @@ const Auth = () => {
                       {isLoading ? (
                         <div className="flex items-center gap-3 relative z-10">
                           <div className="animate-spin rounded-full h-6 w-6 border-3 border-current border-t-transparent"></div>
-                          {isSignUpMode ? 'REGISTERING...' : 'INITIALIZING...'}
+                          INITIALIZING...
                         </div>
                       ) : (
                         <div className="flex items-center gap-3 relative z-10">
                           <Shield className="h-6 w-6" />
-                          {isSignUpMode ? 'CREATE ACCESS' : 'ACTIVATE SYSTEM'}
+                          ACTIVATE SYSTEM
                           <ArrowRight className="h-6 w-6" />
                         </div>
                       )}
                     </Button>
                   </form>
 
-                  {!showResetPassword && !isSignUpMode && (
+                  {!showResetPassword && (
                     <div className="text-center">
                       <Button
                         variant="ghost"
