@@ -348,6 +348,31 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
     }
   });
 
+  // Migration mutation for approved invitations
+  const migrateMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('migrate-invitations');
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Migration Complete",
+        description: `Processed ${data.results?.length || 0} invitations`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['all-users'] });
+      queryClient.invalidateQueries({ queryKey: ['user-roles'] });
+      queryClient.invalidateQueries({ queryKey: ['user-invitations'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Migration Error",
+        description: error.message || "Failed to migrate invitations",
+        variant: "destructive"
+      });
+    }
+  });
+
   const resetCreateForm = () => {
     setNewUserEmail('');
     setNewUserFirstName('');
@@ -717,7 +742,32 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
         </TabsContent>
 
         <TabsContent value="invitations">
-          <InvitationManagement />
+          <div className="space-y-4">
+            {canManage && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>Migration Tools</span>
+                    <Button
+                      onClick={() => migrateMutation.mutate()}
+                      disabled={migrateMutation.isPending}
+                      variant="outline"
+                      className="bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200"
+                    >
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      {migrateMutation.isPending ? 'Processing...' : 'Create Accounts for Approved Invitations'}
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    This will automatically create user accounts for all approved invitations that haven't been converted to user accounts yet.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+            <InvitationManagement />
+          </div>
         </TabsContent>
 
         <TabsContent value="activity">
