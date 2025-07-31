@@ -457,14 +457,14 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
                   Create User
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Create New User</DialogTitle>
-                  <DialogDescription>
-                    Create a new user account with initial role assignment
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Create New User</DialogTitle>
+                    <DialogDescription>
+                      Create a new user account with initial role assignment
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={(e) => { e.preventDefault(); handleCreateUser(); }} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName">First Name *</Label>
