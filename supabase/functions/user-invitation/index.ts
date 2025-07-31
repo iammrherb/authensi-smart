@@ -200,14 +200,28 @@ serve(async (req) => {
 
     if (req.method === 'GET') {
       if (action === 'pending') {
-        // Get pending invitations for approval
+        // Get pending invitations for approval - only for users with permission
+        const { data: canManage } = await supabaseClient.rpc('can_manage_roles', {
+          _user_id: user.id,
+          _scope_type: 'global'
+        });
+
+        if (!canManage) {
+          return new Response(JSON.stringify({ invitations: [] }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
         const { data: invitations, error } = await supabaseClient
           .from('user_invitations')
           .select('*, custom_roles(*)')
           .eq('status', 'pending')
           .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error fetching pending invitations:', error);
+          throw error;
+        }
 
         return new Response(JSON.stringify({ invitations }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
