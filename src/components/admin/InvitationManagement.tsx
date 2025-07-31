@@ -69,7 +69,9 @@ const InvitationManagement: React.FC = () => {
   const { data: invitations = [], isLoading } = useQuery({
     queryKey: ['user-invitations'],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('user-invitation/pending');
+      const { data, error } = await supabase.functions.invoke('user-invitation/pending', {
+        method: 'GET'
+      });
       
       if (error) throw error;
       return data.invitations as UserInvitation[];
