@@ -2594,6 +2594,18 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: Json
       }
+      disable_two_factor_auth: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
+      enable_two_factor_auth: {
+        Args: {
+          p_user_id: string
+          p_secret: string
+          p_verification_code: string
+        }
+        Returns: boolean
+      }
       has_permission: {
         Args: {
           user_id: string
@@ -2631,6 +2643,10 @@ export type Database = {
       }
       user_owns_site: {
         Args: { site_uuid: string }
+        Returns: boolean
+      }
+      verify_totp_code: {
+        Args: { p_user_id: string; p_code: string }
         Returns: boolean
       }
     }

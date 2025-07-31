@@ -55,7 +55,7 @@ const TwoFactorSettings = () => {
   // Enable 2FA mutation
   const enable2FAMutation = useMutation({
     mutationFn: async (params: { secret: string; code: string }) => {
-      const { data, error } = await supabase.rpc('enable_two_factor_auth', {
+      const { data, error } = await supabase.rpc('enable_two_factor_auth' as any, {
         p_user_id: user?.id,
         p_secret: params.secret,
         p_verification_code: params.code
@@ -85,7 +85,7 @@ const TwoFactorSettings = () => {
   // Disable 2FA mutation
   const disable2FAMutation = useMutation({
     mutationFn: async () => {
-      const { data, error } = await supabase.rpc('disable_two_factor_auth', {
+      const { data, error } = await supabase.rpc('disable_two_factor_auth' as any, {
         p_user_id: user?.id
       });
       
