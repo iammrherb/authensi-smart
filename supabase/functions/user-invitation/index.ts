@@ -125,8 +125,56 @@ serve(async (req) => {
         if (updateError) throw updateError;
 
         if (approvalAction === 'approve') {
-          // TODO: Send approval email to user
-          console.log(`Invitation approved for ${invitation.email}`);
+          // Automatically create user account when invitation is approved
+          const serviceClient = createClient(
+            Deno.env.get('SUPABASE_URL') ?? '',
+            Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+          );
+
+          // Generate a temporary password
+          const tempPassword = 'TempPass123!' + Math.random().toString(36).substring(2, 15);
+
+          // Create user account
+          const { data: newUser, error: createError } = await serviceClient.auth.admin.createUser({
+            email: invitation.email,
+            password: tempPassword,
+            user_metadata: {
+              first_name: invitation.email.split('@')[0], // Default first name from email
+              last_name: 'User', // Default last name
+            },
+            email_confirm: true
+          });
+
+          if (createError) {
+            console.error('Error creating user:', createError);
+            // Don't throw error, just log it - invitation is still approved
+          } else if (newUser.user) {
+            console.log(`User account created for ${invitation.email}`);
+            
+            // Assign role to new user
+            const { error: roleError } = await serviceClient
+              .from('user_roles')
+              .insert({
+                user_id: newUser.user.id,
+                role: 'viewer', // Default role
+                custom_role_id: invitation.custom_role_id,
+                scope_type: invitation.scope_type,
+                scope_id: invitation.scope_id,
+                assigned_by: invitation.invited_by
+              });
+
+            if (roleError) {
+              console.error('Error assigning role:', roleError);
+            }
+
+            // Mark invitation as used since we created the account
+            await serviceClient
+              .from('user_invitations')
+              .update({ status: 'used' })
+              .eq('id', invitation.id);
+
+            console.log(`Invitation approved and account created for ${invitation.email}`);
+          }
         }
 
         return new Response(JSON.stringify({ 
