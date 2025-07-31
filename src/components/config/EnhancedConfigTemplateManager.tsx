@@ -18,7 +18,7 @@ import {
   useGenerateConfigWithAI,
   type ConfigTemplate 
 } from "@/hooks/useConfigTemplates";
-import { useEnhancedVendors } from "@/hooks/useVendors";
+import { useVendors } from "@/hooks/useVendors";
 import { useVendorModels } from "@/hooks/useVendorModels";
 import { 
   Plus, 
@@ -58,7 +58,7 @@ const EnhancedConfigTemplateManager: React.FC<EnhancedConfigTemplateManagerProps
   const [tagInput, setTagInput] = useState("");
 
   const { data: templates = [], isLoading } = useConfigTemplates();
-  const { data: vendors = [] } = useEnhancedVendors();
+  const { data: vendors = [] } = useVendors();
   const { data: models = [] } = useVendorModels();
   const createTemplate = useCreateConfigTemplate();
   const updateTemplate = useUpdateConfigTemplate();

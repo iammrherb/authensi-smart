@@ -5,17 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
-import { useEnhancedVendors, useCreateEnhancedVendor, type EnhancedVendor } from "@/hooks/useVendors";
+import { useVendors, useCreateVendor, type Vendor } from "@/hooks/useVendors";
 import { CheckCircle, XCircle, AlertCircle, Plus, Search, ExternalLink, Edit, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const VendorManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedVendor, setSelectedVendor] = useState<EnhancedVendor | null>(null);
+  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
   
-  const { data: vendors = [], isLoading } = useEnhancedVendors();
-  const createVendor = useCreateEnhancedVendor();
+  const { data: vendors = [], isLoading } = useVendors();
+  const createVendor = useCreateVendor();
 
   const filteredVendors = vendors.filter(vendor => {
     const matchesSearch = vendor.vendor_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -43,7 +43,7 @@ const VendorManagement = () => {
     }
   };
 
-  const getUniqueCategories = (): string[] => {
+  const getUniqueCategories = () => {
     const categories = vendors.map(v => v.category);
     return [...new Set(categories)];
   };

@@ -2,36 +2,30 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-export interface EnhancedVendor {
+export interface Vendor {
   id: string;
   vendor_name: string;
   vendor_type: string;
   category: string;
-  description?: string;
-  website_url?: string;
-  support_contact: Record<string, any>;
-  certifications: any[];
-  portnox_integration_level: string;
-  portnox_documentation: Record<string, any>;
   models: any[];
   supported_protocols: any[];
   integration_methods: any[];
-  portnox_compatibility: Record<string, any>;
-  configuration_templates: Record<string, any>;
+  portnox_compatibility: any;
+  configuration_templates: any;
   known_limitations: any[];
-  firmware_requirements: Record<string, any>;
+  firmware_requirements: any;
   documentation_links: any[];
-  support_level?: string;
+  support_level?: 'full' | 'partial' | 'limited' | 'none';
   last_tested_date?: string;
-  status: string;
+  status: 'active' | 'deprecated' | 'end-of-life';
   created_at: string;
   updated_at: string;
   created_by?: string;
 }
 
-export const useEnhancedVendors = () => {
+export const useVendors = () => {
   return useQuery({
-    queryKey: ['enhanced-vendors'],
+    queryKey: ['vendors'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('vendor_library')
@@ -39,14 +33,14 @@ export const useEnhancedVendors = () => {
         .order('vendor_name', { ascending: true });
       
       if (error) throw error;
-      return data as EnhancedVendor[];
+      return data as Vendor[];
     },
   });
 };
 
-export const useEnhancedVendor = (id: string) => {
+export const useVendor = (id: string) => {
   return useQuery({
-    queryKey: ['enhanced-vendor', id],
+    queryKey: ['vendors', id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('vendor_library')
@@ -55,44 +49,30 @@ export const useEnhancedVendor = (id: string) => {
         .maybeSingle();
       
       if (error) throw error;
-      return data as EnhancedVendor | null;
+      return data as Vendor | null;
     },
     enabled: !!id,
   });
 };
 
-export const useCreateEnhancedVendor = () => {
+export const useCreateVendor = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (vendor: Partial<EnhancedVendor>) => {
-      const user = await supabase.auth.getUser();
+    mutationFn: async (vendorData: Omit<Vendor, 'id' | 'created_at' | 'updated_at'>) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User must be authenticated');
+      }
+
       const { data, error } = await supabase
         .from('vendor_library')
-        .insert({
-          vendor_name: vendor.vendor_name!,
-          category: vendor.category!,
-          vendor_type: vendor.vendor_type!,
-          description: vendor.description,
-          website_url: vendor.website_url,
-          support_contact: vendor.support_contact || {},
-          certifications: vendor.certifications || [],
-          portnox_integration_level: vendor.portnox_integration_level || 'supported',
-          portnox_documentation: vendor.portnox_documentation || {},
-          models: vendor.models || [],
-          supported_protocols: vendor.supported_protocols || [],
-          integration_methods: vendor.integration_methods || [],
-          portnox_compatibility: vendor.portnox_compatibility || {},
-          configuration_templates: vendor.configuration_templates || {},
-          known_limitations: vendor.known_limitations || [],
-          firmware_requirements: vendor.firmware_requirements || {},
-          documentation_links: vendor.documentation_links || [],
-          support_level: vendor.support_level,
-          last_tested_date: vendor.last_tested_date,
-          status: vendor.status || 'active',
-          created_by: user.data.user?.id,
-        })
+        .insert([{
+          ...vendorData,
+          created_by: user.id,
+        }])
         .select()
         .maybeSingle();
 
@@ -100,32 +80,69 @@ export const useCreateEnhancedVendor = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['enhanced-vendors'] });
+      queryClient.invalidateQueries({ queryKey: ['vendors'] });
       toast({
         title: "Success",
-        description: "Vendor created successfully.",
+        description: "Vendor created successfully",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to create vendor.",
+        description: "Failed to create vendor: " + error.message,
         variant: "destructive",
       });
     },
   });
 };
 
-export const useUpdateEnhancedVendor = () => {
+export const useProjectVendors = (projectId: string) => {
+  return useQuery({
+    queryKey: ['project-vendors', projectId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('project_vendors')
+        .select(`
+          *,
+          vendor_library (*)
+        `)
+        .eq('project_id', projectId)
+        .order('role', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!projectId,
+  });
+};
+
+export const useAddVendorToProject = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ id, ...vendor }: Partial<EnhancedVendor> & { id: string }) => {
+    mutationFn: async ({
+      projectId,
+      vendorId,
+      role,
+      modelsUsed,
+      integrationNotes
+    }: {
+      projectId: string;
+      vendorId: string;
+      role: string;
+      modelsUsed?: any[];
+      integrationNotes?: string;
+    }) => {
       const { data, error } = await supabase
-        .from('vendor_library')
-        .update(vendor)
-        .eq('id', id)
+        .from('project_vendors')
+        .insert([{
+          project_id: projectId,
+          vendor_id: vendorId,
+          role,
+          models_used: modelsUsed || [],
+          integration_notes: integrationNotes,
+        }])
         .select()
         .maybeSingle();
 
@@ -133,46 +150,16 @@ export const useUpdateEnhancedVendor = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['enhanced-vendors'] });
+      queryClient.invalidateQueries({ queryKey: ['project-vendors'] });
       toast({
         title: "Success",
-        description: "Vendor updated successfully.",
+        description: "Vendor added to project successfully",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to update vendor.",
-        variant: "destructive",
-      });
-    },
-  });
-};
-
-export const useDeleteEnhancedVendor = () => {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('vendor_library')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['enhanced-vendors'] });
-      toast({
-        title: "Success",
-        description: "Vendor deleted successfully.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to delete vendor.",
+        description: "Failed to add vendor to project: " + error.message,
         variant: "destructive",
       });
     },

@@ -1,132 +1,150 @@
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
+import OneXerConfigWizard from "@/components/config/OneXerConfigWizard";
+import EnhancedConfigTemplateManager from "@/components/config/EnhancedConfigTemplateManager";
+import ConfigGeneratorManager from "@/components/config/ConfigGeneratorManager";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bot, Settings, Zap, Network, Shield, FileText, Target } from 'lucide-react';
-import ConfigWizardDialog from "@/components/config/ConfigWizardDialog";
+import { Brain, Settings, FileText, Sparkles, Zap, Target } from "lucide-react";
 
 const AIConfigCenter = () => {
-  const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("wizard");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const features = [
-    {
-      icon: Bot,
-      title: "AI-Powered Generation",
-      description: "Intelligent configuration creation with vendor-specific optimizations and best practices."
-    },
-    {
-      icon: Network,
-      title: "Multi-Vendor Support",
-      description: "Support for Cisco, Aruba, Juniper, and other major network vendors with precise syntax."
-    },
-    {
-      icon: Shield,
-      title: "Security First",
-      description: "Built-in security best practices, compliance frameworks, and advanced threat protection."
-    },
-    {
-      icon: Target,
-      title: "Scenario-Based",
-      description: "Pre-configured scenarios for common use cases: BYOD, IoT, Guest Access, and more."
-    }
-  ];
+  const handleConfigSave = (config: any) => {
+    console.log('Configuration saved:', config);
+    // Handle save logic here
+  };
+
+  const handleConfigCancel = () => {
+    window.history.back();
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="pt-8">
-        <div className="container mx-auto px-6 py-8">
-          <div className="text-center mb-12">
-            <Badge variant="glow" className="mb-4">
-              <Bot className="h-4 w-4 mr-2" />
-              AI Configuration Center
-            </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Intelligent <span className="bg-gradient-primary bg-clip-text text-transparent">Config Generation</span>
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-              Generate comprehensive 802.1X network access control configurations with AI-powered recommendations, 
-              vendor-specific optimization, and intelligent best practices.
-            </p>
+    <div className="min-h-screen bg-background">      
+      {/* Hero Section */}
+      <div className="pt-8 pb-8 bg-gradient-to-br from-background via-accent/10 to-primary/5">
+        <div className="container mx-auto px-6">
+          <div className="relative">
+            {/* Background Effects */}
+            <div className="absolute inset-0 bg-gradient-glow opacity-20 blur-3xl"></div>
             
-            <Button 
-              size="lg" 
-              onClick={() => setIsWizardOpen(true)}
-              className="bg-gradient-primary hover:bg-gradient-primary/90 text-white px-8 py-4 text-lg"
-            >
-              <Settings className="h-5 w-5 mr-2" />
-              Start Configuration Wizard
-              <Zap className="h-4 w-4 ml-2" />
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {features.map((feature, index) => (
-              <Card key={index} className="text-center">
-                <CardHeader>
-                  <div className="mx-auto p-3 rounded-lg bg-primary/10 w-fit">
-                    <feature.icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <CardTitle className="text-lg">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>{feature.description}</CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <Card className="bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl flex items-center justify-center gap-2">
-                <FileText className="h-6 w-6" />
-                Advanced Configuration Features
-              </CardTitle>
-              <CardDescription className="text-lg">
-                Comprehensive toolset for enterprise-grade network access control
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-primary">Authentication Methods</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• 802.1X with EAP variants</li>
-                    <li>• MAC Authentication Bypass</li>
-                    <li>• Web Authentication</li>
-                    <li>• Certificate-based Auth</li>
-                    <li>• Multi-Factor Authentication</li>
-                  </ul>
+            <div className="relative text-center space-y-6">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center shadow-glow">
+                  <Brain className="text-2xl text-primary-foreground animate-pulse" />
                 </div>
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-primary">Advanced Scenarios</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Zero Trust Architecture</li>
-                    <li>• IoT Device Profiling</li>
-                    <li>• BYOD & Guest Access</li>
-                    <li>• Healthcare & Industrial</li>
-                    <li>• Compliance & Privacy</li>
-                  </ul>
+                <Badge variant="glow" className="text-sm px-4 py-2">
+                  Intelligent Configuration Suite
+                </Badge>
+              </div>
+              
+              <h1 className="text-4xl md:text-6xl font-bold mb-4">
+                AI Config
+                <span className="bg-gradient-primary bg-clip-text text-transparent block">
+                  Gen1Xer Hub
+                </span>
+              </h1>
+              
+              <p className="text-lg text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+                Revolutionary AI-powered 802.1X configuration generation. Create, manage, and deploy 
+                enterprise-grade network access control configurations with intelligent automation, 
+                best practices, and seamless integration across your entire infrastructure.
+              </p>
+
+              {/* Quick Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 max-w-2xl mx-auto">
+                <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-primary">AI-Powered</div>
+                  <div className="text-sm text-muted-foreground">Smart Generation</div>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-primary">Enterprise Features</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Dynamic VLAN Assignment</li>
-                    <li>• RADIUS Load Balancing</li>
-                    <li>• CoA & Policy Updates</li>
-                    <li>• Troubleshooting Guides</li>
-                    <li>• Compliance Validation</li>
-                  </ul>
+                <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-primary">Enterprise</div>
+                  <div className="text-sm text-muted-foreground">Grade Security</div>
+                </div>
+                <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-primary">Automated</div>
+                  <div className="text-sm text-muted-foreground">Best Practices</div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
 
-      <ConfigWizardDialog 
-        isOpen={isWizardOpen}
-        onClose={() => setIsWizardOpen(false)}
-      />
+      {/* Main Content */}
+      <div className="container mx-auto px-6 py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 bg-card/50 backdrop-blur-sm border border-border/50">
+            <TabsTrigger value="wizard" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Config Wizard
+            </TabsTrigger>
+            <TabsTrigger value="templates" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Templates
+            </TabsTrigger>
+            <TabsTrigger value="ai-generator" className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              AI Generator
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="wizard" className="space-y-6">
+            <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
+              <CardHeader className="text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Target className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-2xl">Intelligent Configuration Wizard</CardTitle>
+                </div>
+                <CardDescription className="text-base">
+                  Step-by-step guided configuration with AI-powered recommendations
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <OneXerConfigWizard 
+                  onSave={handleConfigSave}
+                  onCancel={handleConfigCancel}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="templates" className="space-y-6">
+            <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
+              <CardHeader className="text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <FileText className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-2xl">Configuration Templates</CardTitle>
+                </div>
+                <CardDescription className="text-base">
+                  Manage and customize pre-built configuration templates for various scenarios
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <EnhancedConfigTemplateManager />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="ai-generator" className="space-y-6">
+            <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
+              <CardHeader className="text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Zap className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-2xl">AI Configuration Generator</CardTitle>
+                </div>
+                <CardDescription className="text-base">
+                  Advanced AI-powered configuration generation with custom requirements
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ConfigGeneratorManager searchTerm={searchTerm} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };
