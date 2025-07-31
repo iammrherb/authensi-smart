@@ -43,21 +43,26 @@ serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    const url = new URL(req.url);
-    const pathParts = url.pathname.split('/').filter(p => p);
-    const action = pathParts[pathParts.length - 1];
+    let action = '';
+    let requestData: any = {};
+
+    if (req.method === 'POST') {
+      requestData = await req.json();
+      action = requestData.action;
+    } else if (req.method === 'GET') {
+      const url = new URL(req.url);
+      action = url.searchParams.get('action') || 'pending';
+    }
     
     console.log('Request details:', {
       method: req.method,
-      pathname: url.pathname,
-      pathParts,
       action,
-      searchParams: url.search
+      requestData
     });
 
     if (req.method === 'POST') {
       if (action === 'invite') {
-        const { email, custom_role_id, scope_type = 'global', scope_id, personal_message }: InvitationRequest = await req.json();
+        const { email, custom_role_id, scope_type = 'global', scope_id, personal_message } = requestData;
         
         // Generate invitation token
         const invitation_token = crypto.randomUUID();
@@ -92,7 +97,7 @@ serve(async (req) => {
       }
 
       if (action === 'approve') {
-        const { invitation_id, action: approvalAction }: ApprovalRequest = await req.json();
+        const { invitation_id, approval_action: approvalAction } = requestData;
         
         // Check if user can approve invitations
         const { data: canManage } = await supabaseClient.rpc('can_manage_roles', {
@@ -134,7 +139,7 @@ serve(async (req) => {
       }
 
       if (action === 'accept') {
-        const { invitation_token, password, first_name, last_name } = await req.json();
+        const { invitation_token, password, first_name, last_name } = requestData;
         
         // Find and validate invitation
         const { data: invitation, error: findError } = await supabaseClient
@@ -214,7 +219,11 @@ serve(async (req) => {
 
         const { data: invitations, error } = await supabaseClient
           .from('user_invitations')
-          .select('*, custom_roles(*)')
+          .select(`
+            *,
+            custom_roles(*),
+            invited_by_profile:profiles!invited_by(*)
+          `)
           .eq('status', 'pending')
           .order('created_at', { ascending: false });
 
@@ -229,6 +238,7 @@ serve(async (req) => {
       }
 
       if (action === 'validate') {
+        const url = new URL(req.url);
         const token = url.searchParams.get('token');
         if (!token) {
           throw new Error('Missing invitation token');

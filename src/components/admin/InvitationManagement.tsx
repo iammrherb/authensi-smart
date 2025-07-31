@@ -69,7 +69,8 @@ const InvitationManagement: React.FC = () => {
   const { data: invitations = [], isLoading } = useQuery({
     queryKey: ['user-invitations'],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('user-invitation/pending', {
+      // For GET requests, we need to append query parameters to the URL
+      const { data, error } = await supabase.functions.invoke('user-invitation?action=pending', {
         method: 'GET'
       });
       
@@ -86,8 +87,8 @@ const InvitationManagement: React.FC = () => {
       scope_type: string;
       personal_message?: string;
     }) => {
-      const { data, error } = await supabase.functions.invoke('user-invitation/invite', {
-        body: inviteData
+      const { data, error } = await supabase.functions.invoke('user-invitation', {
+        body: { action: 'invite', ...inviteData }
       });
       
       if (error) throw error;
@@ -116,8 +117,8 @@ const InvitationManagement: React.FC = () => {
   // Approve/reject invitation mutation
   const approvalMutation = useMutation({
     mutationFn: async ({ invitation_id, action }: { invitation_id: string; action: 'approve' | 'reject' }) => {
-      const { data, error } = await supabase.functions.invoke('user-invitation/approve', {
-        body: { invitation_id, action }
+      const { data, error } = await supabase.functions.invoke('user-invitation', {
+        body: { action: 'approve', invitation_id, approval_action: action }
       });
       
       if (error) throw error;
