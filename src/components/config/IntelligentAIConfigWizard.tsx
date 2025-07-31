@@ -9,138 +9,136 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Brain, Lightbulb, Target, TrendingUp, Shield, Users, Building2, 
-  Network, Clock, Settings, AlertTriangle, CheckCircle, Zap,
+  Network, Clock, DollarSign, AlertTriangle, CheckCircle, Zap,
   MessageSquare, Bot, Star, ArrowRight, ArrowLeft, Sparkles,
-  Globe, Server, Database, Lock, Smartphone, Monitor, Router
+  Globe, Server, Database, Lock, Smartphone, Monitor, Settings
 } from 'lucide-react';
 
 import { useAI } from '@/hooks/useAI';
+import { useEnhancedVendors } from '@/hooks/useVendors';
 import { useVendorModels } from '@/hooks/useVendorModels';
+import { useConfigTemplates } from '@/hooks/useConfigTemplates';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-
-interface VendorModel {
-  id: string;
-  vendor_id: string;
-  model_name: string;
-  model_series: string;
-  supported_features: any; // JSON field from database
-  configuration_notes: string;
-  firmware_versions: any; // JSON field from database
-}
-
-interface Vendor {
-  id: string;
-  name: string;
-  category: string;
-  description: string;
-}
 
 interface ConfigRecommendation {
   id: string;
-  type: 'deployment' | 'security' | 'integration' | 'performance' | 'best_practice';
+  type: 'template' | 'vendor' | 'security' | 'performance' | 'compliance' | 'integration';
   title: string;
   description: string;
   confidence: number;
   impact: 'low' | 'medium' | 'high' | 'critical';
   implementation_effort: 'low' | 'medium' | 'high';
   reasoning: string;
-  config_snippet?: string;
+  config_snippet: string;
+  validation_commands: string[];
+  troubleshooting_steps: string[];
+  dependencies: string[];
+  security_considerations: string[];
 }
 
 interface ConfigContext {
-  organization: string;
-  industry: string;
-  network_size: string;
-  security_level: string;
-  compliance_needs: string[];
-  selected_vendor: string;
-  selected_model: string;
-  deployment_scenario: string;
+  vendor: string;
+  model: string;
+  deployment_type: string;
+  environment_size: string;
+  security_requirements: string[];
+  compliance_frameworks: string[];
+  integration_points: string[];
+  use_cases: string[];
   authentication_methods: string[];
-  integration_requirements: string[];
+  network_topology: string;
 }
 
 interface IntelligentConfigData {
-  // Context Discovery
-  context_discovery: {
-    organization_profile: {
-      name: string;
-      industry: string;
+  // Core Configuration Context
+  config_context: {
+    vendor_name: string;
+    model_name: string;
+    firmware_version: string;
+    deployment_scenario: string;
+    environment_type: string;
+    site_characteristics: {
       size: string;
-      security_posture: string;
-      compliance_requirements: string[];
-      current_challenges: string[];
-    };
-    network_environment: {
-      topology: string;
-      vendor_ecosystem: Array<{vendor: string; role: string; models: string[];}>;
-      device_count: number;
-      site_complexity: string;
-      integration_points: string[];
+      user_count: number;
+      device_types: string[];
+      network_topology: string;
+      bandwidth_requirements: string;
+      availability_requirements: string;
     };
     security_requirements: {
       authentication_methods: string[];
-      authorization_needs: string[];
-      monitoring_requirements: string[];
+      encryption_standards: string[];
       compliance_frameworks: string[];
+      access_policies: string[];
+      monitoring_requirements: string[];
     };
   };
 
-  // Technical Configuration
-  technical_configuration: {
-    selected_vendor: string;
-    selected_model: string;
-    deployment_scenario: string;
-    network_settings: {
-      vlan_strategy: string;
-      radius_config: any;
-      switch_ports: any;
-      wireless_config: any;
+  // Technical Requirements
+  technical_requirements: {
+    integration_points: Array<{
+      system: string;
+      integration_type: string;
+      protocol: string;
+      configuration_notes: string;
+      validation_steps: string[];
+    }>;
+    network_configuration: {
+      vlan_structure: string;
+      ip_addressing: string;
+      routing_requirements: string;
+      firewall_rules: string[];
+      port_requirements: string[];
     };
-    security_policies: {
-      authentication_policies: any[];
-      authorization_rules: any[];
-      guest_access: any;
-      device_compliance: any;
+    performance_requirements: {
+      throughput_needs: string;
+      latency_requirements: string;
+      concurrent_sessions: number;
+      scalability_factors: string[];
     };
   };
 
-  // AI Analysis & Generation
+  // AI Configuration Analysis
   ai_analysis: {
-    recommendations: ConfigRecommendation[];
-    risk_assessment: Array<{
-      risk: string;
-      impact: string;
+    optimal_configuration: string;
+    security_optimizations: string[];
+    performance_tuning: string[];
+    best_practices_applied: string[];
+    potential_issues: Array<{
+      issue: string;
+      severity: 'low' | 'medium' | 'high' | 'critical';
       mitigation: string;
-      priority: string;
+      validation: string;
     }>;
-    optimization_suggestions: Array<{
-      area: string;
-      suggestion: string;
-      expected_benefit: string;
-    }>;
-    best_practices: string[];
   };
 
-  // Generated Configuration
-  generated_configuration: {
-    primary_config: string;
-    supporting_configs: Array<{
-      component: string;
-      config: string;
-      description: string;
+  // Generated Recommendations
+  ai_recommendations: {
+    configuration_recommendations: ConfigRecommendation[];
+    security_recommendations: ConfigRecommendation[];
+    performance_recommendations: ConfigRecommendation[];
+    compliance_recommendations: ConfigRecommendation[];
+    integration_recommendations: ConfigRecommendation[];
+    troubleshooting_recommendations: ConfigRecommendation[];
+  };
+
+  // Conversation History
+  conversation_context: {
+    questions_asked: Array<{
+      question: string;
+      answer: string;
+      timestamp: string;
+      confidence_level: number;
+      follow_up_needed: boolean;
     }>;
-    validation_commands: string[];
-    troubleshooting_guide: Array<{
-      issue: string;
-      symptoms: string[];
-      resolution: string;
-    }>;
-    implementation_notes: string[];
+    inferred_requirements: string[];
+    assumptions_made: string[];
+    clarifications_needed: string[];
+    recommendation_reasoning: string[];
   };
 }
 
@@ -157,180 +155,118 @@ const IntelligentAIConfigWizard: React.FC<IntelligentAIConfigWizardProps> = ({
   onComplete,
   onCancel
 }) => {
-  const [currentPhase, setCurrentPhase] = useState<'discovery' | 'technical' | 'analysis' | 'generation'>('discovery');
+  const [currentPhase, setCurrentPhase] = useState<'context' | 'technical' | 'analysis' | 'generation' | 'review'>('context');
   const [conversationStep, setConversationStep] = useState(0);
   const [isAIThinking, setIsAIThinking] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState('');
   const [aiResponse, setAiResponse] = useState('');
   const [userInput, setUserInput] = useState('');
   
-  const [vendors, setVendors] = useState<Vendor[]>([]);
-  const [vendorModels, setVendorModels] = useState<VendorModel[]>([]);
-  const [filteredModels, setFilteredModels] = useState<VendorModel[]>([]);
-  
   const [configData, setConfigData] = useState<IntelligentConfigData>({
-    context_discovery: {
-      organization_profile: {
-        name: '', industry: '', size: '', security_posture: '', 
-        compliance_requirements: [], current_challenges: []
-      },
-      network_environment: {
-        topology: '', vendor_ecosystem: [], device_count: 0, 
-        site_complexity: '', integration_points: []
+    config_context: {
+      vendor_name: '', model_name: '', firmware_version: '', deployment_scenario: '',
+      environment_type: '', 
+      site_characteristics: {
+        size: '', user_count: 0, device_types: [], network_topology: '',
+        bandwidth_requirements: '', availability_requirements: ''
       },
       security_requirements: {
-        authentication_methods: [], authorization_needs: [], 
-        monitoring_requirements: [], compliance_frameworks: []
+        authentication_methods: [], encryption_standards: [], compliance_frameworks: [],
+        access_policies: [], monitoring_requirements: []
       }
     },
-    technical_configuration: {
-      selected_vendor: '', selected_model: '', deployment_scenario: '',
-      network_settings: { vlan_strategy: '', radius_config: {}, switch_ports: {}, wireless_config: {} },
-      security_policies: { authentication_policies: [], authorization_rules: [], guest_access: {}, device_compliance: {} }
+    technical_requirements: {
+      integration_points: [],
+      network_configuration: {
+        vlan_structure: '', ip_addressing: '', routing_requirements: '',
+        firewall_rules: [], port_requirements: []
+      },
+      performance_requirements: {
+        throughput_needs: '', latency_requirements: '', concurrent_sessions: 0,
+        scalability_factors: []
+      }
     },
     ai_analysis: {
-      recommendations: [], risk_assessment: [], optimization_suggestions: [], best_practices: []
+      optimal_configuration: '', security_optimizations: [], performance_tuning: [],
+      best_practices_applied: [], potential_issues: []
     },
-    generated_configuration: {
-      primary_config: '', supporting_configs: [], validation_commands: [], 
-      troubleshooting_guide: [], implementation_notes: []
+    ai_recommendations: {
+      configuration_recommendations: [], security_recommendations: [], 
+      performance_recommendations: [], compliance_recommendations: [],
+      integration_recommendations: [], troubleshooting_recommendations: []
+    },
+    conversation_context: {
+      questions_asked: [], inferred_requirements: [], assumptions_made: [],
+      clarifications_needed: [], recommendation_reasoning: []
     }
   });
 
   const { generateCompletion } = useAI();
+  const { data: vendors = [] } = useEnhancedVendors();
+  const { data: vendorModels = [] } = useVendorModels();
+  const { data: templates = [] } = useConfigTemplates();
   const { toast } = useToast();
 
-  // Load vendors and models from database
-  useEffect(() => {
-    const loadVendorsAndModels = async () => {
-      try {
-        // Load vendors
-        const { data: vendorData, error: vendorError } = await supabase
-          .from('vendor_models')
-          .select(`
-            vendor_id,
-            vendors!inner(id, name, category, description)
-          `)
-          .eq('vendors.category', 'Network Infrastructure');
-
-        if (vendorError) throw vendorError;
-
-        // Extract unique vendors
-        const uniqueVendors = vendorData
-          ?.reduce((acc: Vendor[], item: any) => {
-            const vendor = item.vendors;
-            if (!acc.find(v => v.id === vendor.id)) {
-              acc.push(vendor);
-            }
-            return acc;
-          }, []) || [];
-
-        setVendors(uniqueVendors);
-
-        // Load all vendor models
-        const { data: modelData, error: modelError } = await supabase
-          .from('vendor_models')
-          .select('*');
-
-        if (modelError) throw modelError;
-        setVendorModels((modelData || []) as VendorModel[]);
-
-      } catch (error) {
-        console.error('Error loading vendors/models:', error);
-        toast({
-          title: "Error Loading Data",
-          description: "Failed to load vendor and model information.",
-          variant: "destructive"
-        });
-      }
-    };
-
-    loadVendorsAndModels();
-  }, [toast]);
-
-  // Filter models when vendor is selected
-  useEffect(() => {
-    if (configData.technical_configuration.selected_vendor) {
-      const filtered = vendorModels.filter(
-        model => model.vendor_id === configData.technical_configuration.selected_vendor
-      );
-      setFilteredModels(filtered);
-    } else {
-      setFilteredModels([]);
-    }
-  }, [configData.technical_configuration.selected_vendor, vendorModels]);
-
-  // AI-driven conversation flow
+  // AI-driven conversation flow for configuration
   const conversationFlow = [
     {
       phase: 'Context Discovery',
       questions: [
-        "Let's start by understanding your organization and network environment. What's your company name and primary industry?",
-        "What specific network access control challenges are you trying to solve? What's not working with your current setup?",
-        "Tell me about your network infrastructure - what vendors and models are you currently using for switches, wireless, and security?",
-        "What compliance requirements do you need to meet, and what's your current security posture?"
+        "Welcome to the Portnox AI Configuration Assistant! Let's start by understanding your specific deployment needs. Which vendor device are you configuring and what's the deployment scenario?",
+        "Tell me about your environment - how many users, what types of devices, and what's your network topology like?",
+        "What are your primary security requirements? Are there specific compliance frameworks you need to meet?",
+        "What authentication methods do you need to support? (802.1X, MAB, Guest access, etc.)"
       ]
     },
     {
-      phase: 'Technical Deep Dive',
+      phase: 'Technical Requirements',
       questions: [
-        "Which vendor and model will you be configuring for 802.1X? What's the specific deployment scenario?",
-        "What authentication methods do you want to implement - certificates, username/password, or both?",
-        "How do you want to handle different device types - corporate laptops, BYOD, IoT devices, guests?",
-        "What VLAN strategy and network segmentation approach fits your security model?"
+        "What systems need to integrate with this configuration? (LDAP, AD, RADIUS servers, etc.)",
+        "Describe your network architecture - VLANs, subnets, and any special routing requirements.",
+        "What are your performance requirements? Expected throughput, concurrent sessions, latency needs?",
+        "Are there any specific policies or access control requirements for different user groups?"
       ]
     },
     {
-      phase: 'Requirements Analysis',
+      phase: 'Advanced Configuration',
       questions: [
-        "What integration points do you need - SIEM, ITSM, monitoring tools, identity providers?",
-        "What are your performance requirements - how many concurrent users, authentication speed expectations?",
-        "How do you want to handle failures and fallback scenarios for business continuity?",
-        "What monitoring and reporting capabilities are most important for your team?"
-      ]
-    },
-    {
-      phase: 'Configuration Generation',
-      questions: [
-        "Based on everything we've discussed, I'm now generating your optimized 802.1X configuration...",
-        "I'm analyzing best practices for your specific vendor and deployment scenario...",
-        "Creating security policies and access rules based on your requirements...",
-        "Finalizing configuration with validation commands and troubleshooting guidance..."
+        "Do you have any existing configurations that need to be preserved or migrated?",
+        "What monitoring and logging requirements do you have?",
+        "Are there any specific troubleshooting or maintenance considerations?",
+        "What's your change management process for configuration updates?"
       ]
     }
   ];
 
-  // Generate contextual AI questions
+  // Generate contextual AI questions based on previous answers
   const generateContextualQuestion = useCallback(async (context: ConfigContext) => {
     setIsAIThinking(true);
     
     const prompt = `
-    You are an expert Network Access Control engineer specializing in 802.1X configurations. Based on the conversation context below, generate the next most insightful question to ask that will help create the best possible network configuration.
+    You are an expert Network Engineer and Portnox Configuration Specialist. Based on the configuration context below, generate the next most insightful question to ask that will help create the optimal configuration.
 
     Context:
-    - Organization: ${context.organization}
-    - Industry: ${context.industry}
-    - Network Size: ${context.network_size}
-    - Security Level: ${context.security_level}
-    - Compliance Needs: ${context.compliance_needs.join(', ')}
-    - Selected Vendor: ${context.selected_vendor}
-    - Selected Model: ${context.selected_model}
-    - Deployment Scenario: ${context.deployment_scenario}
+    - Vendor: ${context.vendor}
+    - Model: ${context.model}
+    - Deployment Type: ${context.deployment_type}
+    - Environment Size: ${context.environment_size}
+    - Security Requirements: ${context.security_requirements.join(', ')}
+    - Use Cases: ${context.use_cases.join(', ')}
     
     Generate a question that:
-    1. Builds on the technical details already provided
-    2. Uncovers specific configuration requirements
-    3. Considers vendor-specific capabilities and limitations
-    4. Addresses security and compliance implications
-    5. Reveals operational and maintenance considerations
+    1. Builds on the technical context we already know
+    2. Uncovers hidden configuration requirements
+    3. Helps identify potential integration challenges
+    4. Considers security and performance implications
+    5. Reveals operational or maintenance considerations
     
-    Make it technical but conversational, focusing on practical implementation details.
+    Make it technical and specific to network configuration, not just a general question.
     `;
 
     try {
       const response = await generateCompletion({
         prompt,
-        context: 'intelligent_config',
+        context: 'config_discovery',
         temperature: 0.7
       });
 
@@ -338,423 +274,787 @@ const IntelligentAIConfigWizard: React.FC<IntelligentAIConfigWizardProps> = ({
         setCurrentQuestion(response.content);
       }
     } catch (error) {
-      console.error('Error generating question:', error);
-      setCurrentQuestion(getDefaultQuestion());
+      console.error('Error generating contextual question:', error);
     } finally {
       setIsAIThinking(false);
     }
   }, [generateCompletion]);
 
-  const getDefaultQuestion = () => {
-    const currentFlow = conversationFlow[Math.min(Math.floor(conversationStep / 4), conversationFlow.length - 1)];
-    return currentFlow.questions[conversationStep % 4] || "Please tell me more about your requirements.";
-  };
+  // Process user input and generate AI analysis
+  const processUserInput = useCallback(async (input: string) => {
+    if (!input.trim()) return;
 
-  // Generate AI recommendations and configuration
-  const generateAIRecommendations = useCallback(async () => {
     setIsAIThinking(true);
-    
-    const prompt = `
-    Generate comprehensive 802.1X configuration recommendations based on:
-    
-    Organization: ${configData.context_discovery.organization_profile.name}
-    Industry: ${configData.context_discovery.organization_profile.industry}
-    Vendor: ${configData.technical_configuration.selected_vendor}
-    Model: ${configData.technical_configuration.selected_model}
-    Scenario: ${configData.technical_configuration.deployment_scenario}
-    
-    Provide:
-    1. Deployment recommendations with confidence scores
-    2. Security recommendations for the specific vendor/model
-    3. Integration recommendations for their environment
-    4. Performance optimization suggestions
-    5. Best practice recommendations
-    
-    Format as JSON with detailed reasoning for each recommendation.
-    `;
 
-    try {
-      const response = await generateCompletion({
-        prompt,
-        context: 'config_recommendations',
-        temperature: 0.3
-      });
-
-      if (response?.content) {
-        // Parse AI recommendations and update state
-        try {
-          const recommendations = JSON.parse(response.content);
-          setConfigData(prev => ({
-            ...prev,
-            ai_analysis: {
-              ...prev.ai_analysis,
-              recommendations: recommendations.recommendations || []
-            }
-          }));
-        } catch (parseError) {
-          console.error('Error parsing AI recommendations:', parseError);
-        }
-      }
-    } catch (error) {
-      console.error('Error generating recommendations:', error);
-    } finally {
-      setIsAIThinking(false);
-    }
-  }, [configData, generateCompletion]);
-
-  // Generate actual configuration
-  const generateConfiguration = useCallback(async () => {
-    setIsAIThinking(true);
-    
-    const selectedVendorName = vendors.find(v => v.id === configData.technical_configuration.selected_vendor)?.name || '';
-    const selectedModelData = vendorModels.find(m => m.id === configData.technical_configuration.selected_model);
-    
-    const prompt = `
-    Generate a complete 802.1X configuration for:
-    
-    Vendor: ${selectedVendorName}
-    Model: ${selectedModelData?.model_name || ''} (${selectedModelData?.model_series || ''})
-    Features: ${Array.isArray(selectedModelData?.supported_features) ? selectedModelData.supported_features.join(', ') : JSON.stringify(selectedModelData?.supported_features) || ''}
-    Scenario: ${configData.technical_configuration.deployment_scenario}
-    
-    Organization Context:
-    - Industry: ${configData.context_discovery.organization_profile.industry}
-    - Security Level: ${configData.context_discovery.organization_profile.security_posture}
-    - Compliance: ${configData.context_discovery.organization_profile.compliance_requirements.join(', ')}
-    
-    Generate:
-    1. Complete switch/device configuration
-    2. RADIUS server configuration snippets
-    3. Supporting network configurations (VLANs, ACLs)
-    4. Validation and testing commands
-    5. Troubleshooting guide with common issues
-    6. Implementation notes and best practices
-    
-    Make it production-ready with proper syntax and security considerations.
-    `;
-
-    try {
-      const response = await generateCompletion({
-        prompt,
-        context: 'config_generation',
-        temperature: 0.2
-      });
-
-      if (response?.content) {
-        setConfigData(prev => ({
-          ...prev,
-          generated_configuration: {
-            ...prev.generated_configuration,
-            primary_config: response.content
-          }
-        }));
-      }
-    } catch (error) {
-      console.error('Error generating configuration:', error);
-    } finally {
-      setIsAIThinking(false);
-    }
-  }, [configData, vendors, vendorModels, generateCompletion]);
-
-  const handleUserResponse = async () => {
-    if (!userInput.trim()) return;
-
-    // Store the conversation
+    // Add to conversation history
     const newQuestion = {
       question: currentQuestion,
-      answer: userInput,
+      answer: input,
       timestamp: new Date().toISOString(),
       confidence_level: 0.8,
       follow_up_needed: false
     };
 
-    // Process the response based on current phase
-    if (currentPhase === 'discovery') {
-      // Update organization profile
-      setConfigData(prev => ({
-        ...prev,
-        context_discovery: {
-          ...prev.context_discovery,
-          organization_profile: {
-            ...prev.context_discovery.organization_profile,
-            name: conversationStep === 0 ? userInput.split(',')[0]?.trim() || prev.context_discovery.organization_profile.name : prev.context_discovery.organization_profile.name,
-            industry: conversationStep === 0 ? userInput.split(',')[1]?.trim() || prev.context_discovery.organization_profile.industry : prev.context_discovery.organization_profile.industry,
-            current_challenges: conversationStep === 1 ? [userInput] : prev.context_discovery.organization_profile.current_challenges
+    setConfigData(prev => ({
+      ...prev,
+      conversation_context: {
+        ...prev.conversation_context,
+        questions_asked: [...prev.conversation_context.questions_asked, newQuestion]
+      }
+    }));
+
+    // Generate AI analysis of the response
+    const analysisPrompt = `
+    Analyze this response from a network engineer configuring Portnox NAC and extract key technical insights:
+    
+    Question: ${currentQuestion}
+    Answer: ${input}
+    
+    Extract:
+    1. Technical requirements and specifications
+    2. Network architecture details
+    3. Security and compliance needs
+    4. Integration requirements
+    5. Performance considerations
+    6. Operational requirements
+    7. Potential configuration challenges
+    
+    Provide structured insights that will help build optimal configurations.
+    `;
+
+    try {
+      const analysisResponse = await generateCompletion({
+        prompt: analysisPrompt,
+        context: 'config_analysis',
+        temperature: 0.3
+      });
+
+      if (analysisResponse?.content) {
+        setAiResponse(analysisResponse.content);
+      }
+
+      // Move to next question or generate contextual follow-up
+      if (conversationStep < conversationFlow[0].questions.length - 1) {
+        setConversationStep(prev => prev + 1);
+        // Use predefined questions first, then generate contextual ones
+        const nextQuestion = conversationFlow[0].questions[conversationStep + 1];
+        if (nextQuestion) {
+          setCurrentQuestion(nextQuestion);
+        } else {
+          await generateContextualQuestion({
+            vendor: configData.config_context.vendor_name,
+            model: configData.config_context.model_name,
+            deployment_type: configData.config_context.deployment_scenario,
+            environment_size: configData.config_context.site_characteristics.size,
+            security_requirements: configData.config_context.security_requirements.authentication_methods,
+            compliance_frameworks: configData.config_context.security_requirements.compliance_frameworks,
+            integration_points: [],
+            use_cases: [],
+            authentication_methods: configData.config_context.security_requirements.authentication_methods,
+            network_topology: configData.config_context.site_characteristics.network_topology
+          });
+        }
+      } else {
+        // Move to analysis phase
+        setCurrentPhase('analysis');
+        await generateComprehensiveConfiguration();
+      }
+
+    } catch (error) {
+      console.error('Error processing user input:', error);
+      toast({
+        title: "Analysis Error",
+        description: "Failed to process your response. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAIThinking(false);
+      setUserInput('');
+    }
+  }, [currentQuestion, conversationStep, configData, generateCompletion, generateContextualQuestion, toast]);
+
+  // Generate comprehensive AI configuration
+  const generateComprehensiveConfiguration = useCallback(async () => {
+    setIsAIThinking(true);
+
+    const conversationHistory = configData.conversation_context.questions_asked
+      .map(qa => `Q: ${qa.question}\nA: ${qa.answer}`)
+      .join('\n\n');
+
+    const configPrompt = `
+    Based on this comprehensive configuration discovery conversation, generate a detailed Portnox NAC configuration:
+
+    Conversation History:
+    ${conversationHistory}
+
+    Generate:
+    1. Complete device configuration optimized for the specified environment
+    2. Security policies and access control rules
+    3. Authentication method configurations
+    4. Network integration settings (VLANs, subnets, routing)
+    5. Performance optimization parameters
+    6. Monitoring and logging configuration
+    7. Troubleshooting commands and validation steps
+    8. Best practices implementation
+    9. Potential issues and mitigation strategies
+    10. Integration-specific configurations
+
+    Provide complete, ready-to-deploy configuration with detailed explanations.
+    `;
+
+    try {
+      const response = await generateCompletion({
+        prompt: configPrompt,
+        context: 'comprehensive_config',
+        temperature: 0.4
+      });
+
+      if (response?.content) {
+        // Parse AI response and structure configuration
+        const configRecommendations: ConfigRecommendation[] = [
+          {
+            id: '1',
+            type: 'template',
+            title: 'Optimized Base Configuration',
+            description: 'Complete device configuration optimized for your environment',
+            confidence: 0.95,
+            impact: 'high',
+            implementation_effort: 'medium',
+            reasoning: 'Based on your network topology and security requirements',
+            config_snippet: response.content,
+            validation_commands: ['show config', 'show status', 'test authentication'],
+            troubleshooting_steps: ['Check connectivity', 'Verify RADIUS', 'Test policies'],
+            dependencies: ['Network connectivity', 'RADIUS server', 'Certificate installation'],
+            security_considerations: ['Secure communication', 'Policy validation', 'Access logging']
           }
-        }
-      }));
+        ];
+
+        setConfigData(prev => ({
+          ...prev,
+          ai_recommendations: {
+            ...prev.ai_recommendations,
+            configuration_recommendations: configRecommendations
+          },
+          ai_analysis: {
+            ...prev.ai_analysis,
+            optimal_configuration: response.content
+          }
+        }));
+
+        setCurrentPhase('generation');
+      }
+    } catch (error) {
+      console.error('Error generating configuration:', error);
+      toast({
+        title: "Configuration Error",
+        description: "Failed to generate configuration. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAIThinking(false);
     }
+  }, [configData.conversation_context.questions_asked, generateCompletion, toast]);
 
-    setUserInput('');
-    setConversationStep(prev => prev + 1);
+  // Initialize the conversation
+  useEffect(() => {
+    if (conversationStep === 0 && currentPhase === 'context') {
+      setCurrentQuestion("Welcome to the Portnox AI Configuration Assistant! I'm here to help you create the optimal configuration for your specific deployment. Let's start with understanding your device and deployment scenario - which vendor device are you configuring and what type of deployment is this?");
+    }
+  }, [conversationStep, currentPhase]);
 
-    // Generate next question or move to next phase
-    if (conversationStep < 15) {
-      setTimeout(() => {
-        const context: ConfigContext = {
-          organization: configData.context_discovery.organization_profile.name,
-          industry: configData.context_discovery.organization_profile.industry,
-          network_size: 'medium',
-          security_level: configData.context_discovery.organization_profile.security_posture,
-          compliance_needs: configData.context_discovery.organization_profile.compliance_requirements,
-          selected_vendor: configData.technical_configuration.selected_vendor,
-          selected_model: configData.technical_configuration.selected_model,
-          deployment_scenario: configData.technical_configuration.deployment_scenario,
-          authentication_methods: configData.context_discovery.security_requirements.authentication_methods,
-          integration_requirements: configData.context_discovery.network_environment.integration_points
-        };
-
-        if (conversationStep >= 8 && conversationStep < 12) {
-          setCurrentPhase('technical');
-        } else if (conversationStep >= 12 && conversationStep < 15) {
-          setCurrentPhase('analysis');
-        } else if (conversationStep >= 15) {
-          setCurrentPhase('generation');
-          generateConfiguration();
-          return;
-        }
-
-        generateContextualQuestion(context);
-      }, 1000);
+  const handleUserSubmit = () => {
+    if (userInput.trim()) {
+      processUserInput(userInput);
     }
   };
 
-  const handleVendorChange = (vendorId: string) => {
-    setConfigData(prev => ({
-      ...prev,
-      technical_configuration: {
-        ...prev.technical_configuration,
-        selected_vendor: vendorId,
-        selected_model: '' // Reset model when vendor changes
-      }
-    }));
-  };
-
-  const handleModelChange = (modelId: string) => {
-    setConfigData(prev => ({
-      ...prev,
-      technical_configuration: {
-        ...prev.technical_configuration,
-        selected_model: modelId
-      }
-    }));
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleUserSubmit();
+    }
   };
 
   const getPhaseProgress = () => {
-    const phaseSteps = {
-      discovery: 8,
-      technical: 4,
-      analysis: 3,
-      generation: 1
-    };
-    
-    const totalSteps = Object.values(phaseSteps).reduce((a, b) => a + b, 0);
-    return Math.min((conversationStep / totalSteps) * 100, 100);
+    switch (currentPhase) {
+      case 'context': return 25;
+      case 'technical': return 50;
+      case 'analysis': return 75;
+      case 'generation': return 90;
+      case 'review': return 100;
+      default: return 0;
+    }
   };
 
-  const renderConversationInterface = () => (
-    <div className="space-y-6">
-      {/* Phase Indicator */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Brain className="h-5 w-5 text-blue-500" />
-          <span className="font-medium">
-            {currentPhase === 'discovery' && 'Context Discovery'}
-            {currentPhase === 'technical' && 'Technical Configuration'}
-            {currentPhase === 'analysis' && 'Requirements Analysis'}
-            {currentPhase === 'generation' && 'Configuration Generation'}
-          </span>
-        </div>
-        <Badge variant="glow">
-          Step {conversationStep + 1}
-        </Badge>
-      </div>
-
-      {/* Progress */}
-      <div>
-        <div className="flex justify-between text-sm text-muted-foreground mb-2">
-          <span>Progress</span>
-          <span>{Math.round(getPhaseProgress())}%</span>
-        </div>
-        <Progress value={getPhaseProgress()} className="h-2" />
-      </div>
-
-      {/* AI Question */}
-      <Card className="border-blue-200 bg-blue-50/50 dark:bg-blue-950/20">
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
-              <Bot className="h-4 w-4 text-white" />
-            </div>
-            <div className="flex-1">
-              {isAIThinking ? (
-                <div className="flex items-center gap-2 text-blue-600">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                  <span>AI is thinking...</span>
-                </div>
-              ) : (
-                <p className="text-blue-900 dark:text-blue-100">
-                  {currentQuestion || getDefaultQuestion()}
-                </p>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Vendor/Model Selection (during technical phase) */}
-      {currentPhase === 'technical' && conversationStep >= 8 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              Vendor & Model Selection
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="vendor-select">Select Vendor</Label>
-              <Select value={configData.technical_configuration.selected_vendor} onValueChange={handleVendorChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose your network vendor" />
-                </SelectTrigger>
-                <SelectContent>
-                  {vendors.map((vendor) => (
-                    <SelectItem key={vendor.id} value={vendor.id}>
-                      {vendor.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {configData.technical_configuration.selected_vendor && (
-              <div>
-                <Label htmlFor="model-select">Select Model</Label>
-                <Select value={configData.technical_configuration.selected_model} onValueChange={handleModelChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose your device model" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {filteredModels.map((model) => (
-                      <SelectItem key={model.id} value={model.id}>
-                        {model.model_name} ({model.model_series})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {configData.technical_configuration.selected_model && (
-              <div>
-                <Label htmlFor="scenario-select">Deployment Scenario</Label>
-                <Select 
-                  value={configData.technical_configuration.deployment_scenario} 
-                  onValueChange={(value) => setConfigData(prev => ({
-                    ...prev,
-                    technical_configuration: {
-                      ...prev.technical_configuration,
-                      deployment_scenario: value
-                    }
-                  }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose deployment scenario" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="basic_dot1x">Basic 802.1X Authentication</SelectItem>
-                    <SelectItem value="dot1x_with_mab">802.1X with MAB Fallback</SelectItem>
-                    <SelectItem value="guest_access">Guest Access with Portal</SelectItem>
-                    <SelectItem value="iot_segmentation">IoT Device Segmentation</SelectItem>
-                    <SelectItem value="byod_environment">BYOD Environment</SelectItem>
-                    <SelectItem value="high_security">High Security Deployment</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* User Response */}
-      {currentPhase !== 'generation' && (
-        <Card>
-          <CardContent className="p-4">
-            <div className="space-y-4">
-              <Textarea
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                placeholder="Please share your thoughts and requirements..."
-                className="min-h-[100px]"
-              />
-              <div className="flex justify-between">
-                <Button variant="outline" onClick={onCancel}>
-                  Cancel
-                </Button>
-                <Button onClick={handleUserResponse} disabled={!userInput.trim()}>
-                  Continue <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Configuration Result */}
-      {currentPhase === 'generation' && configData.generated_configuration.primary_config && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
-              Generated Configuration
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm max-h-96 overflow-y-auto">
-              <pre>{configData.generated_configuration.primary_config}</pre>
-            </div>
-            <div className="mt-4 flex gap-2">
-              <Button onClick={() => onComplete?.(configData)}>
-                Save Configuration
-              </Button>
-              <Button variant="outline" onClick={() => {
-                navigator.clipboard.writeText(configData.generated_configuration.primary_config);
-                toast({ title: "Copied to clipboard" });
-              }}>
-                Copy to Clipboard
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-
-  // Initialize first question
-  useEffect(() => {
-    if (!currentQuestion) {
-      setCurrentQuestion(getDefaultQuestion());
+  const handleComplete = () => {
+    if (onComplete) {
+      onComplete(configData);
     }
-  }, [currentQuestion]);
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <Badge variant="glow" className="mb-4">
-          <Zap className="h-3 w-3 mr-1" />
-          AI-Powered Configuration
-        </Badge>
-        <h2 className="text-3xl font-bold mb-2">
-          Intelligent <span className="bg-gradient-primary bg-clip-text text-transparent">802.1X Config</span> Wizard
-        </h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Advanced AI-driven configuration generation with vendor-specific optimization, 
-          security best practices, and intelligent recommendations.
-        </p>
-      </div>
+    <div className="max-w-6xl mx-auto space-y-6">
+      {/* Header */}
+      <Card className="gradient-border">
+        <CardHeader className="text-center">
+          <CardTitle className="flex items-center justify-center gap-2 text-2xl">
+            <Brain className="h-8 w-8 text-primary" />
+            <span className="bg-gradient-primary bg-clip-text text-transparent">
+              Intelligent AI Configuration Assistant
+            </span>
+            <Sparkles className="h-6 w-6 text-yellow-500" />
+          </CardTitle>
+          <p className="text-muted-foreground">
+            Advanced AI-powered configuration generation for optimal Portnox device setups
+          </p>
+          
+          {/* Progress Bar */}
+          <div className="mt-4 space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="capitalize">{currentPhase.replace('_', ' ')} Phase</span>
+              <span>{getPhaseProgress()}% Complete</span>
+            </div>
+            <Progress value={getPhaseProgress()} className="h-2" />
+          </div>
+        </CardHeader>
+      </Card>
 
-      {renderConversationInterface()}
+      {/* Phase-specific Content */}
+      {(currentPhase === 'context' || currentPhase === 'technical') && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Conversation */}
+          <div className="lg:col-span-2">
+            <Card className="h-[600px] flex flex-col">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5" />
+                  AI Configuration Discovery
+                  <Badge variant="secondary">Step {conversationStep + 1} of {conversationFlow[0].questions.length}</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex-1 flex flex-col">
+                {/* Conversation History */}
+                <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+                  {configData.conversation_context.questions_asked.map((qa, index) => (
+                    <div key={index} className="space-y-2">
+                      <div className="flex gap-2">
+                        <Bot className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                        <div className="bg-primary/10 rounded-lg p-3 flex-1">
+                          <p className="text-sm">{qa.question}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Users className="h-5 w-5 text-blue-500 mt-1 flex-shrink-0" />
+                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 flex-1">
+                          <p className="text-sm">{qa.answer}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {/* Current Question */}
+                  {currentQuestion && (
+                    <div className="flex gap-2">
+                      <Bot className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                      <div className="bg-primary/10 rounded-lg p-3 flex-1">
+                        <p className="text-sm">{currentQuestion}</p>
+                        {isAIThinking && (
+                          <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                            <div className="animate-spin h-3 w-3 border border-current border-t-transparent rounded-full" />
+                            AI is analyzing your response...
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* User Input */}
+                <div className="space-y-3">
+                  <Textarea
+                    placeholder="Share your configuration requirements and technical details..."
+                    value={userInput}
+                    onChange={(e) => setUserInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="min-h-[100px] resize-none"
+                    disabled={isAIThinking}
+                  />
+                  <div className="flex justify-between items-center">
+                    <p className="text-xs text-muted-foreground">
+                      Press Enter to submit, Shift+Enter for new line
+                    </p>
+                    <Button 
+                      onClick={handleUserSubmit} 
+                      disabled={!userInput.trim() || isAIThinking}
+                      className="bg-gradient-primary"
+                    >
+                      {isAIThinking ? (
+                        <>
+                          <div className="animate-spin h-4 w-4 border border-current border-t-transparent rounded-full mr-2" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          Submit Response
+                          <ArrowRight className="h-4 w-4 ml-2" />
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Real-time Insights Panel */}
+          <div className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm">
+                  <Brain className="h-4 w-4" />
+                  Configuration Insights
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {configData.conversation_context.questions_asked.length > 0 && (
+                  <>
+                    <div>
+                      <Label className="text-xs font-medium">Device Information</Label>
+                      <div className="mt-1 space-y-1">
+                        {configData.config_context.vendor_name && (
+                          <Badge variant="outline" className="text-xs">
+                            {configData.config_context.vendor_name}
+                          </Badge>
+                        )}
+                        {configData.config_context.model_name && (
+                          <Badge variant="outline" className="text-xs">
+                            {configData.config_context.model_name}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div>
+                      <Label className="text-xs font-medium">Security Requirements</Label>
+                      <div className="mt-1 space-y-1">
+                        {configData.config_context.security_requirements.authentication_methods.slice(0, 3).map((method, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {method}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div>
+                      <Label className="text-xs font-medium">Configuration Progress</Label>
+                      <div className="mt-1">
+                        <Progress value={65} className="h-2" />
+                        <p className="text-xs text-muted-foreground mt-1">65% - Good configuration data</p>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm">
+                  <Lightbulb className="h-4 w-4" />
+                  Emerging Recommendations
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <span className="text-xs">Security policies identified</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
+                    <Zap className="h-4 w-4 text-blue-500" />
+                    <span className="text-xs">Performance optimization ready</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded">
+                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                    <span className="text-xs">Integration requirements noted</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* Configuration Generation Phase */}
+      {currentPhase === 'generation' && (
+        <div className="space-y-6">
+          <Tabs defaultValue="configuration" className="w-full">
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="configuration">Configuration</TabsTrigger>
+              <TabsTrigger value="security">Security</TabsTrigger>
+              <TabsTrigger value="performance">Performance</TabsTrigger>
+              <TabsTrigger value="integration">Integration</TabsTrigger>
+              <TabsTrigger value="validation">Validation</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="configuration" className="space-y-4">
+              {configData.ai_recommendations.configuration_recommendations.map((rec, index) => (
+                <Card key={index} className="gradient-border">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <Settings className="h-5 w-5" />
+                          {rec.title}
+                          <Badge variant={rec.impact === 'high' ? 'default' : 'secondary'}>
+                            {rec.impact} impact
+                          </Badge>
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">{rec.description}</p>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant="outline" className="mb-2">
+                          {Math.round(rec.confidence * 100)}% confidence
+                        </Badge>
+                        <p className="text-xs text-muted-foreground">
+                          {rec.implementation_effort} effort
+                        </p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label className="text-sm font-medium">Configuration</Label>
+                      <pre className="mt-2 p-3 bg-muted rounded-lg text-xs overflow-x-auto">
+                        {rec.config_snippet}
+                      </pre>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium">Validation Commands</Label>
+                        <ul className="mt-1 space-y-1">
+                          {rec.validation_commands.map((cmd, cmdIndex) => (
+                            <li key={cmdIndex} className="text-xs bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                              <code>{cmd}</code>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-sm font-medium">Security Considerations</Label>
+                        <ul className="mt-1 space-y-1">
+                          {rec.security_considerations.map((consideration, consIndex) => (
+                            <li key={consIndex} className="text-xs text-muted-foreground">
+                              • {consideration}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <Alert>
+                      <Shield className="h-4 w-4" />
+                      <AlertDescription className="text-xs">
+                        <strong>Reasoning:</strong> {rec.reasoning}
+                      </AlertDescription>
+                    </Alert>
+                  </CardContent>
+                </Card>
+              ))}
+            </TabsContent>
+
+            <TabsContent value="security" className="space-y-4">
+              {configData.ai_recommendations.security_recommendations.map((rec, index) => (
+                <Card key={index} className="gradient-border">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <Shield className="h-5 w-5" />
+                          {rec.title}
+                          <Badge variant={rec.impact === 'high' ? 'default' : 'secondary'}>
+                            {rec.impact} impact
+                          </Badge>
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">{rec.description}</p>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant="outline" className="mb-2">
+                          {Math.round(rec.confidence * 100)}% confidence
+                        </Badge>
+                        <p className="text-xs text-muted-foreground">
+                          {rec.implementation_effort} effort
+                        </p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label className="text-sm font-medium">Security Configuration</Label>
+                      <pre className="mt-2 p-3 bg-muted rounded-lg text-xs overflow-x-auto">
+                        {rec.config_snippet}
+                      </pre>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium">Validation Commands</Label>
+                        <ul className="mt-1 space-y-1">
+                          {rec.validation_commands.map((cmd, cmdIndex) => (
+                            <li key={cmdIndex} className="text-xs bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                              <code>{cmd}</code>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-sm font-medium">Security Considerations</Label>
+                        <ul className="mt-1 space-y-1">
+                          {rec.security_considerations.map((consideration, consIndex) => (
+                            <li key={consIndex} className="text-xs text-muted-foreground">
+                              • {consideration}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <Alert>
+                      <Shield className="h-4 w-4" />
+                      <AlertDescription className="text-xs">
+                        <strong>Reasoning:</strong> {rec.reasoning}
+                      </AlertDescription>
+                    </Alert>
+                  </CardContent>
+                </Card>
+              ))}
+            </TabsContent>
+
+            <TabsContent value="performance" className="space-y-4">
+              {configData.ai_recommendations.performance_recommendations.map((rec, index) => (
+                <Card key={index} className="gradient-border">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <Zap className="h-5 w-5" />
+                          {rec.title}
+                          <Badge variant={rec.impact === 'high' ? 'default' : 'secondary'}>
+                            {rec.impact} impact
+                          </Badge>
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">{rec.description}</p>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant="outline" className="mb-2">
+                          {Math.round(rec.confidence * 100)}% confidence
+                        </Badge>
+                        <p className="text-xs text-muted-foreground">
+                          {rec.implementation_effort} effort
+                        </p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label className="text-sm font-medium">Performance Configuration</Label>
+                      <pre className="mt-2 p-3 bg-muted rounded-lg text-xs overflow-x-auto">
+                        {rec.config_snippet}
+                      </pre>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium">Validation Commands</Label>
+                        <ul className="mt-1 space-y-1">
+                          {rec.validation_commands.map((cmd, cmdIndex) => (
+                            <li key={cmdIndex} className="text-xs bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                              <code>{cmd}</code>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-sm font-medium">Performance Considerations</Label>
+                        <ul className="mt-1 space-y-1">
+                          {rec.security_considerations.map((consideration, consIndex) => (
+                            <li key={consIndex} className="text-xs text-muted-foreground">
+                              • {consideration}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <Alert>
+                      <TrendingUp className="h-4 w-4" />
+                      <AlertDescription className="text-xs">
+                        <strong>Reasoning:</strong> {rec.reasoning}
+                      </AlertDescription>
+                    </Alert>
+                  </CardContent>
+                </Card>
+              ))}
+            </TabsContent>
+
+            <TabsContent value="integration" className="space-y-4">
+              {configData.ai_recommendations.integration_recommendations.map((rec, index) => (
+                <Card key={index} className="gradient-border">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <Network className="h-5 w-5" />
+                          {rec.title}
+                          <Badge variant={rec.impact === 'high' ? 'default' : 'secondary'}>
+                            {rec.impact} impact
+                          </Badge>
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">{rec.description}</p>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant="outline" className="mb-2">
+                          {Math.round(rec.confidence * 100)}% confidence
+                        </Badge>
+                        <p className="text-xs text-muted-foreground">
+                          {rec.implementation_effort} effort
+                        </p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label className="text-sm font-medium">Integration Configuration</Label>
+                      <pre className="mt-2 p-3 bg-muted rounded-lg text-xs overflow-x-auto">
+                        {rec.config_snippet}
+                      </pre>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium">Validation Commands</Label>
+                        <ul className="mt-1 space-y-1">
+                          {rec.validation_commands.map((cmd, cmdIndex) => (
+                            <li key={cmdIndex} className="text-xs bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                              <code>{cmd}</code>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-sm font-medium">Dependencies</Label>
+                        <ul className="mt-1 space-y-1">
+                          {rec.dependencies.map((dependency, depIndex) => (
+                            <li key={depIndex} className="text-xs text-muted-foreground">
+                              • {dependency}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <Alert>
+                      <Network className="h-4 w-4" />
+                      <AlertDescription className="text-xs">
+                        <strong>Reasoning:</strong> {rec.reasoning}
+                      </AlertDescription>
+                    </Alert>
+                  </CardContent>
+                </Card>
+              ))}
+            </TabsContent>
+
+            <TabsContent value="validation" className="space-y-4">
+              {configData.ai_recommendations.troubleshooting_recommendations.map((rec, index) => (
+                <Card key={index} className="gradient-border">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <CheckCircle className="h-5 w-5" />
+                          {rec.title}
+                          <Badge variant={rec.impact === 'high' ? 'default' : 'secondary'}>
+                            {rec.impact} impact
+                          </Badge>
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">{rec.description}</p>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant="outline" className="mb-2">
+                          {Math.round(rec.confidence * 100)}% confidence
+                        </Badge>
+                        <p className="text-xs text-muted-foreground">
+                          {rec.implementation_effort} effort
+                        </p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label className="text-sm font-medium">Validation Steps</Label>
+                      <pre className="mt-2 p-3 bg-muted rounded-lg text-xs overflow-x-auto">
+                        {rec.config_snippet}
+                      </pre>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium">Validation Commands</Label>
+                        <ul className="mt-1 space-y-1">
+                          {rec.validation_commands.map((cmd, cmdIndex) => (
+                            <li key={cmdIndex} className="text-xs bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                              <code>{cmd}</code>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-sm font-medium">Troubleshooting Steps</Label>
+                        <ul className="mt-1 space-y-1">
+                          {rec.troubleshooting_steps.map((step, stepIndex) => (
+                            <li key={stepIndex} className="text-xs text-muted-foreground">
+                              • {step}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <Alert>
+                      <CheckCircle className="h-4 w-4" />
+                      <AlertDescription className="text-xs">
+                        <strong>Reasoning:</strong> {rec.reasoning}
+                      </AlertDescription>
+                    </Alert>
+                  </CardContent>
+                </Card>
+              ))}
+            </TabsContent>
+          </Tabs>
+
+          {/* Action Buttons */}
+          <div className="flex justify-between">
+            <Button variant="outline" onClick={onCancel}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Cancel
+            </Button>
+            <Button onClick={handleComplete} className="bg-gradient-primary">
+              Complete Configuration
+              <CheckCircle className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
