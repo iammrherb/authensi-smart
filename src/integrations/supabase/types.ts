@@ -809,6 +809,36 @@ export type Database = {
         }
         Relationships: []
       }
+      password_reset_tokens: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          expires_at: string
+          id: string
+          token: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          expires_at: string
+          id?: string
+          token: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          token?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       poc_activities: {
         Row: {
           activity_type: string
@@ -887,12 +917,19 @@ export type Database = {
           created_at: string
           department: string | null
           email: string | null
+          failed_login_attempts: number | null
           first_name: string | null
           id: string
           is_active: boolean | null
+          is_blocked: boolean | null
           job_title: string | null
+          last_login: string | null
           last_name: string | null
+          locked_until: string | null
+          password_changed_at: string | null
           phone: string | null
+          two_factor_enabled: boolean | null
+          two_factor_secret: string | null
           updated_at: string
         }
         Insert: {
@@ -901,12 +938,19 @@ export type Database = {
           created_at?: string
           department?: string | null
           email?: string | null
+          failed_login_attempts?: number | null
           first_name?: string | null
           id: string
           is_active?: boolean | null
+          is_blocked?: boolean | null
           job_title?: string | null
+          last_login?: string | null
           last_name?: string | null
+          locked_until?: string | null
+          password_changed_at?: string | null
           phone?: string | null
+          two_factor_enabled?: boolean | null
+          two_factor_secret?: string | null
           updated_at?: string
         }
         Update: {
@@ -915,12 +959,19 @@ export type Database = {
           created_at?: string
           department?: string | null
           email?: string | null
+          failed_login_attempts?: number | null
           first_name?: string | null
           id?: string
           is_active?: boolean | null
+          is_blocked?: boolean | null
           job_title?: string | null
+          last_login?: string | null
           last_name?: string | null
+          locked_until?: string | null
+          password_changed_at?: string | null
           phone?: string | null
+          two_factor_enabled?: boolean | null
+          two_factor_secret?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -2196,6 +2247,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_activity_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_invitations: {
         Row: {
           approved_at: string | null
@@ -2298,6 +2385,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_sessions: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          ip_address: unknown | null
+          is_active: boolean | null
+          last_activity: string | null
+          session_token: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean | null
+          last_activity?: string | null
+          session_token: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean | null
+          last_activity?: string | null
+          session_token?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       vendor_library: {
         Row: {
@@ -2455,6 +2578,22 @@ export type Database = {
         Args: { _user_id: string }
         Returns: undefined
       }
+      create_user_safely: {
+        Args: {
+          p_email: string
+          p_password: string
+          p_first_name?: string
+          p_last_name?: string
+          p_role?: Database["public"]["Enums"]["app_role"]
+          p_scope_type?: string
+          p_scope_id?: string
+        }
+        Returns: Json
+      }
+      delete_user_safely: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
       has_permission: {
         Args: {
           user_id: string
@@ -2477,6 +2616,14 @@ export type Database = {
       log_security_event: {
         Args: { _event_type: string; _event_details?: Json; _user_id?: string }
         Returns: undefined
+      }
+      request_password_reset: {
+        Args: { p_email: string }
+        Returns: Json
+      }
+      toggle_user_block: {
+        Args: { p_user_id: string; p_block?: boolean }
+        Returns: Json
       }
       user_owns_project: {
         Args: { project_uuid: string }

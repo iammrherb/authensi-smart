@@ -14,8 +14,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { 
   Users, Plus, Search, UserPlus, Shield, Crown, Briefcase, 
   HeadphonesIcon, TrendingUp, Wrench, Eye, Trash2, AlertTriangle,
-  Building2, Globe, Lock
+  Building2, Globe, Lock, UserX, RefreshCw, MoreHorizontal,
+  Ban, CheckCircle, XCircle
 } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 // Enhanced role definitions with descriptions and permissions
 const ROLE_DEFINITIONS = {
@@ -113,7 +115,6 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [newUserEmail, setNewUserEmail] = useState('');
-  const [newUserPassword, setNewUserPassword] = useState('');
   const [newUserFirstName, setNewUserFirstName] = useState('');
   const [newUserLastName, setNewUserLastName] = useState('');
   const [newUserRole, setNewUserRole] = useState<AppRole>('viewer');
@@ -122,7 +123,7 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
   const [isCreatingUser, setIsCreatingUser] = useState(false);
 
   const { toast } = useToast();
-  const { data: userRoles = [], isLoading } = useUserRoles(scopeType, scopeId);
+  const { data: userRoles = [], isLoading, refetch } = useUserRoles(scopeType, scopeId);
   const { data: canManage = false } = useCanManageRoles(scopeType, scopeId);
   const { mutate: assignRoleMutation } = useAssignRole();
   const { mutate: removeRole } = useRemoveRole();
@@ -138,7 +139,7 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
   });
 
   const handleCreateUser = async () => {
-    if (!newUserEmail || !newUserPassword || !newUserFirstName || !newUserLastName) {
+    if (!newUserEmail || !newUserFirstName || !newUserLastName) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields",
@@ -150,40 +151,35 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
     setIsCreatingUser(true);
     
     try {
-      // Create user account
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: newUserEmail,
-        password: newUserPassword,
-        user_metadata: {
-          first_name: newUserFirstName,
-          last_name: newUserLastName,
-        },
-        email_confirm: true
+      // Use the new database function for safe user creation
+      const { data, error } = await supabase.rpc('create_user_safely', {
+        p_email: newUserEmail,
+        p_password: 'TempPassword123!', // Temporary password, user will reset
+        p_first_name: newUserFirstName,
+        p_last_name: newUserLastName,
+        p_role: newUserRole,
+        p_scope_type: scopeType,
+        p_scope_id: scopeId
       });
 
-      if (authError) throw authError;
+      if (error) throw error;
 
-      if (authData.user) {
-        // Assign the role
-        assignRoleMutation({
-          user_id: authData.user.id,
-          role: newUserRole,
-          scope_type: scopeType,
-          scope_id: scopeId
-        });
-
+      const result = data as any;
+      if (result.success) {
         toast({
           title: "User Created",
-          description: `User ${newUserEmail} has been created with ${ROLE_DEFINITIONS[newUserRole].label} role`,
+          description: `User ${newUserEmail} has been created. They will receive a password reset email.`,
         });
 
-        // Reset form
+        // Reset form and refresh data
         setNewUserEmail('');
-        setNewUserPassword('');
         setNewUserFirstName('');
         setNewUserLastName('');
         setNewUserRole('viewer');
         setIsCreateDialogOpen(false);
+        refetch();
+      } else {
+        throw new Error(result.error);
       }
     } catch (error: any) {
       console.error('Error creating user:', error);
@@ -213,6 +209,8 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
         .from('profiles')
         .select('id')
         .eq('email', assignUserEmail)
+        .eq('is_active', true)
+        .eq('is_blocked', false)
         .maybeSingle();
 
       if (error) throw error;
@@ -220,7 +218,7 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
       if (!profile) {
         toast({
           title: "User Not Found",
-          description: "No user found with this email address",
+          description: "No active user found with this email address",
           variant: "destructive"
         });
         return;
@@ -236,11 +234,84 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
       setAssignUserEmail('');
       setAssignRole('viewer');
       setIsAssignDialogOpen(false);
+      refetch();
     } catch (error: any) {
       console.error('Error assigning role:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to assign role",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handlePasswordReset = async (userEmail: string) => {
+    try {
+      const { data, error } = await supabase.rpc('request_password_reset', {
+        p_email: userEmail
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Password Reset",
+        description: "Password reset email has been sent if the user exists.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send password reset",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleToggleBlock = async (userId: string, isBlocked: boolean) => {
+    try {
+      const { data, error } = await supabase.rpc('toggle_user_block', {
+        p_user_id: userId,
+        p_block: !isBlocked
+      });
+
+      if (error) throw error;
+
+      const result = data as any;
+      if (result.success) {
+        toast({
+          title: "User Updated",
+          description: result.message,
+        });
+        refetch();
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update user",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    try {
+      const { data, error } = await supabase.rpc('delete_user_safely', {
+        p_user_id: userId
+      });
+
+      if (error) throw error;
+
+      const result = data as any;
+      if (result.success) {
+        toast({
+          title: "User Deleted",
+          description: result.message,
+        });
+        refetch();
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete user",
         variant: "destructive"
       });
     }
@@ -278,7 +349,7 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
             </Badge>
           </div>
           <p className="text-muted-foreground mt-1">
-            Manage user roles and permissions for enhanced access control
+            Manage user roles and permissions with enhanced security controls
           </p>
         </div>
 
@@ -295,7 +366,7 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
                 <DialogHeader>
                   <DialogTitle>Create New User</DialogTitle>
                   <DialogDescription>
-                    Create a new user account and assign initial role
+                    Create a new user account with secure profile setup
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
@@ -330,17 +401,6 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password *</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      value={newUserPassword}
-                      onChange={(e) => setNewUserPassword(e.target.value)}
-                      placeholder="Secure password"
-                      autoComplete="new-password"
-                    />
-                  </div>
-                  <div className="space-y-2">
                     <Label htmlFor="role">Initial Role</Label>
                     <Select value={newUserRole} onValueChange={(value) => setNewUserRole(value as AppRole)}>
                       <SelectTrigger>
@@ -357,6 +417,11 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div className="bg-muted/50 p-3 rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      A temporary password will be assigned. The user will receive a password reset email to set their own password.
+                    </p>
                   </div>
                   <div className="flex justify-end space-x-2 pt-4">
                     <Button
@@ -385,7 +450,7 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
                 <DialogHeader>
                   <DialogTitle>Assign Role to User</DialogTitle>
                   <DialogDescription>
-                    Assign a role to an existing user
+                    Assign a role to an existing active user
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
@@ -459,21 +524,9 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
         </CardHeader>
         <CardContent>
           {filteredRoles.length === 0 ? (
-            <div className="text-center py-8">
-              <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium">No users found</h3>
-              <p className="text-muted-foreground">
-                {searchTerm ? 'No users match your search criteria.' : 'No users have been assigned roles yet.'}
-              </p>
-              {canManage && !searchTerm && (
-                <Button 
-                  className="mt-4" 
-                  onClick={() => setIsCreateDialogOpen(true)}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create First User
-                </Button>
-              )}
+            <div className="text-center py-8 text-muted-foreground">
+              <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>{searchTerm ? 'No users match your search' : 'No users found for this scope'}</p>
             </div>
           ) : (
             <Table>
@@ -481,132 +534,178 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
                 <TableRow>
                   <TableHead>User</TableHead>
                   <TableHead>Role</TableHead>
-                  <TableHead>Scope</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Assigned</TableHead>
                   <TableHead>Assigned By</TableHead>
-                  {canManage && <TableHead>Actions</TableHead>}
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredRoles.map((userRole) => {
                   const roleDefinition = getRoleDefinition(userRole.role);
                   const RoleIcon = roleDefinition.icon;
-
+                  const userProfile = userRole.user_profile;
+                  const isBlocked = (userProfile as any)?.is_blocked || false;
+                  const isActive = (userProfile as any)?.is_active !== false;
+                  
                   return (
                     <TableRow key={userRole.id}>
                       <TableCell>
-                        <div>
-                          <div className="font-medium">
-                            {userRole.user_profile?.email || userRole.user_id.slice(0, 8) + '...'}
-                          </div>
-                          {userRole.user_profile?.first_name && (
-                            <div className="text-sm text-muted-foreground">
-                              {userRole.user_profile.first_name} {userRole.user_profile.last_name}
-                            </div>
-                          )}
+                        <div className="flex flex-col">
+                          <span className="font-medium">
+                            {userProfile?.first_name} {userProfile?.last_name}
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            {userProfile?.email}
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          <div className={`p-1.5 rounded-lg ${roleDefinition.color}`}>
-                            <RoleIcon className="h-4 w-4" />
-                          </div>
-                          <div>
-                            <div className="font-medium">{roleDefinition.label}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {roleDefinition.description}
-                            </div>
-                          </div>
+                          <RoleIcon className="h-4 w-4" />
+                          <Badge variant="outline" className={roleDefinition.color}>
+                            {roleDefinition.label}
+                          </Badge>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center space-x-1">
-                          {userRole.scope_type === 'global' && <Globe className="h-4 w-4 text-blue-500" />}
-                          {userRole.scope_type === 'project' && <Building2 className="h-4 w-4 text-green-500" />}
-                          {userRole.scope_type === 'site' && <Lock className="h-4 w-4 text-orange-500" />}
-                          <span className="capitalize">{userRole.scope_type}</span>
+                        <div className="flex flex-col gap-1">
+                          <Badge variant={isActive ? "default" : "secondary"} className="w-fit">
+                            {isActive ? (
+                              <>
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Active
+                              </>
+                            ) : (
+                              <>
+                                <XCircle className="h-3 w-3 mr-1" />
+                                Inactive
+                              </>
+                            )}
+                          </Badge>
+                          {isBlocked && (
+                            <Badge variant="destructive" className="w-fit">
+                              <Ban className="h-3 w-3 mr-1" />
+                              Blocked
+                            </Badge>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="text-sm text-muted-foreground">
-                          {new Date(userRole.assigned_at).toLocaleDateString()}
-                        </div>
+                        {new Date(userRole.assigned_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
-                        <div className="text-sm text-muted-foreground">
-                          {userRole.assigned_by_profile?.email || 
-                           (userRole.assigned_by ? userRole.assigned_by.slice(0, 8) + '...' : 'System')}
-                        </div>
+                        {userRole.assigned_by_profile ? 
+                          `${userRole.assigned_by_profile.first_name} ${userRole.assigned_by_profile.last_name}` :
+                          'System'
+                        }
                       </TableCell>
-                      {canManage && (
-                        <TableCell>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle className="flex items-center space-x-2">
-                                  <AlertTriangle className="h-5 w-5 text-destructive" />
-                                  <span>Remove Role</span>
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Are you sure you want to remove the {roleDefinition.label} role from this user? 
-                                  This action cannot be undone.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => removeRole(userRole.id)}
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          {canManage && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => handlePasswordReset(userProfile?.email || '')}
                                 >
-                                  Remove Role
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </TableCell>
-                      )}
+                                  <RefreshCw className="h-4 w-4 mr-2" />
+                                  Reset Password
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleToggleBlock(userRole.user_id, isBlocked)}
+                                >
+                                  {isBlocked ? (
+                                    <>
+                                      <CheckCircle className="h-4 w-4 mr-2" />
+                                      Unblock User
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Ban className="h-4 w-4 mr-2" />
+                                      Block User
+                                    </>
+                                  )}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <DropdownMenuItem
+                                      className="text-red-600"
+                                      onSelect={(e) => e.preventDefault()}
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Remove Role
+                                    </DropdownMenuItem>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Remove User Role</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Are you sure you want to remove this role from {userProfile?.first_name} {userProfile?.last_name}? 
+                                        This action cannot be undone.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => removeRole(userRole.id)}
+                                        className="bg-red-600 hover:bg-red-700"
+                                      >
+                                        Remove Role
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                                {userRole.role !== 'super_admin' && (
+                                  <>
+                                    <DropdownMenuSeparator />
+                                    <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                        <DropdownMenuItem
+                                          className="text-red-600"
+                                          onSelect={(e) => e.preventDefault()}
+                                        >
+                                          <UserX className="h-4 w-4 mr-2" />
+                                          Delete User
+                                        </DropdownMenuItem>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>Delete User</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            Are you sure you want to permanently delete {userProfile?.first_name} {userProfile?.last_name}? 
+                                            This will deactivate their account and remove all roles. This action cannot be undone.
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                          <AlertDialogAction
+                                            onClick={() => handleDeleteUser(userRole.user_id)}
+                                            className="bg-red-600 hover:bg-red-700"
+                                          >
+                                            Delete User
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  </>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </div>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
               </TableBody>
             </Table>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Role Definitions Reference */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Role Definitions & Capabilities</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(ROLE_DEFINITIONS).map(([role, definition]) => {
-              const RoleIcon = definition.icon;
-              return (
-                <div key={role} className={`p-4 rounded-lg border ${definition.color}`}>
-                  <div className="flex items-center space-x-2 mb-2">
-                    <RoleIcon className="h-5 w-5" />
-                    <h4 className="font-semibold">{definition.label}</h4>
-                  </div>
-                  <p className="text-sm mb-3">{definition.description}</p>
-                  <div className="space-y-1">
-                    {definition.capabilities.map((capability, index) => (
-                      <div key={index} className="text-xs flex items-center space-x-1">
-                        <div className="w-1 h-1 bg-current rounded-full"></div>
-                        <span>{capability}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </CardContent>
       </Card>
     </div>
