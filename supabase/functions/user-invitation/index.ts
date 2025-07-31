@@ -217,19 +217,31 @@ serve(async (req) => {
           });
         }
 
+        // First get the invitations
         const { data: invitations, error } = await supabaseClient
           .from('user_invitations')
-          .select(`
-            *,
-            custom_roles(*),
-            invited_by_profile:profiles!invited_by(*)
-          `)
+          .select('*, custom_roles(*)')
           .eq('status', 'pending')
           .order('created_at', { ascending: false });
 
         if (error) {
           console.error('Error fetching pending invitations:', error);
           throw error;
+        }
+
+        // Then get the profiles for invited_by users
+        if (invitations && invitations.length > 0) {
+          const inviterIds = [...new Set(invitations.map(inv => inv.invited_by))];
+          const { data: profiles } = await supabaseClient
+            .from('profiles')
+            .select('id, first_name, last_name, email')
+            .in('id', inviterIds);
+
+          // Merge the profile data
+          const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+          invitations.forEach(invitation => {
+            invitation.invited_by_profile = profileMap.get(invitation.invited_by) || null;
+          });
         }
 
         return new Response(JSON.stringify({ invitations }), {
