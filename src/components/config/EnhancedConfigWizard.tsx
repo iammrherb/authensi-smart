@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,79 +9,74 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
-  Brain, Settings, Target, TrendingUp, Shield, Users, Building2, 
-  Network, Clock, DollarSign, AlertTriangle, CheckCircle, Zap,
-  MessageSquare, Bot, Star, ArrowRight, ArrowLeft, Sparkles,
-  Globe, Server, Database, Lock, Smartphone, Monitor, Download,
-  Copy, Check, FileText, Wifi
+  Building2, Network, Shield, Users, Target, Clock, Brain, CheckCircle, 
+  AlertTriangle, Globe, Server, Wifi, Lock, Smartphone, Database, FileCheck,
+  Plus, X, ArrowRight, ArrowLeft, Zap, Settings, Monitor, Router,
+  Cpu, HardDrive, Printer, Camera, Phone, Tablet, Laptop, Download, Copy
 } from 'lucide-react';
 
 import { useEnhancedVendors } from '@/hooks/useVendors';
 import { useVendorModels } from '@/hooks/useVendorModels';
-import { useConfigTemplates } from '@/hooks/useConfigTemplates';
 import { useToast } from '@/hooks/use-toast';
 
-interface AIConfigRecommendation {
-  id: string;
-  type: 'vendor' | 'security' | 'performance' | 'compliance' | 'best_practice';
-  title: string;
-  description: string;
-  confidence: number;
-  impact: 'low' | 'medium' | 'high' | 'critical';
-  reasoning: string;
-  configuration_snippet?: string;
-  dependencies: string[];
-  warnings: string[];
-}
-
-interface EnhancedConfigData {
-  // Business Context
-  business_context: {
-    organization_name: string;
-    industry: string;
-    deployment_type: string;
-    security_requirements: string[];
-    compliance_frameworks: string[];
-    business_objectives: string[];
+interface ConfigurationData {
+  // Basic Info
+  basic_info: {
+    config_name: string;
+    description: string;
+    deployment_environment: string;
+    priority: string;
   };
-
-  // Technical Requirements
-  technical_requirements: {
-    selected_vendor: string;
-    selected_model: string;
+  
+  // Vendor & Infrastructure
+  vendor_infrastructure: {
+    primary_vendor: string;
+    model: string;
     firmware_version: string;
-    deployment_scenarios: string[];
-    authentication_methods: string[];
-    network_architecture: string;
-    integration_requirements: string[];
+    deployment_mode: string;
+    management_method: string;
   };
-
-  // AI Analysis & Recommendations
-  ai_analysis: {
-    vendor_recommendations: AIConfigRecommendation[];
-    security_recommendations: AIConfigRecommendation[];
-    performance_recommendations: AIConfigRecommendation[];
-    compliance_recommendations: AIConfigRecommendation[];
-    optimization_suggestions: AIConfigRecommendation[];
+  
+  // Authentication & Security
+  authentication_security: {
+    auth_methods: string[];
+    radius_servers: Array<{host: string; port: number; secret: string;}>;
+    certificate_authority: string;
+    encryption_method: string;
+    fallback_auth: string;
   };
-
-  // Generated Configuration
-  generated_configuration: {
-    base_config: string;
-    advanced_features: Record<string, any>;
-    troubleshooting_commands: string[];
-    validation_steps: string[];
-    deployment_notes: string[];
+  
+  // Network Configuration
+  network_config: {
+    vlan_assignments: Array<{role: string; vlan_id: number; description: string;}>;
+    access_policies: string[];
+    guest_network: {
+      enabled: boolean;
+      vlan_id: number;
+      bandwidth_limit: string;
+      access_duration: string;
+    };
+  };
+  
+  // Templates & AI Generation
+  templates_ai: {
+    selected_templates: string[];
+    configuration_type: string;
+    generated_config: string;
+    validation_results: {
+      syntax_valid: boolean;
+      warnings: string[];
+      recommendations: string[];
+    };
   };
 }
 
 interface EnhancedConfigWizardProps {
   projectId?: string;
   siteId?: string;
-  onComplete?: (configData: EnhancedConfigData) => void;
+  onComplete?: (configData: ConfigurationData) => void;
   onCancel?: () => void;
 }
 
@@ -91,517 +86,1073 @@ const EnhancedConfigWizard: React.FC<EnhancedConfigWizardProps> = ({
   onComplete,
   onCancel
 }) => {
-  const [currentPhase, setCurrentPhase] = useState<'context' | 'technical' | 'analysis' | 'generation' | 'review'>('context');
-  const [conversationStep, setConversationStep] = useState(0);
-  const [isAIThinking, setIsAIThinking] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState('');
-  const [aiResponse, setAiResponse] = useState('');
-  const [userInput, setUserInput] = useState('');
-  
-  const [configData, setConfigData] = useState<EnhancedConfigData>({
-    business_context: {
-      organization_name: '', industry: '', deployment_type: '',
-      security_requirements: [], compliance_frameworks: [], business_objectives: []
+  const [currentStep, setCurrentStep] = useState(0);
+  const [aiGenerationLoading, setAiGenerationLoading] = useState(false);
+  const [formData, setFormData] = useState<ConfigurationData>({
+    basic_info: {
+      config_name: '',
+      description: '',
+      deployment_environment: 'Production',
+      priority: 'Medium'
     },
-    technical_requirements: {
-      selected_vendor: '', selected_model: '', firmware_version: '',
-      deployment_scenarios: [], authentication_methods: [], network_architecture: '',
-      integration_requirements: []
+    vendor_infrastructure: {
+      primary_vendor: '',
+      model: '',
+      firmware_version: '',
+      deployment_mode: 'Centralized',
+      management_method: 'CLI'
     },
-    ai_analysis: {
-      vendor_recommendations: [], security_recommendations: [], performance_recommendations: [],
-      compliance_recommendations: [], optimization_suggestions: []
+    authentication_security: {
+      auth_methods: [],
+      radius_servers: [],
+      certificate_authority: '',
+      encryption_method: 'WPA3-Enterprise',
+      fallback_auth: 'MAB'
     },
-    generated_configuration: {
-      base_config: '', advanced_features: {}, troubleshooting_commands: [],
-      validation_steps: [], deployment_notes: []
+    network_config: {
+      vlan_assignments: [],
+      access_policies: [],
+      guest_network: {
+        enabled: false,
+        vlan_id: 100,
+        bandwidth_limit: '10Mbps',
+        access_duration: '24h'
+      }
+    },
+    templates_ai: {
+      selected_templates: [],
+      configuration_type: '802.1X',
+      generated_config: '',
+      validation_results: {
+        syntax_valid: true,
+        warnings: [],
+        recommendations: []
+      }
     }
   });
 
   const { data: vendors = [] } = useEnhancedVendors();
-  const { data: vendorModels = [] } = useVendorModels(configData.technical_requirements.selected_vendor);
+  const { data: vendorModels = [] } = useVendorModels(formData.vendor_infrastructure.primary_vendor);
   const { toast } = useToast();
 
-  // AI-driven conversation flow for context gathering
-  const contextQuestions = [
-    "What type of organization are you configuring this for? (Industry, size, etc.)",
-    "What are your primary security requirements and compliance needs?",
-    "What deployment scenarios do you need to support? (BYOD, IoT, Guest Access, etc.)",
-    "What authentication methods do you prefer or are required to use?",
-    "Are there any specific integration requirements with existing systems?"
+  const steps = [
+    {
+      id: 'basic_info',
+      title: 'Basic Configuration',
+      description: 'Define basic configuration details and deployment context',
+      icon: FileCheck,
+      color: 'text-blue-500'
+    },
+    {
+      id: 'vendor_infrastructure',
+      title: 'Vendor & Infrastructure',
+      description: 'Select vendor, model, and infrastructure settings',
+      icon: Network,
+      color: 'text-green-500'
+    },
+    {
+      id: 'authentication_security',
+      title: 'Authentication & Security',
+      description: 'Configure authentication methods and security settings',
+      icon: Shield,
+      color: 'text-orange-500'
+    },
+    {
+      id: 'network_config',
+      title: 'Network Configuration',
+      description: 'Set up VLANs, policies, and network access rules',
+      icon: Wifi,
+      color: 'text-purple-500'
+    },
+    {
+      id: 'templates_ai',
+      title: 'AI Generation & Templates',
+      description: 'Generate configuration using AI and templates',
+      icon: Brain,
+      color: 'text-pink-500'
+    }
   ];
 
-  const technicalQuestions = [
-    "Which vendor and model are you configuring?",
-    "What firmware version are you running or planning to use?",
-    "Describe your network architecture and where this device fits",
-    "What advanced features do you need enabled?",
-    "Are there any specific performance or capacity requirements?"
-  ];
+  const progressPercentage = ((currentStep + 1) / steps.length) * 100;
 
-  const renderContextPhase = () => (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <Brain className="h-12 w-12 mx-auto text-blue-500 mb-4" />
-        <h2 className="text-2xl font-bold mb-2">Business Context Discovery</h2>
-        <p className="text-muted-foreground">
-          Let's understand your organization's needs and requirements
-        </p>
-        <Progress value={(conversationStep / contextQuestions.length) * 100} className="mt-4" />
-      </div>
+  const handleNext = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5" />
-            AI Discovery Assistant
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {conversationStep < contextQuestions.length && (
-            <div className="space-y-4">
-              <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-                <p className="font-medium text-blue-900 dark:text-blue-100">
-                  {contextQuestions[conversationStep]}
-                </p>
-              </div>
-              
-              <Textarea
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                placeholder="Share your requirements and context..."
-                rows={4}
-              />
-              
-              <div className="flex gap-2">
-                <Button 
-                  onClick={() => {
-                    // Process answer and move to next question
-                    setConversationStep(prev => prev + 1);
-                    setUserInput('');
-                  }}
-                  disabled={!userInput.trim()}
-                >
-                  Continue
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-                
-                {conversationStep > 0 && (
-                  <Button variant="outline" onClick={() => setConversationStep(prev => prev - 1)}>
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Previous
-                  </Button>
-                )}
-              </div>
-            </div>
-          )}
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
 
-          {conversationStep >= contextQuestions.length && (
-            <div className="text-center">
-              <CheckCircle className="h-8 w-8 mx-auto text-green-500 mb-2" />
-              <p className="text-lg font-medium">Context Discovery Complete!</p>
-              <p className="text-muted-foreground mb-4">
-                Moving to technical requirements...
-              </p>
-              <Button onClick={() => {
-                setCurrentPhase('technical');
-                setConversationStep(0);
-              }}>
-                Continue to Technical Phase
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
+  const handleComplete = () => {
+    if (onComplete) {
+      onComplete(formData);
+    }
+  };
 
-  const renderTechnicalPhase = () => (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <Settings className="h-12 w-12 mx-auto text-green-500 mb-4" />
-        <h2 className="text-2xl font-bold mb-2">Technical Configuration</h2>
-        <p className="text-muted-foreground">
-          Select your devices and configure technical requirements
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Vendor & Device Selection</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>Vendor</Label>
-              <Select
-                value={configData.technical_requirements.selected_vendor}
-                onValueChange={(value) => {
-                  setConfigData(prev => ({
-                    ...prev,
-                    technical_requirements: {
-                      ...prev.technical_requirements,
-                      selected_vendor: value,
-                      selected_model: ''
-                    }
-                  }));
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select vendor..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {vendors.map((vendor) => (
-                    <SelectItem key={vendor.id} value={vendor.id}>
-                      {vendor.vendor_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label>Device Model</Label>
-              <Select
-                value={configData.technical_requirements.selected_model}
-                onValueChange={(value) => {
-                  setConfigData(prev => ({
-                    ...prev,
-                    technical_requirements: {
-                      ...prev.technical_requirements,
-                      selected_model: value
-                    }
-                  }));
-                }}
-                disabled={!configData.technical_requirements.selected_vendor}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select model..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {vendorModels.map((model) => (
-                    <SelectItem key={model.id} value={model.id}>
-                      {model.model_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Configuration Options</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-center">
-              <Button 
-                onClick={() => setCurrentPhase('analysis')}
-                disabled={!configData.technical_requirements.selected_vendor || !configData.technical_requirements.selected_model}
-                className="w-full"
-              >
-                <Brain className="h-4 w-4 mr-2" />
-                Analyze & Generate Recommendations
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-
-  const renderAnalysisPhase = () => (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <Brain className="h-12 w-12 mx-auto text-purple-500 mb-4 animate-pulse" />
-        <h2 className="text-2xl font-bold mb-2">AI Analysis in Progress</h2>
-        <p className="text-muted-foreground">
-          Analyzing your requirements and generating intelligent recommendations...
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[
-          { title: "Vendor Analysis", icon: Shield, status: "complete" },
-          { title: "Security Review", icon: Lock, status: "processing" },
-          { title: "Performance Tuning", icon: Zap, status: "pending" }
-        ].map((item, index) => (
-          <Card key={index}>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <item.icon className={`h-8 w-8 ${
-                  item.status === 'complete' ? 'text-green-500' :
-                  item.status === 'processing' ? 'text-blue-500 animate-pulse' :
-                  'text-gray-400'
-                }`} />
-                <div>
-                  <h3 className="font-medium">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground capitalize">{item.status}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="text-center">
-        <Button 
-          onClick={() => setCurrentPhase('generation')}
-          className="mt-8"
-        >
-          View Analysis Results
-          <ArrowRight className="h-4 w-4 ml-2" />
-        </Button>
-      </div>
-    </div>
-  );
-
-  const renderGenerationPhase = () => (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <FileText className="h-12 w-12 mx-auto text-orange-500 mb-4" />
-        <h2 className="text-2xl font-bold mb-2">Configuration Generated</h2>
-        <p className="text-muted-foreground">
-          Your AI-optimized configuration is ready for review and deployment
-        </p>
-      </div>
-
-      <Tabs defaultValue="config" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="config">Configuration</TabsTrigger>
-          <TabsTrigger value="validation">Validation</TabsTrigger>
-          <TabsTrigger value="troubleshooting">Troubleshooting</TabsTrigger>
-          <TabsTrigger value="deployment">Deployment</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="config" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                Generated Configuration
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <Copy className="h-4 w-4 mr-2" />
-                    Copy
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-2" />
-                    Export
-                  </Button>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm max-h-96 overflow-y-auto">
-                <pre>{`! AI-Generated Configuration for ${vendors.find(v => v.id === configData.technical_requirements.selected_vendor)?.vendor_name || 'Selected Device'}
+  const generateConfiguration = async () => {
+    setAiGenerationLoading(true);
+    try {
+      // Simulate AI configuration generation
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      const generatedConfig = `! Generated 802.1X Configuration for ${formData.vendor_infrastructure.primary_vendor}
+! Model: ${formData.vendor_infrastructure.model}
 ! Generated: ${new Date().toISOString()}
-! 
-interface GigabitEthernet1/0/1
- description *** 802.1X Enabled Port ***
+!
+! === AAA Configuration ===
+aaa new-model
+aaa authentication dot1x default group radius
+aaa authorization network default group radius
+aaa accounting dot1x default start-stop group radius
+!
+! === RADIUS Server Configuration ===
+${formData.authentication_security.radius_servers.map((server, index) => 
+  `radius server RADIUS-${index + 1}
+ address ipv4 ${server.host} auth-port ${server.port} acct-port ${server.port + 1}
+ key ${server.secret}`
+).join('\n')}
+!
+! === 802.1X Global Configuration ===
+dot1x system-auth-control
+dot1x critical eapol
+!
+! === Interface Configuration ===
+interface range gi1/0/1-48
+ description Access Ports
  switchport mode access
- switchport access vlan 100
- authentication event fail action authorize vlan 999
- authentication event server dead action authorize
- authentication event no-response action authorize vlan 999
+ switchport access vlan 10
+ authentication event fail action next-method
+ authentication event server dead action reinitialize vlan 999
+ authentication event server alive action reinitialize
  authentication host-mode multi-auth
  authentication order dot1x mab
  authentication priority dot1x mab
  authentication port-control auto
  authentication periodic
  authentication timer reauthenticate server
+ mab
  dot1x pae authenticator
  dot1x timeout tx-period 10
  spanning-tree portfast
  spanning-tree bpduguard enable
 !
-! RADIUS Configuration
-radius server ISE-Primary
- address ipv4 192.168.1.10 auth-port 1812 acct-port 1813
- key SecureKey123!
+! === VLAN Configuration ===
+${formData.network_config.vlan_assignments.map(vlan => 
+  `vlan ${vlan.vlan_id}
+ name ${vlan.description}
+ state active`
+).join('\n')}
 !
-radius server ISE-Secondary
- address ipv4 192.168.1.11 auth-port 1812 acct-port 1813
- key SecureKey123!
-!
-aaa new-model
-aaa authentication dot1x default group radius
-aaa authorization network default group radius
-aaa accounting dot1x default start-stop group radius
-!
-! End of AI-Generated Configuration`}</pre>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+! End of Configuration`;
 
-        <TabsContent value="validation">
-          <Card>
-            <CardHeader>
-              <CardTitle>Validation Commands</CardTitle>
-            </CardHeader>
-            <CardContent>
+      setFormData(prev => ({
+        ...prev,
+        templates_ai: {
+          ...prev.templates_ai,
+          generated_config: generatedConfig,
+          validation_results: {
+            syntax_valid: true,
+            warnings: ['Consider enabling port security for enhanced security'],
+            recommendations: [
+              'Add DHCP snooping for additional security',
+              'Configure dynamic ARP inspection',
+              'Enable storm control on access ports'
+            ]
+          }
+        }
+      }));
+
+      toast({
+        title: "Configuration Generated",
+        description: "AI has successfully generated your network configuration",
+      });
+    } catch (error) {
+      toast({
+        title: "Generation Failed",
+        description: "Failed to generate configuration. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setAiGenerationLoading(false);
+    }
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(formData.templates_ai.generated_config);
+      toast({
+        title: "Copied to Clipboard",
+        description: "Configuration has been copied to your clipboard",
+      });
+    } catch (error) {
+      toast({
+        title: "Copy Failed",
+        description: "Failed to copy configuration to clipboard",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const downloadConfig = () => {
+    const blob = new Blob([formData.templates_ai.generated_config], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${formData.basic_info.config_name || 'config'}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Download Started",
+      description: "Configuration file download has started",
+    });
+  };
+
+  const renderStepContent = () => {
+    const currentStepData = steps[currentStep];
+
+    switch (currentStepData.id) {
+      case 'basic_info':
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                {[
-                  'show dot1x all summary',
-                  'show authentication sessions',
-                  'show radius server-group all',
-                  'show aaa servers',
-                  'show interface status'
-                ].map((cmd, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
-                    <code className="text-sm">{cmd}</code>
-                    <Button variant="ghost" size="sm">
-                      <Copy className="h-3 w-3" />
+                <Label htmlFor="config_name">Configuration Name *</Label>
+                <Input
+                  id="config_name"
+                  value={formData.basic_info.config_name}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    basic_info: { ...prev.basic_info, config_name: e.target.value }
+                  }))}
+                  placeholder="Enter configuration name"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="deployment_environment">Deployment Environment</Label>
+                <Select
+                  value={formData.basic_info.deployment_environment}
+                  onValueChange={(value) => setFormData(prev => ({
+                    ...prev,
+                    basic_info: { ...prev.basic_info, deployment_environment: value }
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Production">Production</SelectItem>
+                    <SelectItem value="Staging">Staging</SelectItem>
+                    <SelectItem value="Development">Development</SelectItem>
+                    <SelectItem value="Testing">Testing</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="priority">Priority Level</Label>
+                <Select
+                  value={formData.basic_info.priority}
+                  onValueChange={(value) => setFormData(prev => ({
+                    ...prev,
+                    basic_info: { ...prev.basic_info, priority: value }
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Low">Low</SelectItem>
+                    <SelectItem value="Medium">Medium</SelectItem>
+                    <SelectItem value="High">High</SelectItem>
+                    <SelectItem value="Critical">Critical</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.basic_info.description}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  basic_info: { ...prev.basic_info, description: e.target.value }
+                }))}
+                placeholder="Describe the purpose and scope of this configuration"
+                rows={4}
+              />
+            </div>
+          </div>
+        );
+
+      case 'vendor_infrastructure':
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="primary_vendor">Primary Vendor *</Label>
+                <Select
+                  value={formData.vendor_infrastructure.primary_vendor}
+                  onValueChange={(value) => setFormData(prev => ({
+                    ...prev,
+                    vendor_infrastructure: { ...prev.vendor_infrastructure, primary_vendor: value, model: '' }
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select vendor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {vendors.map((vendor) => (
+                      <SelectItem key={vendor.id} value={vendor.id}>
+                        {vendor.vendor_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="model">Model *</Label>
+                <Select
+                  value={formData.vendor_infrastructure.model}
+                  onValueChange={(value) => setFormData(prev => ({
+                    ...prev,
+                    vendor_infrastructure: { ...prev.vendor_infrastructure, model: value }
+                  }))}
+                  disabled={!formData.vendor_infrastructure.primary_vendor}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {vendorModels.map((model) => (
+                      <SelectItem key={model.id} value={model.id}>
+                        {model.model_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="firmware_version">Firmware Version</Label>
+                <Input
+                  id="firmware_version"
+                  value={formData.vendor_infrastructure.firmware_version}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    vendor_infrastructure: { ...prev.vendor_infrastructure, firmware_version: e.target.value }
+                  }))}
+                  placeholder="e.g., 15.2(7)E3"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="deployment_mode">Deployment Mode</Label>
+                <Select
+                  value={formData.vendor_infrastructure.deployment_mode}
+                  onValueChange={(value) => setFormData(prev => ({
+                    ...prev,
+                    vendor_infrastructure: { ...prev.vendor_infrastructure, deployment_mode: value }
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Centralized">Centralized</SelectItem>
+                    <SelectItem value="Distributed">Distributed</SelectItem>
+                    <SelectItem value="Hybrid">Hybrid</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="management_method">Management Method</Label>
+                <Select
+                  value={formData.vendor_infrastructure.management_method}
+                  onValueChange={(value) => setFormData(prev => ({
+                    ...prev,
+                    vendor_infrastructure: { ...prev.vendor_infrastructure, management_method: value }
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="CLI">Command Line Interface</SelectItem>
+                    <SelectItem value="GUI">Graphical User Interface</SelectItem>
+                    <SelectItem value="API">REST API</SelectItem>
+                    <SelectItem value="SNMP">SNMP</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'authentication_security':
+        return (
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <Label>Authentication Methods</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {['802.1X', 'MAB', 'Web Auth', 'Certificate', 'Multi-Factor'].map((method) => (
+                  <div key={method} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`auth-${method}`}
+                      checked={formData.authentication_security.auth_methods.includes(method)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setFormData(prev => ({
+                            ...prev,
+                            authentication_security: {
+                              ...prev.authentication_security,
+                              auth_methods: [...prev.authentication_security.auth_methods, method]
+                            }
+                          }));
+                        } else {
+                          setFormData(prev => ({
+                            ...prev,
+                            authentication_security: {
+                              ...prev.authentication_security,
+                              auth_methods: prev.authentication_security.auth_methods.filter(m => m !== method)
+                            }
+                          }));
+                        }
+                      }}
+                    />
+                    <Label htmlFor={`auth-${method}`}>{method}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>RADIUS Servers</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setFormData(prev => ({
+                    ...prev,
+                    authentication_security: {
+                      ...prev.authentication_security,
+                      radius_servers: [...prev.authentication_security.radius_servers, { host: '', port: 1812, secret: '' }]
+                    }
+                  }))}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Server
+                </Button>
+              </div>
+
+              {formData.authentication_security.radius_servers.map((server, index) => (
+                <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg">
+                  <div className="space-y-2">
+                    <Label>Host/IP</Label>
+                    <Input
+                      value={server.host}
+                      onChange={(e) => {
+                        const newServers = [...formData.authentication_security.radius_servers];
+                        newServers[index].host = e.target.value;
+                        setFormData(prev => ({
+                          ...prev,
+                          authentication_security: { ...prev.authentication_security, radius_servers: newServers }
+                        }));
+                      }}
+                      placeholder="192.168.1.100"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Port</Label>
+                    <Input
+                      type="number"
+                      value={server.port}
+                      onChange={(e) => {
+                        const newServers = [...formData.authentication_security.radius_servers];
+                        newServers[index].port = parseInt(e.target.value);
+                        setFormData(prev => ({
+                          ...prev,
+                          authentication_security: { ...prev.authentication_security, radius_servers: newServers }
+                        }));
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Shared Secret</Label>
+                    <Input
+                      type="password"
+                      value={server.secret}
+                      onChange={(e) => {
+                        const newServers = [...formData.authentication_security.radius_servers];
+                        newServers[index].secret = e.target.value;
+                        setFormData(prev => ({
+                          ...prev,
+                          authentication_security: { ...prev.authentication_security, radius_servers: newServers }
+                        }));
+                      }}
+                      placeholder="Enter shared secret"
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newServers = formData.authentication_security.radius_servers.filter((_, i) => i !== index);
+                        setFormData(prev => ({
+                          ...prev,
+                          authentication_security: { ...prev.authentication_security, radius_servers: newServers }
+                        }));
+                      }}
+                    >
+                      <X className="h-4 w-4" />
                     </Button>
                   </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="encryption_method">Encryption Method</Label>
+                <Select
+                  value={formData.authentication_security.encryption_method}
+                  onValueChange={(value) => setFormData(prev => ({
+                    ...prev,
+                    authentication_security: { ...prev.authentication_security, encryption_method: value }
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="WPA3-Enterprise">WPA3-Enterprise</SelectItem>
+                    <SelectItem value="WPA2-Enterprise">WPA2-Enterprise</SelectItem>
+                    <SelectItem value="EAP-TLS">EAP-TLS</SelectItem>
+                    <SelectItem value="PEAP-MSCHAPv2">PEAP-MSCHAPv2</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="fallback_auth">Fallback Authentication</Label>
+                <Select
+                  value={formData.authentication_security.fallback_auth}
+                  onValueChange={(value) => setFormData(prev => ({
+                    ...prev,
+                    authentication_security: { ...prev.authentication_security, fallback_auth: value }
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="MAB">MAC Authentication Bypass</SelectItem>
+                    <SelectItem value="Web Auth">Web Authentication</SelectItem>
+                    <SelectItem value="Guest VLAN">Guest VLAN</SelectItem>
+                    <SelectItem value="Deny">Deny Access</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'network_config':
+        return (
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>VLAN Assignments</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setFormData(prev => ({
+                    ...prev,
+                    network_config: {
+                      ...prev.network_config,
+                      vlan_assignments: [...prev.network_config.vlan_assignments, { role: '', vlan_id: 10, description: '' }]
+                    }
+                  }))}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add VLAN
+                </Button>
+              </div>
+
+              {formData.network_config.vlan_assignments.map((vlan, index) => (
+                <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg">
+                  <div className="space-y-2">
+                    <Label>Role</Label>
+                    <Select
+                      value={vlan.role}
+                      onValueChange={(value) => {
+                        const newVlans = [...formData.network_config.vlan_assignments];
+                        newVlans[index].role = value;
+                        setFormData(prev => ({
+                          ...prev,
+                          network_config: { ...prev.network_config, vlan_assignments: newVlans }
+                        }));
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Employee">Employee</SelectItem>
+                        <SelectItem value="Guest">Guest</SelectItem>
+                        <SelectItem value="IoT">IoT Devices</SelectItem>
+                        <SelectItem value="BYOD">BYOD</SelectItem>
+                        <SelectItem value="Quarantine">Quarantine</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>VLAN ID</Label>
+                    <Input
+                      type="number"
+                      value={vlan.vlan_id}
+                      onChange={(e) => {
+                        const newVlans = [...formData.network_config.vlan_assignments];
+                        newVlans[index].vlan_id = parseInt(e.target.value);
+                        setFormData(prev => ({
+                          ...prev,
+                          network_config: { ...prev.network_config, vlan_assignments: newVlans }
+                        }));
+                      }}
+                      min="1"
+                      max="4094"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Description</Label>
+                    <Input
+                      value={vlan.description}
+                      onChange={(e) => {
+                        const newVlans = [...formData.network_config.vlan_assignments];
+                        newVlans[index].description = e.target.value;
+                        setFormData(prev => ({
+                          ...prev,
+                          network_config: { ...prev.network_config, vlan_assignments: newVlans }
+                        }));
+                      }}
+                      placeholder="VLAN description"
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newVlans = formData.network_config.vlan_assignments.filter((_, i) => i !== index);
+                        setFormData(prev => ({
+                          ...prev,
+                          network_config: { ...prev.network_config, vlan_assignments: newVlans }
+                        }));
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-4">
+              <Label>Access Policies</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {['Port Security', 'DHCP Snooping', 'Dynamic ARP Inspection', 'Storm Control', 'BPDU Guard', 'Root Guard'].map((policy) => (
+                  <div key={policy} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`policy-${policy}`}
+                      checked={formData.network_config.access_policies.includes(policy)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setFormData(prev => ({
+                            ...prev,
+                            network_config: {
+                              ...prev.network_config,
+                              access_policies: [...prev.network_config.access_policies, policy]
+                            }
+                          }));
+                        } else {
+                          setFormData(prev => ({
+                            ...prev,
+                            network_config: {
+                              ...prev.network_config,
+                              access_policies: prev.network_config.access_policies.filter(p => p !== policy)
+                            }
+                          }));
+                        }
+                      }}
+                    />
+                    <Label htmlFor={`policy-${policy}`}>{policy}</Label>
+                  </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
 
-        <TabsContent value="troubleshooting">
-          <Card>
-            <CardHeader>
-              <CardTitle>Troubleshooting Guide</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[
-                  {
-                    issue: "Authentication Failure",
-                    commands: ["debug dot1x all", "show log | include dot1x"],
-                    solution: "Check RADIUS connectivity and shared secret"
-                  },
-                  {
-                    issue: "VLAN Assignment Issues",
-                    commands: ["show authentication sessions interface gi1/0/1"],
-                    solution: "Verify RADIUS attribute configuration"
-                  }
-                ].map((item, index) => (
-                  <div key={index} className="border rounded-lg p-4">
-                    <h4 className="font-medium text-red-600 mb-2">{item.issue}</h4>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Guest Network Configuration</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="guest_enabled"
+                    checked={formData.network_config.guest_network.enabled}
+                    onCheckedChange={(checked) => setFormData(prev => ({
+                      ...prev,
+                      network_config: {
+                        ...prev.network_config,
+                        guest_network: { ...prev.network_config.guest_network, enabled: checked as boolean }
+                      }
+                    }))}
+                  />
+                  <Label htmlFor="guest_enabled">Enable Guest Network</Label>
+                </div>
+
+                {formData.network_config.guest_network.enabled && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      {item.commands.map((cmd, cmdIndex) => (
-                        <code key={cmdIndex} className="block text-xs bg-muted p-2 rounded">{cmd}</code>
-                      ))}
+                      <Label>Guest VLAN ID</Label>
+                      <Input
+                        type="number"
+                        value={formData.network_config.guest_network.vlan_id}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          network_config: {
+                            ...prev.network_config,
+                            guest_network: { ...prev.network_config.guest_network, vlan_id: parseInt(e.target.value) }
+                          }
+                        }))}
+                        min="1"
+                        max="4094"
+                      />
                     </div>
-                    <p className="text-sm text-muted-foreground mt-2">{item.solution}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="deployment">
-          <Card>
-            <CardHeader>
-              <CardTitle>Deployment Steps</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {[
-                  "Backup current configuration",
-                  "Apply RADIUS server configuration",
-                  "Configure AAA settings",
-                  "Apply interface-specific 802.1X settings",
-                  "Test with a single port",
-                  "Validate authentication flow",
-                  "Apply to remaining ports",
-                  "Monitor and verify operation"
-                ].map((step, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-xs font-medium">
-                      {index + 1}
+                    <div className="space-y-2">
+                      <Label>Bandwidth Limit</Label>
+                      <Select
+                        value={formData.network_config.guest_network.bandwidth_limit}
+                        onValueChange={(value) => setFormData(prev => ({
+                          ...prev,
+                          network_config: {
+                            ...prev.network_config,
+                            guest_network: { ...prev.network_config.guest_network, bandwidth_limit: value }
+                          }
+                        }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="5Mbps">5 Mbps</SelectItem>
+                          <SelectItem value="10Mbps">10 Mbps</SelectItem>
+                          <SelectItem value="25Mbps">25 Mbps</SelectItem>
+                          <SelectItem value="50Mbps">50 Mbps</SelectItem>
+                          <SelectItem value="Unlimited">Unlimited</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <span className="text-sm">{step}</span>
+                    <div className="space-y-2">
+                      <Label>Access Duration</Label>
+                      <Select
+                        value={formData.network_config.guest_network.access_duration}
+                        onValueChange={(value) => setFormData(prev => ({
+                          ...prev,
+                          network_config: {
+                            ...prev.network_config,
+                            guest_network: { ...prev.network_config.guest_network, access_duration: value }
+                          }
+                        }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1h">1 Hour</SelectItem>
+                          <SelectItem value="4h">4 Hours</SelectItem>
+                          <SelectItem value="8h">8 Hours</SelectItem>
+                          <SelectItem value="24h">24 Hours</SelectItem>
+                          <SelectItem value="7d">7 Days</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                ))}
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      case 'templates_ai':
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label>Configuration Type</Label>
+                <Select
+                  value={formData.templates_ai.configuration_type}
+                  onValueChange={(value) => setFormData(prev => ({
+                    ...prev,
+                    templates_ai: { ...prev.templates_ai, configuration_type: value }
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="802.1X">802.1X Authentication</SelectItem>
+                    <SelectItem value="NAC">Network Access Control</SelectItem>
+                    <SelectItem value="BYOD">BYOD Policy</SelectItem>
+                    <SelectItem value="Guest">Guest Access</SelectItem>
+                    <SelectItem value="IoT">IoT Security</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
 
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={() => setCurrentPhase('analysis')}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Analysis
-        </Button>
-        
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={onCancel}>
-            Save for Later
-          </Button>
-          <Button onClick={() => {
-            onComplete?.(configData);
-            toast({
-              title: "Configuration Complete",
-              description: "Your AI-generated configuration has been saved successfully."
-            });
-          }}>
-            <Check className="h-4 w-4 mr-2" />
-            Complete & Save
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
+              <div className="space-y-2">
+                <Label>Configuration Templates</Label>
+                <div className="grid grid-cols-1 gap-2">
+                  {['Basic 802.1X', 'Enterprise Security', 'Multi-Tenant', 'Healthcare Compliance', 'Industrial IoT'].map((template) => (
+                    <div key={template} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`template-${template}`}
+                        checked={formData.templates_ai.selected_templates.includes(template)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              templates_ai: {
+                                ...prev.templates_ai,
+                                selected_templates: [...prev.templates_ai.selected_templates, template]
+                              }
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              templates_ai: {
+                                ...prev.templates_ai,
+                                selected_templates: prev.templates_ai.selected_templates.filter(t => t !== template)
+                              }
+                            }));
+                          }
+                        }}
+                      />
+                      <Label htmlFor={`template-${template}`}>{template}</Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-  const renderCurrentPhase = () => {
-    switch (currentPhase) {
-      case 'context':
-        return renderContextPhase();
-      case 'technical':
-        return renderTechnicalPhase();
-      case 'analysis':
-        return renderAnalysisPhase();
-      case 'generation':
-        return renderGenerationPhase();
+            {!formData.templates_ai.generated_config ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-purple-500" />
+                    AI Configuration Generation
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center space-y-4">
+                    <p className="text-muted-foreground">
+                      Ready to generate your customized network configuration using AI and best practices.
+                    </p>
+                    <Button
+                      onClick={generateConfiguration}
+                      disabled={aiGenerationLoading}
+                      size="lg"
+                      className="bg-gradient-primary hover:bg-gradient-primary/90 text-white"
+                    >
+                      {aiGenerationLoading ? (
+                        <>
+                          <Zap className="h-4 w-4 mr-2 animate-spin" />
+                          Generating Configuration...
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="h-4 w-4 mr-2" />
+                          Generate Configuration
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">Generated Configuration</h3>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={copyToClipboard}>
+                      <Copy className="h-4 w-4 mr-2" />
+                      Copy
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={downloadConfig}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="bg-gray-900 rounded-lg p-4">
+                  <pre className="text-green-400 text-sm overflow-x-auto whitespace-pre-wrap">
+                    {formData.templates_ai.generated_config}
+                  </pre>
+                </div>
+
+                {formData.templates_ai.validation_results.warnings.length > 0 && (
+                  <Alert>
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                      <strong>Warnings:</strong>
+                      <ul className="list-disc ml-4 mt-1">
+                        {formData.templates_ai.validation_results.warnings.map((warning, index) => (
+                          <li key={index}>{warning}</li>
+                        ))}
+                      </ul>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {formData.templates_ai.validation_results.recommendations.length > 0 && (
+                  <Alert>
+                    <CheckCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      <strong>Recommendations:</strong>
+                      <ul className="list-disc ml-4 mt-1">
+                        {formData.templates_ai.validation_results.recommendations.map((rec, index) => (
+                          <li key={index}>{rec}</li>
+                        ))}
+                      </ul>
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            )}
+          </div>
+        );
+
       default:
-        return renderContextPhase();
+        return null;
     }
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4">
-      <form id="radius-config-form" style={{ display: 'none' }} />
-      
-      {/* Phase Navigation */}
-      <div className="mb-8">
-        <div className="flex items-center justify-center space-x-4">
-          {[
-            { id: 'context', label: 'Context', icon: Building2 },
-            { id: 'technical', label: 'Technical', icon: Settings },
-            { id: 'analysis', label: 'Analysis', icon: Brain },
-            { id: 'generation', label: 'Generation', icon: FileText }
-          ].map((phase, index) => (
-            <div key={phase.id} className="flex items-center">
-              <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                currentPhase === phase.id 
-                  ? 'border-blue-500 bg-blue-500 text-white' 
-                  : 'border-gray-300 text-gray-400'
-              }`}>
-                <phase.icon className="h-5 w-5" />
+    <div className="max-w-6xl mx-auto p-6 space-y-6">
+      {/* Progress Header */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">AI Configuration Wizard</h1>
+            <p className="text-muted-foreground">
+              Step {currentStep + 1} of {steps.length}: {steps[currentStep].title}
+            </p>
+          </div>
+          <Badge variant="glow" className="px-3 py-1">
+            <Brain className="h-4 w-4 mr-2" />
+            AI Powered
+          </Badge>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>Progress</span>
+            <span>{Math.round(progressPercentage)}%</span>
+          </div>
+          <Progress value={progressPercentage} className="h-2" />
+        </div>
+
+        {/* Step Navigation */}
+        <div className="flex flex-wrap gap-2">
+          {steps.map((step, index) => {
+            const StepIcon = step.icon;
+            const isActive = index === currentStep;
+            const isCompleted = index < currentStep;
+
+            return (
+              <div
+                key={step.id}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all ${
+                  isActive
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : isCompleted
+                    ? 'bg-green-50 border-green-200 text-green-700'
+                    : 'bg-gray-50 border-gray-200 text-gray-500'
+                }`}
+              >
+                <StepIcon className={`h-4 w-4 ${step.color}`} />
+                <span className="text-sm font-medium hidden sm:inline">{step.title}</span>
+                {isCompleted && <CheckCircle className="h-4 w-4 text-green-600" />}
               </div>
-              <span className={`ml-2 text-sm font-medium ${
-                currentPhase === phase.id ? 'text-blue-600' : 'text-gray-500'
-              }`}>
-                {phase.label}
-              </span>
-              {index < 3 && (
-                <ArrowRight className="h-4 w-4 mx-4 text-gray-300" />
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
-      {/* Phase Content */}
-      {renderCurrentPhase()}
+      {/* Step Content */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-lg bg-primary/10`}>
+              {React.createElement(steps[currentStep].icon, { className: `h-6 w-6 ${steps[currentStep].color}` })}
+            </div>
+            <div>
+              <CardTitle>{steps[currentStep].title}</CardTitle>
+              <CardDescription>{steps[currentStep].description}</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {renderStepContent()}
+        </CardContent>
+      </Card>
+
+      {/* Navigation */}
+      <div className="flex justify-between">
+        <div>
+          {currentStep > 0 && (
+            <Button variant="outline" onClick={handleBack}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+          )}
+        </div>
+
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          
+          {currentStep < steps.length - 1 ? (
+            <Button onClick={handleNext}>
+              Next
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          ) : (
+            <Button onClick={handleComplete} className="bg-gradient-primary hover:bg-gradient-primary/90 text-white">
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Complete Configuration
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

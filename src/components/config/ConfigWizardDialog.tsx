@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Settings, Save, FileDown, Copy, ArrowRight, Bot, Zap } from 'lucide-react';
-import IntelligentAIConfigWizard from './IntelligentAIConfigWizard';
+import EnhancedConfigWizard from './EnhancedConfigWizard';
 import { useToast } from '@/hooks/use-toast';
 
 interface ConfigWizardDialogProps {
@@ -206,7 +206,7 @@ const ConfigWizardDialog: React.FC<ConfigWizardDialogProps> = ({
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto max-h-[80vh]">
-          <IntelligentAIConfigWizard 
+          <EnhancedConfigWizard 
             projectId={projectId}
             siteId={siteId}
             onComplete={handleConfigComplete}
