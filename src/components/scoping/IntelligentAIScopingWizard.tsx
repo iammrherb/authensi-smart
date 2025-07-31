@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 import { useAI } from '@/hooks/useAI';
-import { useVendors } from '@/hooks/useVendors';
+import { useEnhancedVendors } from '@/hooks/useVendors';
 import { usePainPoints } from '@/hooks/usePainPoints';
 import { useRecommendations } from '@/hooks/useRecommendations';
 import { useCreateProject } from '@/hooks/useProjects';
@@ -286,7 +286,7 @@ const IntelligentAIScopingWizard: React.FC<IntelligentAIScopingWizardProps> = ({
   });
 
   const { generateCompletion } = useAI();
-  const { data: vendors = [] } = useVendors();
+  const { data: vendors = [] } = useEnhancedVendors();
   const { data: painPoints = [] } = usePainPoints();
   const { data: recommendations = [] } = useRecommendations();
   const createProject = useCreateProject();

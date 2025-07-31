@@ -41,7 +41,7 @@ import {
   Edit
 } from 'lucide-react';
 import { useConfigTemplates, useCreateConfigTemplate, useGenerateConfigWithAI } from '@/hooks/useConfigTemplates';
-import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
+import { useEnhancedVendors } from '@/hooks/useVendors';
 import { useVendorModels } from '@/hooks/useVendorModels';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
@@ -81,11 +81,6 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
   const createTemplate = useCreateConfigTemplate();
   const generateWithAI = useGenerateConfigWithAI();
   const { toast } = useToast();
-
-  // Filter vendor models based on selected vendor
-  const vendorModels = allVendorModels?.filter(model => 
-    !wizardData.basic.vendor || model.vendor_id === wizardData.basic.vendor
-  );
 
   // Wizard state
   const [currentStep, setCurrentStep] = useState(0);
@@ -130,41 +125,259 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
     }
   });
 
-  // Predefined scenarios
+  // Filter vendor models based on selected vendor (defined after wizardData)
+  const vendorModels = allVendorModels?.filter(model => 
+    !wizardData.basic.vendor || model.vendor_id === wizardData.basic.vendor
+  );
   const configurationScenarios: ConfigurationScenario[] = [
+    // Basic Authentication Scenarios
     {
       id: 'basic-dot1x',
       name: 'Basic 802.1X Authentication',
-      description: 'Simple user authentication with single VLAN',
+      description: 'Simple port-based authentication with basic VLAN assignment',
       category: 'Basic',
-      complexity: 'basic',
+      complexity: 'beginner',
       authMethods: ['EAP-TLS', 'PEAP'],
       vlans: false,
       guestAccess: false,
       compliance: []
     },
     {
-      id: 'dynamic-vlan',
-      name: 'Dynamic VLAN Assignment',
-      description: 'User-based VLAN assignment with RADIUS attributes',
-      category: 'Intermediate',
+      id: 'mab-only',
+      name: 'MAB Only Authentication',
+      description: 'MAC Address Bypass authentication for non-supplicant devices',
+      category: 'Basic',
+      complexity: 'beginner',
+      authMethods: ['MAC Bypass'],
+      vlans: false,
+      guestAccess: false,
+      compliance: []
+    },
+    
+    // Multi-Authentication Scenarios
+    {
+      id: 'multi-host-auth',
+      name: 'Multi-Host Authentication',
+      description: 'Multiple devices per port with host mode authentication',
+      category: 'Multi-Auth',
       complexity: 'intermediate',
-      authMethods: ['EAP-TLS', 'PEAP', 'EAP-TTLS'],
+      authMethods: ['EAP-TLS', 'PEAP', 'MAC Bypass'],
       vlans: true,
       guestAccess: false,
       compliance: []
     },
     {
-      id: 'guest-access',
-      name: 'Guest Network with 802.1X',
-      description: 'Separate guest network with captive portal',
-      category: 'Intermediate',
+      id: 'multi-domain-auth',
+      name: 'Multi-Domain Authentication',
+      description: 'Voice and data domain separation with independent authentication',
+      category: 'Multi-Auth',
       complexity: 'intermediate',
-      authMethods: ['Web Auth', 'MAC Bypass'],
+      authMethods: ['EAP-TLS', 'PEAP', 'LLDP-MED'],
+      vlans: true,
+      guestAccess: false,
+      compliance: []
+    },
+    {
+      id: 'concurrent-auth',
+      name: 'Concurrent 802.1X and MAB',
+      description: 'Simultaneous 802.1X and MAB authentication methods',
+      category: 'Multi-Auth',
+      complexity: 'advanced',
+      authMethods: ['EAP-TLS', 'PEAP', 'MAC Bypass'],
+      vlans: true,
+      guestAccess: false,
+      compliance: []
+    },
+    
+    // Advanced Authentication
+    {
+      id: 'dot1x-priority',
+      name: '802.1X Priority with MAB Fallback',
+      description: 'Prioritized 802.1X with intelligent MAB fallback',
+      category: 'Advanced',
+      complexity: 'intermediate',
+      authMethods: ['EAP-TLS', 'PEAP', 'MAC Bypass Fallback'],
+      vlans: true,
+      guestAccess: false,
+      compliance: []
+    },
+    {
+      id: 'guest-onboarding',
+      name: 'Guest Onboarding & BYOD',
+      description: 'Comprehensive guest access and BYOD device onboarding',
+      category: 'Guest',
+      complexity: 'advanced',
+      authMethods: ['Web Auth', 'Device Registration', 'Self-Service'],
       vlans: true,
       guestAccess: true,
       compliance: []
     },
+    
+    // RADIUS and Protocol Configurations
+    {
+      id: 'radsec-deployment',
+      name: 'RADSEC Secure RADIUS',
+      description: 'Secure RADIUS communication over TLS',
+      category: 'Security',
+      complexity: 'advanced',
+      authMethods: ['EAP-TLS', 'RADSEC'],
+      vlans: true,
+      guestAccess: false,
+      compliance: ['TLS', 'PKI']
+    },
+    {
+      id: 'coa-deployment',
+      name: 'Change of Authorization (CoA)',
+      description: 'Dynamic session control and policy updates',
+      category: 'Dynamic',
+      complexity: 'advanced',
+      authMethods: ['EAP-TLS', 'PEAP', 'CoA'],
+      vlans: true,
+      guestAccess: false,
+      compliance: []
+    },
+    {
+      id: 'tacacs-integration',
+      name: 'TACACS+ Administrative Access',
+      description: 'Centralized administrative authentication and authorization',
+      category: 'Administration',
+      complexity: 'intermediate',
+      authMethods: ['TACACS+', 'Local Fallback'],
+      vlans: false,
+      guestAccess: false,
+      compliance: []
+    },
+    
+    // VLAN and Network Segmentation
+    {
+      id: 'dynamic-vlan-assignment',
+      name: 'Dynamic VLAN Assignment',
+      description: 'Policy-based dynamic VLAN assignment with profiling',
+      category: 'Segmentation',
+      complexity: 'intermediate',
+      authMethods: ['EAP-TLS', 'PEAP', 'RADIUS Attributes'],
+      vlans: true,
+      guestAccess: false,
+      compliance: []
+    },
+    {
+      id: 'vlan-override-policies',
+      name: 'VLAN Override Policies',
+      description: 'Administrative VLAN overrides and exception handling',
+      category: 'Segmentation',
+      complexity: 'advanced',
+      authMethods: ['EAP-TLS', 'PEAP', 'Administrative Override'],
+      vlans: true,
+      guestAccess: false,
+      compliance: []
+    },
+    {
+      id: 'quarantine-isolation',
+      name: 'Quarantine & Isolation VLANs',
+      description: 'Security quarantine and network isolation policies',
+      category: 'Security',
+      complexity: 'intermediate',
+      authMethods: ['EAP-TLS', 'PEAP', 'Policy Enforcement'],
+      vlans: true,
+      guestAccess: false,
+      compliance: []
+    },
+    {
+      id: 'blackhole-vlan',
+      name: 'Blackhole VLAN Configuration',
+      description: 'Network blackhole for threat containment',
+      category: 'Security',
+      complexity: 'advanced',
+      authMethods: ['Policy Enforcement', 'Threat Response'],
+      vlans: true,
+      guestAccess: false,
+      compliance: []
+    },
+    
+    // IoT and Device Profiling
+    {
+      id: 'iot-profiling',
+      name: 'IoT Device Profiling & Segmentation',
+      description: 'Comprehensive IoT device identification and segmentation',
+      category: 'IoT',
+      complexity: 'advanced',
+      authMethods: ['Device Profiling', 'MAC Bypass', 'Certificate'],
+      vlans: true,
+      guestAccess: false,
+      compliance: []
+    },
+    {
+      id: 'dhcp-profiling',
+      name: 'DHCP Relay & IP Helper Configuration',
+      description: 'DHCP-based device profiling and IP management',
+      category: 'Profiling',
+      complexity: 'intermediate',
+      authMethods: ['DHCP Profiling', 'IP Helper'],
+      vlans: true,
+      guestAccess: false,
+      compliance: []
+    },
+    
+    // Port Security and Protection
+    {
+      id: 'port-security-basic',
+      name: 'Basic Port Security',
+      description: 'Fundamental port security with MAC limiting',
+      category: 'Security',
+      complexity: 'beginner',
+      authMethods: ['Port Security', 'MAC Limiting'],
+      vlans: false,
+      guestAccess: false,
+      compliance: []
+    },
+    {
+      id: 'port-security-advanced',
+      name: 'Advanced Port Security & Guards',
+      description: 'Comprehensive port protection with security guards',
+      category: 'Security',
+      complexity: 'advanced',
+      authMethods: ['BPDU Guard', 'Root Guard', 'Loop Guard', 'DHCP Snooping'],
+      vlans: true,
+      guestAccess: false,
+      compliance: []
+    },
+    {
+      id: 'device-tracking',
+      name: 'Device Tracking & Monitoring',
+      description: 'Comprehensive device tracking and session monitoring',
+      category: 'Monitoring',
+      complexity: 'intermediate',
+      authMethods: ['Device Tracking', 'Session Monitoring'],
+      vlans: true,
+      guestAccess: false,
+      compliance: []
+    },
+    
+    // Load Balancing and High Availability
+    {
+      id: 'radius-load-balancing',
+      name: 'RADIUS Load Balancing',
+      description: 'High-availability RADIUS with load balancing',
+      category: 'High Availability',
+      complexity: 'advanced',
+      authMethods: ['Load Balanced RADIUS', 'Failover'],
+      vlans: false,
+      guestAccess: false,
+      compliance: []
+    },
+    {
+      id: 'radius-testing',
+      name: 'RADIUS Testing & Validation',
+      description: 'Comprehensive RADIUS connectivity and response testing',
+      category: 'Testing',
+      complexity: 'intermediate',
+      authMethods: ['RADIUS Test', 'Connectivity Validation'],
+      vlans: false,
+      guestAccess: false,
+      compliance: []
+    },
+    
+    // Compliance Frameworks
     {
       id: 'healthcare-hipaa',
       name: 'Healthcare HIPAA Compliant',
@@ -188,15 +401,15 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
       compliance: ['PCI-DSS', 'SOX']
     },
     {
-      id: 'iot-segmentation',
-      name: 'IoT Device Segmentation',
-      description: 'Secure IoT device onboarding with microsegmentation',
-      category: 'Advanced',
-      complexity: 'advanced',
-      authMethods: ['Certificate', 'PSK', 'MAC Bypass'],
+      id: 'enterprise-deployment',
+      name: 'Complete Enterprise Deployment',
+      description: 'Full enterprise-grade NAC deployment',
+      category: 'Enterprise',
+      complexity: 'expert',
+      authMethods: ['All Methods', 'Policy Enforcement', 'Integration'],
       vlans: true,
-      guestAccess: false,
-      compliance: []
+      guestAccess: true,
+      compliance: ['Multiple Frameworks']
     }
   ];
 

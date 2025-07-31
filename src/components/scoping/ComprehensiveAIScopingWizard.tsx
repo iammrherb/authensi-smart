@@ -18,7 +18,7 @@ import {
   Cpu, HardDrive, Printer, Camera, Phone, Tablet, Laptop
 } from 'lucide-react';
 
-import { useVendors } from '@/hooks/useVendors';
+import { useEnhancedVendors } from '@/hooks/useVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { useCreateProject, useUpdateProject } from '@/hooks/useProjects';
@@ -300,7 +300,7 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
     }
   });
 
-  const { data: vendors = [] } = useVendors();
+  const { data: vendors = [] } = useEnhancedVendors();
   const { data: useCases = [] } = useUseCases();
   const { data: requirements = [] } = useRequirements();
   const createProject = useCreateProject();

@@ -16,7 +16,7 @@ import {
   useDeleteVendorModel,
   type VendorModel 
 } from "@/hooks/useVendorModels";
-import { useVendors } from "@/hooks/useVendors";
+import { useEnhancedVendors } from "@/hooks/useVendors";
 import { 
   Plus, 
   Edit, 
@@ -52,7 +52,7 @@ const EnhancedVendorModelManager: React.FC<EnhancedVendorModelManagerProps> = ({
   const [tagInput, setTagInput] = useState("");
 
   const { data: models = [], isLoading } = useVendorModels(vendorId);
-  const { data: vendors = [] } = useVendors();
+  const { data: vendors = [] } = useEnhancedVendors();
   const createModel = useCreateVendorModel();
   const updateModel = useUpdateVendorModel();
   const deleteModel = useDeleteVendorModel();

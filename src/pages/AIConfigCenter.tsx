@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
-import OneXerConfigWizard from "@/components/config/OneXerConfigWizard";
-import EnhancedConfigTemplateManager from "@/components/config/EnhancedConfigTemplateManager";
-import ConfigGeneratorManager from "@/components/config/ConfigGeneratorManager";
+import ConfigWizardDialog from "@/components/config/ConfigWizardDialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, Settings, FileText, Sparkles, Zap, Target } from "lucide-react";
+import { Brain, Settings, FileText, Sparkles, Zap, Target, Plus } from "lucide-react";
 
 const AIConfigCenter = () => {
   const [activeTab, setActiveTab] = useState("wizard");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
 
   const handleConfigSave = (config: any) => {
     console.log('Configuration saved:', config);
-    // Handle save logic here
+    setIsWizardOpen(false);
   };
 
   const handleConfigCancel = () => {
-    window.history.back();
+    setIsWizardOpen(false);
   };
 
   return (
@@ -34,7 +34,7 @@ const AIConfigCenter = () => {
                 <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center shadow-glow">
                   <Brain className="text-2xl text-primary-foreground animate-pulse" />
                 </div>
-                <Badge variant="glow" className="text-sm px-4 py-2">
+                <Badge variant="secondary" className="text-sm px-4 py-2">
                   Intelligent Configuration Suite
                 </Badge>
               </div>
@@ -47,9 +47,7 @@ const AIConfigCenter = () => {
               </h1>
               
               <p className="text-lg text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-                Revolutionary AI-powered 802.1X configuration generation. Create, manage, and deploy 
-                enterprise-grade network access control configurations with intelligent automation, 
-                best practices, and seamless integration across your entire infrastructure.
+                Advanced AI-powered network configuration generation with intelligent recommendations and automated best practices.
               </p>
 
               {/* Quick Stats */}
@@ -98,14 +96,23 @@ const AIConfigCenter = () => {
                   <CardTitle className="text-2xl">Intelligent Configuration Wizard</CardTitle>
                 </div>
                 <CardDescription className="text-base">
-                  Step-by-step guided configuration with AI-powered recommendations
+                  AI-powered 802.1X configuration generation with smart recommendations
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <OneXerConfigWizard 
-                  onSave={handleConfigSave}
-                  onCancel={handleConfigCancel}
-                />
+              <CardContent className="text-center space-y-6">
+                <div className="space-y-4">
+                  <p className="text-muted-foreground">
+                    Launch the comprehensive configuration wizard to generate custom 802.1X configurations with AI-powered recommendations.
+                  </p>
+                  <Button 
+                    onClick={() => setIsWizardOpen(true)}
+                    size="lg"
+                    className="bg-gradient-primary hover:opacity-90 transition-opacity"
+                  >
+                    <Plus className="h-5 w-5 mr-2" />
+                    Launch Configuration Wizard
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -118,11 +125,13 @@ const AIConfigCenter = () => {
                   <CardTitle className="text-2xl">Configuration Templates</CardTitle>
                 </div>
                 <CardDescription className="text-base">
-                  Manage and customize pre-built configuration templates for various scenarios
+                  Component temporarily disabled for debugging
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <EnhancedConfigTemplateManager />
+                <p className="text-center text-muted-foreground">
+                  EnhancedConfigTemplateManager component temporarily disabled to isolate the JavaScript error.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -135,16 +144,24 @@ const AIConfigCenter = () => {
                   <CardTitle className="text-2xl">AI Configuration Generator</CardTitle>
                 </div>
                 <CardDescription className="text-base">
-                  Advanced AI-powered configuration generation with custom requirements
+                  Component temporarily disabled for debugging
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ConfigGeneratorManager searchTerm={searchTerm} />
+                <p className="text-center text-muted-foreground">
+                  ConfigGeneratorManager component temporarily disabled to isolate the JavaScript error.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Configuration Wizard Dialog */}
+      <ConfigWizardDialog
+        isOpen={isWizardOpen}
+        onClose={handleConfigCancel}
+      />
     </div>
   );
 };

@@ -40,7 +40,7 @@ import {
   Bot
 } from 'lucide-react';
 import { useConfigTemplates, useCreateConfigTemplate, useUpdateConfigTemplate, useDeleteConfigTemplate, useGenerateConfigWithAI } from '@/hooks/useConfigTemplates';
-import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
+import { useEnhancedVendors } from '@/hooks/useVendors';
 import { useVendorModels } from '@/hooks/useVendorModels';
 import { useToast } from '@/hooks/use-toast';
 
