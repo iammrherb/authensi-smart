@@ -229,6 +229,13 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
   const vendorModels = allVendorModels?.filter(model => 
     model.vendor_id === wizardData.basic.vendor
   ) || [];
+  
+  console.log('Debug Config Wizard:', { 
+    vendors: vendors?.length || 0, 
+    allVendorModels: allVendorModels?.length || 0,
+    selectedVendor: wizardData.basic.vendor,
+    filteredModels: vendorModels.length
+  });
 
   // Wizard steps
   const steps = [
@@ -1321,18 +1328,17 @@ vlan ${data.advanced.vlans.managementVlan}
                 placeholder="192.168.1.11"
               />
             </div>
-            <form>
-              <div>
-                <Label htmlFor="radius-secret">Shared Secret</Label>
-                <Input
-                  id="radius-secret"
-                  type="password"
-                  value={wizardData.advanced.radius.secret}
-                  onChange={(e) => updateAdvancedData('radius', 'secret', e.target.value)}
-                  placeholder="Enter shared secret"
-                />
-              </div>
-            </form>
+            <div>
+              <Label htmlFor="radius-secret">Shared Secret</Label>
+              <Input
+                id="radius-secret"
+                type="password"
+                value={wizardData.advanced.radius.secret}
+                onChange={(e) => updateAdvancedData('radius', 'secret', e.target.value)}
+                placeholder="Enter shared secret"
+                form="radius-config-form"
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="radius-timeout">Timeout (seconds)</Label>

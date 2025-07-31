@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Settings, Save, FileDown, Copy, ArrowRight, Bot } from 'lucide-react';
-import OneXerConfigWizard from './OneXerConfigWizard';
+import { Settings, Save, FileDown, Copy, ArrowRight, Bot, Zap } from 'lucide-react';
+import EnhancedConfigWizard from './EnhancedConfigWizard';
 import { useToast } from '@/hooks/use-toast';
 
 interface ConfigWizardDialogProps {
@@ -190,27 +190,26 @@ const ConfigWizardDialog: React.FC<ConfigWizardDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl max-h-[95vh] overflow-hidden p-0">
-        <div className="bg-gradient-to-br from-background via-background/95 to-primary/5 p-6">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-3 text-2xl">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Bot className="h-6 w-6 text-primary" />
-              </div>
-              AI Configuration Wizard
-              <Badge variant="glow" className="ml-2">Advanced</Badge>
-            </DialogTitle>
-            <DialogDescription className="text-base mt-2">
-              Generate intelligent, vendor-specific 802.1X network access control configurations with AI-powered recommendations and best practices.
-            </DialogDescription>
-          </DialogHeader>
-        </div>
+      <DialogContent className="max-w-7xl max-h-[95vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Bot className="h-6 w-6 text-blue-500" />
+            AI Configuration Wizard
+            <Badge variant="glow" className="ml-2">
+              <Zap className="h-3 w-3 mr-1" />
+              Advanced
+            </Badge>
+          </DialogTitle>
+          <DialogDescription>
+            Generate intelligent, vendor-specific 802.1X network access control configurations with AI-powered recommendations and best practices.
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="px-6 pb-6 max-h-[calc(95vh-140px)] overflow-auto">
-          <OneXerConfigWizard 
+        <div className="flex-1 overflow-y-auto max-h-[80vh]">
+          <EnhancedConfigWizard 
             projectId={projectId}
             siteId={siteId}
-            onSave={handleConfigComplete}
+            onComplete={handleConfigComplete}
             onCancel={onClose}
           />
         </div>
