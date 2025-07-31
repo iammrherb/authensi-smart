@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useUserRoles, useAssignRole, useRemoveRole, useCanManageRoles, AppRole } from '@/hooks/useUserRoles';
 import InvitationManagement from './InvitationManagement';
+import TwoFactorEnforcementSettings from './TwoFactorEnforcementSettings';
 
 // Enhanced role definitions with descriptions and permissions
 const ROLE_DEFINITIONS = {
@@ -294,6 +295,59 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
     }
   });
 
+  // 2FA enforcement mutations
+  const enforce2FAMutation = useMutation({
+    mutationFn: async ({ userId, immediate }: { userId: string; immediate?: boolean }) => {
+      const { data, error } = await supabase.rpc('enforce_2fa_for_user' as any, {
+        p_user_id: userId,
+        p_deadline: immediate ? new Date() : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        p_immediate: immediate || false
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast({
+        title: "2FA Enforced",
+        description: "2FA requirement has been set for the user",
+      });
+      queryClient.invalidateQueries({ queryKey: ['all-users'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to enforce 2FA",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const reset2FAMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const { data, error } = await supabase.rpc('reset_user_2fa' as any, {
+        p_user_id: userId
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast({
+        title: "2FA Reset",
+        description: "User's 2FA has been reset successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ['all-users'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to reset 2FA",
+        variant: "destructive"
+      });
+    }
+  });
+
   const resetCreateForm = () => {
     setNewUserEmail('');
     setNewUserFirstName('');
@@ -454,9 +508,10 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
       </div>
 
       <Tabs defaultValue="users" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="users">All Users</TabsTrigger>
           <TabsTrigger value="roles">Role Management</TabsTrigger>
+          <TabsTrigger value="2fa">2FA Settings</TabsTrigger>
           <TabsTrigger value="invitations">Invitations</TabsTrigger>
           <TabsTrigger value="activity">Activity Log</TabsTrigger>
         </TabsList>
@@ -550,64 +605,90 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
                           <TableCell>
                             {new Date(user.created_at).toLocaleDateString()}
                           </TableCell>
-                          {canManage && (
-                            <TableCell>
-                              <div className="flex space-x-1">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => toggleBlockMutation.mutate({ 
-                                    userId: user.id, 
-                                    block: !user.is_blocked 
-                                  })}
-                                  disabled={toggleBlockMutation.isPending}
-                                >
-                                  {user.is_blocked ? (
-                                    <>
-                                      <UserCheck className="h-3 w-3 mr-1" />
-                                      Unblock
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Ban className="h-3 w-3 mr-1" />
-                                      Block
-                                    </>
-                                  )}
-                                </Button>
-                                
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="text-red-600 hover:text-red-700"
-                                    >
-                                      <Trash2 className="h-3 w-3 mr-1" />
-                                      Delete
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Delete User</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Are you sure you want to delete {user.first_name} {user.last_name}? 
-                                        This will deactivate their account and remove all roles.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                      <AlertDialogAction
-                                        onClick={() => deleteUserMutation.mutate(user.id)}
-                                        className="bg-red-600 hover:bg-red-700"
-                                      >
-                                        Delete User
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              </div>
-                            </TableCell>
-                          )}
+                           {canManage && (
+                             <TableCell>
+                               <div className="flex space-x-1">
+                                 <Button
+                                   size="sm"
+                                   variant="outline"
+                                   onClick={() => toggleBlockMutation.mutate({ 
+                                     userId: user.id, 
+                                     block: !user.is_blocked 
+                                   })}
+                                   disabled={toggleBlockMutation.isPending}
+                                 >
+                                   {user.is_blocked ? (
+                                     <>
+                                       <UserCheck className="h-3 w-3 mr-1" />
+                                       Unblock
+                                     </>
+                                   ) : (
+                                     <>
+                                       <Ban className="h-3 w-3 mr-1" />
+                                       Block
+                                     </>
+                                   )}
+                                 </Button>
+                                 
+                                 {!user.two_factor_enabled && (
+                                   <Button
+                                     size="sm"
+                                     variant="outline"
+                                     onClick={() => enforce2FAMutation.mutate({ userId: user.id })}
+                                     disabled={enforce2FAMutation.isPending}
+                                     className="text-orange-600 hover:text-orange-700"
+                                   >
+                                     <Shield className="h-3 w-3 mr-1" />
+                                     Force 2FA
+                                   </Button>
+                                 )}
+                                 
+                                 {user.two_factor_enabled && (
+                                   <Button
+                                     size="sm"
+                                     variant="outline"
+                                     onClick={() => reset2FAMutation.mutate(user.id)}
+                                     disabled={reset2FAMutation.isPending}
+                                     className="text-blue-600 hover:text-blue-700"
+                                   >
+                                     <RotateCcw className="h-3 w-3 mr-1" />
+                                     Reset 2FA
+                                   </Button>
+                                 )}
+                                 
+                                 <AlertDialog>
+                                   <AlertDialogTrigger asChild>
+                                     <Button
+                                       size="sm"
+                                       variant="outline"
+                                       className="text-red-600 hover:text-red-700"
+                                     >
+                                       <Trash2 className="h-3 w-3 mr-1" />
+                                       Delete
+                                     </Button>
+                                   </AlertDialogTrigger>
+                                   <AlertDialogContent>
+                                     <AlertDialogHeader>
+                                       <AlertDialogTitle>Delete User</AlertDialogTitle>
+                                       <AlertDialogDescription>
+                                         Are you sure you want to delete {user.first_name} {user.last_name}? 
+                                         This will deactivate their account and remove all roles.
+                                       </AlertDialogDescription>
+                                     </AlertDialogHeader>
+                                     <AlertDialogFooter>
+                                       <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                       <AlertDialogAction
+                                         onClick={() => deleteUserMutation.mutate(user.id)}
+                                         className="bg-red-600 hover:bg-red-700"
+                                       >
+                                         Delete User
+                                       </AlertDialogAction>
+                                     </AlertDialogFooter>
+                                   </AlertDialogContent>
+                                 </AlertDialog>
+                               </div>
+                             </TableCell>
+                           )}
                         </TableRow>
                       );
                     })}
@@ -616,6 +697,10 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="2fa">
+          <TwoFactorEnforcementSettings />
         </TabsContent>
 
         <TabsContent value="roles">

@@ -928,8 +928,11 @@ export type Database = {
           locked_until: string | null
           password_changed_at: string | null
           phone: string | null
+          two_factor_deadline: string | null
           two_factor_enabled: boolean | null
+          two_factor_required: boolean | null
           two_factor_secret: string | null
+          two_factor_setup_forced: boolean | null
           updated_at: string
         }
         Insert: {
@@ -949,8 +952,11 @@ export type Database = {
           locked_until?: string | null
           password_changed_at?: string | null
           phone?: string | null
+          two_factor_deadline?: string | null
           two_factor_enabled?: boolean | null
+          two_factor_required?: boolean | null
           two_factor_secret?: string | null
+          two_factor_setup_forced?: boolean | null
           updated_at?: string
         }
         Update: {
@@ -970,8 +976,11 @@ export type Database = {
           locked_until?: string | null
           password_changed_at?: string | null
           phone?: string | null
+          two_factor_deadline?: string | null
           two_factor_enabled?: boolean | null
+          two_factor_required?: boolean | null
           two_factor_secret?: string | null
+          two_factor_setup_forced?: boolean | null
           updated_at?: string
         }
         Relationships: []
@@ -2059,6 +2068,41 @@ export type Database = {
         }
         Relationships: []
       }
+      system_settings: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          setting_key: string
+          setting_value?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_settings_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       template_usage_analytics: {
         Row: {
           created_at: string | null
@@ -2606,6 +2650,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      enforce_2fa_for_user: {
+        Args: { p_user_id: string; p_deadline?: string; p_immediate?: boolean }
+        Returns: boolean
+      }
       has_permission: {
         Args: {
           user_id: string
@@ -2633,9 +2681,17 @@ export type Database = {
         Args: { p_email: string }
         Returns: Json
       }
+      reset_user_2fa: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
       toggle_user_block: {
         Args: { p_user_id: string; p_block?: boolean }
         Returns: Json
+      }
+      update_2fa_enforcement: {
+        Args: { p_settings: Json }
+        Returns: boolean
       }
       user_owns_project: {
         Args: { project_uuid: string }
@@ -2643,6 +2699,10 @@ export type Database = {
       }
       user_owns_site: {
         Args: { site_uuid: string }
+        Returns: boolean
+      }
+      user_requires_2fa: {
+        Args: { p_user_id?: string }
         Returns: boolean
       }
       verify_totp_code: {
