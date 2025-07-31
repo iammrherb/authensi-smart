@@ -14,7 +14,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import ComprehensiveAIScopingWizard from '@/components/scoping/ComprehensiveAIScopingWizard';
+import IntelligentAIScopingWizard from '@/components/scoping/IntelligentAIScopingWizard';
 import EnhancedProjectCreationWizard from '@/components/comprehensive/EnhancedProjectCreationWizard';
 import SiteForm from '@/components/sites/SiteForm';
 import AIWorkflowEngine from '@/components/ai/AIWorkflowEngine';
@@ -370,7 +370,7 @@ const CommandCenter = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <ComprehensiveAIScopingWizard
+                      <IntelligentAIScopingWizard
                         onComplete={handleScopingComplete}
                         onCancel={() => setShowAIScopingWizard(false)}
                       />

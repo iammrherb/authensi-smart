@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import IntelligentAIScopingWizard from "@/components/scoping/IntelligentAIScopingWizard";
 import {
   Building2,
   CheckCircle,
@@ -874,11 +875,11 @@ const UnifiedProjectManager = () => {
                   Templates
                 </Button>
                 <Button 
-                  onClick={handleCreateProject}
+                  onClick={() => setActiveView("ai-scoping")}
                   className="bg-gradient-primary hover:opacity-90 shadow-lg hover:shadow-xl transition-all"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
-                  New Project
+                  <Brain className="w-4 h-4 mr-2" />
+                  AI Scoping Wizard
                 </Button>
               </div>
             </div>
@@ -1009,10 +1010,11 @@ const UnifiedProjectManager = () => {
 
       {/* Main Content Tabs */}
       <Tabs value={activeView} onValueChange={setActiveView} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5 bg-card/50 backdrop-blur-sm">
+        <TabsList className="grid w-full grid-cols-6 bg-card/50 backdrop-blur-sm">
           <TabsTrigger value="overview">Project Overview</TabsTrigger>
           <TabsTrigger value="active">Active Projects</TabsTrigger>
           <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
+          <TabsTrigger value="ai-scoping">AI Scoping</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="resources">Resources</TabsTrigger>
         </TabsList>
@@ -1215,9 +1217,9 @@ const UnifiedProjectManager = () => {
                 <p className="text-muted-foreground mb-6">
                   Adjust your filters or create a new project to get started.
                 </p>
-                <Button onClick={handleCreateProject} className="bg-gradient-primary hover:opacity-90">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Project
+                <Button onClick={() => setActiveView("ai-scoping")} className="bg-gradient-primary hover:opacity-90">
+                  <Brain className="w-4 h-4 mr-2" />
+                  Launch AI Scoping
                 </Button>
               </CardContent>
             </Card>
@@ -1274,114 +1276,6 @@ const UnifiedProjectManager = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Create Project Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-2xl bg-gradient-primary bg-clip-text text-transparent">
-              Create New Project
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-6 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="projectName">Project Name</Label>
-                  <Input id="projectName" placeholder="Enter project name" />
-                </div>
-                <div>
-                  <Label htmlFor="client">Client</Label>
-                  <Input id="client" placeholder="Client organization" />
-                </div>
-                <div>
-                  <Label htmlFor="industry">Industry</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select industry" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="healthcare">Healthcare</SelectItem>
-                      <SelectItem value="finance">Financial Services</SelectItem>
-                      <SelectItem value="education">Education</SelectItem>
-                      <SelectItem value="manufacturing">Manufacturing</SelectItem>
-                      <SelectItem value="retail">Retail</SelectItem>
-                      <SelectItem value="government">Government</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="projectType">Project Type</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select project type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="scoping">Scoping & Assessment</SelectItem>
-                      <SelectItem value="poc">Proof of Concept</SelectItem>
-                      <SelectItem value="pilot">Pilot Deployment</SelectItem>
-                      <SelectItem value="deployment">Full Deployment</SelectItem>
-                      <SelectItem value="migration">System Migration</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="priority">Priority</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select priority" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="critical">Critical</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="low">Low</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="budget">Budget</Label>
-                  <Input id="budget" type="number" placeholder="Project budget" />
-                </div>
-                <div>
-                  <Label htmlFor="endpoints">Total Endpoints</Label>
-                  <Input id="endpoints" type="number" placeholder="Number of endpoints" />
-                </div>
-                <div>
-                  <Label htmlFor="sites">Total Sites</Label>
-                  <Input id="sites" type="number" placeholder="Number of sites" />
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <Label htmlFor="description">Project Description</Label>
-              <Textarea 
-                id="description" 
-                placeholder="Provide a detailed description of the project..." 
-                className="min-h-[100px]"
-              />
-            </div>
-            
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button 
-                className="bg-gradient-primary hover:opacity-90"
-                onClick={() => {
-                  toast.success("Project created successfully!");
-                  setIsCreateDialogOpen(false);
-                }}
-              >
-                Create Project
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
