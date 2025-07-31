@@ -918,46 +918,74 @@ vlan ${data.advanced.vlans.managementVlan}
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="vendor">Vendor</Label>
+              <Label htmlFor="vendor">Vendor *</Label>
               <Select value={wizardData.basic.vendor} onValueChange={(value) => {
                 updateWizardData('basic', 'vendor', value);
                 updateWizardData('basic', 'model', ''); // Reset model when vendor changes
               }}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select vendor" />
+                  <SelectValue placeholder="Select network vendor..." />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-[200px]">
                   {vendors?.map((vendor) => (
                     <SelectItem key={vendor.id} value={vendor.id}>
-                      {vendor.vendor_name}
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{vendor.vendor_name}</span>
+                        <Badge variant="outline" className="text-xs">
+                          {vendor.category}
+                        </Badge>
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {!wizardData.basic.vendor && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Please select a vendor to continue
+                </p>
+              )}
             </div>
             <div>
-              <Label htmlFor="model">Model</Label>
+              <Label htmlFor="model">Model *</Label>
               <Select 
                 value={wizardData.basic.model} 
                 onValueChange={(value) => updateWizardData('basic', 'model', value)}
-                disabled={!wizardData.basic.vendor}
+                disabled={!wizardData.basic.vendor || vendorModels.length === 0}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={wizardData.basic.vendor ? "Select model" : "Select vendor first"} />
+                  <SelectValue placeholder={
+                    !wizardData.basic.vendor 
+                      ? "Select vendor first" 
+                      : vendorModels.length === 0 
+                        ? "No models available"
+                        : "Select device model..."
+                  } />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-[200px]">
                   {vendorModels.map((model) => (
                     <SelectItem key={model.id} value={model.id}>
-                      {model.model_name}
-                      {model.configuration_notes && (
-                        <span className="text-sm text-muted-foreground ml-2">
-                          - {model.configuration_notes}
-                        </span>
-                      )}
+                      <div className="flex flex-col gap-1">
+                        <span className="font-medium">{model.model_name}</span>
+                        {model.model_series && (
+                          <span className="text-xs text-muted-foreground">
+                            Series: {model.model_series}
+                          </span>
+                        )}
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {wizardData.basic.vendor && vendorModels.length === 0 && (
+                <p className="text-sm text-orange-600 mt-1">
+                  No models found for selected vendor. Please contact support.
+                </p>
+              )}
+              {!wizardData.basic.model && wizardData.basic.vendor && vendorModels.length > 0 && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Please select a device model to continue
+                </p>
+              )}
             </div>
             <div>
               <Label htmlFor="firmware">Firmware Version</Label>
@@ -1293,16 +1321,18 @@ vlan ${data.advanced.vlans.managementVlan}
                 placeholder="192.168.1.11"
               />
             </div>
-            <div>
-              <Label htmlFor="radius-secret">Shared Secret</Label>
-              <Input
-                id="radius-secret"
-                type="password"
-                value={wizardData.advanced.radius.secret}
-                onChange={(e) => updateAdvancedData('radius', 'secret', e.target.value)}
-                placeholder="Enter shared secret"
-              />
-            </div>
+            <form>
+              <div>
+                <Label htmlFor="radius-secret">Shared Secret</Label>
+                <Input
+                  id="radius-secret"
+                  type="password"
+                  value={wizardData.advanced.radius.secret}
+                  onChange={(e) => updateAdvancedData('radius', 'secret', e.target.value)}
+                  placeholder="Enter shared secret"
+                />
+              </div>
+            </form>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="radius-timeout">Timeout (seconds)</Label>
