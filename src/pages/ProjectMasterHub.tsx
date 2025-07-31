@@ -23,7 +23,6 @@ import { useSites } from '@/hooks/useSites';
 import { useAI } from '@/hooks/useAI';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import ProjectCreationWizard from '@/components/comprehensive/ProjectCreationWizard';
 
 interface ProjectMasterData {
   id: string;
@@ -266,6 +265,7 @@ interface Requirement {
 const ProjectMasterHub = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedProject, setSelectedProject] = useState<ProjectMasterData | null>(null);
+  const [projects, setProjects] = useState<ProjectMasterData[]>([]);
   const [filters, setFilters] = useState({
     search: '',
     type: 'all',
@@ -285,58 +285,41 @@ const ProjectMasterHub = () => {
 
   // Transform database projects to master format
   const masterProjects = useMemo(() => {
-    return dbProjects.map(project => {
-      // Map database status to our status enum
-      const projectStatus = project.status as string;
-      const mappedStatus: 'planning' | 'in-progress' | 'on-hold' | 'completed' | 'at-risk' = 
-        projectStatus === 'scoping' ? 'planning' : 
-        projectStatus === 'designing' ? 'in-progress' :
-        projectStatus === 'implementing' ? 'in-progress' :
-        projectStatus === 'testing' ? 'in-progress' :
-        projectStatus === 'deployed' ? 'completed' :
-        projectStatus === 'maintenance' ? 'completed' :
-        projectStatus === 'planning' ? 'planning' :
-        projectStatus === 'in-progress' ? 'in-progress' :
-        projectStatus === 'on-hold' ? 'on-hold' :
-        projectStatus === 'completed' ? 'completed' :
-        projectStatus === 'at-risk' ? 'at-risk' : 'planning';
-
-      return {
-        id: project.id,
-        name: project.name,
-        client: project.client_name || 'Unknown Client',
-        type: (project.project_type || 'deployment') as 'scoping' | 'poc' | 'pilot' | 'deployment' | 'migration' | 'support',
-        status: mappedStatus,
-        priority: 'medium' as 'critical' | 'high' | 'medium' | 'low',
-        progress: project.progress_percentage || 0,
-        health: calculateProjectHealth(project),
-        phase: project.current_phase || 'planning',
-        startDate: project.start_date || new Date().toISOString().split('T')[0],
-        targetDate: project.target_completion || new Date().toISOString().split('T')[0],
-        totalSites: project.total_sites || 0,
-        totalEndpoints: project.total_endpoints || 0,
-        activeSites: 0, // Calculate from sites data
-        completedSites: 0, // Calculate from sites data
-        projectManager: 'John Doe', // Mock data
-        technicalLead: 'Jane Smith', // Mock data
-        team: [], // Mock data
-        budget: project.budget || 0,
-        spent: 0, // Mock data
-        aiInsights: [],
-        riskScore: calculateRiskScore(project),
-        successProbability: calculateSuccessProbability(project),
-        recommendations: [],
-        kpis: generateMockKPIs(project),
-        phases: generateProjectPhases(project),
-        sites: generateProjectSites(project),
-        deployments: [],
-        testCases: [],
-        useCases: [],
-        requirements: [],
-        nextMilestone: generateNextMilestone(project),
-        upcomingMilestones: []
-      };
-    });
+    return dbProjects.map(project => ({
+      id: project.id,
+      name: project.name,
+      client: project.client_name || 'Unknown Client',
+      type: (project.project_type || 'deployment') as 'scoping' | 'poc' | 'pilot' | 'deployment' | 'migration' | 'support',
+      status: (project.status || 'planning') as 'planning' | 'in-progress' | 'on-hold' | 'completed' | 'at-risk',
+      priority: 'medium' as 'critical' | 'high' | 'medium' | 'low',
+      progress: project.progress_percentage || 0,
+      health: calculateProjectHealth(project),
+      phase: project.current_phase || 'planning',
+      startDate: project.start_date || new Date().toISOString().split('T')[0],
+      targetDate: project.target_completion || new Date().toISOString().split('T')[0],
+      totalSites: project.total_sites || 0,
+      totalEndpoints: project.total_endpoints || 0,
+      activeSites: 0, // Calculate from sites data
+      completedSites: 0, // Calculate from sites data
+      projectManager: 'John Doe', // Mock data
+      technicalLead: 'Jane Smith', // Mock data
+      team: [], // Mock data
+      budget: project.budget || 0,
+      spent: 0, // Mock data
+      aiInsights: [],
+      riskScore: calculateRiskScore(project),
+      successProbability: calculateSuccessProbability(project),
+      recommendations: [],
+      kpis: generateMockKPIs(project),
+      phases: generateProjectPhases(project),
+      sites: generateProjectSites(project),
+      deployments: [],
+      testCases: [],
+      useCases: [],
+      requirements: [],
+      nextMilestone: generateNextMilestone(project),
+      upcomingMilestones: []
+    }));
   }, [dbProjects]);
 
   // Helper functions
@@ -433,7 +416,7 @@ const ProjectMasterHub = () => {
   ];
 
   const generateProjectSites = (project: any): ProjectSite[] => 
-    sites.slice(0, 2).map(site => ({
+    sites.filter(site => true).slice(0, 2).map(site => ({
       id: site.id,
       name: site.name,
       location: site.location || 'Unknown',
@@ -974,22 +957,6 @@ const ProjectMasterHub = () => {
               </div>
             </TabsContent>
           </Tabs>
-
-          {/* Project Creation Wizard Dialog */}
-          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-            <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="text-2xl">Create New Project</DialogTitle>
-              </DialogHeader>
-              <ProjectCreationWizard 
-                onComplete={() => {
-                  setShowCreateDialog(false);
-                  toast.success('Project created successfully!');
-                }}
-                onCancel={() => setShowCreateDialog(false)}
-              />
-            </DialogContent>
-          </Dialog>
 
           {/* Project Details Modal */}
           {selectedProject && (

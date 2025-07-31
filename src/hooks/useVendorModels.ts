@@ -59,10 +59,10 @@ export const useVendorModel = (id: string) => {
           vendor:vendor_library(vendor_name, category)
         `)
         .eq('id', id)
-        .maybeSingle();
+        .single();
       
       if (error) throw error;
-      return data as VendorModel | null;
+      return data as VendorModel;
     },
     enabled: !!id,
   });
@@ -92,7 +92,7 @@ export const useCreateVendorModel = () => {
           created_by: user.data.user?.id,
         })
         .select()
-        .maybeSingle();
+        .single();
 
       if (error) throw error;
       return data;
@@ -125,7 +125,7 @@ export const useUpdateVendorModel = () => {
         .update(model)
         .eq('id', id)
         .select()
-        .maybeSingle();
+        .single();
 
       if (error) throw error;
       return data;
