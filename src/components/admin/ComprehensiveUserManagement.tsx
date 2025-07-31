@@ -521,12 +521,15 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
                     >
                       Cancel
                     </Button>
-                    <Button onClick={handleCreateUser} disabled={createUserMutation.isPending}>
+                    <Button 
+                      type="submit"
+                      disabled={createUserMutation.isPending || !newUserEmail || !newUserFirstName || !newUserLastName}
+                    >
                       {createUserMutation.isPending ? 'Creating...' : 'Create User'}
                     </Button>
                   </div>
-                </div>
-              </DialogContent>
+                  </form>
+                </DialogContent>
             </Dialog>
           </div>
         )}
