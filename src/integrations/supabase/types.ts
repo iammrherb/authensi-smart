@@ -2654,6 +2654,10 @@ export type Database = {
         Args: { p_user_id: string; p_deadline?: string; p_immediate?: boolean }
         Returns: boolean
       }
+      get_current_user_email: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       has_permission: {
         Args: {
           user_id: string
