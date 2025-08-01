@@ -1157,6 +1157,7 @@ Complexity score: ${formData.templates_ai.ai_recommendations.complexity_score}/1
                   </TabsContent>
 
                   <TabsContent value="devices" className="space-y-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {Object.entries(formData.network_infrastructure.device_inventory).map(([deviceType, count]) => {
                         if (deviceType === 'custom_devices') return null;
                         
@@ -1200,7 +1201,7 @@ Complexity score: ${formData.templates_ai.ai_recommendations.complexity_score}/1
                             />
                           </div>
                         );
-                      })}
+                       })}
                     </div>
                   </TabsContent>
                 </Tabs>
@@ -1779,7 +1780,7 @@ Complexity score: ${formData.templates_ai.ai_recommendations.complexity_score}/1
                             />
                             <div className="flex-1">
                               <Label htmlFor={`usecase-${useCase.id}`} className="font-medium">
-                                {useCase.name || useCase.title}
+                                {useCase.name}
                                 {formData.templates_ai.ai_recommendations.recommended_use_cases.includes(useCase.id) && (
                                   <Badge variant="secondary" className="ml-2">AI Recommended</Badge>
                                 )}
