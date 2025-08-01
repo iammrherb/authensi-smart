@@ -11,16 +11,20 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { 
   Building2, Network, Shield, Users, Target, Clock, Brain, CheckCircle, 
   AlertTriangle, Globe, Server, Wifi, Lock, Smartphone, Database, FileCheck,
   Plus, X, ArrowRight, ArrowLeft, Zap, Settings, Monitor, Router,
-  Cpu, HardDrive, Printer, Camera, Phone, Tablet, Laptop
+  Cpu, HardDrive, Printer, Camera, Phone, Tablet, Laptop, FileText,
+  Download, Save, Eye, Wand2, BookOpen, Filter
 } from 'lucide-react';
 
 import { useVendors } from '@/hooks/useVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
+import { usePainPoints, useCreatePainPoint } from '@/hooks/usePainPoints';
+import { useRecommendations, useCreateRecommendation } from '@/hooks/useRecommendations';
 import { 
   useIndustryOptions, 
   useComplianceFrameworks, 
@@ -33,7 +37,7 @@ import {
 } from '@/hooks/useResourceLibrary';
 import { useCreateProject, useUpdateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
-import AIWorkflowEngine from '@/components/ai/AIWorkflowEngine';
+import { useAI } from '@/hooks/useAI';
 
 interface ComprehensiveScopingData {
   // Organization Profile
@@ -46,6 +50,7 @@ interface ComprehensiveScopingData {
     compliance_needs: string[];
     existing_solutions: string[];
     pain_points: string[];
+    custom_pain_points: Array<{id: string; title: string; description: string; category: string; severity: string;}>;
     budget_range: string;
     timeline_preference: string;
   };
@@ -56,57 +61,16 @@ interface ComprehensiveScopingData {
     site_count: number;
     network_complexity: "Simple" | "Moderate" | "Complex" | "Very Complex";
     existing_vendors: {
-      // Network Infrastructure
       wired_switches: string[];
       wireless_aps: string[];
       routers: string[];
-      
-      // Security Infrastructure  
       firewalls: string[];
       vpn_solutions: string[];
       edr_xdr: string[];
       siem_mdr: string[];
-      
-      // Monitoring & Management
       monitoring_tools: string[];
       device_inventory_tools: string[];
     };
-    
-    // Site-specific inventory assignments
-    site_inventory: Array<{
-      site_name: string;
-      site_location: string;
-      vendors_assigned: {
-        wired_switches: string[];
-        wireless_aps: string[];
-        firewalls: string[];
-        routers: string[];
-        vpn_solutions: string[];
-        monitoring_tools: string[];
-        device_inventory_tools: string[];
-      };
-      device_counts: {
-        corporate_laptops: number;
-        desktop_workstations: number;
-        mobile_devices: number;
-        tablets: number;
-        iot_devices: number;
-        printers_mfps: number;
-        security_cameras: number;
-        voip_phones: number;
-        medical_devices: number;
-        industrial_controls: number;
-        pos_systems: number;
-        digital_signage: number;
-        custom_devices: Array<{name: string; count: number; description: string;}>;
-      };
-      priority: "Low" | "Medium" | "High" | "Critical";
-      deployment_order: number;
-      estimated_complexity: "Simple" | "Moderate" | "Complex" | "Very Complex";
-      assigned_engineer: string;
-      go_live_date: string;
-      special_requirements: string[];
-    }>;
     device_inventory: {
       corporate_laptops: number;
       desktop_workstations: number;
@@ -121,6 +85,31 @@ interface ComprehensiveScopingData {
       pos_systems: number;
       digital_signage: number;
       custom_devices: Array<{name: string; count: number; description: string;}>;
+    };
+  };
+  
+  // Integration & Compliance (moved before use cases)
+  integration_compliance: {
+    compliance_frameworks: string[];
+    nac_requirements: {
+      device_administration: string[];
+      mfa_requirements: string[];
+      sso_requirements: string[];
+      dot1x_requirements: string[];
+      access_control_requirements: string[];
+      passwordless_auth_requirements: string[];
+    };
+    current_nac_vendor: string;
+    current_radius_vendor: string;
+    current_auth_methods: string[];
+    pki_cert_authority: string;
+    required_integrations: string[];
+    audit_requirements: string[];
+    reporting_needs: string[];
+    performance_requirements: {
+      max_auth_time: number;
+      uptime_requirement: number;
+      concurrent_users: number;
     };
   };
   
@@ -143,19 +132,8 @@ interface ComprehensiveScopingData {
     custom_requirements: Array<{title: string; description: string; priority: string;}>;
     success_criteria: string[];
     testing_requirements: string[];
-  };
-  
-  // Integration & Compliance
-  integration_compliance: {
-    required_integrations: string[];
-    compliance_frameworks: string[];
-    audit_requirements: string[];
-    reporting_needs: string[];
-    performance_requirements: {
-      max_auth_time: number;
-      uptime_requirement: number;
-      concurrent_users: number;
-    };
+    ai_recommended_use_cases: string[];
+    ai_recommended_requirements: string[];
   };
   
   // Templates & AI Recommendations
@@ -179,60 +157,8 @@ interface ComprehensiveScopingData {
         engineer_weeks: number;
         testing_weeks: number;
       };
-    };
-  };
-
-  // Project Assignments & Team Structure
-  project_assignments: {
-    project_manager: string;
-    technical_lead: string;
-    lead_engineer: string;
-    security_architect: string;
-    network_engineer: string;
-    test_engineer: string;
-    implementation_team: Array<{name: string; role: string; skills: string[]; availability: string;}>;
-    vendor_contacts: Array<{vendor: string; contact_name: string; contact_email: string; role: string;}>;
-    client_stakeholders: Array<{name: string; role: string; department: string; involvement_level: string;}>;
-    escalation_contacts: Array<{name: string; role: string; contact_info: string; escalation_type: string;}>;
-  };
-
-  // Comprehensive Project Planning
-  comprehensive_planning: {
-    deployment_phases: Array<{
-      phase_name: string;
-      duration_weeks: number;
-      start_date: string;
-      end_date: string;
-      prerequisites: string[];
-      deliverables: string[];
-      success_criteria: string[];
-      assigned_team: string[];
-      risks: string[];
-      mitigation_strategies: string[];
-    }>;
-    site_deployment_order: Array<{
-      site_name: string;
-      priority: number;
-      complexity_level: string;
-      estimated_duration: number;
-      dependencies: string[];
-      assigned_engineer: string;
-    }>;
-    testing_strategy: {
-      test_phases: string[];
-      test_environments: string[];
-      acceptance_criteria: string[];
-      testing_timeline: Array<{phase: string; duration: number; resources: string[];}>;
-    };
-    risk_management: {
-      identified_risks: Array<{risk: string; impact: string; probability: string; mitigation: string; owner: string;}>;
-      contingency_plans: Array<{scenario: string; response_plan: string; resources_needed: string[];}>;
-    };
-    quality_assurance: {
-      review_checkpoints: string[];
-      approval_gates: string[];
-      documentation_requirements: string[];
-      compliance_checkpoints: string[];
+      optimization_suggestions: string[];
+      enhanced_recommendations: string[];
     };
   };
 }
@@ -260,12 +186,28 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
   const { data: vendorsData = [] } = useVendors();
   const { data: useCasesData = [] } = useUseCases();
   const { data: requirementsData = [] } = useRequirements();
+  const { data: painPointsData = [] } = usePainPoints();
+  const { data: recommendationsData = [] } = useRecommendations();
+  
+  const createPainPoint = useCreatePainPoint();
+  const createRecommendation = useCreateRecommendation();
+  const { generateRecommendations, enhanceNotes, isLoading: aiLoading } = useAI();
+  
   const [currentStep, setCurrentStep] = useState(0);
   const [aiAnalysisLoading, setAiAnalysisLoading] = useState(false);
+  const [showPainPointDialog, setShowPainPointDialog] = useState(false);
+  const [showRecommendationDialog, setShowRecommendationDialog] = useState(false);
+  const [newPainPoint, setNewPainPoint] = useState({ title: '', description: '', category: 'general', severity: 'medium' });
+  const [newRecommendation, setNewRecommendation] = useState({ 
+    title: '', description: '', category: 'implementation', priority: 'medium', 
+    implementation_effort: 'medium', prerequisites: [], related_pain_points: [], 
+    portnox_features: [], industry_specific: [] 
+  });
+  
   const [formData, setFormData] = useState<ComprehensiveScopingData>({
     organization: {
       name: '', industry: '', size: 'Mid-Market', locations: 1, total_users: 100,
-      compliance_needs: [], existing_solutions: [], pain_points: [], 
+      compliance_needs: [], existing_solutions: [], pain_points: [], custom_pain_points: [],
       budget_range: '', timeline_preference: ''
     },
     network_infrastructure: {
@@ -275,12 +217,32 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
         firewalls: [], vpn_solutions: [], edr_xdr: [], siem_mdr: [],
         monitoring_tools: [], device_inventory_tools: []
       },
-      site_inventory: [],
       device_inventory: {
         corporate_laptops: 0, desktop_workstations: 0, mobile_devices: 0, tablets: 0,
         iot_devices: 0, printers_mfps: 0, security_cameras: 0, voip_phones: 0,
         medical_devices: 0, industrial_controls: 0, pos_systems: 0, digital_signage: 0,
         custom_devices: []
+      }
+    },
+    integration_compliance: {
+      compliance_frameworks: [],
+      nac_requirements: {
+        device_administration: [],
+        mfa_requirements: [],
+        sso_requirements: [],
+        dot1x_requirements: [],
+        access_control_requirements: [],
+        passwordless_auth_requirements: []
+      },
+      current_nac_vendor: '',
+      current_radius_vendor: '',
+      current_auth_methods: [],
+      pki_cert_authority: '',
+      required_integrations: [],
+      audit_requirements: [],
+      reporting_needs: [],
+      performance_requirements: {
+        max_auth_time: 30, uptime_requirement: 99.5, concurrent_users: 1000
       }
     },
     authentication_security: {
@@ -290,13 +252,8 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
     },
     use_cases_requirements: {
       selected_use_cases: [], custom_use_cases: [], selected_requirements: [],
-      custom_requirements: [], success_criteria: [], testing_requirements: []
-    },
-    integration_compliance: {
-      required_integrations: [], compliance_frameworks: [], audit_requirements: [],
-      reporting_needs: [], performance_requirements: {
-        max_auth_time: 30, uptime_requirement: 99.5, concurrent_users: 1000
-      }
+      custom_requirements: [], success_criteria: [], testing_requirements: [],
+      ai_recommended_use_cases: [], ai_recommended_requirements: []
     },
     templates_ai: {
       selected_templates: [],
@@ -306,19 +263,9 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
         recommended_use_cases: [], recommended_requirements: [], recommended_test_cases: [],
         project_roadmap: [], success_metrics: [], resource_estimates: {
           project_manager_weeks: 0, lead_engineer_weeks: 0, engineer_weeks: 0, testing_weeks: 0
-        }
+        },
+        optimization_suggestions: [], enhanced_recommendations: []
       }
-    },
-    project_assignments: {
-      project_manager: '', technical_lead: '', lead_engineer: '', security_architect: '',
-      network_engineer: '', test_engineer: '', implementation_team: [], vendor_contacts: [],
-      client_stakeholders: [], escalation_contacts: []
-    },
-    comprehensive_planning: {
-      deployment_phases: [], site_deployment_order: [],
-      testing_strategy: { test_phases: [], test_environments: [], acceptance_criteria: [], testing_timeline: [] },
-      risk_management: { identified_risks: [], contingency_plans: [] },
-      quality_assurance: { review_checkpoints: [], approval_gates: [], documentation_requirements: [], compliance_checkpoints: [] }
     }
   });
 
@@ -332,353 +279,129 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
   const steps = [
     {
       id: 0, title: "Organization Profile", icon: Building2,
-      description: "Company details, size, industry, and business context"
+      description: "Company details, size, industry, and business context with pain points"
     },
     {
       id: 1, title: "Network Infrastructure", icon: Network,
       description: "Network topology, vendors, devices, and infrastructure details"
     },
     {
-      id: 2, title: "Authentication & Security", icon: Shield,
+      id: 2, title: "Integration & Compliance", icon: FileCheck,
+      description: "NAC/Device Admin, MFA, SSO, 802.1x, compliance frameworks, and current vendors"
+    },
+    {
+      id: 3, title: "Authentication & Security", icon: Shield,
       description: "Authentication methods, identity providers, and security requirements"
     },
     {
-      id: 3, title: "Use Cases & Requirements", icon: Target,
-      description: "Business use cases, technical requirements, and success criteria"
+      id: 4, title: "Use Cases & Requirements", icon: Target,
+      description: "Business use cases, technical requirements, and success criteria with AI recommendations"
     },
     {
-      id: 4, title: "Integration & Compliance", icon: FileCheck,
-      description: "System integrations, compliance frameworks, and performance needs"
-    },
-    {
-      id: 5, title: "Project Assignments", icon: Users,
-      description: "Team assignments, stakeholders, and project roles"
-    },
-    {
-      id: 6, title: "Comprehensive Planning", icon: Clock,
-      description: "Deployment phases, testing strategy, and risk management"
-    },
-    {
-      id: 7, title: "AI Analysis & Recommendations", icon: Brain,
-      description: "Intelligent analysis, recommendations, and project planning"
+      id: 5, title: "AI Analysis & Recommendations", icon: Brain,
+      description: "Intelligent analysis, recommendations, and comprehensive project planning"
     }
   ];
 
-  // Convert resource library data to arrays for compatibility
+  // Comprehensive data collections
+  const nacRequirementCategories = {
+    device_administration: [
+      "Device onboarding automation", "Device fingerprinting", "Device compliance checking",
+      "Device profiling", "Device quarantine", "Device certificate management",
+      "Device inventory tracking", "Device health monitoring", "Device policy enforcement"
+    ],
+    mfa_requirements: [
+      "RADIUS MFA integration", "SMS/Voice MFA", "Push notification MFA",
+      "Hardware token MFA", "Biometric MFA", "Certificate-based MFA",
+      "FIDO2/WebAuthn", "Risk-based MFA", "Adaptive MFA"
+    ],
+    sso_requirements: [
+      "SAML 2.0 SSO", "OAuth 2.0/OpenID Connect", "LDAP/AD integration",
+      "Kerberos authentication", "NTLM authentication", "RADIUS proxy",
+      "Azure AD integration", "Google Workspace SSO", "Okta integration"
+    ],
+    dot1x_requirements: [
+      "EAP-TLS authentication", "EAP-TTLS/PAP", "EAP-PEAP/MSCHAPv2",
+      "EAP-FAST", "Dynamic VLAN assignment", "802.1x supplicant configuration",
+      "Certificate auto-enrollment", "Machine vs user authentication", "Guest portal integration"
+    ],
+    access_control_requirements: [
+      "Role-based access control (RBAC)", "Attribute-based access control (ABAC)",
+      "Time-based access policies", "Location-based access", "Device-based policies",
+      "Network segmentation", "Micro-segmentation", "Zero Trust network access",
+      "Policy enforcement points", "Dynamic policy assignment"
+    ],
+    passwordless_auth_requirements: [
+      "FIDO2/WebAuthn support", "Windows Hello for Business", "Certificate-based auth",
+      "Biometric authentication", "Smart card authentication", "Mobile push authentication",
+      "QR code authentication", "Hardware security keys", "Platform authenticators"
+    ]
+  };
+
+  const vendorsByCategory = {
+    nac_vendors: [
+      "Portnox", "Cisco ISE", "Aruba ClearPass", "ForeScout CounterACT",
+      "Bradford Campus Manager", "Impulse SafeConnect", "Extreme Control",
+      "Microsoft NPS", "Juniper Policy Enforcer", "PacketFence"
+    ],
+    radius_vendors: [
+      "Microsoft NPS", "FreeRADIUS", "Cisco ISE", "Aruba ClearPass",
+      "Steel-Belted RADIUS", "RSA Authentication Manager", "TekRADIUS",
+      "Radiator", "Elektron", "WinRadius"
+    ],
+    pki_cert_authorities: [
+      "Microsoft Active Directory Certificate Services", "DigiCert", "Entrust",
+      "GlobalSign", "Verisign", "Comodo", "OpenSSL-based internal CA",
+      "AWS Certificate Manager", "Azure Key Vault", "HashiCorp Vault",
+      "EJBCA", "Dogtag Certificate System"
+    ]
+  };
+
+  const authenticationMethods = [
+    // Traditional Methods
+    "Username/Password", "LDAP/Active Directory", "Local Database",
+    
+    // Certificate-based
+    "X.509 Certificates", "Smart Cards", "PIV/CAC Cards",
+    
+    // Multi-Factor Authentication
+    "SMS/Voice OTP", "TOTP/HOTP", "Push Notifications", "Hardware Tokens",
+    "Biometric Authentication", "Risk-based Authentication",
+    
+    // Modern/Passwordless
+    "FIDO2/WebAuthn", "Windows Hello for Business", "Mobile Device Certificates",
+    "QR Code Authentication", "Platform Authenticators",
+    
+    // SSO/Federation
+    "SAML 2.0", "OAuth 2.0/OpenID Connect", "Kerberos", "NTLM",
+    
+    // Network Authentication
+    "EAP-TLS", "EAP-TTLS", "EAP-PEAP", "EAP-FAST", "EAP-MD5",
+    
+    // Cloud Identity
+    "Azure AD", "Google Workspace", "Okta", "Ping Identity", "Auth0"
+  ];
+
   const industries = industryOptions.map(option => option.name);
   const complianceFrameworks = complianceFrameworksData.map(framework => framework.name);
-  const deploymentTypes = deploymentTypesData.map(type => type.name);
-  const securityLevels = securityLevelsData.map(level => level.name);
-  const businessDomains = businessDomainsData.map(domain => domain.name);
-  const authenticationMethods = authenticationMethodsData.map(method => method.name);
-  const networkSegments = networkSegmentsData.map(segment => segment.name);
-  const projectPhases = projectPhasesData.map(phase => phase.name);
-  
-  // Dynamic vendor data from resource library
-  const resourceVendors = vendorsData.reduce((acc, vendor) => {
-    if (!acc[vendor.vendor_type]) {
-      acc[vendor.vendor_type] = [];
-    }
-    acc[vendor.vendor_type].push(vendor.vendor_name);
-    return acc;
-  }, {} as Record<string, string[]>);
 
-  // Comprehensive Vendor Lists
-  const networkVendors = {
-    wired_switches: [
-      "Cisco", "Aruba (HPE)", "Juniper Networks", "Extreme Networks", "Dell EMC",
-      "Huawei", "D-Link", "Netgear", "TP-Link", "Ubiquiti", "Meraki", "Brocade",
-      "Allied Telesis", "Alcatel-Lucent Enterprise", "Adtran", "ZyXEL", "3Com",
-      "Foundry Networks", "Force10", "Nortel", "H3C", "Planet Technology"
-    ],
-    wireless_aps: [
-      "Cisco Meraki", "Aruba (HPE)", "Ubiquiti", "Ruckus (CommScope)", "Extreme Networks",
-      "Fortinet", "SonicWall", "Cambium Networks", "Motorola Solutions", "Ericsson",
-      "Aerohive (Extreme)", "Mist (Juniper)", "Lancom", "EnGenius", "D-Link",
-      "Netgear", "TP-Link", "Linksys", "Xirrus", "Symbol (Zebra)", "Proxim"
-    ],
-    routers: [
-      "Cisco", "Juniper Networks", "Huawei", "Mikrotik", "Ubiquiti", "Fortinet",
-      "SonicWall", "pfSense", "VyOS", "Arista", "Extreme Networks", "Dell EMC",
-      "HPE", "Alcatel-Lucent", "ZyXEL", "Netgate", "Peplink", "Cradlepoint"
-    ]
+  const calculateProgress = () => {
+    const stepWeights = [15, 20, 25, 15, 20, 5]; // Different weights for each step
+    let totalProgress = 0;
+    
+    stepWeights.forEach((weight, index) => {
+      if (index < currentStep) {
+        totalProgress += weight;
+      } else if (index === currentStep) {
+        // Calculate partial progress for current step
+        totalProgress += weight * 0.5; // Assume 50% progress on current step
+      }
+    });
+    
+    return Math.min(totalProgress, 100);
   };
 
-  const securityVendors = {
-    firewalls: [
-      "Palo Alto Networks", "Fortinet", "Check Point", "Cisco ASA/FTD", "SonicWall",
-      "Juniper SRX", "pfSense", "WatchGuard", "Barracuda", "Sophos", "Zscaler",
-      "Forcepoint", "McAfee", "Untangle", "IPFire", "OPNsense", "Smoothwall",
-      "Endian", "ClearOS", "Kerio Control", "Cyberoam", "Array Networks"
-    ],
-    vpn_solutions: [
-      "Cisco AnyConnect", "Palo Alto GlobalProtect", "Fortinet FortiClient", "Pulse Secure",
-      "OpenVPN", "WireGuard", "NordLayer", "Perimeter 81", "Zscaler Private Access",
-      "Microsoft Always On VPN", "SonicWall NetExtender", "Check Point Endpoint",
-      "F5 BIG-IP Edge", "Array SSL VPN", "Barracuda SSL VPN", "Kemp LoadMaster",
-      "Citrix Gateway", "VMware Tunnel", "Tunnelbear for Business", "ExpressVPN for Business"
-    ],
-    edr_xdr: [
-      "CrowdStrike Falcon", "Microsoft Defender for Endpoint", "SentinelOne", "Carbon Black",
-      "Cortex XDR", "Trend Micro", "Symantec Endpoint", "McAfee MVISION", "Bitdefender GravityZone",
-      "Kaspersky Endpoint", "ESET PROTECT", "Sophos Intercept X", "Malwarebytes Endpoint",
-      "Cybereason", "FireEye Endpoint", "Cylance", "Tanium", "Qualys VMDR",
-      "Rapid7 InsightIDR", "Elastic Security", "Chronicle Security", "Splunk Enterprise Security"
-    ],
-    siem_mdr: [
-      "Splunk Enterprise Security", "IBM QRadar", "Microsoft Sentinel", "ArcSight (Micro Focus)",
-      "LogRhythm", "Rapid7 InsightIDR", "Elastic Security", "Chronicle Security",
-      "Securonix", "Exabeam", "Sumo Logic", "AlienVault (AT&T)", "McAfee ESM",
-      "RSA NetWitness", "Fortinet FortiSIEM", "ManageEngine Log360", "SolarWinds Security Event Manager",
-      "Graylog", "OSSIM", "Wazuh", "OSSEC", "ELK Stack", "Datadog Security Monitoring"
-    ]
-  };
-
-  const identityProviders = [
-    // Cloud Identity Providers
-    "Microsoft Azure AD/Entra ID", "Google Workspace", "Okta", "Auth0", "AWS IAM Identity Center",
-    "OneLogin", "Ping Identity", "ForgeRock", "IBM Security Verify", "Oracle Identity Cloud",
-    "Duo Security", "RSA SecurID", "CyberArk Identity", "SailPoint IdentityNow",
-    
-    // On-Premises Identity
-    "Microsoft Active Directory", "OpenLDAP", "Apache Directory Server", "389 Directory Server",
-    "Novell eDirectory", "Oracle Internet Directory", "IBM Security Directory Server",
-    "CA Directory", "Sun Java System Directory Server", "FreeIPA",
-    
-    // Federation & SSO
-    "ADFS", "Shibboleth", "SimpleSAMLphp", "Keycloak", "WSO2 Identity Server",
-    "MiniOrange", "JumpCloud", "Centrify", "BeyondTrust", "Thycotic Secret Server"
-  ];
-
-  const mfaProviders = [
-    "Microsoft Authenticator", "Google Authenticator", "Okta Verify", "Duo Security",
-    "RSA SecurID", "Symantec VIP", "Authy", "YubiKey", "FIDO2/WebAuthn",
-    "Ping Identity", "ForgeRock", "CyberArk", "OneLogin", "Auth0 Guardian",
-    "IBM Security Verify", "Cisco Duo", "Entrust", "HID Global", "Gemalto",
-    "SMS/Voice OTP", "Hardware Tokens", "Smart Cards", "Biometric Authentication"
-  ];
-
-  const monitoringTools = [
-    // Network Monitoring
-    "SolarWinds NPM", "PRTG Network Monitor", "ManageEngine OpManager", "Nagios",
-    "Zabbix", "LibreNMS", "Cacti", "Observium", "WhatsUp Gold", "Auvik",
-    "Datadog", "New Relic", "AppDynamics", "Dynatrace", "ThousandEyes",
-    
-    // Infrastructure Monitoring
-    "VMware vRealize", "Microsoft SCOM", "IBM Tivoli", "CA Spectrum",
-    "HP OpenView", "BMC TrueSight", "Splunk Infrastructure Monitoring",
-    "Elastic Observability", "Prometheus + Grafana", "InfluxDB + Telegraf",
-    
-    // Application Performance
-    "AppDynamics", "New Relic", "Dynatrace", "Splunk APM", "Datadog APM",
-    "Elastic APM", "Jaeger", "Zipkin", "OpenTelemetry", "Instana"
-  ];
-
-  const deviceInventoryTools = [
-    // Asset Management
-    "Microsoft SCCM", "Lansweeper", "ManageEngine AssetExplorer", "ServiceNow ITAM",
-    "IBM Maximo", "Flexera", "Snow Software", "Device42", "Spiceworks", "PDQ Inventory",
-    "OCS Inventory", "GLPI", "InvGate Assets", "Alloy Discovery", "Network Detective",
-    
-    // Mobile Device Management
-    "Microsoft Intune", "VMware Workspace ONE", "Jamf Pro", "IBM MaaS360",
-    "Citrix Endpoint Management", "BlackBerry UEM", "SOTI MobiControl", "42Gears SureMDM",
-    "Hexnode", "ManageEngine Mobile Device Manager Plus", "Miradore", "Scalefusion",
-    
-    // Network Discovery
-    "Nmap", "Advanced IP Scanner", "Angry IP Scanner", "Network Scanner", "Fing",
-    "NetCrunch Tools", "SoftPerfect Network Scanner", "LanSweeper Network Discovery",
-    "ManageEngine OpUtils", "SolarWinds Network Discovery", "Spiceworks Network Scanner"
-  ];
-
-  // authenticationMethods is now defined from resource library above
-
-  const integrationSystems = [
-    "Microsoft Intune", "VMware Workspace ONE", "Jamf Pro", "ServiceNow",
-    "Splunk", "QRadar", "Microsoft Sentinel", "CrowdStrike", "Carbon Black",
-    "SentinelOne", "Palo Alto Prisma", "Check Point", "FortiGate", "Cisco ISE",
-    "Aruba ClearPass", "Microsoft SCCM", "Tanium", "Rapid7", "Qualys"
-  ];
-
-  const generateComprehensiveAIRecommendations = async () => {
-    setAiAnalysisLoading(true);
-    
-    // Simulate comprehensive AI analysis
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    const recommendations = {
-      deployment_approach: determineDeploymentApproach(),
-      recommended_phases: generateDetailedPhases(),
-      estimated_timeline_weeks: calculateDetailedTimeline(),
-      complexity_score: calculateComplexityScore(),
-      risk_factors: identifyComprehensiveRisks(),
-      recommended_vendors: generateVendorRecommendations(),
-      recommended_use_cases: generateUseCaseRecommendations(),
-      recommended_requirements: generateRequirementRecommendations(),
-      recommended_test_cases: generateTestCaseRecommendations(),
-      project_roadmap: generateProjectRoadmap(),
-      success_metrics: generateSuccessMetrics(),
-      resource_estimates: calculateResourceEstimates()
-    };
-
-    setFormData(prev => ({
-      ...prev,
-      templates_ai: { ...prev.templates_ai, ai_recommendations: recommendations }
-    }));
-    
-    setAiAnalysisLoading(false);
-  };
-
-  const determineDeploymentApproach = (): string => {
-    const { organization, network_infrastructure } = formData;
-    
-    if (organization.size === "Enterprise" && network_infrastructure.site_count > 10) {
-      return "Phased Enterprise Rollout: Multi-site deployment with comprehensive pilot validation";
-    } else if (organization.compliance_needs.length > 2) {
-      return "Compliance-First Approach: Security-focused implementation with audit trail";
-    } else if (network_infrastructure.topology_type === "Zero-Trust") {
-      return "Zero Trust Implementation: Identity-centric micro-segmentation deployment";
-    } else {
-      return "Standard NAC Deployment: Traditional network access control with modern features";
-    }
-  };
-
-  const generateDetailedPhases = (): string[] => {
-    const phases = ["Discovery & Assessment", "Design & Architecture", "Pilot Implementation"];
-    
-    if (formData.organization.size === "Enterprise") {
-      phases.push("Phased Site Rollout", "Production Deployment", "Optimization & Tuning");
-    } else {
-      phases.push("Full Implementation", "Testing & Validation");
-    }
-    
-    phases.push("Go-Live & Knowledge Transfer", "Post-Implementation Support");
-    return phases;
-  };
-
-  const calculateDetailedTimeline = (): number => {
-    let weeks = 12; // Enhanced base timeline
-    
-    if (formData.organization.size === "Enterprise") weeks += 12;
-    if (formData.network_infrastructure.site_count > 5) weeks += 6;
-    if (formData.organization.compliance_needs.length > 2) weeks += 4;
-    if (formData.network_infrastructure.network_complexity === "Complex") weeks += 4;
-    if (formData.network_infrastructure.network_complexity === "Very Complex") weeks += 8;
-    
-    return weeks;
-  };
-
-  const calculateComplexityScore = (): number => {
-    let score = 3;
-    
-    if (formData.organization.size === "Enterprise") score += 3;
-    if (formData.network_infrastructure.topology_type === "Zero-Trust") score += 2;
-    if (formData.network_infrastructure.network_complexity === "Complex") score += 2;
-    if (formData.network_infrastructure.network_complexity === "Very Complex") score += 3;
-    if (formData.organization.compliance_needs.length > 2) score += 2;
-    
-    return Math.min(score, 10);
-  };
-
-  const identifyComprehensiveRisks = (): string[] => {
-    const risks = [];
-    
-    if (Object.values(formData.network_infrastructure.existing_vendors).flat().length > 8) {
-      risks.push("Multi-vendor complexity requires extensive integration testing and validation");
-    }
-    
-    if (formData.organization.compliance_needs.some(c => ["HIPAA", "PCI-DSS", "FISMA"].includes(c))) {
-      risks.push("Strict compliance requirements demand comprehensive audit trails and validation");
-    }
-    
-    if (formData.authentication_security.desired_auth_methods.includes("802.1X with Certificates")) {
-      risks.push("Certificate-based authentication requires robust PKI infrastructure and expertise");
-    }
-    
-    if (formData.network_infrastructure.device_inventory.iot_devices > 100) {
-      risks.push("Large IoT deployment requires specialized device profiling and policy management");
-    }
-    
-    return risks;
-  };
-
-  const generateVendorRecommendations = () => {
-    return [
-      { vendor: "Primary NAC Platform", role: "Core NAC Solution", justification: "Best fit for organizational requirements" },
-      { vendor: "Network Infrastructure", role: "Integration Partner", justification: "Existing vendor compatibility" },
-      { vendor: "Identity Provider", role: "Authentication Source", justification: "Current identity infrastructure" }
-    ];
-  };
-
-  const generateUseCaseRecommendations = (): string[] => {
-    const recommendations = [];
-    
-    if (formData.organization.compliance_needs.length > 0) {
-      recommendations.push("Compliance Reporting & Audit Trail");
-    }
-    
-    if (formData.network_infrastructure.device_inventory.mobile_devices > 50) {
-      recommendations.push("BYOD Device Management");
-    }
-    
-    if (formData.network_infrastructure.device_inventory.iot_devices > 0) {
-      recommendations.push("IoT Device Discovery & Profiling");
-    }
-    
-    return recommendations;
-  };
-
-  const generateRequirementRecommendations = (): string[] => {
-    return [
-      "Network Access Authentication",
-      "Device Identity Management", 
-      "Policy Enforcement",
-      "Compliance Reporting"
-    ];
-  };
-
-  const generateTestCaseRecommendations = (): string[] => {
-    return [
-      "End-to-End Authentication Testing",
-      "Policy Enforcement Validation",
-      "Vendor Integration Testing",
-      "Performance & Load Testing"
-    ];
-  };
-
-  const generateProjectRoadmap = () => {
-    return [
-      { phase: "Discovery", duration: 2, deliverables: ["Current State Assessment", "Requirements Document"] },
-      { phase: "Design", duration: 3, deliverables: ["Architecture Design", "Implementation Plan"] },
-      { phase: "Implementation", duration: 8, deliverables: ["Configured Solution", "Test Results"] },
-      { phase: "Deployment", duration: 4, deliverables: ["Production Rollout", "Documentation"] }
-    ];
-  };
-
-  const generateSuccessMetrics = (): string[] => {
-    return [
-      "Authentication Success Rate > 99%",
-      "Average Authentication Time < 30 seconds", 
-      "Policy Compliance Rate > 95%",
-      "Incident Response Time < 15 minutes"
-    ];
-  };
-
-  const calculateResourceEstimates = () => {
-    const baseWeeks = formData.templates_ai.ai_recommendations.estimated_timeline_weeks || 12;
-    return {
-      project_manager_weeks: Math.round(baseWeeks * 0.8),
-      lead_engineer_weeks: Math.round(baseWeeks * 1.2),
-      engineer_weeks: Math.round(baseWeeks * 2.0),
-      testing_weeks: Math.round(baseWeeks * 0.4)
-    };
-  };
-
-  const handleNext = async () => {
-    if (currentStep === 4) {
-      await generateComprehensiveAIRecommendations();
-    }
-    
+  const handleNext = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
@@ -690,1928 +413,1695 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
     }
   };
 
-  const calculateProgress = () => {
-    if (currentStep === steps.length - 1 && formData.templates_ai.ai_recommendations.deployment_approach) {
-      return 100;
-    }
-    return Math.round(((currentStep + 1) / steps.length) * 100);
-  };
-
-  const handleCreateProject = async () => {
+  const generateAIRecommendations = async () => {
+    setAiAnalysisLoading(true);
     try {
-      if (projectId) {
-        // Update existing project with scoping data
-        const { organization, templates_ai } = formData;
-        const { ai_recommendations } = templates_ai;
-        
-        const updateData = {
-          id: projectId,
-          industry: organization.industry,
-          compliance_frameworks: organization.compliance_needs,
-          deployment_type: organization.size.toLowerCase(),
-          security_level: formData.network_infrastructure.topology_type.toLowerCase(),
-          total_endpoints: Object.entries(formData.network_infrastructure.device_inventory)
-            .filter(([key]) => key !== 'custom_devices')
-            .reduce((total, [_, count]) => total + (count as number), 0),
-          total_sites: formData.network_infrastructure.site_count,
-          status: 'scoping' as const,
-          current_phase: 'scoping' as const,
-          progress_percentage: 25,
-          success_criteria: formData.use_cases_requirements.success_criteria,
-          pain_points: organization.pain_points,
-          integration_requirements: formData.integration_compliance.required_integrations
+      const recommendations = await generateRecommendations(
+        formData,
+        useCases,
+        vendors
+      );
+
+      if (recommendations) {
+        // Parse and structure AI recommendations
+        const aiRecommendations = {
+          deployment_approach: "Phased deployment with pilot testing",
+          recommended_phases: ["Discovery & Planning", "Pilot Implementation", "Production Rollout", "Optimization"],
+          estimated_timeline_weeks: Math.max(12, formData.network_infrastructure.site_count * 2),
+          complexity_score: calculateComplexityScore(),
+          risk_factors: identifyRiskFactors(),
+          recommended_vendors: generateVendorRecommendations(),
+          recommended_use_cases: getRelevantUseCases(),
+          recommended_requirements: getRelevantRequirements(),
+          recommended_test_cases: generateTestCases(),
+          project_roadmap: generateProjectRoadmap(),
+          success_metrics: generateSuccessMetrics(),
+          resource_estimates: calculateResourceEstimates(),
+          optimization_suggestions: [recommendations],
+          enhanced_recommendations: await enhanceRecommendations()
         };
 
-        await updateProject.mutateAsync(updateData);
-        
-        if (onComplete) {
-          onComplete(projectId, formData);
-        }
-        
-        toast({
-          title: "Success!",
-          description: "Project scoping completed successfully with AI recommendations",
-        });
-      } else {
-        // Create new project
-        const { organization, templates_ai } = formData;
-        const { ai_recommendations } = templates_ai;
-        
-        const projectData = {
-          name: `${organization.name} - Comprehensive NAC Implementation`,
-          client_name: organization.name,
-          description: `AI-powered comprehensive NAC deployment for ${organization.name} with ${ai_recommendations.deployment_approach}`,
-          industry: organization.industry,
-          compliance_frameworks: organization.compliance_needs,
-          deployment_type: organization.size.toLowerCase(),
-          security_level: formData.network_infrastructure.topology_type.toLowerCase(),
-          total_sites: formData.network_infrastructure.site_count,
-          total_endpoints: Object.entries(formData.network_infrastructure.device_inventory)
-            .filter(([key]) => key !== 'custom_devices')
-            .reduce((total, [_, count]) => total + (count as number), 0),
-          status: 'scoping' as const,
-          current_phase: 'scoping' as const,
-          start_date: new Date().toISOString().split('T')[0],
-          progress_percentage: 10,
-          success_criteria: formData.use_cases_requirements.success_criteria,
-          pain_points: organization.pain_points,
-          integration_requirements: formData.integration_compliance.required_integrations
-        };
+        setFormData(prev => ({
+          ...prev,
+          templates_ai: {
+            ...prev.templates_ai,
+            ai_recommendations: aiRecommendations
+          }
+        }));
 
-        const project = await createProject.mutateAsync(projectData);
-        
-        if (project && onComplete) {
-          onComplete(project.id, formData);
-        }
-        
         toast({
-          title: "Success!",
-          description: "Comprehensive project created successfully with AI recommendations",
+          title: "AI Analysis Complete",
+          description: "Comprehensive recommendations have been generated based on your requirements."
         });
       }
     } catch (error) {
-      console.error('Failed to create/update project:', error);
+      console.error('AI recommendation error:', error);
       toast({
-        title: "Error",
-        description: `Failed to ${projectId ? 'update' : 'create'} project. Please try again.`,
-        variant: "destructive",
+        title: "AI Analysis Failed",
+        description: "Unable to generate recommendations. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setAiAnalysisLoading(false);
+    }
+  };
+
+  const calculateComplexityScore = (): number => {
+    let score = 0;
+    
+    // Organization size factor
+    score += formData.organization.size === 'SMB' ? 1 : formData.organization.size === 'Mid-Market' ? 2 : 3;
+    
+    // Network complexity
+    score += formData.network_infrastructure.network_complexity === 'Simple' ? 1 : 
+             formData.network_infrastructure.network_complexity === 'Moderate' ? 2 :
+             formData.network_infrastructure.network_complexity === 'Complex' ? 3 : 4;
+    
+    // Compliance requirements
+    score += formData.integration_compliance.compliance_frameworks.length;
+    
+    // Site count factor
+    score += Math.min(formData.network_infrastructure.site_count / 5, 3);
+    
+    return Math.min(score, 10);
+  };
+
+  const identifyRiskFactors = (): string[] => {
+    const risks = [];
+    
+    if (formData.network_infrastructure.site_count > 10) {
+      risks.push("Large number of sites increases deployment complexity");
+    }
+    
+    if (formData.integration_compliance.compliance_frameworks.length > 2) {
+      risks.push("Multiple compliance requirements may create conflicting policies");
+    }
+    
+    if (formData.organization.total_users > 5000) {
+      risks.push("High user count requires careful performance planning");
+    }
+    
+    return risks;
+  };
+
+  const generateVendorRecommendations = () => {
+    return [
+      { vendor: "Portnox", role: "Primary NAC", justification: "Cloud-native NAC with comprehensive device visibility" },
+      { vendor: formData.integration_compliance.current_radius_vendor || "Microsoft NPS", role: "RADIUS", justification: "Existing infrastructure integration" }
+    ];
+  };
+
+  const getRelevantUseCases = (): string[] => {
+    return useCases
+      .filter(uc => 
+        formData.organization.industry === '' || 
+        uc.description?.toLowerCase().includes(formData.organization.industry.toLowerCase())
+      )
+      .slice(0, 5)
+      .map(uc => uc.id);
+  };
+
+  const getRelevantRequirements = (): string[] => {
+    return requirements
+      .filter(req => 
+        formData.integration_compliance.compliance_frameworks.some(cf =>
+          req.description?.toLowerCase().includes(cf.toLowerCase())
+        )
+      )
+      .slice(0, 5)
+      .map(req => req.id);
+  };
+
+  const generateTestCases = (): string[] => {
+    return [
+      "802.1x authentication testing",
+      "Device profiling validation",
+      "Policy enforcement verification",
+      "Guest access testing",
+      "Compliance reporting validation"
+    ];
+  };
+
+  const generateProjectRoadmap = () => {
+    return [
+      { phase: "Discovery & Assessment", duration: 2, deliverables: ["Network assessment", "Requirements validation", "Risk assessment"] },
+      { phase: "Design & Planning", duration: 3, deliverables: ["Solution design", "Implementation plan", "Test plan"] },
+      { phase: "Pilot Implementation", duration: 4, deliverables: ["Pilot deployment", "Testing", "Optimization"] },
+      { phase: "Production Rollout", duration: 8, deliverables: ["Phased deployment", "Training", "Documentation"] }
+    ];
+  };
+
+  const generateSuccessMetrics = (): string[] => {
+    return [
+      "99.5% authentication success rate",
+      "< 3 second authentication time",
+      "100% device visibility",
+      "Zero security incidents",
+      "Compliance audit success"
+    ];
+  };
+
+  const calculateResourceEstimates = () => {
+    const baseWeeks = formData.network_infrastructure.site_count * 0.5;
+    return {
+      project_manager_weeks: Math.max(baseWeeks, 8),
+      lead_engineer_weeks: Math.max(baseWeeks * 1.5, 12),
+      engineer_weeks: Math.max(baseWeeks * 2, 16),
+      testing_weeks: Math.max(baseWeeks * 0.5, 4)
+    };
+  };
+
+  const enhanceRecommendations = async (): Promise<string[]> => {
+    try {
+      const context = `Industry: ${formData.organization.industry}, Size: ${formData.organization.size}, Compliance: ${formData.integration_compliance.compliance_frameworks.join(', ')}`;
+      const enhanced = await enhanceNotes(
+        "Generate specific Portnox NAC implementation recommendations",
+        context
+      );
+      return enhanced ? [enhanced] : [];
+    } catch (error) {
+      return [];
+    }
+  };
+
+  const handleCreatePainPoint = async () => {
+    if (!newPainPoint.title.trim()) return;
+    
+    try {
+      await createPainPoint.mutateAsync({
+        title: newPainPoint.title,
+        description: newPainPoint.description,
+        category: newPainPoint.category,
+        severity: newPainPoint.severity as 'low' | 'medium' | 'high' | 'critical',
+        recommended_solutions: [],
+        industry_specific: [formData.organization.industry]
+      });
+      
+      setShowPainPointDialog(false);
+      setNewPainPoint({ title: '', description: '', category: 'general', severity: 'medium' });
+    } catch (error) {
+      console.error('Failed to create pain point:', error);
+    }
+  };
+
+  const exportScopingReport = () => {
+    const report = {
+      title: `Comprehensive Scoping Report - ${formData.organization.name}`,
+      generatedAt: new Date().toISOString(),
+      data: formData,
+      summary: generateReportSummary()
+    };
+    
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `scoping-report-${formData.organization.name.replace(/\s+/g, '-')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const generateReportSummary = () => {
+    return {
+      organization: formData.organization.name,
+      industry: formData.organization.industry,
+      userCount: formData.organization.total_users,
+      siteCount: formData.network_infrastructure.site_count,
+      complexityScore: formData.templates_ai.ai_recommendations.complexity_score,
+      estimatedTimeline: formData.templates_ai.ai_recommendations.estimated_timeline_weeks,
+      selectedPainPoints: formData.organization.pain_points.length,
+      complianceFrameworks: formData.integration_compliance.compliance_frameworks.length,
+      recommendedUseCases: formData.templates_ai.ai_recommendations.recommended_use_cases.length
+    };
+  };
+
+  const saveAndContinueToProject = async () => {
+    try {
+      const projectData = {
+        name: formData.organization.name,
+        description: `Comprehensive AI-scoped project with detailed requirements and recommendations`,
+        client_name: formData.organization.name,
+        industry: formData.organization.industry,
+        deployment_type: 'comprehensive',
+        security_level: 'enhanced',
+        total_sites: formData.network_infrastructure.site_count,
+        total_endpoints: formData.organization.total_users,
+        compliance_frameworks: formData.integration_compliance.compliance_frameworks,
+        pain_points: formData.organization.pain_points,
+        success_criteria: formData.use_cases_requirements.success_criteria,
+        status: 'planning' as const,
+        current_phase: 'requirements' as const,
+        progress_percentage: 25,
+        business_summary: generateBusinessSummary()
+      };
+
+      if (projectId) {
+        await updateProject.mutateAsync({ id: projectId, ...projectData });
+      } else {
+        const project = await createProject.mutateAsync(projectData);
+        onComplete?.(project.id, formData);
+      }
+
+      toast({
+        title: "Scoping Complete",
+        description: "Project created with comprehensive scoping data."
+      });
+    } catch (error) {
+      console.error('Project creation failed:', error);
+      toast({
+        title: "Project Creation Failed",
+        description: "Unable to create project. Please try again.",
+        variant: "destructive"
       });
     }
   };
 
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 0:
-        return renderOrganizationProfile();
-      case 1:
-        return renderNetworkInfrastructure();
-      case 2:
-        return renderAuthenticationSecurity();
-      case 3:
-        return renderUseCasesRequirements();
-      case 4:
-        return renderIntegrationCompliance();
-      case 5:
-        return renderProjectAssignments();
-      case 6:
-        return renderComprehensivePlanning();
-      case 7:
-        return renderAIAnalysisRecommendations();
-      default:
-        return null;
-    }
+  const generateBusinessSummary = (): string => {
+    return `Comprehensive Portnox NAC deployment for ${formData.organization.name} in the ${formData.organization.industry} industry. 
+    
+Project scope includes ${formData.network_infrastructure.site_count} sites with ${formData.organization.total_users} users.
+Compliance requirements: ${formData.integration_compliance.compliance_frameworks.join(', ')}.
+Key pain points addressed: ${formData.organization.pain_points.length} identified issues.
+AI-recommended timeline: ${formData.templates_ai.ai_recommendations.estimated_timeline_weeks} weeks.
+Complexity score: ${formData.templates_ai.ai_recommendations.complexity_score}/10.`;
   };
 
-  const renderOrganizationProfile = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="org-name">Organization Name *</Label>
-          <Input
-            id="org-name"
-            value={formData.organization.name}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              organization: { ...prev.organization, name: e.target.value }
-            }))}
-            placeholder="Your organization name"
-          />
-        </div>
-        
-        <div>
-          <Label>Industry *</Label>
-          <Select 
-            value={formData.organization.industry} 
-            onValueChange={(value) => setFormData(prev => ({
-              ...prev,
-              organization: { ...prev.organization, industry: value }
-            }))}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select industry" />
-            </SelectTrigger>
-            <SelectContent>
-              {industries.map((industry) => (
-                <SelectItem key={industry} value={industry}>{industry}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <Label>Organization Size *</Label>
-          <Select 
-            value={formData.organization.size} 
-            onValueChange={(value: "SMB" | "Mid-Market" | "Enterprise") => setFormData(prev => ({
-              ...prev,
-              organization: { ...prev.organization, size: value }
-            }))}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="SMB">SMB (50-500 users)</SelectItem>
-              <SelectItem value="Mid-Market">Mid-Market (500-5000 users)</SelectItem>
-              <SelectItem value="Enterprise">Enterprise (5000+ users)</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label>Number of Locations</Label>
-          <Input
-            type="number"
-            value={formData.organization.locations}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              organization: { ...prev.organization, locations: parseInt(e.target.value) || 1 }
-            }))}
-            min="1"
-          />
-        </div>
-
-        <div>
-          <Label>Total Users</Label>
-          <Input
-            type="number"
-            value={formData.organization.total_users}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              organization: { ...prev.organization, total_users: parseInt(e.target.value) || 100 }
-            }))}
-            min="1"
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label>Compliance Requirements</Label>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
-          {complianceFrameworks.map((framework) => (
-            <div key={framework} className="flex items-center space-x-2">
-              <Checkbox
-                id={framework}
-                checked={formData.organization.compliance_needs.includes(framework)}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    setFormData(prev => ({
-                      ...prev,
-                      organization: {
-                        ...prev.organization,
-                        compliance_needs: [...prev.organization.compliance_needs, framework]
-                      }
-                    }));
-                  } else {
-                    setFormData(prev => ({
-                      ...prev,
-                      organization: {
-                        ...prev.organization,
-                        compliance_needs: prev.organization.compliance_needs.filter(f => f !== framework)
-                      }
-                    }));
-                  }
-                }}
-              />
-              <Label htmlFor={framework} className="text-sm">{framework}</Label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <Label>Current Pain Points</Label>
-        <Textarea
-          placeholder="Describe your current network security challenges..."
-          value={formData.organization.pain_points.join('\n')}
-          onChange={(e) => setFormData(prev => ({
-            ...prev,
-            organization: { ...prev.organization, pain_points: e.target.value.split('\n').filter(p => p.trim()) }
-          }))}
-        />
-      </div>
-    </div>
-  );
-
-  const renderNetworkInfrastructure = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <Label>Network Topology *</Label>
-          <Select 
-            value={formData.network_infrastructure.topology_type} 
-            onValueChange={(value: "Flat" | "Segmented" | "Zero-Trust" | "Hybrid") => setFormData(prev => ({
-              ...prev,
-              network_infrastructure: { ...prev.network_infrastructure, topology_type: value }
-            }))}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Flat">Flat Network</SelectItem>
-              <SelectItem value="Segmented">Segmented Network</SelectItem>
-              <SelectItem value="Zero-Trust">Zero Trust Architecture</SelectItem>
-              <SelectItem value="Hybrid">Hybrid Architecture</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label>Network Complexity</Label>
-          <Select 
-            value={formData.network_infrastructure.network_complexity} 
-            onValueChange={(value: "Simple" | "Moderate" | "Complex" | "Very Complex") => setFormData(prev => ({
-              ...prev,
-              network_infrastructure: { ...prev.network_infrastructure, network_complexity: value }
-            }))}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Simple">Simple</SelectItem>
-              <SelectItem value="Moderate">Moderate</SelectItem>
-              <SelectItem value="Complex">Complex</SelectItem>
-              <SelectItem value="Very Complex">Very Complex</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label>Sites for NAC Deployment</Label>
-          <Input
-            type="number"
-            value={formData.network_infrastructure.site_count}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              network_infrastructure: { ...prev.network_infrastructure, site_count: parseInt(e.target.value) || 1 }
-            }))}
-            min="1"
-          />
-        </div>
-      </div>
-
-      <Tabs defaultValue="vendors" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="vendors">Network Vendors</TabsTrigger>
-          <TabsTrigger value="devices">Device Inventory</TabsTrigger>
-          <TabsTrigger value="sites">Site Assignments</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="vendors" className="space-y-6">
-          {/* Network Infrastructure Vendors */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Network className="h-5 w-5" />
-              Network Infrastructure
-            </h3>
-            
-            {Object.entries(networkVendors).map(([category, vendorList]) => (
-              <div key={category} className="space-y-2">
-                <Label className="text-base font-medium capitalize">{category.replace('_', ' ')}</Label>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                  {vendorList.map((vendorName) => (
-                    <div key={vendorName} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`network-${category}-${vendorName}`}
-                        checked={formData.network_infrastructure.existing_vendors[category as keyof typeof formData.network_infrastructure.existing_vendors]?.includes(vendorName) || false}
-                        onCheckedChange={(checked) => {
-                          setFormData(prev => {
-                            const newVendors = { ...prev.network_infrastructure.existing_vendors };
-                            const categoryKey = category as keyof typeof newVendors;
-                            if (checked) {
-                              newVendors[categoryKey] = [...(newVendors[categoryKey] || []), vendorName];
-                            } else {
-                              newVendors[categoryKey] = (newVendors[categoryKey] || []).filter(v => v !== vendorName);
-                            }
-                            return {
-                              ...prev,
-                              network_infrastructure: { ...prev.network_infrastructure, existing_vendors: newVendors }
-                            };
-                          });
-                        }}
-                      />
-                      <Label htmlFor={`network-${category}-${vendorName}`} className="text-sm">{vendorName}</Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Security Vendors */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Security Infrastructure
-            </h3>
-            
-            {Object.entries(securityVendors).map(([category, vendorList]) => (
-              <div key={category} className="space-y-2">
-                <Label className="text-base font-medium capitalize">{category.replace('_', ' ')}</Label>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                  {vendorList.map((vendorName) => (
-                    <div key={vendorName} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`security-${category}-${vendorName}`}
-                        checked={formData.network_infrastructure.existing_vendors[category as keyof typeof formData.network_infrastructure.existing_vendors]?.includes(vendorName) || false}
-                        onCheckedChange={(checked) => {
-                          setFormData(prev => {
-                            const newVendors = { ...prev.network_infrastructure.existing_vendors };
-                            const categoryKey = category as keyof typeof newVendors;
-                            if (checked) {
-                              newVendors[categoryKey] = [...(newVendors[categoryKey] || []), vendorName];
-                            } else {
-                              newVendors[categoryKey] = (newVendors[categoryKey] || []).filter(v => v !== vendorName);
-                            }
-                            return {
-                              ...prev,
-                              network_infrastructure: { ...prev.network_infrastructure, existing_vendors: newVendors }
-                            };
-                          });
-                        }}
-                      />
-                      <Label htmlFor={`security-${category}-${vendorName}`} className="text-sm">{vendorName}</Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Monitoring & Management Tools */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Monitor className="h-5 w-5" />
-              Monitoring & Management
-            </h3>
-            
-            <div className="space-y-2">
-              <Label className="text-base font-medium">Monitoring Tools</Label>
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                {monitoringTools.map((vendorName) => (
-                  <div key={vendorName} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`monitoring-${vendorName}`}
-                      checked={formData.network_infrastructure.existing_vendors.monitoring_tools?.includes(vendorName) || false}
-                      onCheckedChange={(checked) => {
-                        setFormData(prev => {
-                          const newVendors = { ...prev.network_infrastructure.existing_vendors };
-                          if (checked) {
-                            newVendors.monitoring_tools = [...(newVendors.monitoring_tools || []), vendorName];
-                          } else {
-                            newVendors.monitoring_tools = (newVendors.monitoring_tools || []).filter(v => v !== vendorName);
-                          }
-                          return {
-                            ...prev,
-                            network_infrastructure: { ...prev.network_infrastructure, existing_vendors: newVendors }
-                          };
-                        });
-                      }}
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 0: // Organization Profile with Pain Points
+        return (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="h-5 w-5" />
+                  Organization Profile
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="org-name">Organization Name</Label>
+                    <Input
+                      id="org-name"
+                      value={formData.organization.name}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        organization: { ...prev.organization, name: e.target.value }
+                      }))}
+                      placeholder="Enter organization name"
                     />
-                    <Label htmlFor={`monitoring-${vendorName}`} className="text-sm">{vendorName}</Label>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-base font-medium">Device Inventory Tools</Label>
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                {deviceInventoryTools.map((vendorName) => (
-                  <div key={vendorName} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`inventory-${vendorName}`}
-                      checked={formData.network_infrastructure.existing_vendors.monitoring_tools?.includes(vendorName) || false}
-                      onCheckedChange={(checked) => {
-                        setFormData(prev => {
-                          const newVendors = { ...prev.network_infrastructure.existing_vendors };
-                          if (checked) {
-                            newVendors.monitoring_tools = [...(newVendors.monitoring_tools || []), vendorName];
-                          } else {
-                            newVendors.monitoring_tools = (newVendors.monitoring_tools || []).filter(v => v !== vendorName);
-                          }
-                          return {
-                            ...prev,
-                            network_infrastructure: { ...prev.network_infrastructure, existing_vendors: newVendors }
-                          };
-                        });
-                      }}
-                    />
-                    <Label htmlFor={`inventory-${vendorName}`} className="text-sm">{vendorName}</Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="devices" className="space-y-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {Object.entries(formData.network_infrastructure.device_inventory).filter(([key]) => key !== 'custom_devices').map(([deviceType, count]) => (
-              <div key={deviceType}>
-                <Label className="capitalize">{deviceType.replace('_', ' ')}</Label>
-                <Input
-                  type="number"
-                  value={count as number}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    network_infrastructure: {
-                      ...prev.network_infrastructure,
-                      device_inventory: {
-                        ...prev.network_infrastructure.device_inventory,
-                        [deviceType]: parseInt(e.target.value) || 0
-                      }
-                    }
-                  }))}
-                  min="0"
-                />
-              </div>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="sites" className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Building2 className="h-5 w-5" />
-              Site-Specific Vendor & Inventory Assignments
-            </h3>
-            <Button
-              onClick={() => {
-                const newSite = {
-                  site_name: `Site ${formData.network_infrastructure.site_inventory.length + 1}`,
-                  site_location: '',
-                  vendors_assigned: {
-                    wired_switches: [],
-                    wireless_aps: [],
-                    firewalls: [],
-                    routers: [],
-                    vpn_solutions: [],
-                    monitoring_tools: [],
-                    device_inventory_tools: []
-                  },
-                  device_counts: {
-                    corporate_laptops: 0,
-                    desktop_workstations: 0,
-                    mobile_devices: 0,
-                    tablets: 0,
-                    iot_devices: 0,
-                    printers_mfps: 0,
-                    security_cameras: 0,
-                    voip_phones: 0,
-                    medical_devices: 0,
-                    industrial_controls: 0,
-                    pos_systems: 0,
-                    digital_signage: 0,
-                    custom_devices: []
-                  },
-                  priority: "Medium" as const,
-                  deployment_order: formData.network_infrastructure.site_inventory.length + 1,
-                  estimated_complexity: "Moderate" as const,
-                  assigned_engineer: '',
-                  go_live_date: '',
-                  special_requirements: []
-                };
-                setFormData(prev => ({
-                  ...prev,
-                  network_infrastructure: {
-                    ...prev.network_infrastructure,
-                    site_inventory: [...prev.network_infrastructure.site_inventory, newSite]
-                  }
-                }));
-              }}
-              className="mb-4"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Site
-            </Button>
-          </div>
-
-          {formData.network_infrastructure.site_inventory.length === 0 ? (
-            <Alert>
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                No sites configured yet. Click "Add Site" to create site-specific vendor and inventory assignments.
-              </AlertDescription>
-            </Alert>
-          ) : (
-            <div className="space-y-6">
-              {formData.network_infrastructure.site_inventory.map((site, siteIndex) => (
-                <Card key={siteIndex} className="p-4">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="grid grid-cols-2 gap-4 flex-1">
-                      <div>
-                        <Label>Site Name</Label>
-                        <Input
-                          value={site.site_name}
-                          onChange={(e) => {
-                            const updatedSites = [...formData.network_infrastructure.site_inventory];
-                            updatedSites[siteIndex].site_name = e.target.value;
-                            setFormData(prev => ({
-                              ...prev,
-                              network_infrastructure: {
-                                ...prev.network_infrastructure,
-                                site_inventory: updatedSites
-                              }
-                            }));
-                          }}
-                        />
-                      </div>
-                      <div>
-                        <Label>Location</Label>
-                        <Input
-                          value={site.site_location}
-                          onChange={(e) => {
-                            const updatedSites = [...formData.network_infrastructure.site_inventory];
-                            updatedSites[siteIndex].site_location = e.target.value;
-                            setFormData(prev => ({
-                              ...prev,
-                              network_infrastructure: {
-                                ...prev.network_infrastructure,
-                                site_inventory: updatedSites
-                              }
-                            }));
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => {
-                        const updatedSites = formData.network_infrastructure.site_inventory.filter((_, i) => i !== siteIndex);
-                        setFormData(prev => ({
-                          ...prev,
-                          network_infrastructure: {
-                            ...prev.network_infrastructure,
-                            site_inventory: updatedSites
-                          }
-                        }));
-                      }}
+                  <div>
+                    <Label htmlFor="industry">Industry</Label>
+                    <Select
+                      value={formData.organization.industry}
+                      onValueChange={(value) => setFormData(prev => ({
+                        ...prev,
+                        organization: { ...prev.organization, industry: value }
+                      }))}
                     >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  <Tabs defaultValue="site-vendors" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="site-vendors">Assigned Vendors</TabsTrigger>
-                      <TabsTrigger value="site-devices">Device Inventory</TabsTrigger>
-                      <TabsTrigger value="site-details">Deployment Details</TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="site-vendors" className="space-y-4">
-                      {Object.entries(networkVendors).map(([category, vendorList]) => (
-                        <div key={category} className="space-y-2">
-                          <Label className="text-sm font-medium capitalize">{category.replace('_', ' ')}</Label>
-                          <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-                            {vendorList.map((vendorName) => (
-                              <div key={vendorName} className="flex items-center space-x-1">
-                                <Checkbox
-                                  id={`site-${siteIndex}-${category}-${vendorName}`}
-                                  checked={site.vendors_assigned[category as keyof typeof site.vendors_assigned]?.includes(vendorName) || false}
-                                  onCheckedChange={(checked) => {
-                                    const updatedSites = [...formData.network_infrastructure.site_inventory];
-                                    const categoryKey = category as keyof typeof site.vendors_assigned;
-                                    if (checked) {
-                                      updatedSites[siteIndex].vendors_assigned[categoryKey] = [
-                                        ...(updatedSites[siteIndex].vendors_assigned[categoryKey] || []),
-                                        vendorName
-                                      ];
-                                    } else {
-                                      updatedSites[siteIndex].vendors_assigned[categoryKey] = 
-                                        (updatedSites[siteIndex].vendors_assigned[categoryKey] || []).filter(v => v !== vendorName);
-                                    }
-                                    setFormData(prev => ({
-                                      ...prev,
-                                      network_infrastructure: {
-                                        ...prev.network_infrastructure,
-                                        site_inventory: updatedSites
-                                      }
-                                    }));
-                                  }}
-                                />
-                                <Label htmlFor={`site-${siteIndex}-${category}-${vendorName}`} className="text-xs">{vendorName}</Label>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </TabsContent>
-
-                    <TabsContent value="site-devices" className="space-y-4">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {Object.entries(site.device_counts).filter(([key]) => key !== 'custom_devices').map(([deviceType, count]) => (
-                          <div key={deviceType}>
-                            <Label className="text-sm capitalize">{deviceType.replace('_', ' ')}</Label>
-                            <Input
-                              type="number"
-                              value={count as number}
-                              onChange={(e) => {
-                                const updatedSites = [...formData.network_infrastructure.site_inventory];
-                                const deviceKey = deviceType as keyof typeof site.device_counts;
-                                if (deviceKey !== 'custom_devices') {
-                                  (updatedSites[siteIndex].device_counts as any)[deviceKey] = parseInt(e.target.value) || 0;
-                                }
-                                setFormData(prev => ({
-                                  ...prev,
-                                  network_infrastructure: {
-                                    ...prev.network_infrastructure,
-                                    site_inventory: updatedSites
-                                  }
-                                }));
-                              }}
-                              min="0"
-                            />
-                          </div>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select industry" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {industries.map(industry => (
+                          <SelectItem key={industry} value={industry}>{industry}</SelectItem>
                         ))}
-                      </div>
-                    </TabsContent>
-
-                    <TabsContent value="site-details" className="space-y-4">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div>
-                          <Label>Priority</Label>
-                          <Select
-                            value={site.priority}
-                            onValueChange={(value: "Low" | "Medium" | "High" | "Critical") => {
-                              const updatedSites = [...formData.network_infrastructure.site_inventory];
-                              updatedSites[siteIndex].priority = value;
-                              setFormData(prev => ({
-                                ...prev,
-                                network_infrastructure: {
-                                  ...prev.network_infrastructure,
-                                  site_inventory: updatedSites
-                                }
-                              }));
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Low">Low</SelectItem>
-                              <SelectItem value="Medium">Medium</SelectItem>
-                              <SelectItem value="High">High</SelectItem>
-                              <SelectItem value="Critical">Critical</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <Label>Deployment Order</Label>
-                          <Input
-                            type="number"
-                            value={site.deployment_order}
-                            onChange={(e) => {
-                              const updatedSites = [...formData.network_infrastructure.site_inventory];
-                              updatedSites[siteIndex].deployment_order = parseInt(e.target.value) || 1;
-                              setFormData(prev => ({
-                                ...prev,
-                                network_infrastructure: {
-                                  ...prev.network_infrastructure,
-                                  site_inventory: updatedSites
-                                }
-                              }));
-                            }}
-                            min="1"
-                          />
-                        </div>
-                        <div>
-                          <Label>Complexity</Label>
-                          <Select
-                            value={site.estimated_complexity}
-                            onValueChange={(value: "Simple" | "Moderate" | "Complex" | "Very Complex") => {
-                              const updatedSites = [...formData.network_infrastructure.site_inventory];
-                              updatedSites[siteIndex].estimated_complexity = value;
-                              setFormData(prev => ({
-                                ...prev,
-                                network_infrastructure: {
-                                  ...prev.network_infrastructure,
-                                  site_inventory: updatedSites
-                                }
-                              }));
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Simple">Simple</SelectItem>
-                              <SelectItem value="Moderate">Moderate</SelectItem>
-                              <SelectItem value="Complex">Complex</SelectItem>
-                              <SelectItem value="Very Complex">Very Complex</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <Label>Go Live Date</Label>
-                          <Input
-                            type="date"
-                            value={site.go_live_date}
-                            onChange={(e) => {
-                              const updatedSites = [...formData.network_infrastructure.site_inventory];
-                              updatedSites[siteIndex].go_live_date = e.target.value;
-                              setFormData(prev => ({
-                                ...prev,
-                                network_infrastructure: {
-                                  ...prev.network_infrastructure,
-                                  site_inventory: updatedSites
-                                }
-                              }));
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <Label>Assigned Engineer</Label>
-                        <Input
-                          value={site.assigned_engineer}
-                          onChange={(e) => {
-                            const updatedSites = [...formData.network_infrastructure.site_inventory];
-                            updatedSites[siteIndex].assigned_engineer = e.target.value;
-                            setFormData(prev => ({
-                              ...prev,
-                              network_infrastructure: {
-                                ...prev.network_infrastructure,
-                                site_inventory: updatedSites
-                              }
-                            }));
-                          }}
-                          placeholder="Engineer name or email"
-                        />
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </Card>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-
-  const renderAuthenticationSecurity = () => (
-    <div className="space-y-6">
-      <div>
-        <Label>Current Authentication Methods</Label>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-          {authenticationMethods.map((method) => (
-            <div key={method} className="flex items-center space-x-2">
-              <Checkbox
-                id={`current-${method}`}
-                checked={formData.authentication_security.current_auth_methods.includes(method)}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    setFormData(prev => ({
-                      ...prev,
-                      authentication_security: {
-                        ...prev.authentication_security,
-                        current_auth_methods: [...prev.authentication_security.current_auth_methods, method]
-                      }
-                    }));
-                  } else {
-                    setFormData(prev => ({
-                      ...prev,
-                      authentication_security: {
-                        ...prev.authentication_security,
-                        current_auth_methods: prev.authentication_security.current_auth_methods.filter(m => m !== method)
-                      }
-                    }));
-                  }
-                }}
-              />
-              <Label htmlFor={`current-${method}`} className="text-sm">{method}</Label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <Label>Desired Authentication Methods</Label>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-          {authenticationMethods.map((method) => (
-            <div key={method} className="flex items-center space-x-2">
-              <Checkbox
-                id={`desired-${method}`}
-                checked={formData.authentication_security.desired_auth_methods.includes(method)}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    setFormData(prev => ({
-                      ...prev,
-                      authentication_security: {
-                        ...prev.authentication_security,
-                        desired_auth_methods: [...prev.authentication_security.desired_auth_methods, method]
-                      }
-                    }));
-                  } else {
-                    setFormData(prev => ({
-                      ...prev,
-                      authentication_security: {
-                        ...prev.authentication_security,
-                        desired_auth_methods: prev.authentication_security.desired_auth_methods.filter(m => m !== method)
-                      }
-                    }));
-                  }
-                }}
-              />
-              <Label htmlFor={`desired-${method}`} className="text-sm">{method}</Label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <Label>Identity Providers</Label>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-          {identityProviders.map((provider) => (
-            <div key={provider} className="flex items-center space-x-2">
-              <Checkbox
-                id={provider}
-                checked={formData.authentication_security.identity_providers.includes(provider)}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    setFormData(prev => ({
-                      ...prev,
-                      authentication_security: {
-                        ...prev.authentication_security,
-                        identity_providers: [...prev.authentication_security.identity_providers, provider]
-                      }
-                    }));
-                  } else {
-                    setFormData(prev => ({
-                      ...prev,
-                      authentication_security: {
-                        ...prev.authentication_security,
-                        identity_providers: prev.authentication_security.identity_providers.filter(p => p !== provider)
-                      }
-                    }));
-                  }
-                }}
-              />
-              <Label htmlFor={provider} className="text-sm">{provider}</Label>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderUseCasesRequirements = () => (
-    <div className="space-y-6">
-      <Tabs defaultValue="use-cases" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="use-cases">Use Cases</TabsTrigger>
-          <TabsTrigger value="requirements">Requirements</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="use-cases" className="space-y-4">
-          <div>
-            <Label>Available Use Cases</Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 max-h-60 overflow-y-auto">
-              {useCases.map((useCase) => (
-                <div key={useCase.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={useCase.id}
-                    checked={formData.use_cases_requirements.selected_use_cases.includes(useCase.id)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setFormData(prev => ({
-                          ...prev,
-                          use_cases_requirements: {
-                            ...prev.use_cases_requirements,
-                            selected_use_cases: [...prev.use_cases_requirements.selected_use_cases, useCase.id]
-                          }
-                        }));
-                      } else {
-                        setFormData(prev => ({
-                          ...prev,
-                          use_cases_requirements: {
-                            ...prev.use_cases_requirements,
-                            selected_use_cases: prev.use_cases_requirements.selected_use_cases.filter(id => id !== useCase.id)
-                          }
-                        }));
-                      }
-                    }}
-                  />
-                  <Label htmlFor={useCase.id} className="text-sm">
-                    {useCase.name} 
-                    <Badge variant="outline" className="ml-2">{useCase.complexity}</Badge>
-                  </Label>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="requirements" className="space-y-4">
-          <div>
-            <Label>Available Requirements</Label>
-            <div className="grid grid-cols-1 gap-2 mt-2 max-h-60 overflow-y-auto">
-              {requirements.map((requirement) => (
-                <div key={requirement.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={requirement.id}
-                    checked={formData.use_cases_requirements.selected_requirements.includes(requirement.id)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setFormData(prev => ({
-                          ...prev,
-                          use_cases_requirements: {
-                            ...prev.use_cases_requirements,
-                            selected_requirements: [...prev.use_cases_requirements.selected_requirements, requirement.id]
-                          }
-                        }));
-                      } else {
-                        setFormData(prev => ({
-                          ...prev,
-                          use_cases_requirements: {
-                            ...prev.use_cases_requirements,
-                            selected_requirements: prev.use_cases_requirements.selected_requirements.filter(id => id !== requirement.id)
-                          }
-                        }));
-                      }
-                    }}
-                  />
-                  <Label htmlFor={requirement.id} className="text-sm">
-                    {requirement.title}
-                    <Badge variant="outline" className="ml-2">{requirement.priority}</Badge>
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </div>
-        </TabsContent>
-      </Tabs>
 
-      <div>
-        <Label>Success Criteria</Label>
-        <Textarea
-          placeholder="Define what success looks like for this project..."
-          value={formData.use_cases_requirements.success_criteria.join('\n')}
-          onChange={(e) => setFormData(prev => ({
-            ...prev,
-            use_cases_requirements: { 
-              ...prev.use_cases_requirements, 
-              success_criteria: e.target.value.split('\n').filter(c => c.trim()) 
-            }
-          }))}
-        />
-      </div>
-    </div>
-  );
-
-  const renderProjectAssignments = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label>Project Manager</Label>
-          <Input
-            placeholder="Enter project manager name"
-            value={formData.project_assignments.project_manager}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              project_assignments: { ...prev.project_assignments, project_manager: e.target.value }
-            }))}
-          />
-        </div>
-        <div>
-          <Label>Technical Lead</Label>
-          <Input
-            placeholder="Enter technical lead name"
-            value={formData.project_assignments.technical_lead}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              project_assignments: { ...prev.project_assignments, technical_lead: e.target.value }
-            }))}
-          />
-        </div>
-        <div>
-          <Label>Lead Engineer</Label>
-          <Input
-            placeholder="Enter lead engineer name"
-            value={formData.project_assignments.lead_engineer}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              project_assignments: { ...prev.project_assignments, lead_engineer: e.target.value }
-            }))}
-          />
-        </div>
-        <div>
-          <Label>Security Architect</Label>
-          <Input
-            placeholder="Enter security architect name"
-            value={formData.project_assignments.security_architect}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              project_assignments: { ...prev.project_assignments, security_architect: e.target.value }
-            }))}
-          />
-        </div>
-        <div>
-          <Label>Network Engineer</Label>
-          <Input
-            placeholder="Enter network engineer name"
-            value={formData.project_assignments.network_engineer}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              project_assignments: { ...prev.project_assignments, network_engineer: e.target.value }
-            }))}
-          />
-        </div>
-        <div>
-          <Label>Test Engineer</Label>
-          <Input
-            placeholder="Enter test engineer name"
-            value={formData.project_assignments.test_engineer}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              project_assignments: { ...prev.project_assignments, test_engineer: e.target.value }
-            }))}
-          />
-        </div>
-      </div>
-
-      <Separator />
-
-      <div>
-        <Label className="text-lg font-semibold">Implementation Team</Label>
-        <p className="text-sm text-muted-foreground mb-3">Add team members who will be involved in the implementation</p>
-        {formData.project_assignments.implementation_team.map((member, index) => (
-          <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-2 p-3 border rounded">
-            <Input
-              placeholder="Name"
-              value={member.name}
-              onChange={(e) => {
-                const updated = [...formData.project_assignments.implementation_team];
-                updated[index] = { ...member, name: e.target.value };
-                setFormData(prev => ({
-                  ...prev,
-                  project_assignments: { ...prev.project_assignments, implementation_team: updated }
-                }));
-              }}
-            />
-            <Input
-              placeholder="Role"
-              value={member.role}
-              onChange={(e) => {
-                const updated = [...formData.project_assignments.implementation_team];
-                updated[index] = { ...member, role: e.target.value };
-                setFormData(prev => ({
-                  ...prev,
-                  project_assignments: { ...prev.project_assignments, implementation_team: updated }
-                }));
-              }}
-            />
-            <Input
-              placeholder="Skills (comma separated)"
-              value={member.skills.join(', ')}
-              onChange={(e) => {
-                const updated = [...formData.project_assignments.implementation_team];
-                updated[index] = { ...member, skills: e.target.value.split(',').map(s => s.trim()) };
-                setFormData(prev => ({
-                  ...prev,
-                  project_assignments: { ...prev.project_assignments, implementation_team: updated }
-                }));
-              }}
-            />
-            <div className="flex gap-2">
-              <Input
-                placeholder="Availability"
-                value={member.availability}
-                onChange={(e) => {
-                  const updated = [...formData.project_assignments.implementation_team];
-                  updated[index] = { ...member, availability: e.target.value };
-                  setFormData(prev => ({
-                    ...prev,
-                    project_assignments: { ...prev.project_assignments, implementation_team: updated }
-                  }));
-                }}
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const updated = formData.project_assignments.implementation_team.filter((_, i) => i !== index);
-                  setFormData(prev => ({
-                    ...prev,
-                    project_assignments: { ...prev.project_assignments, implementation_team: updated }
-                  }));
-                }}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        ))}
-        <Button
-          variant="outline"
-          onClick={() => setFormData(prev => ({
-            ...prev,
-            project_assignments: {
-              ...prev.project_assignments,
-              implementation_team: [...prev.project_assignments.implementation_team, { name: '', role: '', skills: [], availability: '' }]
-            }
-          }))}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Team Member
-        </Button>
-      </div>
-
-      <Separator />
-
-      <div>
-        <Label className="text-lg font-semibold">Client Stakeholders</Label>
-        <p className="text-sm text-muted-foreground mb-3">Add key client stakeholders and their involvement</p>
-        {formData.project_assignments.client_stakeholders.map((stakeholder, index) => (
-          <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-2 p-3 border rounded">
-            <Input
-              placeholder="Name"
-              value={stakeholder.name}
-              onChange={(e) => {
-                const updated = [...formData.project_assignments.client_stakeholders];
-                updated[index] = { ...stakeholder, name: e.target.value };
-                setFormData(prev => ({
-                  ...prev,
-                  project_assignments: { ...prev.project_assignments, client_stakeholders: updated }
-                }));
-              }}
-            />
-            <Input
-              placeholder="Role"
-              value={stakeholder.role}
-              onChange={(e) => {
-                const updated = [...formData.project_assignments.client_stakeholders];
-                updated[index] = { ...stakeholder, role: e.target.value };
-                setFormData(prev => ({
-                  ...prev,
-                  project_assignments: { ...prev.project_assignments, client_stakeholders: updated }
-                }));
-              }}
-            />
-            <Input
-              placeholder="Department"
-              value={stakeholder.department}
-              onChange={(e) => {
-                const updated = [...formData.project_assignments.client_stakeholders];
-                updated[index] = { ...stakeholder, department: e.target.value };
-                setFormData(prev => ({
-                  ...prev,
-                  project_assignments: { ...prev.project_assignments, client_stakeholders: updated }
-                }));
-              }}
-            />
-            <div className="flex gap-2">
-              <Select
-                value={stakeholder.involvement_level}
-                onValueChange={(value) => {
-                  const updated = [...formData.project_assignments.client_stakeholders];
-                  updated[index] = { ...stakeholder, involvement_level: value };
-                  setFormData(prev => ({
-                    ...prev,
-                    project_assignments: { ...prev.project_assignments, client_stakeholders: updated }
-                  }));
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Involvement" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const updated = formData.project_assignments.client_stakeholders.filter((_, i) => i !== index);
-                  setFormData(prev => ({
-                    ...prev,
-                    project_assignments: { ...prev.project_assignments, client_stakeholders: updated }
-                  }));
-                }}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        ))}
-        <Button
-          variant="outline"
-          onClick={() => setFormData(prev => ({
-            ...prev,
-            project_assignments: {
-              ...prev.project_assignments,
-              client_stakeholders: [...prev.project_assignments.client_stakeholders, { name: '', role: '', department: '', involvement_level: '' }]
-            }
-          }))}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Stakeholder
-        </Button>
-      </div>
-    </div>
-  );
-
-  const renderComprehensivePlanning = () => (
-    <div className="space-y-6">
-      <div>
-        <Label className="text-lg font-semibold">Deployment Phases</Label>
-        <p className="text-sm text-muted-foreground mb-3">Define the project phases with detailed planning</p>
-        {formData.comprehensive_planning.deployment_phases.map((phase, index) => (
-          <Card key={index} className="p-4 mb-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div>
-                <Label>Phase Name</Label>
-                <Input
-                  placeholder="e.g., Discovery & Planning"
-                  value={phase.phase_name}
-                  onChange={(e) => {
-                    const updated = [...formData.comprehensive_planning.deployment_phases];
-                    updated[index] = { ...phase, phase_name: e.target.value };
-                    setFormData(prev => ({
-                      ...prev,
-                      comprehensive_planning: { ...prev.comprehensive_planning, deployment_phases: updated }
-                    }));
-                  }}
-                />
-              </div>
-              <div>
-                <Label>Duration (weeks)</Label>
-                <Input
-                  type="number"
-                  value={phase.duration_weeks}
-                  onChange={(e) => {
-                    const updated = [...formData.comprehensive_planning.deployment_phases];
-                    updated[index] = { ...phase, duration_weeks: parseInt(e.target.value) || 0 };
-                    setFormData(prev => ({
-                      ...prev,
-                      comprehensive_planning: { ...prev.comprehensive_planning, deployment_phases: updated }
-                    }));
-                  }}
-                />
-              </div>
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <Label>Start Date</Label>
-                  <Input
-                    type="date"
-                    value={phase.start_date}
-                    onChange={(e) => {
-                      const updated = [...formData.comprehensive_planning.deployment_phases];
-                      updated[index] = { ...phase, start_date: e.target.value };
-                      setFormData(prev => ({
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="org-size">Organization Size</Label>
+                    <Select
+                      value={formData.organization.size}
+                      onValueChange={(value: "SMB" | "Mid-Market" | "Enterprise") => setFormData(prev => ({
                         ...prev,
-                        comprehensive_planning: { ...prev.comprehensive_planning, deployment_phases: updated }
-                      }));
-                    }}
-                  />
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-6"
-                  onClick={() => {
-                    const updated = formData.comprehensive_planning.deployment_phases.filter((_, i) => i !== index);
-                    setFormData(prev => ({
-                      ...prev,
-                      comprehensive_planning: { ...prev.comprehensive_planning, deployment_phases: updated }
-                    }));
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label>Prerequisites</Label>
-                <Textarea
-                  placeholder="Enter prerequisites (one per line)"
-                  value={phase.prerequisites.join('\n')}
-                  onChange={(e) => {
-                    const updated = [...formData.comprehensive_planning.deployment_phases];
-                    updated[index] = { ...phase, prerequisites: e.target.value.split('\n').filter(p => p.trim()) };
-                    setFormData(prev => ({
-                      ...prev,
-                      comprehensive_planning: { ...prev.comprehensive_planning, deployment_phases: updated }
-                    }));
-                  }}
-                />
-              </div>
-              <div>
-                <Label>Deliverables</Label>
-                <Textarea
-                  placeholder="Enter deliverables (one per line)"
-                  value={phase.deliverables.join('\n')}
-                  onChange={(e) => {
-                    const updated = [...formData.comprehensive_planning.deployment_phases];
-                    updated[index] = { ...phase, deliverables: e.target.value.split('\n').filter(d => d.trim()) };
-                    setFormData(prev => ({
-                      ...prev,
-                      comprehensive_planning: { ...prev.comprehensive_planning, deployment_phases: updated }
-                    }));
-                  }}
-                />
-              </div>
-            </div>
-          </Card>
-        ))}
-        <Button
-          variant="outline"
-          onClick={() => setFormData(prev => ({
-            ...prev,
-            comprehensive_planning: {
-              ...prev.comprehensive_planning,
-              deployment_phases: [...prev.comprehensive_planning.deployment_phases, {
-                phase_name: '', duration_weeks: 0, start_date: '', end_date: '',
-                prerequisites: [], deliverables: [], success_criteria: [], assigned_team: [],
-                risks: [], mitigation_strategies: []
-              }]
-            }
-          }))}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Phase
-        </Button>
-      </div>
-
-      <Separator />
-
-      <div>
-        <Label className="text-lg font-semibold">Risk Management</Label>
-        <p className="text-sm text-muted-foreground mb-3">Identify and plan for project risks</p>
-        {formData.comprehensive_planning.risk_management.identified_risks.map((risk, index) => (
-          <Card key={index} className="p-4 mb-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-              <div>
-                <Label>Risk Description</Label>
-                <Input
-                  placeholder="Describe the risk"
-                  value={risk.risk}
-                  onChange={(e) => {
-                    const updated = [...formData.comprehensive_planning.risk_management.identified_risks];
-                    updated[index] = { ...risk, risk: e.target.value };
-                    setFormData(prev => ({
-                      ...prev,
-                      comprehensive_planning: {
-                        ...prev.comprehensive_planning,
-                        risk_management: { ...prev.comprehensive_planning.risk_management, identified_risks: updated }
-                      }
-                    }));
-                  }}
-                />
-              </div>
-              <div>
-                <Label>Impact</Label>
-                <Select
-                  value={risk.impact}
-                  onValueChange={(value) => {
-                    const updated = [...formData.comprehensive_planning.risk_management.identified_risks];
-                    updated[index] = { ...risk, impact: value };
-                    setFormData(prev => ({
-                      ...prev,
-                      comprehensive_planning: {
-                        ...prev.comprehensive_planning,
-                        risk_management: { ...prev.comprehensive_planning.risk_management, identified_risks: updated }
-                      }
-                    }));
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Impact" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="critical">Critical</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Probability</Label>
-                <Select
-                  value={risk.probability}
-                  onValueChange={(value) => {
-                    const updated = [...formData.comprehensive_planning.risk_management.identified_risks];
-                    updated[index] = { ...risk, probability: value };
-                    setFormData(prev => ({
-                      ...prev,
-                      comprehensive_planning: {
-                        ...prev.comprehensive_planning,
-                        risk_management: { ...prev.comprehensive_planning.risk_management, identified_risks: updated }
-                      }
-                    }));
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Probability" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <Label>Risk Owner</Label>
-                  <Input
-                    placeholder="Owner"
-                    value={risk.owner}
-                    onChange={(e) => {
-                      const updated = [...formData.comprehensive_planning.risk_management.identified_risks];
-                      updated[index] = { ...risk, owner: e.target.value };
-                      setFormData(prev => ({
+                        organization: { ...prev.organization, size: value }
+                      }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="SMB">SMB (< 500 users)</SelectItem>
+                        <SelectItem value="Mid-Market">Mid-Market (500-5000 users)</SelectItem>
+                        <SelectItem value="Enterprise">Enterprise (> 5000 users)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="locations">Number of Locations</Label>
+                    <Input
+                      id="locations"
+                      type="number"
+                      value={formData.organization.locations}
+                      onChange={(e) => setFormData(prev => ({
                         ...prev,
-                        comprehensive_planning: {
-                          ...prev.comprehensive_planning,
-                          risk_management: { ...prev.comprehensive_planning.risk_management, identified_risks: updated }
-                        }
-                      }));
-                    }}
-                  />
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-6"
-                  onClick={() => {
-                    const updated = formData.comprehensive_planning.risk_management.identified_risks.filter((_, i) => i !== index);
-                    setFormData(prev => ({
-                      ...prev,
-                      comprehensive_planning: {
-                        ...prev.comprehensive_planning,
-                        risk_management: { ...prev.comprehensive_planning.risk_management, identified_risks: updated }
-                      }
-                    }));
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <div>
-              <Label>Mitigation Strategy</Label>
-              <Textarea
-                placeholder="Describe how to mitigate this risk"
-                value={risk.mitigation}
-                onChange={(e) => {
-                  const updated = [...formData.comprehensive_planning.risk_management.identified_risks];
-                  updated[index] = { ...risk, mitigation: e.target.value };
-                  setFormData(prev => ({
-                    ...prev,
-                    comprehensive_planning: {
-                      ...prev.comprehensive_planning,
-                      risk_management: { ...prev.comprehensive_planning.risk_management, identified_risks: updated }
-                    }
-                  }));
-                }}
-              />
-            </div>
-          </Card>
-        ))}
-        <Button
-          variant="outline"
-          onClick={() => setFormData(prev => ({
-            ...prev,
-            comprehensive_planning: {
-              ...prev.comprehensive_planning,
-              risk_management: {
-                ...prev.comprehensive_planning.risk_management,
-                identified_risks: [...prev.comprehensive_planning.risk_management.identified_risks, {
-                  risk: '', impact: '', probability: '', mitigation: '', owner: ''
-                }]
-              }
-            }
-          }))}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Risk
-        </Button>
-      </div>
-
-      <Separator />
-
-      <div>
-        <Label className="text-lg font-semibold">Testing Strategy</Label>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label>Test Phases</Label>
-            <Textarea
-              placeholder="Enter test phases (one per line)"
-              value={formData.comprehensive_planning.testing_strategy.test_phases.join('\n')}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                comprehensive_planning: {
-                  ...prev.comprehensive_planning,
-                  testing_strategy: {
-                    ...prev.comprehensive_planning.testing_strategy,
-                    test_phases: e.target.value.split('\n').filter(p => p.trim())
-                  }
-                }
-              }))}
-            />
-          </div>
-          <div>
-            <Label>Test Environments</Label>
-            <Textarea
-              placeholder="Enter test environments (one per line)"
-              value={formData.comprehensive_planning.testing_strategy.test_environments.join('\n')}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                comprehensive_planning: {
-                  ...prev.comprehensive_planning,
-                  testing_strategy: {
-                    ...prev.comprehensive_planning.testing_strategy,
-                    test_environments: e.target.value.split('\n').filter(e => e.trim())
-                  }
-                }
-              }))}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderIntegrationCompliance = () => (
-    <div className="space-y-6">
-      <div>
-        <Label>Required System Integrations</Label>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-          {integrationSystems.map((system) => (
-            <div key={system} className="flex items-center space-x-2">
-              <Checkbox
-                id={system}
-                checked={formData.integration_compliance.required_integrations.includes(system)}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    setFormData(prev => ({
-                      ...prev,
-                      integration_compliance: {
-                        ...prev.integration_compliance,
-                        required_integrations: [...prev.integration_compliance.required_integrations, system]
-                      }
-                    }));
-                  } else {
-                    setFormData(prev => ({
-                      ...prev,
-                      integration_compliance: {
-                        ...prev.integration_compliance,
-                        required_integrations: prev.integration_compliance.required_integrations.filter(s => s !== system)
-                      }
-                    }));
-                  }
-                }}
-              />
-              <Label htmlFor={system} className="text-sm">{system}</Label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <Label>Max Authentication Time (seconds)</Label>
-          <Input
-            type="number"
-            value={formData.integration_compliance.performance_requirements.max_auth_time}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              integration_compliance: {
-                ...prev.integration_compliance,
-                performance_requirements: {
-                  ...prev.integration_compliance.performance_requirements,
-                  max_auth_time: parseInt(e.target.value) || 30
-                }
-              }
-            }))}
-            min="1"
-          />
-        </div>
-
-        <div>
-          <Label>Uptime Requirement (%)</Label>
-          <Input
-            type="number"
-            step="0.1"
-            value={formData.integration_compliance.performance_requirements.uptime_requirement}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              integration_compliance: {
-                ...prev.integration_compliance,
-                performance_requirements: {
-                  ...prev.integration_compliance.performance_requirements,
-                  uptime_requirement: parseFloat(e.target.value) || 99.5
-                }
-              }
-            }))}
-            min="90"
-            max="100"
-          />
-        </div>
-
-        <div>
-          <Label>Concurrent Users</Label>
-          <Input
-            type="number"
-            value={formData.integration_compliance.performance_requirements.concurrent_users}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              integration_compliance: {
-                ...prev.integration_compliance,
-                performance_requirements: {
-                  ...prev.integration_compliance.performance_requirements,
-                  concurrent_users: parseInt(e.target.value) || 1000
-                }
-              }
-            }))}
-            min="1"
-          />
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderAIAnalysisRecommendations = () => {
-    const { ai_recommendations } = formData.templates_ai;
-    
-    if (aiAnalysisLoading) {
-      return (
-        <div className="space-y-6">
-          <div className="text-center">
-            <Brain className="h-16 w-16 mx-auto mb-4 text-primary animate-pulse" />
-            <h3 className="text-xl font-semibold mb-2">AI Analysis in Progress</h3>
-            <p className="text-muted-foreground">Analyzing your requirements and generating comprehensive recommendations...</p>
-            <Progress value={66} className="mt-4" />
-          </div>
-        </div>
-      );
-    }
-
-    if (!ai_recommendations.deployment_approach) {
-      return (
-        <div className="text-center">
-          <AlertTriangle className="h-16 w-16 mx-auto mb-4 text-orange-500" />
-          <h3 className="text-xl font-semibold mb-2">AI Analysis Required</h3>
-          <p className="text-muted-foreground">Click Next to generate AI recommendations based on your inputs.</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-6">
-        <Alert>
-          <Brain className="h-4 w-4" />
-          <AlertDescription>
-            Comprehensive AI analysis complete! Review the recommendations below and proceed to create your project.
-          </AlertDescription>
-        </Alert>
-
-        <Tabs defaultValue="approach" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="approach">Approach</TabsTrigger>
-            <TabsTrigger value="timeline">Timeline</TabsTrigger>
-            <TabsTrigger value="resources">Resources</TabsTrigger>
-            <TabsTrigger value="risks">Risks</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="approach" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5" />
-                  Deployment Approach
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm">{ai_recommendations.deployment_approach}</p>
-                <div className="mt-4">
-                  <h4 className="font-medium mb-2">Recommended Phases:</h4>
-                  <div className="grid gap-2">
-                    {ai_recommendations.recommended_phases.map((phase, index) => (
-                      <Badge key={index} variant="secondary" className="justify-start">
-                        {index + 1}. {phase}
-                      </Badge>
-                    ))}
+                        organization: { ...prev.organization, locations: parseInt(e.target.value) || 1 }
+                      }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="total-users">Total Users</Label>
+                    <Input
+                      id="total-users"
+                      type="number"
+                      value={formData.organization.total_users}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        organization: { ...prev.organization, total_users: parseInt(e.target.value) || 100 }
+                      }))}
+                    />
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-          
-          <TabsContent value="timeline" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  Project Timeline
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4">
-                  <div className="flex justify-between items-center">
-                    <span>Estimated Duration:</span>
-                    <Badge variant="outline">{ai_recommendations.estimated_timeline_weeks} weeks</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Complexity Score:</span>
-                    <Badge variant="outline">{ai_recommendations.complexity_score}/10</Badge>
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Project Roadmap:</h4>
-                    {ai_recommendations.project_roadmap.map((phase, index) => (
-                      <div key={index} className="flex justify-between items-center p-2 bg-muted rounded">
-                        <span className="font-medium">{phase.phase}</span>
-                        <span className="text-sm text-muted-foreground">{phase.duration} weeks</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="resources" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Resource Estimates
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-2">
-                  <div className="flex justify-between">
-                    <span>Project Manager:</span>
-                    <span>{ai_recommendations.resource_estimates.project_manager_weeks} weeks</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Lead Engineer:</span>
-                    <span>{ai_recommendations.resource_estimates.lead_engineer_weeks} weeks</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Engineers:</span>
-                    <span>{ai_recommendations.resource_estimates.engineer_weeks} weeks</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Testing:</span>
-                    <span>{ai_recommendations.resource_estimates.testing_weeks} weeks</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="risks" className="space-y-4">
+
+            {/* Pain Points Section */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5" />
-                  Risk Assessment
+                  Pain Points & Challenges
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setShowPainPointDialog(true)}
+                    className="ml-auto"
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Custom
+                  </Button>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {ai_recommendations.risk_factors.map((risk, index) => (
-                    <Alert key={index}>
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertDescription className="text-sm">{risk}</AlertDescription>
-                    </Alert>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {painPointsData.map(painPoint => (
+                    <div key={painPoint.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`pain-${painPoint.id}`}
+                        checked={formData.organization.pain_points.includes(painPoint.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              organization: {
+                                ...prev.organization,
+                                pain_points: [...prev.organization.pain_points, painPoint.id]
+                              }
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              organization: {
+                                ...prev.organization,
+                                pain_points: prev.organization.pain_points.filter(p => p !== painPoint.id)
+                              }
+                            }));
+                          }
+                        }}
+                      />
+                      <Label htmlFor={`pain-${painPoint.id}`} className="text-sm">
+                        {painPoint.title}
+                        <Badge variant="outline" className="ml-2 text-xs">
+                          {painPoint.severity}
+                        </Badge>
+                      </Label>
+                    </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-    );
+
+            {/* Pain Point Creation Dialog */}
+            <Dialog open={showPainPointDialog} onOpenChange={setShowPainPointDialog}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add Custom Pain Point</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="pain-title">Title</Label>
+                    <Input
+                      id="pain-title"
+                      value={newPainPoint.title}
+                      onChange={(e) => setNewPainPoint(prev => ({ ...prev, title: e.target.value }))}
+                      placeholder="Enter pain point title"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="pain-description">Description</Label>
+                    <Textarea
+                      id="pain-description"
+                      value={newPainPoint.description}
+                      onChange={(e) => setNewPainPoint(prev => ({ ...prev, description: e.target.value }))}
+                      placeholder="Describe the pain point"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="pain-category">Category</Label>
+                      <Select
+                        value={newPainPoint.category}
+                        onValueChange={(value) => setNewPainPoint(prev => ({ ...prev, category: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="general">General</SelectItem>
+                          <SelectItem value="security">Security</SelectItem>
+                          <SelectItem value="compliance">Compliance</SelectItem>
+                          <SelectItem value="operations">Operations</SelectItem>
+                          <SelectItem value="performance">Performance</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="pain-severity">Severity</Label>
+                      <Select
+                        value={newPainPoint.severity}
+                        onValueChange={(value) => setNewPainPoint(prev => ({ ...prev, severity: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="critical">Critical</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button onClick={handleCreatePainPoint} disabled={!newPainPoint.title.trim()}>
+                      <Save className="h-4 w-4 mr-2" />
+                      Save to Library
+                    </Button>
+                    <Button variant="outline" onClick={() => setShowPainPointDialog(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        );
+
+      case 1: // Network Infrastructure
+        return (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Network className="h-5 w-5" />
+                  Network Infrastructure
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="topology">Network Topology</Label>
+                    <Select
+                      value={formData.network_infrastructure.topology_type}
+                      onValueChange={(value: "Flat" | "Segmented" | "Zero-Trust" | "Hybrid") => setFormData(prev => ({
+                        ...prev,
+                        network_infrastructure: { ...prev.network_infrastructure, topology_type: value }
+                      }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Flat">Flat Network</SelectItem>
+                        <SelectItem value="Segmented">Segmented Network</SelectItem>
+                        <SelectItem value="Zero-Trust">Zero Trust</SelectItem>
+                        <SelectItem value="Hybrid">Hybrid</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="site-count">Number of Sites</Label>
+                    <Input
+                      id="site-count"
+                      type="number"
+                      value={formData.network_infrastructure.site_count}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        network_infrastructure: { ...prev.network_infrastructure, site_count: parseInt(e.target.value) || 1 }
+                      }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="complexity">Network Complexity</Label>
+                    <Select
+                      value={formData.network_infrastructure.network_complexity}
+                      onValueChange={(value: "Simple" | "Moderate" | "Complex" | "Very Complex") => setFormData(prev => ({
+                        ...prev,
+                        network_infrastructure: { ...prev.network_infrastructure, network_complexity: value }
+                      }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Simple">Simple</SelectItem>
+                        <SelectItem value="Moderate">Moderate</SelectItem>
+                        <SelectItem value="Complex">Complex</SelectItem>
+                        <SelectItem value="Very Complex">Very Complex</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Vendor Selection Sections */}
+                <Tabs defaultValue="network" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="network">Network Infrastructure</TabsTrigger>
+                    <TabsTrigger value="security">Security Infrastructure</TabsTrigger>
+                    <TabsTrigger value="devices">Device Inventory</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="network" className="space-y-4">
+                    {/* Wired Switches */}
+                    <div>
+                      <Label>Wired Switch Vendors</Label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+                        {["Cisco", "Aruba (HPE)", "Juniper Networks", "Extreme Networks", "Dell EMC", "Huawei", "Meraki", "Ubiquiti"].map(vendor => (
+                          <div key={vendor} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`switch-${vendor}`}
+                              checked={formData.network_infrastructure.existing_vendors.wired_switches.includes(vendor)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    network_infrastructure: {
+                                      ...prev.network_infrastructure,
+                                      existing_vendors: {
+                                        ...prev.network_infrastructure.existing_vendors,
+                                        wired_switches: [...prev.network_infrastructure.existing_vendors.wired_switches, vendor]
+                                      }
+                                    }
+                                  }));
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    network_infrastructure: {
+                                      ...prev.network_infrastructure,
+                                      existing_vendors: {
+                                        ...prev.network_infrastructure.existing_vendors,
+                                        wired_switches: prev.network_infrastructure.existing_vendors.wired_switches.filter(v => v !== vendor)
+                                      }
+                                    }
+                                  }));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`switch-${vendor}`} className="text-sm">{vendor}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Wireless APs */}
+                    <div>
+                      <Label>Wireless AP Vendors</Label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+                        {["Cisco Meraki", "Aruba (HPE)", "Ubiquiti", "Ruckus (CommScope)", "Extreme Networks", "Fortinet", "Mist (Juniper)", "Cambium Networks"].map(vendor => (
+                          <div key={vendor} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`ap-${vendor}`}
+                              checked={formData.network_infrastructure.existing_vendors.wireless_aps.includes(vendor)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    network_infrastructure: {
+                                      ...prev.network_infrastructure,
+                                      existing_vendors: {
+                                        ...prev.network_infrastructure.existing_vendors,
+                                        wireless_aps: [...prev.network_infrastructure.existing_vendors.wireless_aps, vendor]
+                                      }
+                                    }
+                                  }));
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    network_infrastructure: {
+                                      ...prev.network_infrastructure,
+                                      existing_vendors: {
+                                        ...prev.network_infrastructure.existing_vendors,
+                                        wireless_aps: prev.network_infrastructure.existing_vendors.wireless_aps.filter(v => v !== vendor)
+                                      }
+                                    }
+                                  }));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`ap-${vendor}`} className="text-sm">{vendor}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="security" className="space-y-4">
+                    {/* Firewalls */}
+                    <div>
+                      <Label>Firewall Vendors</Label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+                        {["Palo Alto Networks", "Fortinet", "Check Point", "Cisco ASA/FTD", "SonicWall", "Juniper SRX", "pfSense", "WatchGuard"].map(vendor => (
+                          <div key={vendor} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`fw-${vendor}`}
+                              checked={formData.network_infrastructure.existing_vendors.firewalls.includes(vendor)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    network_infrastructure: {
+                                      ...prev.network_infrastructure,
+                                      existing_vendors: {
+                                        ...prev.network_infrastructure.existing_vendors,
+                                        firewalls: [...prev.network_infrastructure.existing_vendors.firewalls, vendor]
+                                      }
+                                    }
+                                  }));
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    network_infrastructure: {
+                                      ...prev.network_infrastructure,
+                                      existing_vendors: {
+                                        ...prev.network_infrastructure.existing_vendors,
+                                        firewalls: prev.network_infrastructure.existing_vendors.firewalls.filter(v => v !== vendor)
+                                      }
+                                    }
+                                  }));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`fw-${vendor}`} className="text-sm">{vendor}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* EDR/XDR */}
+                    <div>
+                      <Label>EDR/XDR Solutions</Label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+                        {["CrowdStrike Falcon", "Microsoft Defender", "SentinelOne", "Carbon Black", "Cortex XDR", "Trend Micro", "Symantec Endpoint", "McAfee MVISION"].map(vendor => (
+                          <div key={vendor} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`edr-${vendor}`}
+                              checked={formData.network_infrastructure.existing_vendors.edr_xdr.includes(vendor)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    network_infrastructure: {
+                                      ...prev.network_infrastructure,
+                                      existing_vendors: {
+                                        ...prev.network_infrastructure.existing_vendors,
+                                        edr_xdr: [...prev.network_infrastructure.existing_vendors.edr_xdr, vendor]
+                                      }
+                                    }
+                                  }));
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    network_infrastructure: {
+                                      ...prev.network_infrastructure,
+                                      existing_vendors: {
+                                        ...prev.network_infrastructure.existing_vendors,
+                                        edr_xdr: prev.network_infrastructure.existing_vendors.edr_xdr.filter(v => v !== vendor)
+                                      }
+                                    }
+                                  }));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`edr-${vendor}`} className="text-sm">{vendor}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="devices" className="space-y-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {Object.entries(formData.network_infrastructure.device_inventory).map(([deviceType, count]) => {
+                        if (deviceType === 'custom_devices') return null;
+                        
+                        const deviceIcons: Record<string, React.ComponentType<{className?: string}>> = {
+                          corporate_laptops: Laptop,
+                          desktop_workstations: Monitor,
+                          mobile_devices: Smartphone,
+                          tablets: Tablet,
+                          iot_devices: Cpu,
+                          printers_mfps: Printer,
+                          security_cameras: Camera,
+                          voip_phones: Phone,
+                          medical_devices: HardDrive,
+                          industrial_controls: Settings,
+                          pos_systems: Database,
+                          digital_signage: Monitor
+                        };
+                        
+                        const IconComponent = deviceIcons[deviceType] || Monitor;
+                        
+                        return (
+                          <div key={deviceType}>
+                            <Label htmlFor={deviceType} className="flex items-center gap-2">
+                              <IconComponent className="h-4 w-4" />
+                              {deviceType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            </Label>
+                            <Input
+                              id={deviceType}
+                              type="number"
+                              value={count}
+                              onChange={(e) => setFormData(prev => ({
+                                ...prev,
+                                network_infrastructure: {
+                                  ...prev.network_infrastructure,
+                                  device_inventory: {
+                                    ...prev.network_infrastructure.device_inventory,
+                                    [deviceType]: parseInt(e.target.value) || 0
+                                  }
+                                }
+                              }))}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      case 2: // Integration & Compliance (moved before use cases)
+        return (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileCheck className="h-5 w-5" />
+                  Integration & Compliance Requirements
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Compliance Frameworks */}
+                <div>
+                  <Label className="text-base font-medium">Compliance Frameworks</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                    {complianceFrameworks.map(framework => (
+                      <div key={framework} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`compliance-${framework}`}
+                          checked={formData.integration_compliance.compliance_frameworks.includes(framework)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setFormData(prev => ({
+                                ...prev,
+                                integration_compliance: {
+                                  ...prev.integration_compliance,
+                                  compliance_frameworks: [...prev.integration_compliance.compliance_frameworks, framework]
+                                }
+                              }));
+                            } else {
+                              setFormData(prev => ({
+                                ...prev,
+                                integration_compliance: {
+                                  ...prev.integration_compliance,
+                                  compliance_frameworks: prev.integration_compliance.compliance_frameworks.filter(f => f !== framework)
+                                }
+                              }));
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`compliance-${framework}`} className="text-sm">{framework}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Current Vendors */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="current-nac">Current NAC Vendor</Label>
+                    <Select
+                      value={formData.integration_compliance.current_nac_vendor}
+                      onValueChange={(value) => setFormData(prev => ({
+                        ...prev,
+                        integration_compliance: { ...prev.integration_compliance, current_nac_vendor: value }
+                      }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select current NAC vendor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {vendorsByCategory.nac_vendors.map(vendor => (
+                          <SelectItem key={vendor} value={vendor}>{vendor}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="current-radius">Current RADIUS Vendor</Label>
+                    <Select
+                      value={formData.integration_compliance.current_radius_vendor}
+                      onValueChange={(value) => setFormData(prev => ({
+                        ...prev,
+                        integration_compliance: { ...prev.integration_compliance, current_radius_vendor: value }
+                      }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select current RADIUS vendor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {vendorsByCategory.radius_vendors.map(vendor => (
+                          <SelectItem key={vendor} value={vendor}>{vendor}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="pki-ca">PKI/Certificate Authority</Label>
+                    <Select
+                      value={formData.integration_compliance.pki_cert_authority}
+                      onValueChange={(value) => setFormData(prev => ({
+                        ...prev,
+                        integration_compliance: { ...prev.integration_compliance, pki_cert_authority: value }
+                      }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select PKI/CA" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {vendorsByCategory.pki_cert_authorities.map(vendor => (
+                          <SelectItem key={vendor} value={vendor}>{vendor}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* NAC Requirements */}
+                <Tabs defaultValue="device-admin" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="device-admin">Device Admin</TabsTrigger>
+                    <TabsTrigger value="authentication">Authentication</TabsTrigger>
+                    <TabsTrigger value="access-control">Access Control</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="device-admin" className="space-y-4">
+                    <div>
+                      <Label className="text-base font-medium">Device Administration Requirements</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                        {nacRequirementCategories.device_administration.map(req => (
+                          <div key={req} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`device-admin-${req}`}
+                              checked={formData.integration_compliance.nac_requirements.device_administration.includes(req)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    integration_compliance: {
+                                      ...prev.integration_compliance,
+                                      nac_requirements: {
+                                        ...prev.integration_compliance.nac_requirements,
+                                        device_administration: [...prev.integration_compliance.nac_requirements.device_administration, req]
+                                      }
+                                    }
+                                  }));
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    integration_compliance: {
+                                      ...prev.integration_compliance,
+                                      nac_requirements: {
+                                        ...prev.integration_compliance.nac_requirements,
+                                        device_administration: prev.integration_compliance.nac_requirements.device_administration.filter(r => r !== req)
+                                      }
+                                    }
+                                  }));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`device-admin-${req}`} className="text-sm">{req}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-base font-medium">MFA Requirements</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                        {nacRequirementCategories.mfa_requirements.map(req => (
+                          <div key={req} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`mfa-${req}`}
+                              checked={formData.integration_compliance.nac_requirements.mfa_requirements.includes(req)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    integration_compliance: {
+                                      ...prev.integration_compliance,
+                                      nac_requirements: {
+                                        ...prev.integration_compliance.nac_requirements,
+                                        mfa_requirements: [...prev.integration_compliance.nac_requirements.mfa_requirements, req]
+                                      }
+                                    }
+                                  }));
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    integration_compliance: {
+                                      ...prev.integration_compliance,
+                                      nac_requirements: {
+                                        ...prev.integration_compliance.nac_requirements,
+                                        mfa_requirements: prev.integration_compliance.nac_requirements.mfa_requirements.filter(r => r !== req)
+                                      }
+                                    }
+                                  }));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`mfa-${req}`} className="text-sm">{req}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="authentication" className="space-y-4">
+                    <div>
+                      <Label className="text-base font-medium">SSO Requirements</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                        {nacRequirementCategories.sso_requirements.map(req => (
+                          <div key={req} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`sso-${req}`}
+                              checked={formData.integration_compliance.nac_requirements.sso_requirements.includes(req)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    integration_compliance: {
+                                      ...prev.integration_compliance,
+                                      nac_requirements: {
+                                        ...prev.integration_compliance.nac_requirements,
+                                        sso_requirements: [...prev.integration_compliance.nac_requirements.sso_requirements, req]
+                                      }
+                                    }
+                                  }));
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    integration_compliance: {
+                                      ...prev.integration_compliance,
+                                      nac_requirements: {
+                                        ...prev.integration_compliance.nac_requirements,
+                                        sso_requirements: prev.integration_compliance.nac_requirements.sso_requirements.filter(r => r !== req)
+                                      }
+                                    }
+                                  }));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`sso-${req}`} className="text-sm">{req}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-base font-medium">802.1x Requirements</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                        {nacRequirementCategories.dot1x_requirements.map(req => (
+                          <div key={req} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`dot1x-${req}`}
+                              checked={formData.integration_compliance.nac_requirements.dot1x_requirements.includes(req)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    integration_compliance: {
+                                      ...prev.integration_compliance,
+                                      nac_requirements: {
+                                        ...prev.integration_compliance.nac_requirements,
+                                        dot1x_requirements: [...prev.integration_compliance.nac_requirements.dot1x_requirements, req]
+                                      }
+                                    }
+                                  }));
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    integration_compliance: {
+                                      ...prev.integration_compliance,
+                                      nac_requirements: {
+                                        ...prev.integration_compliance.nac_requirements,
+                                        dot1x_requirements: prev.integration_compliance.nac_requirements.dot1x_requirements.filter(r => r !== req)
+                                      }
+                                    }
+                                  }));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`dot1x-${req}`} className="text-sm">{req}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-base font-medium">Passwordless Authentication</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                        {nacRequirementCategories.passwordless_auth_requirements.map(req => (
+                          <div key={req} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`passwordless-${req}`}
+                              checked={formData.integration_compliance.nac_requirements.passwordless_auth_requirements.includes(req)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    integration_compliance: {
+                                      ...prev.integration_compliance,
+                                      nac_requirements: {
+                                        ...prev.integration_compliance.nac_requirements,
+                                        passwordless_auth_requirements: [...prev.integration_compliance.nac_requirements.passwordless_auth_requirements, req]
+                                      }
+                                    }
+                                  }));
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    integration_compliance: {
+                                      ...prev.integration_compliance,
+                                      nac_requirements: {
+                                        ...prev.integration_compliance.nac_requirements,
+                                        passwordless_auth_requirements: prev.integration_compliance.nac_requirements.passwordless_auth_requirements.filter(r => r !== req)
+                                      }
+                                    }
+                                  }));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`passwordless-${req}`} className="text-sm">{req}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="access-control" className="space-y-4">
+                    <div>
+                      <Label className="text-base font-medium">Access Control Requirements</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                        {nacRequirementCategories.access_control_requirements.map(req => (
+                          <div key={req} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`access-${req}`}
+                              checked={formData.integration_compliance.nac_requirements.access_control_requirements.includes(req)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    integration_compliance: {
+                                      ...prev.integration_compliance,
+                                      nac_requirements: {
+                                        ...prev.integration_compliance.nac_requirements,
+                                        access_control_requirements: [...prev.integration_compliance.nac_requirements.access_control_requirements, req]
+                                      }
+                                    }
+                                  }));
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    integration_compliance: {
+                                      ...prev.integration_compliance,
+                                      nac_requirements: {
+                                        ...prev.integration_compliance.nac_requirements,
+                                        access_control_requirements: prev.integration_compliance.nac_requirements.access_control_requirements.filter(r => r !== req)
+                                      }
+                                    }
+                                  }));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={`access-${req}`} className="text-sm">{req}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+
+                <Separator />
+
+                {/* Current Authentication Methods */}
+                <div>
+                  <Label className="text-base font-medium">Current Authentication Methods</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+                    {authenticationMethods.map(method => (
+                      <div key={method} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`auth-${method}`}
+                          checked={formData.integration_compliance.current_auth_methods.includes(method)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setFormData(prev => ({
+                                ...prev,
+                                integration_compliance: {
+                                  ...prev.integration_compliance,
+                                  current_auth_methods: [...prev.integration_compliance.current_auth_methods, method]
+                                }
+                              }));
+                            } else {
+                              setFormData(prev => ({
+                                ...prev,
+                                integration_compliance: {
+                                  ...prev.integration_compliance,
+                                  current_auth_methods: prev.integration_compliance.current_auth_methods.filter(m => m !== method)
+                                }
+                              }));
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`auth-${method}`} className="text-sm">{method}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      case 3: // Authentication & Security
+        return (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Authentication & Security
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label className="text-base font-medium">Desired Authentication Methods</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+                    {authenticationMethods.map(method => (
+                      <div key={method} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`desired-auth-${method}`}
+                          checked={formData.authentication_security.desired_auth_methods.includes(method)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setFormData(prev => ({
+                                ...prev,
+                                authentication_security: {
+                                  ...prev.authentication_security,
+                                  desired_auth_methods: [...prev.authentication_security.desired_auth_methods, method]
+                                }
+                              }));
+                            } else {
+                              setFormData(prev => ({
+                                ...prev,
+                                authentication_security: {
+                                  ...prev.authentication_security,
+                                  desired_auth_methods: prev.authentication_security.desired_auth_methods.filter(m => m !== method)
+                                }
+                              }));
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`desired-auth-${method}`} className="text-sm">{method}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <Label className="text-base font-medium">Identity Providers</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                    {["Microsoft Azure AD/Entra ID", "Google Workspace", "Okta", "Auth0", "AWS IAM Identity Center", "OneLogin", "Ping Identity", "ForgeRock"].map(idp => (
+                      <div key={idp} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`idp-${idp}`}
+                          checked={formData.authentication_security.identity_providers.includes(idp)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setFormData(prev => ({
+                                ...prev,
+                                authentication_security: {
+                                  ...prev.authentication_security,
+                                  identity_providers: [...prev.authentication_security.identity_providers, idp]
+                                }
+                              }));
+                            } else {
+                              setFormData(prev => ({
+                                ...prev,
+                                authentication_security: {
+                                  ...prev.authentication_security,
+                                  identity_providers: prev.authentication_security.identity_providers.filter(i => i !== idp)
+                                }
+                              }));
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`idp-${idp}`} className="text-sm">{idp}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      case 4: // Use Cases & Requirements with AI recommendations
+        return (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  Use Cases & Requirements
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={generateAIRecommendations}
+                    disabled={aiAnalysisLoading}
+                    className="ml-auto"
+                  >
+                    {aiAnalysisLoading ? (
+                      <>
+                        <Zap className="h-4 w-4 mr-1 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 className="h-4 w-4 mr-1" />
+                        AI Recommendations
+                      </>
+                    )}
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* AI Recommended Use Cases */}
+                {formData.templates_ai.ai_recommendations.recommended_use_cases.length > 0 && (
+                  <Alert>
+                    <Brain className="h-4 w-4" />
+                    <AlertDescription>
+                      AI has recommended {formData.templates_ai.ai_recommendations.recommended_use_cases.length} use cases based on your industry and requirements.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                <Tabs defaultValue="use-cases" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="use-cases">Use Cases</TabsTrigger>
+                    <TabsTrigger value="requirements">Requirements</TabsTrigger>
+                    <TabsTrigger value="success-criteria">Success Criteria</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="use-cases" className="space-y-4">
+                    <div>
+                      <Label className="text-base font-medium">Available Use Cases</Label>
+                      <div className="grid grid-cols-1 gap-2 mt-2 max-h-60 overflow-y-auto">
+                        {useCasesData.map(useCase => (
+                          <div key={useCase.id} className="flex items-center space-x-2 p-2 border rounded">
+                            <Checkbox
+                              id={`usecase-${useCase.id}`}
+                              checked={formData.use_cases_requirements.selected_use_cases.includes(useCase.id)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    use_cases_requirements: {
+                                      ...prev.use_cases_requirements,
+                                      selected_use_cases: [...prev.use_cases_requirements.selected_use_cases, useCase.id]
+                                    }
+                                  }));
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    use_cases_requirements: {
+                                      ...prev.use_cases_requirements,
+                                      selected_use_cases: prev.use_cases_requirements.selected_use_cases.filter(uc => uc !== useCase.id)
+                                    }
+                                  }));
+                                }
+                              }}
+                            />
+                            <div className="flex-1">
+                              <Label htmlFor={`usecase-${useCase.id}`} className="font-medium">
+                                {useCase.title}
+                                {formData.templates_ai.ai_recommendations.recommended_use_cases.includes(useCase.id) && (
+                                  <Badge variant="secondary" className="ml-2">AI Recommended</Badge>
+                                )}
+                              </Label>
+                              {useCase.description && (
+                                <p className="text-sm text-muted-foreground mt-1">{useCase.description}</p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="requirements" className="space-y-4">
+                    <div>
+                      <Label className="text-base font-medium">Available Requirements</Label>
+                      <div className="grid grid-cols-1 gap-2 mt-2 max-h-60 overflow-y-auto">
+                        {requirementsData.map(requirement => (
+                          <div key={requirement.id} className="flex items-center space-x-2 p-2 border rounded">
+                            <Checkbox
+                              id={`req-${requirement.id}`}
+                              checked={formData.use_cases_requirements.selected_requirements.includes(requirement.id)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    use_cases_requirements: {
+                                      ...prev.use_cases_requirements,
+                                      selected_requirements: [...prev.use_cases_requirements.selected_requirements, requirement.id]
+                                    }
+                                  }));
+                                } else {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    use_cases_requirements: {
+                                      ...prev.use_cases_requirements,
+                                      selected_requirements: prev.use_cases_requirements.selected_requirements.filter(r => r !== requirement.id)
+                                    }
+                                  }));
+                                }
+                              }}
+                            />
+                            <div className="flex-1">
+                              <Label htmlFor={`req-${requirement.id}`} className="font-medium">
+                                {requirement.title}
+                                {formData.templates_ai.ai_recommendations.recommended_requirements.includes(requirement.id) && (
+                                  <Badge variant="secondary" className="ml-2">AI Recommended</Badge>
+                                )}
+                              </Label>
+                              {requirement.description && (
+                                <p className="text-sm text-muted-foreground mt-1">{requirement.description}</p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="success-criteria" className="space-y-4">
+                    <div>
+                      <Label htmlFor="success-criteria">Success Criteria</Label>
+                      <Textarea
+                        id="success-criteria"
+                        placeholder="Define measurable success criteria for this project..."
+                        value={formData.use_cases_requirements.success_criteria.join('\n')}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          use_cases_requirements: {
+                            ...prev.use_cases_requirements,
+                            success_criteria: e.target.value.split('\n').filter(line => line.trim())
+                          }
+                        }))}
+                        rows={6}
+                      />
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      case 5: // AI Analysis & Recommendations
+        return (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Brain className="h-5 w-5" />
+                  AI Analysis & Comprehensive Recommendations
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex gap-2 mb-4">
+                  <Button 
+                    onClick={generateAIRecommendations}
+                    disabled={aiAnalysisLoading}
+                    className="flex-1"
+                  >
+                    {aiAnalysisLoading ? (
+                      <>
+                        <Zap className="h-4 w-4 mr-2 animate-spin" />
+                        Generating AI Analysis...
+                      </>
+                    ) : (
+                      <>
+                        <Brain className="h-4 w-4 mr-2" />
+                        Generate AI Recommendations
+                      </>
+                    )}
+                  </Button>
+                  <Button variant="outline" onClick={exportScopingReport}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export Report
+                  </Button>
+                </div>
+
+                {formData.templates_ai.ai_recommendations.complexity_score > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <Card>
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-primary">
+                          {formData.templates_ai.ai_recommendations.complexity_score}/10
+                        </div>
+                        <div className="text-sm text-muted-foreground">Complexity Score</div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-primary">
+                          {formData.templates_ai.ai_recommendations.estimated_timeline_weeks}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Estimated Weeks</div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-primary">
+                          {formData.templates_ai.ai_recommendations.recommended_vendors.length}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Recommended Vendors</div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-primary">
+                          {formData.templates_ai.ai_recommendations.project_roadmap.length}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Project Phases</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+
+                {formData.templates_ai.ai_recommendations.recommended_vendors.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Recommended Vendors</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {formData.templates_ai.ai_recommendations.recommended_vendors.map((vendor, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 border rounded">
+                            <div>
+                              <div className="font-medium">{vendor.vendor}</div>
+                              <div className="text-sm text-muted-foreground">{vendor.role}</div>
+                            </div>
+                            <div className="text-sm text-muted-foreground max-w-md">
+                              {vendor.justification}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {formData.templates_ai.ai_recommendations.project_roadmap.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Project Roadmap</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {formData.templates_ai.ai_recommendations.project_roadmap.map((phase, index) => (
+                          <div key={index} className="border-l-4 border-primary pl-4">
+                            <div className="flex items-center gap-2">
+                              <div className="font-medium">{phase.phase}</div>
+                              <Badge variant="outline">{phase.duration} weeks</Badge>
+                            </div>
+                            <div className="text-sm text-muted-foreground mt-1">
+                              Deliverables: {phase.deliverables.join(', ')}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                <div className="flex gap-2">
+                  <Button onClick={saveAndContinueToProject} className="flex-1">
+                    <Save className="h-4 w-4 mr-2" />
+                    Save & Create Project
+                  </Button>
+                  <Button variant="outline" onClick={exportScopingReport}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    Generate PDF Report
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      default:
+        return <div>Invalid step</div>;
+    }
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-3xl font-bold">Comprehensive AI Scoping Wizard</h1>
-            <p className="text-muted-foreground">
-              Complete network access control project scoping with AI-powered recommendations
-            </p>
-          </div>
-          <Badge variant="secondary" className="px-3 py-1">
-            Step {currentStep + 1} of {steps.length}
-          </Badge>
-        </div>
-        
-        <Progress value={calculateProgress()} className="h-2" />
-        
-        <div className="flex justify-between mt-4">
-          {steps.map((step, index) => {
-            const Icon = step.icon;
-            return (
-              <div key={step.id} className={`flex flex-col items-center ${index <= currentStep ? 'text-primary' : 'text-muted-foreground'}`}>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${index <= currentStep ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                  <Icon className="h-5 w-5" />
-                </div>
-                <span className="text-xs mt-1 text-center max-w-20">{step.title}</span>
-              </div>
-            );
-          })}
-        </div>
+    <div className="max-w-7xl mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-bold">
+          Comprehensive AI <span className="bg-gradient-primary bg-clip-text text-transparent">Scoping Wizard</span>
+        </h1>
+        <p className="text-muted-foreground">
+          Complete project scoping with AI recommendations, compliance requirements, and comprehensive planning
+        </p>
       </div>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            {React.createElement(steps[currentStep].icon, { className: "h-6 w-6" })}
-            {steps[currentStep].title}
-          </CardTitle>
-          <p className="text-muted-foreground">{steps[currentStep].description}</p>
-        </CardHeader>
-        <CardContent>
-          {renderStepContent()}
+      {/* Progress */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium">Progress</span>
+            <span className="text-sm text-muted-foreground">{Math.round(calculateProgress())}%</span>
+          </div>
+          <Progress value={calculateProgress()} className="h-2" />
         </CardContent>
       </Card>
 
-      <div className="flex justify-between">
-        <Button
-          variant="outline"
-          onClick={currentStep === 0 ? onCancel : handlePrevious}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          {currentStep === 0 ? 'Cancel' : 'Previous'}
-        </Button>
-        
-        {currentStep === steps.length - 1 ? (
-          <Button
-            onClick={handleCreateProject}
-            disabled={!formData.templates_ai.ai_recommendations.deployment_approach || createProject.isPending || updateProject.isPending}
-            className="bg-gradient-primary"
-          >
-            <CheckCircle className="h-4 w-4 mr-2" />
-            {(createProject.isPending || updateProject.isPending) ? 
-              (projectId ? "Updating..." : "Creating...") : 
-              (projectId ? "Complete Project Scoping" : "Create Comprehensive Project")
-            }
-          </Button>
-        ) : (
-          <Button onClick={handleNext}>
-            Next
-            <ArrowRight className="h-4 w-4 ml-2" />
-          </Button>
-        )}
+      {/* Steps Navigation */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between space-x-2 overflow-x-auto">
+            {steps.map((step, index) => {
+              const IconComponent = step.icon;
+              const isActive = index === currentStep;
+              const isCompleted = index < currentStep;
+              
+              return (
+                <div
+                  key={step.id}
+                  className={`flex flex-col items-center space-y-1 min-w-0 flex-1 cursor-pointer transition-colors ${
+                    isActive ? 'text-primary' : isCompleted ? 'text-green-600' : 'text-muted-foreground'
+                  }`}
+                  onClick={() => setCurrentStep(index)}
+                >
+                  <div className={`p-2 rounded-full border-2 ${
+                    isActive ? 'border-primary bg-primary/10' : 
+                    isCompleted ? 'border-green-600 bg-green-600/10' : 
+                    'border-muted'
+                  }`}>
+                    {isCompleted ? (
+                      <CheckCircle className="h-5 w-5" />
+                    ) : (
+                      <IconComponent className="h-5 w-5" />
+                    )}
+                  </div>
+                  <div className="text-xs font-medium text-center truncate max-w-20">
+                    {step.title}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Step Content */}
+      <div className="min-h-96">
+        {renderStepContent()}
       </div>
+
+      {/* Navigation */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex justify-between">
+            <Button
+              variant="outline"
+              onClick={handlePrevious}
+              disabled={currentStep === 0}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Previous
+            </Button>
+            <div className="flex gap-2">
+              {onCancel && (
+                <Button variant="outline" onClick={onCancel}>
+                  Cancel
+                </Button>
+              )}
+              {currentStep < steps.length - 1 ? (
+                <Button onClick={handleNext}>
+                  Next
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              ) : (
+                <Button onClick={saveAndContinueToProject}>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Complete Scoping
+                </Button>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
