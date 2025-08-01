@@ -11,17 +11,65 @@ import {
   Filter, Edit, Trash2, Eye
 } from 'lucide-react';
 
-// For now, we'll create placeholder components until we can access the real ones
-const EnhancedResourceManager = () => <div className="p-4">Enhanced Resource Manager - Coming Soon</div>;
-const ProjectTemplatesManager = () => <div className="p-4">Project Templates Manager - Coming Soon</div>;
-const UseCaseLibraryBrowser = () => <div className="p-4">Use Case Library Browser - Coming Soon</div>;
-const RequirementsManagement = () => <div className="p-4">Requirements Management - Coming Soon</div>;
-const EnhancedVendorManagement = () => <div className="p-4">Enhanced Vendor Management - Coming Soon</div>;
-const EnhancedConfigTemplateManager = () => <div className="p-4">Enhanced Config Template Manager - Coming Soon</div>;
+// Import all the actual components
+import { EnhancedResourceManager } from '@/components/resources/EnhancedResourceManager';
+import EnhancedVendorManagement from '@/components/vendors/EnhancedVendorManagement';
+import UseCaseLibraryBrowser from '@/components/use-cases/UseCaseLibraryBrowser';
+import RequirementsManagement from '@/components/requirements/RequirementsManagement';
+// Temporary placeholders for missing components
+const EnhancedConfigTemplateManager = () => (
+  <div className="p-8 text-center">
+    <h2 className="text-2xl font-bold mb-4">Configuration Templates</h2>
+    <p className="text-muted-foreground">
+      Configuration template management coming soon. This will include device-specific configurations,
+      automation templates, and deployment scripts.
+    </p>
+  </div>
+);
+
+const ProjectTemplatesManager = () => (
+  <div className="p-8 text-center">
+    <h2 className="text-2xl font-bold mb-4">Project Templates</h2>
+    <p className="text-muted-foreground">
+      Project template management coming soon. This will include industry-specific templates,
+      deployment scenarios, and pre-configured project setups.
+    </p>
+  </div>
+);
+
+// Import hooks for real data
+import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
+import { useUseCases } from '@/hooks/useUseCases';
+import { useRequirements } from '@/hooks/useRequirements';
+import { useConfigTemplates } from '@/hooks/useConfigTemplates';
+import { 
+  useIndustryOptions, 
+  useComplianceFrameworks, 
+  useDeploymentTypes, 
+  useSecurityLevels,
+  useBusinessDomains,
+  useAuthenticationMethods,
+  useNetworkSegments,
+  useProjectPhases
+} from '@/hooks/useResourceLibrary';
 
 const ResourceCenter = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('overview');
+
+  // Fetch real data for counts
+  const { data: vendors = [] } = useEnhancedVendors();
+  const { data: useCases = [] } = useUseCases();
+  const { data: requirements = [] } = useRequirements();
+  const { data: configTemplates = [] } = useConfigTemplates();
+  const { data: industries = [] } = useIndustryOptions();
+  const { data: complianceFrameworks = [] } = useComplianceFrameworks();
+  const { data: deploymentTypes = [] } = useDeploymentTypes();
+  const { data: securityLevels = [] } = useSecurityLevels();
+  const { data: businessDomains = [] } = useBusinessDomains();
+  const { data: authenticationMethods = [] } = useAuthenticationMethods();
+  const { data: networkSegments = [] } = useNetworkSegments();
+  const { data: projectPhases = [] } = useProjectPhases();
 
   const resourceCategories = [
     {
@@ -36,77 +84,77 @@ const ResourceCenter = () => {
       name: 'Vendors',
       icon: Building2,
       description: 'NAC, Wireless, Security, EDR, SIEM, Identity, Cloud vendors',
-      count: '150+'
+      count: vendors.length
     },
     {
       id: 'config-templates',
       name: 'Config Templates',
       icon: FileCheck,
       description: 'Configuration templates for all vendor devices',
-      count: '200+'
-    },
-    {
-      id: 'project-templates',
-      name: 'Project Templates',
-      icon: Target,
-      description: 'Industry-specific project templates',
-      count: '25+'
+      count: configTemplates.length
     },
     {
       id: 'use-cases',
       name: 'Use Cases',
       icon: CheckCircle,
       description: 'Authentication and access control use cases',
-      count: '75+'
+      count: useCases.length
     },
     {
       id: 'requirements',
       name: 'Requirements',
       icon: AlertTriangle,
       description: 'Business and technical requirements',
-      count: '100+'
+      count: requirements.length
     },
     {
       id: 'compliance',
       name: 'Compliance',
       icon: Shield,
       description: 'Compliance frameworks and controls',
-      count: '30+'
-    },
-    {
-      id: 'pain-points',
-      name: 'Pain Points',
-      icon: AlertTriangle,
-      description: 'Common business and technical challenges',
-      count: '50+'
+      count: complianceFrameworks.length
     },
     {
       id: 'authentication',
       name: 'Authentication',
       icon: Lock,
       description: 'Authentication methods and workflows',
-      count: '40+'
-    },
-    {
-      id: 'devices',
-      name: 'Device Types',
-      icon: Smartphone,
-      description: 'Network device types and categories',
-      count: '80+'
+      count: authenticationMethods.length
     },
     {
       id: 'network-segments',
       name: 'Network Segments',
       icon: Network,
       description: 'Network segmentation patterns',
-      count: '20+'
+      count: networkSegments.length
     },
     {
       id: 'industries',
       name: 'Industries',
       icon: Building2,
       description: 'Industry-specific configurations',
-      count: '15+'
+      count: industries.length
+    },
+    {
+      id: 'security-levels',
+      name: 'Security Levels',
+      icon: Shield,
+      description: 'Security level classifications',
+      count: securityLevels.length
+    },
+    {
+      id: 'business-domains',
+      name: 'Business Domains',
+      icon: Target,
+      description: 'Business domain classifications',
+      count: businessDomains.length
+    },
+    {
+      id: 'deployment-types',
+      name: 'Deployment Types',
+      icon: Settings,
+      description: 'Different deployment approaches',
+      count: deploymentTypes.length
     }
   ];
 
@@ -251,12 +299,18 @@ const ResourceCenter = () => {
         return <EnhancedVendorManagement />;
       case 'config-templates':
         return <EnhancedConfigTemplateManager />;
-      case 'project-templates':
-        return <ProjectTemplatesManager />;
       case 'use-cases':
         return <UseCaseLibraryBrowser />;
       case 'requirements':
         return <RequirementsManagement />;
+      case 'compliance':
+      case 'authentication':
+      case 'network-segments':
+      case 'industries':
+      case 'security-levels':
+      case 'business-domains':
+      case 'deployment-types':
+        return <EnhancedResourceManager />;
       case 'overview':
       default:
         return renderOverview();
@@ -292,21 +346,28 @@ const ResourceCenter = () => {
 
       {/* Category Tabs */}
       <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
-        <TabsList className="grid w-full grid-cols-6 lg:grid-cols-12">
-          {resourceCategories.map((category) => {
-            const IconComponent = category.icon;
-            return (
-              <TabsTrigger
-                key={category.id}
-                value={category.id}
-                className="flex items-center gap-1 text-xs"
-              >
-                <IconComponent className="h-3 w-3" />
-                <span className="hidden sm:inline">{category.name}</span>
-              </TabsTrigger>
-            );
-          })}
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground w-max">
+            {resourceCategories.map((category) => {
+              const IconComponent = category.icon;
+              return (
+                <TabsTrigger
+                  key={category.id}
+                  value={category.id}
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                >
+                  <IconComponent className="h-4 w-4 mr-2" />
+                  <span>{category.name}</span>
+                  {category.count !== '--' && (
+                    <Badge variant="secondary" className="ml-2 text-xs">
+                      {category.count}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+        </div>
 
         <TabsContent value={activeCategory} className="mt-6">
           {renderCategoryContent()}
