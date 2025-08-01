@@ -5,7 +5,7 @@ import { EnhancedCard } from "@/components/ui/enhanced-card";
 import { EnhancedButton } from "@/components/ui/enhanced-button";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle, Bot } from "lucide-react";
-import IntelligentAIScopingWizard from "@/components/scoping/IntelligentAIScopingWizard";
+import EnhancedAIScopingWizard from "@/components/scoping/EnhancedAIScopingWizard";
 import AIAssistant from "@/components/ai/AIAssistant";
 
 const ProjectScoping = () => {
@@ -81,11 +81,10 @@ const ProjectScoping = () => {
             </CardContent>
           </EnhancedCard>
 
-          <IntelligentAIScopingWizard
-            projectId={projectId!}
-            onComplete={handleScopingComplete}
-            onCancel={handleCancel}
-          />
+            <EnhancedAIScopingWizard
+              onComplete={(session) => navigate(`/project/${session.projectId}/tracking`)}
+              onCancel={handleCancel}
+            />
         </div>
 
         <div className="space-y-6">
