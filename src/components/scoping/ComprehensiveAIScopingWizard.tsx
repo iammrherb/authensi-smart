@@ -11,7 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { 
   Building2, Network, Shield, Users, Target, Clock, Brain, CheckCircle, 
   AlertTriangle, Globe, Server, Wifi, Lock, Smartphone, Database, FileCheck,
@@ -842,6 +842,9 @@ Complexity score: ${formData.templates_ai.ai_recommendations.complexity_score}/1
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Add Custom Pain Point</DialogTitle>
+                  <DialogDescription>
+                    Create a custom pain point that will be saved to the resource library for future use.
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>

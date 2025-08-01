@@ -37,6 +37,7 @@ import ProjectDetails from "./pages/ProjectDetails";
 import IntelligenceTrackerHub from "./pages/IntelligenceTrackerHub";
 import ImplementationCenter from "./pages/ImplementationCenter";
 import Resources from "./pages/Resources";
+import ResourceCenter from "./pages/ResourceCenter";
 import ProjectCreation from "./pages/ProjectCreation";
 import OneXerWizardPage from "./pages/OneXerWizard";
 import AIConfigCenter from "./pages/AIConfigCenter";
@@ -134,6 +135,11 @@ const App = () => (
               <Route path="/resources" element={
                 <ProtectedRoute>
                   <Resources />
+                </ProtectedRoute>
+              } />
+              <Route path="/resource-center" element={
+                <ProtectedRoute>
+                  <ResourceCenter />
                 </ProtectedRoute>
               } />
               <Route path="/project-creation" element={
