@@ -12,7 +12,7 @@ import {
   Globe, Server, Database, Monitor, Smartphone, Lock, Building2
 } from 'lucide-react';
 
-import { useVendors } from '@/hooks/useVendors';
+import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { 
@@ -26,6 +26,7 @@ import {
   useProjectPhases
 } from '@/hooks/useResourceLibrary';
 import { EnhancedResourceManager } from '@/components/resources/EnhancedResourceManager';
+import { ResourceCreationDialog } from '@/components/wizards/ResourceCreationDialog';
 import { useCreateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
 import { PortnoxDocumentationService, type PortnoxDocumentationResult } from '@/services/PortnoxDocumentationService';
@@ -65,7 +66,7 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
   const [currentSession, setCurrentSession] = useState<EnhancedScopingSession | null>(existingSession || null);
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
 
-  const { data: vendors = [] } = useVendors();
+  const { data: vendors = [] } = useEnhancedVendors();
   const { data: useCases = [] } = useUseCases();
   const { data: requirements = [] } = useRequirements();
   const createProjectMutation = useCreateProject();
