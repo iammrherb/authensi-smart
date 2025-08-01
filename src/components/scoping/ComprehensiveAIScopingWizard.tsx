@@ -21,6 +21,16 @@ import {
 import { useVendors } from '@/hooks/useVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
+import { 
+  useIndustryOptions, 
+  useComplianceFrameworks, 
+  useDeploymentTypes, 
+  useSecurityLevels,
+  useBusinessDomains,
+  useAuthenticationMethods,
+  useNetworkSegments,
+  useProjectPhases
+} from '@/hooks/useResourceLibrary';
 import { useCreateProject, useUpdateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
 import AIWorkflowEngine from '@/components/ai/AIWorkflowEngine';
@@ -238,6 +248,18 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
   onComplete,
   onCancel
 }) => {
+  // Resource library hooks
+  const { data: industryOptions = [] } = useIndustryOptions();
+  const { data: complianceFrameworksData = [] } = useComplianceFrameworks();
+  const { data: deploymentTypesData = [] } = useDeploymentTypes();
+  const { data: securityLevelsData = [] } = useSecurityLevels();
+  const { data: businessDomainsData = [] } = useBusinessDomains();
+  const { data: authenticationMethodsData = [] } = useAuthenticationMethods();
+  const { data: networkSegmentsData = [] } = useNetworkSegments();
+  const { data: projectPhasesData = [] } = useProjectPhases();
+  const { data: vendorsData = [] } = useVendors();
+  const { data: useCasesData = [] } = useUseCases();
+  const { data: requirementsData = [] } = useRequirements();
   const [currentStep, setCurrentStep] = useState(0);
   const [aiAnalysisLoading, setAiAnalysisLoading] = useState(false);
   const [formData, setFormData] = useState<ComprehensiveScopingData>({
@@ -342,17 +364,24 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
     }
   ];
 
-  // Data arrays for dropdowns
-  const industries = [
-    "Healthcare & Life Sciences", "Financial Services", "Government & Public Sector",
-    "Education", "Manufacturing", "Retail & Hospitality", "Technology", 
-    "Energy & Utilities", "Transportation", "Legal Services", "Other"
-  ];
-
-  const complianceFrameworks = [
-    "HIPAA", "PCI-DSS", "SOX", "GDPR", "SOC 2", "ISO 27001",
-    "NIST", "FedRAMP", "FISMA", "CMMC", "NERC CIP", "21 CFR Part 11"
-  ];
+  // Convert resource library data to arrays for compatibility
+  const industries = industryOptions.map(option => option.name);
+  const complianceFrameworks = complianceFrameworksData.map(framework => framework.name);
+  const deploymentTypes = deploymentTypesData.map(type => type.name);
+  const securityLevels = securityLevelsData.map(level => level.name);
+  const businessDomains = businessDomainsData.map(domain => domain.name);
+  const authenticationMethods = authenticationMethodsData.map(method => method.name);
+  const networkSegments = networkSegmentsData.map(segment => segment.name);
+  const projectPhases = projectPhasesData.map(phase => phase.name);
+  
+  // Dynamic vendor data from resource library
+  const resourceVendors = vendorsData.reduce((acc, vendor) => {
+    if (!acc[vendor.vendor_type]) {
+      acc[vendor.vendor_type] = [];
+    }
+    acc[vendor.vendor_type].push(vendor.vendor_name);
+    return acc;
+  }, {} as Record<string, string[]>);
 
   // Comprehensive Vendor Lists
   const networkVendors = {
@@ -462,13 +491,7 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
     "ManageEngine OpUtils", "SolarWinds Network Discovery", "Spiceworks Network Scanner"
   ];
 
-  const authenticationMethods = [
-    "802.1X with Certificates", "802.1X with Credentials", "MAC Authentication Bypass",
-    "Web Authentication (Captive Portal)", "SAML/SSO Integration", "Multi-Factor Authentication",
-    "Mobile Device Certificates", "Guest Self-Registration", "Sponsored Guest Access",
-    "Certificate-Based Device Authentication", "Active Directory Integration",
-    "LDAP Authentication", "RADIUS Authentication", "OAuth 2.0", "OpenID Connect"
-  ];
+  // authenticationMethods is now defined from resource library above
 
   const integrationSystems = [
     "Microsoft Intune", "VMware Workspace ONE", "Jamf Pro", "ServiceNow",

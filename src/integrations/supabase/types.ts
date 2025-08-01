@@ -79,6 +79,54 @@ export type Database = {
           },
         ]
       }
+      authentication_methods: {
+        Row: {
+          configuration_complexity: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          documentation_links: Json | null
+          id: string
+          is_active: boolean | null
+          method_type: string
+          name: string
+          portnox_integration: Json | null
+          security_level: string | null
+          updated_at: string | null
+          vendor_support: Json | null
+        }
+        Insert: {
+          configuration_complexity?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          documentation_links?: Json | null
+          id?: string
+          is_active?: boolean | null
+          method_type: string
+          name: string
+          portnox_integration?: Json | null
+          security_level?: string | null
+          updated_at?: string | null
+          vendor_support?: Json | null
+        }
+        Update: {
+          configuration_complexity?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          documentation_links?: Json | null
+          id?: string
+          is_active?: boolean | null
+          method_type?: string
+          name?: string
+          portnox_integration?: Json | null
+          security_level?: string | null
+          updated_at?: string | null
+          vendor_support?: Json | null
+        }
+        Relationships: []
+      }
       authentication_workflows: {
         Row: {
           authentication_method: string
@@ -178,6 +226,78 @@ export type Database = {
           template_name?: string
           updated_at?: string
           validation_rules?: Json
+        }
+        Relationships: []
+      }
+      business_domains: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          industry_alignment: Json | null
+          is_active: boolean | null
+          name: string
+          typical_use_cases: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          industry_alignment?: Json | null
+          is_active?: boolean | null
+          name: string
+          typical_use_cases?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          industry_alignment?: Json | null
+          is_active?: boolean | null
+          name?: string
+          typical_use_cases?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      compliance_frameworks: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          industry_specific: Json | null
+          is_active: boolean | null
+          name: string
+          requirements: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          industry_specific?: Json | null
+          is_active?: boolean | null
+          name: string
+          requirements?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          industry_specific?: Json | null
+          is_active?: boolean | null
+          name?: string
+          requirements?: Json | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -653,6 +773,45 @@ export type Database = {
         }
         Relationships: []
       }
+      deployment_types: {
+        Row: {
+          complexity_level: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          requirements: Json | null
+          typical_timeline: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          complexity_level?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          requirements?: Json | null
+          typical_timeline?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          complexity_level?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          requirements?: Json | null
+          typical_timeline?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       implementation_checklists: {
         Row: {
           assigned_to: string | null
@@ -716,6 +875,39 @@ export type Database = {
           },
         ]
       }
+      industry_options: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       network_authentication_scenarios: {
         Row: {
           authentication_flow: Json
@@ -767,6 +959,48 @@ export type Database = {
           updated_at?: string
           use_cases?: Json | null
           vendor_specific_configs?: Json | null
+        }
+        Relationships: []
+      }
+      network_segments: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          security_requirements: Json | null
+          segment_type: string
+          typical_size_range: string | null
+          updated_at: string | null
+          vendor_considerations: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          security_requirements?: Json | null
+          segment_type: string
+          typical_size_range?: string | null
+          updated_at?: string | null
+          vendor_considerations?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          security_requirements?: Json | null
+          segment_type?: string
+          typical_size_range?: string | null
+          updated_at?: string | null
+          vendor_considerations?: Json | null
         }
         Relationships: []
       }
@@ -1129,6 +1363,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      project_phases: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          deliverables: Json | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          phase_order: number | null
+          prerequisites: Json | null
+          success_criteria: Json | null
+          typical_duration: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          deliverables?: Json | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          phase_order?: number | null
+          prerequisites?: Json | null
+          success_criteria?: Json | null
+          typical_duration?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          deliverables?: Json | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          phase_order?: number | null
+          prerequisites?: Json | null
+          success_criteria?: Json | null
+          typical_duration?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       project_requirements: {
         Row: {
@@ -1878,6 +2157,42 @@ export type Database = {
           ip_address?: unknown | null
           user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      security_levels: {
+        Row: {
+          compliance_mappings: Json | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          requirements: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          compliance_mappings?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          requirements?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          compliance_mappings?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          requirements?: Json | null
+          updated_at?: string | null
         }
         Relationships: []
       }

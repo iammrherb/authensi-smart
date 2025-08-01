@@ -23,6 +23,7 @@ import EnhancedVendorManagement from "@/components/vendors/EnhancedVendorManagem
 import RequirementsManagement from "@/components/requirements/RequirementsManagement";
 import UseCaseLibraryBrowser from "@/components/use-cases/UseCaseLibraryBrowser";
 import ProjectTemplatesManager from "@/components/templates/ProjectTemplatesManager";
+import { EnhancedResourceManager } from "@/components/resources/EnhancedResourceManager";
 
 const Resources = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -128,8 +129,12 @@ const Resources = () => {
             </div>
 
             {/* Main Resource Management Tabs */}
-            <Tabs defaultValue="templates" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4 max-w-3xl mx-auto">
+            <Tabs defaultValue="library" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-5 max-w-4xl mx-auto">
+                <TabsTrigger value="library" className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  <span className="hidden sm:inline">Library</span>
+                </TabsTrigger>
                 <TabsTrigger value="templates" className="flex items-center gap-2">
                   <Folder className="h-4 w-4" />
                   <span className="hidden sm:inline">Templates</span>
@@ -147,6 +152,21 @@ const Resources = () => {
                   <span className="hidden sm:inline">Vendors</span>
                 </TabsTrigger>
               </TabsList>
+
+              {/* Enhanced Resource Library Tab */}
+              <TabsContent value="library" className="space-y-6">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <Settings className="h-6 w-6 text-primary" />
+                    <h2 className="text-2xl font-bold">Enhanced Resource Library</h2>
+                  </div>
+                  <p className="text-muted-foreground mb-6">
+                    Comprehensive resource management including vendors, use cases, requirements, 
+                    industries, compliance frameworks, deployment types, and more.
+                  </p>
+                </div>
+                <EnhancedResourceManager />
+              </TabsContent>
 
               {/* Project Templates Tab */}
               <TabsContent value="templates" className="space-y-6">

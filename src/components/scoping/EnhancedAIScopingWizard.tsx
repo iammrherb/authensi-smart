@@ -15,6 +15,16 @@ import {
 import { useVendors } from '@/hooks/useVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
+import { 
+  useIndustryOptions, 
+  useComplianceFrameworks, 
+  useDeploymentTypes, 
+  useSecurityLevels,
+  useBusinessDomains,
+  useAuthenticationMethods,
+  useNetworkSegments,
+  useProjectPhases
+} from '@/hooks/useResourceLibrary';
 import { EnhancedResourceManager } from '@/components/resources/EnhancedResourceManager';
 import { useCreateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
