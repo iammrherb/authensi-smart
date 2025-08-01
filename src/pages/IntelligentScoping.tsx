@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AIScopingDialog from '@/components/scoping/AIScopingDialog';
+import ComprehensiveAIScopingWizard from '@/components/scoping/ComprehensiveAIScopingWizard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -155,12 +156,24 @@ const IntelligentScoping = () => {
               </div>
             )}
 
-            {/* AI Scoping Dialog */}
-            <AIScopingDialog
-              isOpen={showScopingDialog}
-              onClose={() => setShowScopingDialog(false)}
-              onCreateProject={handleCreateProject}
-            />
+            {/* AI Scoping Wizard - Inline */}
+            {showScopingDialog && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold">AI Scoping Wizard</h2>
+                  <Button variant="outline" onClick={() => setShowScopingDialog(false)}>
+                    Close
+                  </Button>
+                </div>
+                <ComprehensiveAIScopingWizard
+                  onComplete={(projectId, scopingData) => {
+                    handleCreateProject(scopingData);
+                    setShowScopingDialog(false);
+                  }}
+                  onCancel={() => setShowScopingDialog(false)}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
