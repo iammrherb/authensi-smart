@@ -37,7 +37,7 @@ const EnhancedCommandCenter: React.FC = () => {
       description: 'Start comprehensive project scoping with AI recommendations',
       icon: Brain,
       color: 'from-purple-500 to-blue-600',
-      path: '/intelligent-scoping'
+      path: '/scoping'
     },
     {
       id: 'create-project',
@@ -45,7 +45,7 @@ const EnhancedCommandCenter: React.FC = () => {
       description: 'Launch new Portnox deployment project',
       icon: Target,
       color: 'from-green-500 to-emerald-600',
-      path: '/dashboard'
+      path: '/scoping'
     },
     {
       id: 'resource-library',
@@ -53,7 +53,7 @@ const EnhancedCommandCenter: React.FC = () => {
       description: 'Manage vendors, use cases, and requirements',
       icon: Building2,
       color: 'from-blue-500 to-cyan-600',
-      action: () => setActiveTab('resources')
+      path: '/resources'
     },
     {
       id: 'reports',
@@ -69,7 +69,7 @@ const EnhancedCommandCenter: React.FC = () => {
       description: 'View insights and performance metrics',
       icon: BarChart3,
       color: 'from-indigo-500 to-purple-600',
-      path: '/intelligence-tracker-hub'
+      path: '/intelligence'
     },
     {
       id: 'user-management',
@@ -181,7 +181,7 @@ const EnhancedCommandCenter: React.FC = () => {
               <Target className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
               <h3 className="text-lg font-semibold mb-2">No Projects Yet</h3>
               <p className="text-muted-foreground mb-4">Start by creating your first Portnox deployment project</p>
-              <Button onClick={() => navigate('/intelligent-scoping')}>
+              <Button onClick={() => navigate('/scoping')}>
                 <Brain className="h-4 w-4 mr-2" />
                 Start AI Scoping
               </Button>
@@ -249,7 +249,7 @@ const EnhancedCommandCenter: React.FC = () => {
                 <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-lg font-semibold mb-2">No Projects Available</h3>
                 <p className="text-muted-foreground mb-4">Create a project first to generate reports</p>
-                <Button onClick={() => navigate('/intelligent-scoping')}>
+                <Button onClick={() => navigate('/scoping')}>
                   <Brain className="h-4 w-4 mr-2" />
                   Start New Project
                 </Button>
