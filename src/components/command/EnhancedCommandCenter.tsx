@@ -45,7 +45,7 @@ const EnhancedCommandCenter: React.FC = () => {
       description: 'Launch new Portnox deployment project',
       icon: Target,
       color: 'from-green-500 to-emerald-600',
-      path: '/scoping'
+      path: '/project-creation'
     },
     {
       id: 'resource-library',
