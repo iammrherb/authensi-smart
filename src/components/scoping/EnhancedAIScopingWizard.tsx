@@ -9,12 +9,13 @@ import { Separator } from '@/components/ui/separator';
 import { 
   Brain, FileText, Network, Shield, Target, Users, CheckCircle, 
   ArrowRight, ArrowLeft, Download, Save, Zap, BookOpen, Settings,
-  Globe, Server, Database, Monitor, Smartphone, Lock
+  Globe, Server, Database, Monitor, Smartphone, Lock, Building2
 } from 'lucide-react';
 
 import { useVendors } from '@/hooks/useVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
+import { EnhancedResourceManager } from '@/components/resources/EnhancedResourceManager';
 import { useCreateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
 import { PortnoxDocumentationService, type PortnoxDocumentationResult } from '@/services/PortnoxDocumentationService';
@@ -130,6 +131,26 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
       title: "Scoping Complete",
       description: "Ready to generate comprehensive documentation",
     });
+  };
+
+  const handleResourceSelect = (resource: any, type: 'vendor' | 'usecase' | 'requirement') => {
+    switch (type) {
+      case 'vendor':
+        if (!selectedVendors.some(v => v.id === resource.id)) {
+          setSelectedVendors([...selectedVendors, resource]);
+        }
+        break;
+      case 'usecase':
+        if (!selectedUseCases.some(uc => uc.id === resource.id)) {
+          setSelectedUseCases([...selectedUseCases, resource]);
+        }
+        break;
+      case 'requirement':
+        if (!selectedRequirements.some(req => req.id === resource.id)) {
+          setSelectedRequirements([...selectedRequirements, resource]);
+        }
+        break;
+    }
   };
 
   const generateComprehensiveDocumentation = async () => {
@@ -275,10 +296,35 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
               </AlertDescription>
             </Alert>
             
-            <ComprehensiveAIScopingWizard
-              onComplete={handleScopingComplete}
-              onCancel={onCancel}
-            />
+            <div className="space-y-6">
+              <ComprehensiveAIScopingWizard
+                onComplete={handleScopingComplete}
+                onCancel={onCancel}
+              />
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5" />
+                    Resource Library Integration
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Select additional vendors, use cases, and requirements from your resource library
+                  </p>
+                  
+                  <EnhancedResourceManager 
+                    onResourceSelect={handleResourceSelect}
+                    selectedResources={{
+                      vendors: selectedVendors,
+                      useCases: selectedUseCases,
+                      requirements: selectedRequirements
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            </div>
           </div>
         );
         

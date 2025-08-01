@@ -92,7 +92,17 @@ export const useProject = (id: string) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('projects')
-        .select('*')
+        .select(`
+          id, name, description, client_name, business_domain, business_website, 
+          business_summary, project_type, industry, primary_country, primary_region, 
+          timezone, deployment_type, security_level, total_sites, total_endpoints, 
+          budget, project_manager, project_owner, technical_owner, portnox_owner, 
+          additional_stakeholders, compliance_frameworks, pain_points, success_criteria, 
+          integration_requirements, enable_bulk_sites, enable_bulk_users, enable_auto_vendors, 
+          start_date, target_completion, status, current_phase, progress_percentage, 
+          created_by, bulk_sites_data, migration_scope, created_at, updated_at, 
+          actual_completion, template_id, poc_status
+        `)
         .eq('id', id)
         .maybeSingle();
       
