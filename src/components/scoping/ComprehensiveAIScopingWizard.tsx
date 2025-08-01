@@ -650,7 +650,7 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
         pain_points: formData.organization.pain_points,
         success_criteria: formData.use_cases_requirements.success_criteria,
         status: 'planning' as const,
-        current_phase: 'requirements' as const,
+        current_phase: 'scoping' as const,
         progress_percentage: 25,
         business_summary: generateBusinessSummary()
       };
@@ -747,9 +747,9 @@ Complexity score: ${formData.templates_ai.ai_recommendations.complexity_score}/1
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="SMB">SMB (< 500 users)</SelectItem>
+                        <SelectItem value="SMB">SMB (&lt; 500 users)</SelectItem>
                         <SelectItem value="Mid-Market">Mid-Market (500-5000 users)</SelectItem>
-                        <SelectItem value="Enterprise">Enterprise (> 5000 users)</SelectItem>
+                        <SelectItem value="Enterprise">Enterprise (&gt; 5000 users)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -1157,7 +1157,6 @@ Complexity score: ${formData.templates_ai.ai_recommendations.complexity_score}/1
                   </TabsContent>
 
                   <TabsContent value="devices" className="space-y-4">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {Object.entries(formData.network_infrastructure.device_inventory).map(([deviceType, count]) => {
                         if (deviceType === 'custom_devices') return null;
                         
@@ -1187,7 +1186,7 @@ Complexity score: ${formData.templates_ai.ai_recommendations.complexity_score}/1
                             <Input
                               id={deviceType}
                               type="number"
-                              value={count}
+                              value={count as number}
                               onChange={(e) => setFormData(prev => ({
                                 ...prev,
                                 network_infrastructure: {
@@ -1780,7 +1779,7 @@ Complexity score: ${formData.templates_ai.ai_recommendations.complexity_score}/1
                             />
                             <div className="flex-1">
                               <Label htmlFor={`usecase-${useCase.id}`} className="font-medium">
-                                {useCase.title}
+                                {useCase.name || useCase.title}
                                 {formData.templates_ai.ai_recommendations.recommended_use_cases.includes(useCase.id) && (
                                   <Badge variant="secondary" className="ml-2">AI Recommended</Badge>
                                 )}
