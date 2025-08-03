@@ -56,7 +56,7 @@ const QuickNav = () => {
   ];
 
   const quickActions = [
-    { title: "Use Case Library", href: "/use-cases", icon: <BookOpen className="h-5 w-5" />, description: "200+ pre-built cases" },
+    { title: "Resource Center", href: "/resource-center", icon: <BookOpen className="h-5 w-5" />, description: "Vendors, use cases, templates" },
     { title: "Site Management", href: "/sites", icon: <Building2 className="h-5 w-5" />, description: "Manage deployment sites" },
     { title: "Questionnaires", href: "/questionnaires", icon: <FileText className="h-5 w-5" />, description: "Requirements capture" },
     { title: "Deployment Planner", href: "/deployment", icon: <Rocket className="h-5 w-5" />, description: "Go-live planning" },

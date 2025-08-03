@@ -36,7 +36,7 @@ import UseCaseLibrary from "./pages/UseCaseLibrary";
 import ProjectDetails from "./pages/ProjectDetails";
 import IntelligenceTrackerHub from "./pages/IntelligenceTrackerHub";
 import ImplementationCenter from "./pages/ImplementationCenter";
-import Resources from "./pages/Resources";
+
 import ResourceCenter from "./pages/ResourceCenter";
 import ProjectCreation from "./pages/ProjectCreation";
 import OneXerWizardPage from "./pages/OneXerWizard";
@@ -134,7 +134,7 @@ const App = () => (
               {/* Knowledge & Resources */}
               <Route path="/resources" element={
                 <ProtectedRoute>
-                  <Resources />
+                  <ResourceCenter />
                 </ProtectedRoute>
               } />
               <Route path="/resource-center" element={

@@ -41,7 +41,7 @@ const navigationItems = [
     title: "Knowledge & Resources",
     icon: BookOpen,
     items: [
-      { title: "Use Case Library", url: "/use-cases", icon: BookOpen, description: "200+ pre-built use cases" },
+      { title: "Resource Center", url: "/resource-center", icon: Archive, description: "Centralized vendors, templates, use cases & requirements" },
       { title: "Site Management", url: "/sites", icon: Building2, description: "Site configuration (Project-based)" },
       { title: "Scoping Questionnaires", url: "/questionnaires", icon: FileText, description: "Requirements capture" },
     ]
@@ -51,7 +51,6 @@ const navigationItems = [
     icon: Settings,
     items: [
       { title: "Team Management", url: "/users", icon: Users, description: "User & role management" },
-      { title: "Vendor Library", url: "/vendors", icon: Archive, description: "Vendor configurations" },
       { title: "System Settings", url: "/settings", icon: Settings, description: "Platform configuration" },
     ]
   }
