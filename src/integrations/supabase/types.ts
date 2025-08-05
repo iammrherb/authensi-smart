@@ -699,7 +699,22 @@ export type Database = {
           vendor_id?: string | null
           wizard_parameters?: Json | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "configuration_templates_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "configuration_templates_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_library"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       countries_regions: {
         Row: {
@@ -799,63 +814,6 @@ export type Database = {
           name?: string
           requirements?: Json | null
           typical_timeline?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      device_types: {
-        Row: {
-          authentication_capabilities: Json | null
-          category: string
-          compliance_requirements: Json | null
-          created_at: string | null
-          created_by: string | null
-          deployment_considerations: Json | null
-          description: string | null
-          device_name: string
-          id: string
-          integration_complexity: string | null
-          management_options: Json | null
-          manufacturer: string
-          operating_systems: Json | null
-          security_features: Json | null
-          typical_use_cases: Json | null
-          updated_at: string | null
-        }
-        Insert: {
-          authentication_capabilities?: Json | null
-          category: string
-          compliance_requirements?: Json | null
-          created_at?: string | null
-          created_by?: string | null
-          deployment_considerations?: Json | null
-          description?: string | null
-          device_name: string
-          id?: string
-          integration_complexity?: string | null
-          management_options?: Json | null
-          manufacturer: string
-          operating_systems?: Json | null
-          security_features?: Json | null
-          typical_use_cases?: Json | null
-          updated_at?: string | null
-        }
-        Update: {
-          authentication_capabilities?: Json | null
-          category?: string
-          compliance_requirements?: Json | null
-          created_at?: string | null
-          created_by?: string | null
-          deployment_considerations?: Json | null
-          description?: string | null
-          device_name?: string
-          id?: string
-          integration_complexity?: string | null
-          management_options?: Json | null
-          manufacturer?: string
-          operating_systems?: Json | null
-          security_features?: Json | null
-          typical_use_cases?: Json | null
           updated_at?: string | null
         }
         Relationships: []
