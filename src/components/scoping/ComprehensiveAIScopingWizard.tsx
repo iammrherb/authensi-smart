@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 
 import { useVendors } from '@/hooks/useVendors';
+import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { usePainPoints, useCreatePainPoint } from '@/hooks/usePainPoints';
@@ -38,6 +39,7 @@ import {
 import { useCreateProject, useUpdateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
 import { useAI } from '@/hooks/useAI';
+import EnhancedScopingActions from './EnhancedScopingActions';
 
 interface ComprehensiveScopingData {
   // Organization Profile
@@ -272,6 +274,7 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
   const { data: vendors = [] } = useVendors();
   const { data: useCases = [] } = useUseCases();
   const { data: requirements = [] } = useRequirements();
+  const { data: enhancedVendors = [] } = useEnhancedVendors();
   const createProject = useCreateProject();
   const updateProject = useUpdateProject();
   const { toast } = useToast();
@@ -338,24 +341,48 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
     ]
   };
 
+  // Enhanced vendor categories with comprehensive vendor options
   const vendorsByCategory = {
-    nac_vendors: [
-      "Portnox", "Cisco ISE", "Aruba ClearPass", "ForeScout CounterACT",
-      "Bradford Campus Manager", "Impulse SafeConnect", "Extreme Control",
-      "Microsoft NPS", "Juniper Policy Enforcer", "PacketFence"
-    ],
-    radius_vendors: [
-      "Microsoft NPS", "FreeRADIUS", "Cisco ISE", "Aruba ClearPass",
-      "Steel-Belted RADIUS", "RSA Authentication Manager", "TekRADIUS",
-      "Radiator", "Elektron", "WinRadius"
-    ],
-    pki_cert_authorities: [
-      "Microsoft Active Directory Certificate Services", "DigiCert", "Entrust",
-      "GlobalSign", "Verisign", "Comodo", "OpenSSL-based internal CA",
-      "AWS Certificate Manager", "Azure Key Vault", "HashiCorp Vault",
-      "EJBCA", "Dogtag Certificate System"
-    ]
+    nac_vendors: enhancedVendors.filter(v => v.category === 'NAC' || v.vendor_type === 'NAC').map(v => v.vendor_name),
+    wired_switches: enhancedVendors.filter(v => v.category === 'Wired Switch' || v.vendor_type === 'Switch').map(v => v.vendor_name),
+    wireless_aps: enhancedVendors.filter(v => v.category === 'Wireless' || v.vendor_type === 'Access Point').map(v => v.vendor_name),
+    routers: enhancedVendors.filter(v => v.category === 'Router' || v.vendor_type === 'Router').map(v => v.vendor_name),
+    firewalls: enhancedVendors.filter(v => v.category === 'Firewall' || v.vendor_type === 'Security').map(v => v.vendor_name),
+    vpn_solutions: enhancedVendors.filter(v => v.category === 'VPN' || v.vendor_type === 'VPN').map(v => v.vendor_name),
+    edr_xdr: enhancedVendors.filter(v => v.category === 'EDR' || v.category === 'XDR' || v.vendor_type === 'Security').map(v => v.vendor_name),
+    siem_mdr: enhancedVendors.filter(v => v.category === 'SIEM' || v.category === 'MDR' || v.vendor_type === 'Security').map(v => v.vendor_name),
+    mfa_solutions: enhancedVendors.filter(v => v.category === 'MFA' || v.vendor_type === 'Authentication').map(v => v.vendor_name),
+    sso_solutions: enhancedVendors.filter(v => v.category === 'SSO' || v.vendor_type === 'Identity').map(v => v.vendor_name),
+    identity_providers: enhancedVendors.filter(v => v.category === 'IDP' || v.vendor_type === 'Identity').map(v => v.vendor_name),
+    radius_vendors: enhancedVendors.filter(v => v.category === 'RADIUS' || v.vendor_type === 'Authentication').map(v => v.vendor_name),
+    pki_cert_authorities: enhancedVendors.filter(v => v.category === 'PKI' || v.vendor_type === 'Certificate').map(v => v.vendor_name),
+    monitoring_tools: enhancedVendors.filter(v => v.category === 'Monitoring' || v.vendor_type === 'Management').map(v => v.vendor_name)
   };
+
+  // Fallback default vendors if database is empty
+  const defaultVendorsByCategory = {
+    nac_vendors: ["Portnox", "Cisco ISE", "Aruba ClearPass", "ForeScout CounterACT", "Bradford Campus Manager", "Impulse SafeConnect", "Extreme Control", "Microsoft NPS", "Juniper Policy Enforcer", "PacketFence"],
+    wired_switches: ["Cisco", "HPE/Aruba", "Juniper", "Extreme Networks", "Dell", "Netgear", "D-Link", "TP-Link", "Ubiquiti", "Huawei"],
+    wireless_aps: ["Cisco", "HPE/Aruba", "Ruckus", "Meraki", "Ubiquiti", "Fortinet", "SonicWall", "Extreme Networks", "Mist", "Cambium"],
+    routers: ["Cisco", "Juniper", "HPE/Aruba", "Fortinet", "SonicWall", "Mikrotik", "Ubiquiti", "Palo Alto", "Check Point", "pfSense"],
+    firewalls: ["Palo Alto", "Fortinet", "Check Point", "SonicWall", "Cisco ASA", "pfSense", "WatchGuard", "Barracuda", "Sophos", "Juniper SRX"],
+    vpn_solutions: ["Cisco AnyConnect", "Palo Alto GlobalProtect", "Fortinet FortiClient", "SonicWall NetExtender", "OpenVPN", "WireGuard", "Pulse Secure", "Check Point Mobile", "F5 BIG-IP Edge", "Microsoft DirectAccess"],
+    edr_xdr: ["CrowdStrike Falcon", "SentinelOne", "Microsoft Defender", "Carbon Black", "Cylance", "Trend Micro", "Symantec", "McAfee", "FireEye", "Cortex XDR"],
+    siem_mdr: ["Splunk", "IBM QRadar", "Microsoft Sentinel", "LogRhythm", "ArcSight", "AlienVault", "Rapid7", "SumoLogic", "Elastic SIEM", "Chronicle"],
+    mfa_solutions: ["Microsoft Authenticator", "Okta Verify", "Duo Security", "RSA SecurID", "Google Authenticator", "Authy", "YubiKey", "Ping Identity", "Auth0", "OneLogin"],
+    sso_solutions: ["Microsoft Azure AD", "Okta", "Ping Identity", "Auth0", "OneLogin", "Google Workspace", "AWS SSO", "JumpCloud", "SailPoint", "CyberArk"],
+    identity_providers: ["Microsoft Azure AD", "Active Directory", "Okta", "Ping Identity", "Auth0", "OneLogin", "Google Workspace", "AWS Cognito", "JumpCloud", "LDAP"],
+    radius_vendors: ["Microsoft NPS", "FreeRADIUS", "Cisco ISE", "Aruba ClearPass", "Steel-Belted RADIUS", "RSA Authentication Manager", "TekRADIUS", "Radiator", "Elektron", "WinRadius"],
+    pki_cert_authorities: ["Microsoft ADCS", "DigiCert", "Entrust", "GlobalSign", "Verisign", "Comodo", "OpenSSL CA", "AWS Certificate Manager", "Azure Key Vault", "HashiCorp Vault"],
+    monitoring_tools: ["SolarWinds", "PRTG", "Nagios", "Zabbix", "ManageEngine", "WhatsUp Gold", "Datadog", "New Relic", "Dynatrace", "AppDynamics"]
+  };
+
+  // Merge enhanced vendors with defaults
+  Object.keys(defaultVendorsByCategory).forEach(category => {
+    if (vendorsByCategory[category as keyof typeof vendorsByCategory].length === 0) {
+      vendorsByCategory[category as keyof typeof vendorsByCategory] = defaultVendorsByCategory[category as keyof typeof defaultVendorsByCategory];
+    }
+  });
 
   const authenticationMethods = [
     // Traditional Methods
@@ -1986,16 +2013,10 @@ Complexity score: ${formData.templates_ai.ai_recommendations.complexity_score}/1
                   </Card>
                 )}
 
-                <div className="flex gap-2">
-                  <Button onClick={saveAndContinueToProject} className="flex-1">
-                    <Save className="h-4 w-4 mr-2" />
-                    Save & Create Project
-                  </Button>
-                  <Button variant="outline" onClick={exportScopingReport}>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Generate PDF Report
-                  </Button>
-                </div>
+                <EnhancedScopingActions 
+                  formData={formData}
+                  onProjectCreated={(projectId) => onComplete?.(projectId, formData)}
+                />
               </CardContent>
             </Card>
           </div>
@@ -2096,10 +2117,33 @@ Complexity score: ${formData.templates_ai.ai_recommendations.complexity_score}/1
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               ) : (
-                <Button onClick={saveAndContinueToProject}>
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Complete Scoping
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => {
+                    const scopingSession = {
+                      id: Date.now().toString(),
+                      name: `${formData.organization.name || 'Unnamed'} Scoping Session`,
+                      date: new Date().toISOString(),
+                      data: formData,
+                      projectId: null
+                    };
+                    
+                    const existingSessions = JSON.parse(localStorage.getItem('scopingSessions') || '[]');
+                    existingSessions.push(scopingSession);
+                    localStorage.setItem('scopingSessions', JSON.stringify(existingSessions));
+                    
+                    toast({
+                      title: "Scoping Session Saved",
+                      description: "Your scoping data has been saved locally.",
+                    });
+                  }}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Session
+                  </Button>
+                  <Button onClick={saveAndContinueToProject}>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Create Project
+                  </Button>
+                </div>
               )}
             </div>
           </div>
