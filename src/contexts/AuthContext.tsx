@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -86,29 +86,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const hasRole = (role: string, scope?: string, scopeId?: string): boolean => {
-    // Check for global roles first (highest privilege)
-    const hasGlobalRole = userRoleData.some(r => 
-      r.role === role && r.scope_type === 'global'
-    );
-    
-    if (hasGlobalRole) return true;
-    
-    // If no scope specified, only check for global roles
-    if (!scope) return false;
-    
-    // Check for scoped roles
-    const hasScopedRole = userRoleData.some(r => 
-      r.role === role && 
-      r.scope_type === scope && 
-      (scopeId ? r.scope_id === scopeId : true)
-    );
-    
-    return hasScopedRole;
-  };
+  const hasRole = useMemo(() => {
+    return (role: string, scope?: string, scopeId?: string): boolean => {
+      // Check for global roles first (highest privilege)
+      const hasGlobalRole = userRoleData.some(r => 
+        r.role === role && r.scope_type === 'global'
+      );
+      
+      if (hasGlobalRole) return true;
+      
+      // If no scope specified, only check for global roles
+      if (!scope) return false;
+      
+      // Check for scoped roles
+      const hasScopedRole = userRoleData.some(r => 
+        r.role === role && 
+        r.scope_type === scope && 
+        (scopeId ? r.scope_id === scopeId : true)
+      );
+      
+      return hasScopedRole;
+    };
+  }, [userRoleData]);
 
-  const isAdmin = hasRole('project_owner', 'global');
-  const isProjectManager = hasRole('project_manager', 'global') || isAdmin;
+  const isAdmin = useMemo(() => hasRole('project_owner', 'global'), [hasRole]);
+  const isProjectManager = useMemo(() => hasRole('project_manager', 'global') || isAdmin, [hasRole, isAdmin]);
 
   useEffect(() => {
     // Set up auth state listener
@@ -127,6 +129,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } else {
           setProfile(null);
           setUserRoles([]);
+          setUserRoleData([]);
         }
       }
     );
@@ -248,6 +251,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(null);
       setProfile(null);
       setUserRoles([]);
+      setUserRoleData([]);
       
       // Clear any cached data in localStorage
       localStorage.removeItem('supabase.auth.token');
@@ -274,6 +278,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(null);
       setProfile(null);
       setUserRoles([]);
+      setUserRoleData([]);
       localStorage.clear();
       
       toast({
