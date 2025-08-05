@@ -555,6 +555,8 @@ export type Database = {
         Row: {
           ai_generated: boolean | null
           ai_optimization_rules: Json | null
+          associated_projects: Json | null
+          associated_sites: Json | null
           authentication_methods: Json | null
           automation_level: string | null
           best_practices: Json | null
@@ -602,6 +604,8 @@ export type Database = {
         Insert: {
           ai_generated?: boolean | null
           ai_optimization_rules?: Json | null
+          associated_projects?: Json | null
+          associated_sites?: Json | null
           authentication_methods?: Json | null
           automation_level?: string | null
           best_practices?: Json | null
@@ -649,6 +653,8 @@ export type Database = {
         Update: {
           ai_generated?: boolean | null
           ai_optimization_rules?: Json | null
+          associated_projects?: Json | null
+          associated_sites?: Json | null
           authentication_methods?: Json | null
           automation_level?: string | null
           best_practices?: Json | null
@@ -1952,12 +1958,15 @@ export type Database = {
       requirements_library: {
         Row: {
           acceptance_criteria: Json | null
+          associated_projects: Json | null
+          associated_sites: Json | null
           assumptions: Json | null
           category: string
           compliance_frameworks: string[] | null
           constraints: Json | null
           created_at: string
           created_by: string | null
+          custom_categories: Json | null
           dependencies: Json | null
           description: string | null
           documentation_references: Json | null
@@ -1978,12 +1987,15 @@ export type Database = {
         }
         Insert: {
           acceptance_criteria?: Json | null
+          associated_projects?: Json | null
+          associated_sites?: Json | null
           assumptions?: Json | null
           category: string
           compliance_frameworks?: string[] | null
           constraints?: Json | null
           created_at?: string
           created_by?: string | null
+          custom_categories?: Json | null
           dependencies?: Json | null
           description?: string | null
           documentation_references?: Json | null
@@ -2004,12 +2016,15 @@ export type Database = {
         }
         Update: {
           acceptance_criteria?: Json | null
+          associated_projects?: Json | null
+          associated_sites?: Json | null
           assumptions?: Json | null
           category?: string
           compliance_frameworks?: string[] | null
           constraints?: Json | null
           created_at?: string
           created_by?: string | null
+          custom_categories?: Json | null
           dependencies?: Json | null
           description?: string | null
           documentation_references?: Json | null
@@ -2029,6 +2044,95 @@ export type Database = {
           verification_methods?: Json | null
         }
         Relationships: []
+      }
+      resource_categories: {
+        Row: {
+          color_code: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          parent_category_id: string | null
+          resource_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          color_code?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          parent_category_id?: string | null
+          resource_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          color_code?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          parent_category_id?: string | null
+          resource_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_categories_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resource_categories_parent_category_id_fkey"
+            columns: ["parent_category_id"]
+            isOneToOne: false
+            referencedRelation: "resource_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_tags: {
+        Row: {
+          color_code: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          color_code?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          color_code?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_tags_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       scoping_questionnaires: {
         Row: {
@@ -2533,6 +2637,8 @@ export type Database = {
       }
       use_case_library: {
         Row: {
+          associated_projects: Json | null
+          associated_sites: Json | null
           authentication_methods: Json | null
           business_value: string | null
           category: string
@@ -2540,6 +2646,7 @@ export type Database = {
           compliance_frameworks: string[] | null
           created_at: string
           created_by: string | null
+          custom_categories: Json | null
           dependencies: Json | null
           deployment_scenarios: Json | null
           description: string | null
@@ -2557,6 +2664,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          associated_projects?: Json | null
+          associated_sites?: Json | null
           authentication_methods?: Json | null
           business_value?: string | null
           category: string
@@ -2564,6 +2673,7 @@ export type Database = {
           compliance_frameworks?: string[] | null
           created_at?: string
           created_by?: string | null
+          custom_categories?: Json | null
           dependencies?: Json | null
           deployment_scenarios?: Json | null
           description?: string | null
@@ -2581,6 +2691,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          associated_projects?: Json | null
+          associated_sites?: Json | null
           authentication_methods?: Json | null
           business_value?: string | null
           category?: string
@@ -2588,6 +2700,7 @@ export type Database = {
           compliance_frameworks?: string[] | null
           created_at?: string
           created_by?: string | null
+          custom_categories?: Json | null
           dependencies?: Json | null
           deployment_scenarios?: Json | null
           description?: string | null
@@ -2786,11 +2899,14 @@ export type Database = {
       }
       vendor_library: {
         Row: {
+          associated_projects: Json | null
+          associated_sites: Json | null
           category: string
           certifications: Json | null
           configuration_templates: Json | null
           created_at: string
           created_by: string | null
+          custom_categories: Json | null
           description: string | null
           documentation_links: Json | null
           firmware_requirements: Json | null
@@ -2806,17 +2922,21 @@ export type Database = {
           support_contact: Json | null
           support_level: string | null
           supported_protocols: Json | null
+          tags: Json | null
           updated_at: string
           vendor_name: string
           vendor_type: string
           website_url: string | null
         }
         Insert: {
+          associated_projects?: Json | null
+          associated_sites?: Json | null
           category: string
           certifications?: Json | null
           configuration_templates?: Json | null
           created_at?: string
           created_by?: string | null
+          custom_categories?: Json | null
           description?: string | null
           documentation_links?: Json | null
           firmware_requirements?: Json | null
@@ -2832,17 +2952,21 @@ export type Database = {
           support_contact?: Json | null
           support_level?: string | null
           supported_protocols?: Json | null
+          tags?: Json | null
           updated_at?: string
           vendor_name: string
           vendor_type: string
           website_url?: string | null
         }
         Update: {
+          associated_projects?: Json | null
+          associated_sites?: Json | null
           category?: string
           certifications?: Json | null
           configuration_templates?: Json | null
           created_at?: string
           created_by?: string | null
+          custom_categories?: Json | null
           description?: string | null
           documentation_links?: Json | null
           firmware_requirements?: Json | null
@@ -2858,6 +2982,7 @@ export type Database = {
           support_contact?: Json | null
           support_level?: string | null
           supported_protocols?: Json | null
+          tags?: Json | null
           updated_at?: string
           vendor_name?: string
           vendor_type?: string

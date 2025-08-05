@@ -42,6 +42,10 @@ import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { useConfigTemplates } from '@/hooks/useConfigTemplates';
+import { useResourceTags } from '@/hooks/useResourceTags';
+import { useResourceCategories } from '@/hooks/useResourceCategories';
+import { useProjects } from '@/hooks/useProjects';
+import { useSites } from '@/hooks/useSites';
 import { 
   useIndustryOptions, 
   useComplianceFrameworks, 
@@ -62,6 +66,10 @@ const ResourceCenter = () => {
   const { data: useCases = [] } = useUseCases();
   const { data: requirements = [] } = useRequirements();
   const { data: configTemplates = [] } = useConfigTemplates();
+  const { data: resourceTags = [] } = useResourceTags();
+  const { data: resourceCategoriesFromDB = [] } = useResourceCategories();
+  const { data: projects = [] } = useProjects();
+  const { data: sites = [] } = useSites();
   const { data: industries = [] } = useIndustryOptions();
   const { data: complianceFrameworks = [] } = useComplianceFrameworks();
   const { data: deploymentTypes = [] } = useDeploymentTypes();
