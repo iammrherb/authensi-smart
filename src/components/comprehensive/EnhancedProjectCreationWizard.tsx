@@ -27,6 +27,7 @@ import { useBulkSiteTemplates } from '@/hooks/useBulkSiteTemplates';
 import { useRequirements } from '@/hooks/useRequirements';
 import { usePainPoints, useCreatePainPoint } from '@/hooks/usePainPoints';
 import { useRecommendations, useCreateRecommendation } from '@/hooks/useRecommendations';
+import { useIndustryOptions, useComplianceFrameworks } from '@/hooks/useResourceLibrary';
 import { AppRole } from '@/hooks/useUserRoles';
 import { useAI } from '@/hooks/useAI';
 
@@ -181,6 +182,8 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
   const { data: requirements = [] } = useRequirements();
   const { data: painPoints = [] } = usePainPoints();
   const { data: recommendations = [] } = useRecommendations();
+  const { data: industryOptions = [] } = useIndustryOptions();
+  const { data: complianceFrameworksData = [] } = useComplianceFrameworks();
   const { mutate: createProject, isPending } = useCreateProject();
   const { mutate: createPainPoint } = useCreatePainPoint();
   const { mutate: createRecommendation } = useCreateRecommendation();
@@ -232,11 +235,8 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
     }
   ];
 
-  const industries = [
-    "Financial Services", "Healthcare", "Government", "Education", "Manufacturing",
-    "Retail", "Technology", "Energy", "Transportation", "Telecommunications",
-    "Legal", "Consulting", "Real Estate", "Media", "Non-Profit"
-  ];
+  const industries = industryOptions.map(option => option.name);
+  const complianceOptions = complianceFrameworksData.map(framework => framework.name);
 
   const deploymentTypes = [
     "greenfield", "brownfield", "hybrid", "cloud-first", "on-premises", "multi-cloud"
@@ -244,11 +244,6 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
 
   const securityLevels = [
     "basic", "standard", "enhanced", "maximum", "government", "defense"
-  ];
-
-  const complianceOptions = [
-    "SOX", "HIPAA", "PCI-DSS", "GDPR", "SOC2", "ISO27001", "NIST", "FISMA", 
-    "FedRAMP", "CCPA", "PIPEDA", "LGPD", "Custom"
   ];
 
   const timezones = [

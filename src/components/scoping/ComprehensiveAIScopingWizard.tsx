@@ -409,8 +409,13 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
     "Azure AD", "Google Workspace", "Okta", "Ping Identity", "Auth0"
   ];
 
-  const industries = industryOptions.map(option => option.name);
-  const complianceFrameworks = complianceFrameworksData.map(framework => framework.name);
+  const industries = industryOptions.length > 0 ? industryOptions.map(option => option.name) : [
+    "Financial Services", "Healthcare", "Government", "Education", "Manufacturing",
+    "Retail", "Technology", "Energy", "Transportation", "Telecommunications"
+  ];
+  const complianceFrameworks = complianceFrameworksData.length > 0 ? complianceFrameworksData.map(framework => framework.name) : [
+    "SOX", "HIPAA", "PCI-DSS", "GDPR", "SOC2", "ISO27001", "NIST", "FISMA"
+  ];
 
   const calculateProgress = () => {
     const stepWeights = [15, 20, 25, 15, 20, 5]; // Different weights for each step
