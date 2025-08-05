@@ -90,6 +90,12 @@ export const useProject = (id: string) => {
   return useQuery({
     queryKey: ['projects', id],
     queryFn: async () => {
+      // Validate that id is a UUID format, not a route like "create"
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(id)) {
+        return null; // Return null for invalid UUIDs instead of throwing an error
+      }
+
       const { data, error } = await supabase
         .from('projects')
         .select(`
@@ -112,7 +118,7 @@ export const useProject = (id: string) => {
       }
       return data as Project | null;
     },
-    enabled: !!id,
+    enabled: !!id && id !== 'create', // Don't run query for route paths like "create"
   });
 };
 

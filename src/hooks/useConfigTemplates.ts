@@ -49,13 +49,21 @@ export const useConfigTemplates = () => {
         .from('configuration_templates')
         .select(`
           *,
-          vendor:vendor_library(vendor_name, category),
-          model:vendor_models(model_name, model_series)
+          vendor:vendor_library!vendor_id(vendor_name, category),
+          model:vendor_models!model_id(model_name, model_series)
         `)
         .order('name', { ascending: true });
       
       if (error) throw error;
-      return data as ConfigTemplate[];
+      
+      // Transform the data to match our interface
+      const transformedData = data?.map(item => ({
+        ...item,
+        vendor: Array.isArray(item.vendor) ? item.vendor[0] : item.vendor,
+        model: Array.isArray(item.model) ? item.model[0] : item.model,
+      }));
+      
+      return transformedData as ConfigTemplate[];
     },
   });
 };
@@ -68,14 +76,24 @@ export const useConfigTemplate = (id: string) => {
         .from('configuration_templates')
         .select(`
           *,
-          vendor:vendor_library(vendor_name, category),
-          model:vendor_models(model_name, model_series)
+          vendor:vendor_library!vendor_id(vendor_name, category),
+          model:vendor_models!model_id(model_name, model_series)
         `)
         .eq('id', id)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
-      return data as ConfigTemplate;
+      
+      if (!data) return null;
+      
+      // Transform the data to match our interface
+      const transformedData = {
+        ...data,
+        vendor: Array.isArray(data.vendor) ? data.vendor[0] : data.vendor,
+        model: Array.isArray(data.model) ? data.model[0] : data.model,
+      };
+      
+      return transformedData as ConfigTemplate;
     },
     enabled: !!id,
   });
