@@ -699,7 +699,15 @@ export type Database = {
           vendor_id?: string | null
           wizard_parameters?: Json | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_configuration_templates_vendor"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_library"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       countries_regions: {
         Row: {
