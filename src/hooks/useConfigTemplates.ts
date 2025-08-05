@@ -49,7 +49,7 @@ export const useConfigTemplates = () => {
         .from('configuration_templates')
         .select(`
           *,
-          vendor:vendor_library!vendor_id(vendor_name, category)
+          vendor:vendor_library(vendor_name, category)
         `)
         .order('name', { ascending: true });
       
@@ -74,7 +74,7 @@ export const useConfigTemplate = (id: string) => {
         .from('configuration_templates')
         .select(`
           *,
-          vendor:vendor_library!vendor_id(vendor_name, category)
+          vendor:vendor_library(vendor_name, category)
         `)
         .eq('id', id)
         .maybeSingle();
