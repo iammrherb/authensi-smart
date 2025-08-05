@@ -1946,6 +1946,147 @@ export type Database = {
           },
         ]
       }
+      questionnaire_responses: {
+        Row: {
+          approved_at: string | null
+          completion_percentage: number | null
+          completion_status: string | null
+          complexity_score: number | null
+          created_at: string | null
+          created_by: string | null
+          estimated_timeline: string | null
+          id: string
+          project_id: string | null
+          questionnaire_id: string | null
+          recommendations: Json | null
+          response_metadata: Json | null
+          responses: Json
+          reviewed_at: string | null
+          reviewer_id: string | null
+          reviewer_notes: string | null
+          risk_assessment: Json | null
+          submitted_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          completion_percentage?: number | null
+          completion_status?: string | null
+          complexity_score?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          estimated_timeline?: string | null
+          id?: string
+          project_id?: string | null
+          questionnaire_id?: string | null
+          recommendations?: Json | null
+          response_metadata?: Json | null
+          responses?: Json
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          reviewer_notes?: string | null
+          risk_assessment?: Json | null
+          submitted_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          completion_percentage?: number | null
+          completion_status?: string | null
+          complexity_score?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          estimated_timeline?: string | null
+          id?: string
+          project_id?: string | null
+          questionnaire_id?: string | null
+          recommendations?: Json | null
+          response_metadata?: Json | null
+          responses?: Json
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          reviewer_notes?: string | null
+          risk_assessment?: Json | null
+          submitted_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questionnaire_responses_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "questionnaire_responses_questionnaire_id_fkey"
+            columns: ["questionnaire_id"]
+            isOneToOne: false
+            referencedRelation: "questionnaires"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      questionnaires: {
+        Row: {
+          completion_requirements: Json | null
+          conditional_logic: Json | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          is_template: boolean | null
+          questionnaire_type: string | null
+          questions: Json
+          scoring_criteria: Json | null
+          sections: Json | null
+          tags: Json | null
+          title: string
+          updated_at: string | null
+          validation_rules: Json | null
+          version: string | null
+        }
+        Insert: {
+          completion_requirements?: Json | null
+          conditional_logic?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_template?: boolean | null
+          questionnaire_type?: string | null
+          questions?: Json
+          scoring_criteria?: Json | null
+          sections?: Json | null
+          tags?: Json | null
+          title: string
+          updated_at?: string | null
+          validation_rules?: Json | null
+          version?: string | null
+        }
+        Update: {
+          completion_requirements?: Json | null
+          conditional_logic?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_template?: boolean | null
+          questionnaire_type?: string | null
+          questions?: Json
+          scoring_criteria?: Json | null
+          sections?: Json | null
+          tags?: Json | null
+          title?: string
+          updated_at?: string | null
+          validation_rules?: Json | null
+          version?: string | null
+        }
+        Relationships: []
+      }
       recommendations_library: {
         Row: {
           category: string
@@ -1994,6 +2135,99 @@ export type Database = {
           related_pain_points?: Json | null
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      requirements: {
+        Row: {
+          acceptance_criteria: Json | null
+          category: string
+          complexity: string | null
+          compliance_frameworks: Json | null
+          conflicts_with: string[] | null
+          created_at: string | null
+          created_by: string | null
+          custom_fields: Json | null
+          depends_on: string[] | null
+          description: string
+          estimated_effort_hours: number | null
+          id: string
+          impact: string | null
+          implementation_approach: string | null
+          is_active: boolean | null
+          prerequisites: Json | null
+          priority: string | null
+          rationale: string | null
+          regulatory_requirement: boolean | null
+          requirement_type: string | null
+          source_document: string | null
+          stakeholder_type: string | null
+          tags: Json | null
+          test_scenarios: Json | null
+          testable: boolean | null
+          title: string
+          updated_at: string | null
+          verification_method: string | null
+        }
+        Insert: {
+          acceptance_criteria?: Json | null
+          category: string
+          complexity?: string | null
+          compliance_frameworks?: Json | null
+          conflicts_with?: string[] | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_fields?: Json | null
+          depends_on?: string[] | null
+          description: string
+          estimated_effort_hours?: number | null
+          id?: string
+          impact?: string | null
+          implementation_approach?: string | null
+          is_active?: boolean | null
+          prerequisites?: Json | null
+          priority?: string | null
+          rationale?: string | null
+          regulatory_requirement?: boolean | null
+          requirement_type?: string | null
+          source_document?: string | null
+          stakeholder_type?: string | null
+          tags?: Json | null
+          test_scenarios?: Json | null
+          testable?: boolean | null
+          title: string
+          updated_at?: string | null
+          verification_method?: string | null
+        }
+        Update: {
+          acceptance_criteria?: Json | null
+          category?: string
+          complexity?: string | null
+          compliance_frameworks?: Json | null
+          conflicts_with?: string[] | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_fields?: Json | null
+          depends_on?: string[] | null
+          description?: string
+          estimated_effort_hours?: number | null
+          id?: string
+          impact?: string | null
+          implementation_approach?: string | null
+          is_active?: boolean | null
+          prerequisites?: Json | null
+          priority?: string | null
+          rationale?: string | null
+          regulatory_requirement?: boolean | null
+          requirement_type?: string | null
+          source_document?: string | null
+          stakeholder_type?: string | null
+          tags?: Json | null
+          test_scenarios?: Json | null
+          testable?: boolean | null
+          title?: string
+          updated_at?: string | null
+          verification_method?: string | null
         }
         Relationships: []
       }
@@ -2677,6 +2911,96 @@ export type Database = {
         }
         Relationships: []
       }
+      test_cases: {
+        Row: {
+          actual_outcome: string | null
+          automation_level: string | null
+          category: string
+          complexity: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          environment_requirements: Json | null
+          execution_history: Json | null
+          execution_time_minutes: number | null
+          expected_outcome: string
+          id: string
+          is_active: boolean | null
+          last_execution_date: string | null
+          last_execution_status: string | null
+          name: string
+          pass_rate_percentage: number | null
+          preconditions: Json | null
+          priority: string | null
+          requirements_covered: string[] | null
+          risk_areas_covered: string[] | null
+          tags: Json | null
+          test_data: Json | null
+          test_steps: Json | null
+          test_type: string | null
+          updated_at: string | null
+          use_cases_covered: string[] | null
+        }
+        Insert: {
+          actual_outcome?: string | null
+          automation_level?: string | null
+          category: string
+          complexity?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          environment_requirements?: Json | null
+          execution_history?: Json | null
+          execution_time_minutes?: number | null
+          expected_outcome: string
+          id?: string
+          is_active?: boolean | null
+          last_execution_date?: string | null
+          last_execution_status?: string | null
+          name: string
+          pass_rate_percentage?: number | null
+          preconditions?: Json | null
+          priority?: string | null
+          requirements_covered?: string[] | null
+          risk_areas_covered?: string[] | null
+          tags?: Json | null
+          test_data?: Json | null
+          test_steps?: Json | null
+          test_type?: string | null
+          updated_at?: string | null
+          use_cases_covered?: string[] | null
+        }
+        Update: {
+          actual_outcome?: string | null
+          automation_level?: string | null
+          category?: string
+          complexity?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          environment_requirements?: Json | null
+          execution_history?: Json | null
+          execution_time_minutes?: number | null
+          expected_outcome?: string
+          id?: string
+          is_active?: boolean | null
+          last_execution_date?: string | null
+          last_execution_status?: string | null
+          name?: string
+          pass_rate_percentage?: number | null
+          preconditions?: Json | null
+          priority?: string | null
+          requirements_covered?: string[] | null
+          risk_areas_covered?: string[] | null
+          tags?: Json | null
+          test_data?: Json | null
+          test_steps?: Json | null
+          test_type?: string | null
+          updated_at?: string | null
+          use_cases_covered?: string[] | null
+        }
+        Relationships: []
+      }
       use_case_library: {
         Row: {
           associated_projects: Json | null
@@ -2758,6 +3082,123 @@ export type Database = {
           technical_requirements?: Json | null
           test_scenarios?: Json | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      use_cases: {
+        Row: {
+          acceptance_criteria: Json | null
+          business_value: string | null
+          category: string
+          complexity: string | null
+          compliance_frameworks: Json | null
+          configuration_impact: Json | null
+          conflicts_with: string[] | null
+          created_at: string | null
+          created_by: string | null
+          dependencies: Json | null
+          description: string | null
+          documentation_links: Json | null
+          estimated_effort_hours: number | null
+          example_configurations: Json | null
+          id: string
+          implementation_steps: Json | null
+          industry_applicability: Json | null
+          is_active: boolean | null
+          last_used: string | null
+          prerequisites: Json | null
+          priority: string | null
+          regulatory_considerations: string | null
+          related_use_cases: string[] | null
+          required_integrations: Json | null
+          resource_requirements: Json | null
+          stakeholder_types: Json | null
+          success_metrics: Json | null
+          tags: Json | null
+          technical_requirements: Json | null
+          title: string
+          troubleshooting_guide: Json | null
+          typical_timeline: string | null
+          updated_at: string | null
+          usage_count: number | null
+          use_case_type: string | null
+          validation_steps: Json | null
+        }
+        Insert: {
+          acceptance_criteria?: Json | null
+          business_value?: string | null
+          category: string
+          complexity?: string | null
+          compliance_frameworks?: Json | null
+          configuration_impact?: Json | null
+          conflicts_with?: string[] | null
+          created_at?: string | null
+          created_by?: string | null
+          dependencies?: Json | null
+          description?: string | null
+          documentation_links?: Json | null
+          estimated_effort_hours?: number | null
+          example_configurations?: Json | null
+          id?: string
+          implementation_steps?: Json | null
+          industry_applicability?: Json | null
+          is_active?: boolean | null
+          last_used?: string | null
+          prerequisites?: Json | null
+          priority?: string | null
+          regulatory_considerations?: string | null
+          related_use_cases?: string[] | null
+          required_integrations?: Json | null
+          resource_requirements?: Json | null
+          stakeholder_types?: Json | null
+          success_metrics?: Json | null
+          tags?: Json | null
+          technical_requirements?: Json | null
+          title: string
+          troubleshooting_guide?: Json | null
+          typical_timeline?: string | null
+          updated_at?: string | null
+          usage_count?: number | null
+          use_case_type?: string | null
+          validation_steps?: Json | null
+        }
+        Update: {
+          acceptance_criteria?: Json | null
+          business_value?: string | null
+          category?: string
+          complexity?: string | null
+          compliance_frameworks?: Json | null
+          configuration_impact?: Json | null
+          conflicts_with?: string[] | null
+          created_at?: string | null
+          created_by?: string | null
+          dependencies?: Json | null
+          description?: string | null
+          documentation_links?: Json | null
+          estimated_effort_hours?: number | null
+          example_configurations?: Json | null
+          id?: string
+          implementation_steps?: Json | null
+          industry_applicability?: Json | null
+          is_active?: boolean | null
+          last_used?: string | null
+          prerequisites?: Json | null
+          priority?: string | null
+          regulatory_considerations?: string | null
+          related_use_cases?: string[] | null
+          required_integrations?: Json | null
+          resource_requirements?: Json | null
+          stakeholder_types?: Json | null
+          success_metrics?: Json | null
+          tags?: Json | null
+          technical_requirements?: Json | null
+          title?: string
+          troubleshooting_guide?: Json | null
+          typical_timeline?: string | null
+          updated_at?: string | null
+          usage_count?: number | null
+          use_case_type?: string | null
+          validation_steps?: Json | null
         }
         Relationships: []
       }
@@ -3093,6 +3534,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      vendors: {
+        Row: {
+          authentication_standards: Json | null
+          configuration_templates: Json | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          documentation_url: string | null
+          id: string
+          integration_complexity: string | null
+          integration_methods: Json | null
+          is_active: boolean | null
+          licensing_model: string | null
+          market_segment: string[] | null
+          name: string
+          portnox_certified: boolean | null
+          support_email: string | null
+          support_phone: string | null
+          supported_protocols: Json | null
+          typical_deployment_size: string | null
+          updated_at: string | null
+          vendor_type: string
+          website_url: string | null
+        }
+        Insert: {
+          authentication_standards?: Json | null
+          configuration_templates?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          documentation_url?: string | null
+          id?: string
+          integration_complexity?: string | null
+          integration_methods?: Json | null
+          is_active?: boolean | null
+          licensing_model?: string | null
+          market_segment?: string[] | null
+          name: string
+          portnox_certified?: boolean | null
+          support_email?: string | null
+          support_phone?: string | null
+          supported_protocols?: Json | null
+          typical_deployment_size?: string | null
+          updated_at?: string | null
+          vendor_type: string
+          website_url?: string | null
+        }
+        Update: {
+          authentication_standards?: Json | null
+          configuration_templates?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          documentation_url?: string | null
+          id?: string
+          integration_complexity?: string | null
+          integration_methods?: Json | null
+          is_active?: boolean | null
+          licensing_model?: string | null
+          market_segment?: string[] | null
+          name?: string
+          portnox_certified?: boolean | null
+          support_email?: string | null
+          support_phone?: string | null
+          supported_protocols?: Json | null
+          typical_deployment_size?: string | null
+          updated_at?: string | null
+          vendor_type?: string
+          website_url?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
