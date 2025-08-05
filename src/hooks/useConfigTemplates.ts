@@ -222,22 +222,25 @@ export const useGenerateConfigWithAI = () => {
     mutationFn: async ({
       vendor,
       model,
+      firmware,
       configType,
       requirements,
       variables
     }: {
       vendor: string;
       model?: string;
+      firmware?: string;
       configType: string;
       requirements: string;
       variables?: Record<string, any>;
     }) => {
       const { data, error } = await supabase.functions.invoke('ai-completion', {
         body: {
-          prompt: `Generate a comprehensive ${configType} configuration for ${vendor}${model ? ` ${model}` : ''} switch/device with the following requirements: ${requirements}`,
+          prompt: `Generate a comprehensive ${configType} configuration for ${vendor}${model ? ` ${model}` : ''}${firmware ? ` (firmware ${firmware})` : ''} switch/device with the following requirements: ${requirements}`,
           context: {
             vendor,
             model,
+            firmware,
             configType,
             variables,
             task: 'config_generation'

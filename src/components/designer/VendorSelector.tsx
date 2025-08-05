@@ -1,5 +1,6 @@
 
 import { Badge } from "@/components/ui/badge";
+import { comprehensiveVendorData } from "@/data/comprehensiveVendorData";
 
 interface VendorSelectorProps {
   selectedVendor: string;
@@ -7,14 +8,14 @@ interface VendorSelectorProps {
 }
 
 const VendorSelector = ({ selectedVendor, onVendorChange }: VendorSelectorProps) => {
-  const vendors = [
-    { id: "portnox", name: "Portnox", icon: "🔐", color: "bg-blue-500" },
-    { id: "cisco", name: "Cisco ISE", icon: "🌐", color: "bg-blue-600" },
-    { id: "aruba", name: "Aruba ClearPass", icon: "📡", color: "bg-orange-500" },
-    { id: "fortinet", name: "FortiNAC", icon: "🛡️", color: "bg-red-500" },
-    { id: "juniper", name: "Juniper NAC", icon: "🌲", color: "bg-green-600" },
-    { id: "azure", name: "Azure AD", icon: "☁️", color: "bg-blue-400" },
-  ];
+  const vendors = comprehensiveVendorData.map(vendor => ({
+    id: vendor.id,
+    name: vendor.name,
+    icon: vendor.icon,
+    color: vendor.color,
+    description: vendor.description,
+    category: vendor.category
+  }));
 
   return (
     <div className="space-y-3">
@@ -37,12 +38,7 @@ const VendorSelector = ({ selectedVendor, onVendorChange }: VendorSelectorProps)
               <div>
                 <div className="font-medium text-sm">{vendor.name}</div>
                 <div className="text-xs text-muted-foreground">
-                  {vendor.id === "portnox" && "AI-Optimized"}
-                  {vendor.id === "cisco" && "Enterprise"}
-                  {vendor.id === "aruba" && "Wireless-First"}
-                  {vendor.id === "fortinet" && "Security-First"}
-                  {vendor.id === "juniper" && "Performance"}
-                  {vendor.id === "azure" && "Cloud-Native"}
+                  {vendor.description}
                 </div>
               </div>
             </div>

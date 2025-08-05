@@ -43,6 +43,7 @@ import { useConfigTemplates, useCreateConfigTemplate, useUpdateConfigTemplate, u
 import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
 import { useVendorModels } from '@/hooks/useVendorModels';
 import { useToast } from '@/hooks/use-toast';
+import EnhancedVendorSelector from './EnhancedVendorSelector';
 
 interface ConfigGeneratorManagerProps {
   searchTerm: string;
@@ -94,6 +95,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
+  const [selectedFirmware, setSelectedFirmware] = useState("");
   const [configType, setConfigType] = useState("");
   const [aiRequirements, setAiRequirements] = useState("");
   const [generatedConfig, setGeneratedConfig] = useState("");
@@ -228,6 +230,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
       const result = await generateWithAI.mutateAsync({
         vendor: selectedVendorName,
         model: selectedModelName,
+        firmware: selectedFirmware,
         configType,
         requirements: aiRequirements,
       });
@@ -244,14 +247,14 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
     
     form.reset({
       name: `${selectedVendorName} ${configType} Configuration`,
-      description: `AI-generated ${configType} configuration for ${selectedVendorName}${selectedModelName ? ` ${selectedModelName}` : ''}`,
+      description: `AI-generated ${configType} configuration for ${selectedVendorName}${selectedModelName ? ` ${selectedModelName}` : ''}${selectedFirmware ? ` (${selectedFirmware})` : ''}`,
       vendor_id: selectedVendor,
       model_id: selectedModel || undefined,
       category: configType,
       configuration_type: "switch",
       complexity_level: "intermediate",
       template_content: generatedConfig,
-      template_variables: {},
+      template_variables: { firmware_version: selectedFirmware },
       supported_scenarios: [],
       authentication_methods: [],
       required_features: [],
@@ -260,7 +263,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
       best_practices: [],
       troubleshooting_guide: [],
       validation_commands: [],
-      tags: ["ai-generated", configType.toLowerCase(), selectedVendorName.toLowerCase()],
+      tags: ["ai-generated", configType.toLowerCase(), selectedVendorName.toLowerCase(), ...(selectedFirmware ? [selectedFirmware] : [])],
       is_public: true,
       is_validated: false,
     });
@@ -302,38 +305,16 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Vendor</Label>
-                    <Select value={selectedVendor} onValueChange={setSelectedVendor}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select vendor" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {vendors?.map(vendor => (
-                          <SelectItem key={vendor.id} value={vendor.id}>
-                            {vendor.vendor_name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Model (Optional)</Label>
-                    <Select value={selectedModel} onValueChange={setSelectedModel}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select model" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {filteredModels.map(model => (
-                          <SelectItem key={model.id} value={model.id}>
-                            {model.model_name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+                <EnhancedVendorSelector
+                  selectedVendor={selectedVendor}
+                  selectedModel={selectedModel}
+                  selectedFirmware={selectedFirmware}
+                  onVendorChange={setSelectedVendor}
+                  onModelChange={setSelectedModel}
+                  onFirmwareChange={setSelectedFirmware}
+                  compact={true}
+                  showDetails={false}
+                />
                 
                 <div className="space-y-2">
                   <Label>Configuration Type</Label>

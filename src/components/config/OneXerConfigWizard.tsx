@@ -46,6 +46,7 @@ import { useVendorModels } from '@/hooks/useVendorModels';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { useToast } from '@/hooks/use-toast';
+import EnhancedVendorSelector from './EnhancedVendorSelector';
 
 interface OneXerConfigWizardProps {
   projectId?: string;
@@ -379,53 +380,16 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Vendor</Label>
-          <Select
-            value={wizardData.basic.vendor}
-            onValueChange={(value) => updateWizardData('basic', { vendor: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select vendor" />
-            </SelectTrigger>
-            <SelectContent>
-              {vendors?.map(vendor => (
-                <SelectItem key={vendor.id} value={vendor.id}>
-                  {vendor.vendor_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label>Model (Optional)</Label>
-          <Select
-            value={wizardData.basic.model}
-            onValueChange={(value) => updateWizardData('basic', { model: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select model" />
-            </SelectTrigger>
-            <SelectContent>
-              {vendorModels?.filter(m => !wizardData.basic.vendor || m.vendor_id === wizardData.basic.vendor).map(model => (
-                <SelectItem key={model.id} value={model.id}>
-                  {model.model_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label>Firmware Version (Optional)</Label>
-        <Input
-          value={wizardData.basic.firmwareVersion}
-          onChange={(e) => updateWizardData('basic', { firmwareVersion: e.target.value })}
-          placeholder="e.g., 16.12.04, 15.2(4)S7"
-        />
-      </div>
+      <EnhancedVendorSelector
+        selectedVendor={wizardData.basic.vendor}
+        selectedModel={wizardData.basic.model}
+        selectedFirmware={wizardData.basic.firmwareVersion}
+        onVendorChange={(vendor) => updateWizardData('basic', { vendor })}
+        onModelChange={(model) => updateWizardData('basic', { model })}
+        onFirmwareChange={(firmwareVersion) => updateWizardData('basic', { firmwareVersion })}
+        compact={true}
+        showDetails={false}
+      />
     </div>
   );
 
