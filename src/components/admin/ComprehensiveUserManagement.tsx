@@ -181,11 +181,20 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
         p_first_name: userData.first_name,
         p_last_name: userData.last_name,
         p_role: userData.role,
-        p_scope_type: scopeType,
+        p_scope_type: scopeType || 'global',
         p_scope_id: scopeId
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating user:', error);
+        throw error;
+      }
+      
+      const result = data as any;
+      if (!result?.success) {
+        throw new Error(result?.error || 'Failed to create user');
+      }
+      
       return data;
     },
     onSuccess: (data: any) => {
@@ -245,11 +254,20 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      const { data, error } = await supabase.rpc('delete_user_safely', {
+      const { data, error } = await supabase.rpc('soft_delete_user', {
         p_user_id: userId
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting user:', error);
+        throw error;
+      }
+      
+      const result = data as any;
+      if (!result?.success) {
+        throw new Error(result?.error || 'Failed to delete user');
+      }
+      
       return data;
     },
     onSuccess: (data: any) => {

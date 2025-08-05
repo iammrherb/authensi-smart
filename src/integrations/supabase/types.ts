@@ -3699,6 +3699,10 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: boolean
       }
+      soft_delete_user: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
       toggle_user_block: {
         Args: { p_user_id: string; p_block?: boolean }
         Returns: Json
