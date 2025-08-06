@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -52,16 +53,34 @@ import EnhancedVendorSelector from "./EnhancedVendorSelector";
 import DecisionTreeEngine from "./DecisionTreeEngine";
 import ScopingFlowManager from "./ScopingFlowManager";
 
+interface VendorModel {
+  name: string;
+  series?: string;
+  firmware_versions: string[];
+  features: string[];
+  eol_status?: 'active' | 'eol' | 'eos';
+}
+
+interface Vendor {
+  id: string;
+  name: string;
+  category: string;
+  icon: string;
+  color: string;
+  models: VendorModel[];
+  integration_level: 'native' | 'supported' | 'limited' | 'manual';
+}
+
+interface SelectedVendor extends Vendor {
+  selected_models: string[];
+  selected_firmware: Record<string, string[]>;
+  deployment_notes?: string;
+}
+
 interface PainPoint {
   id: string;
   title: string;
   description: string;
-}
-
-interface Vendor {
-  name: string;
-  category: string;
-  models: string[];
 }
 
 interface UseCase {
@@ -89,15 +108,15 @@ interface ScopingData {
     current_security_solutions: string[];
   };
   vendor_ecosystem: {
-    wired_wireless: Vendor[];
-    security_solutions: Vendor[];
-    edr_solutions: Vendor[];
-    vpn_solutions: Vendor[];
-    mfa_solutions: Vendor[];
-    sso_solutions: Vendor[];
-    cloud_platforms: Vendor[];
-    identity_providers: Vendor[];
-    pki_solutions: Vendor[];
+    wired_wireless: SelectedVendor[];
+    security_solutions: SelectedVendor[];
+    edr_solutions: SelectedVendor[];
+    vpn_solutions: SelectedVendor[];
+    mfa_solutions: SelectedVendor[];
+    sso_solutions: SelectedVendor[];
+    cloud_platforms: SelectedVendor[];
+    identity_providers: SelectedVendor[];
+    pki_solutions: SelectedVendor[];
   };
   use_cases_requirements: {
     primary_use_cases: UseCase[];
@@ -205,21 +224,21 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
         category: "Enterprise Networking",
         icon: "C",
         color: "bg-blue-600",
-        integration_level: "native",
+        integration_level: "native" as const,
         models: [
           { 
             name: "Catalyst 9300", 
             series: "Campus Core",
             firmware_versions: ["16.12.09", "17.06.05", "17.09.04"],
             features: ["StackWise-480", "mGig", "DNA Ready"],
-            eol_status: "active"
+            eol_status: "active" as const
           },
           {
             name: "Catalyst 9200",
             series: "Campus Access", 
             firmware_versions: ["16.12.09", "17.06.05"],
             features: ["StackWise-160", "PoE+", "DNA Ready"],
-            eol_status: "active"
+            eol_status: "active" as const
           }
         ]
       },
@@ -229,23 +248,41 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
         category: "Wireless Solutions", 
         icon: "A",
         color: "bg-orange-600",
-        integration_level: "native",
+        integration_level: "native" as const,
         models: [
           {
             name: "AP-635",
             series: "Wi-Fi 6E",
             firmware_versions: ["8.10.0.4", "8.11.0.1"],
             features: ["Wi-Fi 6E", "IoT Ready", "AI Insights"],
-            eol_status: "active"
+            eol_status: "active" as const
           }
         ]
       },
-      { name: "Juniper", category: "Enterprise", models: ["EX4400", "SRX300", "Mist AP"] },
-      { name: "Fortinet", category: "Security-First", models: ["FortiGate", "FortiSwitch", "FortiAP"] },
-      { name: "HPE", category: "Enterprise", models: ["ProCurve", "FlexNetwork", "Aruba CX"] },
-      { name: "Ruckus", category: "Wireless", models: ["R750", "R650", "ZoneDirector"] },
-      { name: "Ubiquiti", category: "SMB", models: ["UniFi", "EdgeMax", "AmpliFi"] },
-      { name: "Meraki", category: "Cloud-Managed", models: ["MX", "MR", "MS"] }
+      { 
+        id: 'juniper',
+        name: "Juniper", 
+        category: "Enterprise", 
+        icon: "J",
+        color: "bg-green-600",
+        integration_level: "supported" as const,
+        models: [
+          { name: "EX4400", firmware_versions: ["20.4R3"], features: ["Virtual Chassis"], eol_status: "active" as const },
+          { name: "SRX300", firmware_versions: ["15.1X49-D200"], features: ["UTM"], eol_status: "active" as const }
+        ]
+      },
+      { 
+        id: 'fortinet_network',
+        name: "Fortinet", 
+        category: "Security-First", 
+        icon: "F",
+        color: "bg-red-600",
+        integration_level: "supported" as const,
+        models: [
+          { name: "FortiGate", firmware_versions: ["7.0.12", "7.2.5"], features: ["NGFW"], eol_status: "active" as const },
+          { name: "FortiSwitch", firmware_versions: ["7.0.6"], features: ["Security Fabric"], eol_status: "active" as const }
+        ]
+      }
     ],
     security_solutions: [
       {
@@ -254,73 +291,241 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
         category: "NGFW",
         icon: "P", 
         color: "bg-red-600",
-        integration_level: "supported",
+        integration_level: "supported" as const,
         models: [
           {
             name: "PA-5220",
             series: "PA-5000",
             firmware_versions: ["10.2.4", "11.0.1"],
             features: ["Threat Prevention", "URL Filtering", "App-ID"],
-            eol_status: "active"
+            eol_status: "active" as const
           }
         ]
       },
-      { name: "Fortinet", category: "Security Fabric", models: ["FortiGate", "FortiAnalyzer", "FortiManager"] },
-      { name: "Check Point", category: "Advanced Threat", models: ["Quantum", "CloudGuard", "Harmony"] },
-      { name: "SonicWall", category: "SMB Security", models: ["TZ", "NSa", "NSsp"] },
-      { name: "Sophos", category: "Synchronized Security", models: ["XG", "XGS", "Central"] },
-      { name: "WatchGuard", category: "SMB-Focused", models: ["Firebox", "AuthPoint", "Dimension"] }
+      { 
+        id: 'fortinet_security',
+        name: "Fortinet", 
+        category: "Security Fabric", 
+        icon: "F",
+        color: "bg-red-600",
+        integration_level: "native" as const,
+        models: [
+          { name: "FortiGate", firmware_versions: ["7.0.12"], features: ["NGFW"], eol_status: "active" as const },
+          { name: "FortiAnalyzer", firmware_versions: ["7.0.10"], features: ["Logging"], eol_status: "active" as const }
+        ]
+      },
+      { 
+        id: 'checkpoint',
+        name: "Check Point", 
+        category: "Advanced Threat", 
+        icon: "C",
+        color: "bg-blue-600",
+        integration_level: "supported" as const,
+        models: [
+          { name: "Quantum", firmware_versions: ["R81.20"], features: ["Threat Prevention"], eol_status: "active" as const }
+        ]
+      }
     ],
     edr_solutions: [
-      { name: "CrowdStrike", category: "Cloud-Native", models: ["Falcon", "Falcon Go", "Falcon Enterprise"] },
-      { name: "Microsoft Defender", category: "Integrated", models: ["Defender for Endpoint", "Defender for Business"] },
-      { name: "SentinelOne", category: "AI-Powered", models: ["Singularity", "Vigilance", "Ranger"] },
-      { name: "Carbon Black", category: "VMware", models: ["Cloud Endpoint", "EDR", "App Control"] },
-      { name: "Cylance", category: "BlackBerry", models: ["CylancePROTECT", "CylanceOPTICS"] },
-      { name: "Symantec", category: "Broadcom", models: ["Endpoint Protection", "Advanced Threat Protection"] }
+      { 
+        id: 'crowdstrike',
+        name: "CrowdStrike", 
+        category: "Cloud-Native", 
+        icon: "C",
+        color: "bg-gray-800",
+        integration_level: "supported" as const,
+        models: [
+          { name: "Falcon", firmware_versions: ["7.10"], features: ["AI-Powered"], eol_status: "active" as const }
+        ]
+      },
+      { 
+        id: 'ms_defender',
+        name: "Microsoft Defender", 
+        category: "Integrated", 
+        icon: "M",
+        color: "bg-blue-600",
+        integration_level: "native" as const,
+        models: [
+          { name: "Defender for Endpoint", firmware_versions: ["Current"], features: ["Cloud-Native"], eol_status: "active" as const }
+        ]
+      },
+      { 
+        id: 'sentinelone',
+        name: "SentinelOne", 
+        category: "AI-Powered", 
+        icon: "S",
+        color: "bg-purple-600",
+        integration_level: "supported" as const,
+        models: [
+          { name: "Singularity", firmware_versions: ["22.3"], features: ["Autonomous"], eol_status: "active" as const }
+        ]
+      }
     ],
     vpn_solutions: [
-      { name: "Cisco AnyConnect", category: "Enterprise VPN", models: ["AnyConnect", "SSLVPN", "FlexVPN"] },
-      { name: "Palo Alto GlobalProtect", category: "SASE", models: ["GlobalProtect", "Prisma Access"] },
-      { name: "Fortinet FortiClient", category: "Integrated", models: ["FortiClient", "FortiGate VPN"] },
-      { name: "Check Point", category: "Remote Access", models: ["Endpoint Remote Access", "Mobile Access"] },
-      { name: "SonicWall", category: "SSL VPN", models: ["NetExtender", "Mobile Connect"] },
-      { name: "OpenVPN", category: "Open Source", models: ["Access Server", "Cloud", "Connect"] }
+      { 
+        id: 'cisco_anyconnect',
+        name: "Cisco AnyConnect", 
+        category: "Enterprise VPN", 
+        icon: "C",
+        color: "bg-blue-600",
+        integration_level: "native" as const,
+        models: [
+          { name: "AnyConnect", firmware_versions: ["4.10.06079"], features: ["SSL VPN"], eol_status: "active" as const }
+        ]
+      },
+      { 
+        id: 'palo_globalprotect',
+        name: "Palo Alto GlobalProtect", 
+        category: "SASE", 
+        icon: "P",
+        color: "bg-red-600",
+        integration_level: "supported" as const,
+        models: [
+          { name: "GlobalProtect", firmware_versions: ["6.0.4"], features: ["Zero Trust"], eol_status: "active" as const }
+        ]
+      }
     ],
     mfa_solutions: [
-      { name: "Microsoft Authenticator", category: "Integrated", models: ["Azure MFA", "Conditional Access"] },
-      { name: "Okta", category: "Identity-First", models: ["Verify", "FastPass", "Adaptive MFA"] },
-      { name: "Duo Security", category: "Cisco", models: ["Duo MFA", "Duo Access", "Duo Beyond"] },
-      { name: "RSA", category: "Traditional", models: ["SecurID", "Authentication Manager"] },
-      { name: "Ping Identity", category: "Enterprise", models: ["PingID", "PingOne MFA"] },
-      { name: "Google Authenticator", category: "Consumer/SMB", models: ["Google Auth", "Titan Security Keys"] }
+      { 
+        id: 'ms_authenticator',
+        name: "Microsoft Authenticator", 
+        category: "Integrated", 
+        icon: "M",
+        color: "bg-blue-600",
+        integration_level: "native" as const,
+        models: [
+          { name: "Azure MFA", firmware_versions: ["Current"], features: ["Conditional Access"], eol_status: "active" as const }
+        ]
+      },
+      { 
+        id: 'okta_verify',
+        name: "Okta", 
+        category: "Identity-First", 
+        icon: "O",
+        color: "bg-blue-500",
+        integration_level: "native" as const,
+        models: [
+          { name: "Verify", firmware_versions: ["Current"], features: ["Adaptive MFA"], eol_status: "active" as const }
+        ]
+      },
+      { 
+        id: 'duo_security',
+        name: "Duo Security", 
+        category: "Cisco", 
+        icon: "D",
+        color: "bg-green-600",
+        integration_level: "native" as const,
+        models: [
+          { name: "Duo MFA", firmware_versions: ["Current"], features: ["Push Auth"], eol_status: "active" as const }
+        ]
+      }
     ],
     sso_solutions: [
-      { name: "Microsoft Azure AD", category: "Cloud-First", models: ["Azure AD", "Azure AD B2B", "Azure AD B2C"] },
-      { name: "Okta", category: "Identity Platform", models: ["Single Sign-On", "Universal Directory"] },
-      { name: "Ping Identity", category: "Hybrid", models: ["PingFederate", "PingOne SSO"] },
-      { name: "OneLogin", category: "Cloud SSO", models: ["OneLogin SSO", "SmartFactor"] },
-      { name: "Auth0", category: "Developer-First", models: ["Universal Login", "Machine to Machine"] },
-      { name: "ADFS", category: "On-Premises", models: ["AD FS", "WAP"] }
+      { 
+        id: 'azure_ad',
+        name: "Microsoft Azure AD", 
+        category: "Cloud-First", 
+        icon: "M",
+        color: "bg-blue-600",
+        integration_level: "native" as const,
+        models: [
+          { name: "Azure AD", firmware_versions: ["Current"], features: ["Conditional Access"], eol_status: "active" as const }
+        ]
+      },
+      { 
+        id: 'okta_sso',
+        name: "Okta", 
+        category: "Identity Platform", 
+        icon: "O",
+        color: "bg-blue-500",
+        integration_level: "native" as const,
+        models: [
+          { name: "Single Sign-On", firmware_versions: ["Current"], features: ["Universal Directory"], eol_status: "active" as const }
+        ]
+      },
+      { 
+        id: 'ping_sso',
+        name: "Ping Identity", 
+        category: "Hybrid", 
+        icon: "P",
+        color: "bg-orange-600",
+        integration_level: "supported" as const,
+        models: [
+          { name: "PingFederate", firmware_versions: ["11.3"], features: ["Federation"], eol_status: "active" as const }
+        ]
+      }
     ],
     cloud_platforms: [
-      { name: "Microsoft Azure", category: "Enterprise Cloud", models: ["Azure AD", "Azure Security", "M365"] },
-      { name: "Amazon AWS", category: "Market Leader", models: ["IAM", "Directory Service", "WorkSpaces"] },
-      { name: "Google Cloud", category: "Innovation", models: ["Cloud Identity", "Chrome Enterprise"] },
-      { name: "VMware", category: "Virtualization", models: ["vSphere", "Workspace ONE", "Carbon Black"] },
-      { name: "Citrix", category: "VDI/DaaS", models: ["Citrix Cloud", "Virtual Apps", "Endpoint Management"] }
+      { 
+        id: 'azure_cloud',
+        name: "Microsoft Azure", 
+        category: "Enterprise Cloud", 
+        icon: "M",
+        color: "bg-blue-600",
+        integration_level: "native" as const,
+        models: [
+          { name: "Azure AD", firmware_versions: ["Current"], features: ["Cloud Identity"], eol_status: "active" as const }
+        ]
+      },
+      { 
+        id: 'aws_cloud',
+        name: "Amazon AWS", 
+        category: "Market Leader", 
+        icon: "A",
+        color: "bg-orange-500",
+        integration_level: "supported" as const,
+        models: [
+          { name: "IAM", firmware_versions: ["Current"], features: ["Identity Management"], eol_status: "active" as const }
+        ]
+      }
     ],
     identity_providers: [
-      { name: "Active Directory", category: "On-Premises", models: ["AD DS", "AD LDS", "AD CS"] },
-      { name: "Azure Active Directory", category: "Cloud", models: ["Azure AD", "Azure AD DS"] },
-      { name: "LDAP", category: "Standards-Based", models: ["OpenLDAP", "Directory Services"] },
-      { name: "SAML Providers", category: "Federation", models: ["ADFS", "Shibboleth", "SimpleSAMLphp"] }
+      { 
+        id: 'active_directory',
+        name: "Active Directory", 
+        category: "On-Premises", 
+        icon: "A",
+        color: "bg-gray-600",
+        integration_level: "native" as const,
+        models: [
+          { name: "AD DS", firmware_versions: ["2019", "2022"], features: ["LDAP"], eol_status: "active" as const }
+        ]
+      },
+      { 
+        id: 'azure_ad_idp',
+        name: "Azure Active Directory", 
+        category: "Cloud", 
+        icon: "A",
+        color: "bg-blue-600",
+        integration_level: "native" as const,
+        models: [
+          { name: "Azure AD", firmware_versions: ["Current"], features: ["Cloud Identity"], eol_status: "active" as const }
+        ]
+      }
     ],
     pki_solutions: [
-      { name: "Microsoft CA", category: "Windows-Integrated", models: ["Enterprise CA", "Standalone CA"] },
-      { name: "DigiCert", category: "Commercial", models: ["CertCentral", "PKI Platform"] },
-      { name: "Entrust", category: "Enterprise PKI", models: ["Authority", "IdentityGuard"] },
-      { name: "GlobalSign", category: "Cloud PKI", models: ["Atlas", "Auto Enrollment Gateway"] }
+      { 
+        id: 'ms_ca',
+        name: "Microsoft CA", 
+        category: "Windows-Integrated", 
+        icon: "M",
+        color: "bg-blue-600",
+        integration_level: "native" as const,
+        models: [
+          { name: "Enterprise CA", firmware_versions: ["2019", "2022"], features: ["Auto Enrollment"], eol_status: "active" as const }
+        ]
+      },
+      { 
+        id: 'digicert',
+        name: "DigiCert", 
+        category: "Commercial", 
+        icon: "D",
+        color: "bg-green-600",
+        integration_level: "supported" as const,
+        models: [
+          { name: "CertCentral", firmware_versions: ["Current"], features: ["Cloud PKI"], eol_status: "active" as const }
+        ]
+      }
     ]
   };
 
@@ -357,21 +562,8 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
       ...prev,
       last_modified: new Date().toISOString(),
       [section]: {
-        ...(prev[section] as object),
+        ...prev[section],
         [field]: value
-      }
-    }));
-  }, []);
-
-  const handleVendorSelection = useCallback((category: keyof typeof comprehensiveVendorEcosystem, vendor: any) => {
-    setScopingData(prev => ({
-      ...prev,
-      last_modified: new Date().toISOString(),
-      vendor_ecosystem: {
-        ...prev.vendor_ecosystem,
-        [category]: prev.vendor_ecosystem[category]?.some((v: any) => v.name === vendor.name)
-          ? prev.vendor_ecosystem[category].filter((v: any) => v.name !== vendor.name)
-          : [...(prev.vendor_ecosystem[category] || []), vendor]
       }
     }));
   }, []);
@@ -627,96 +819,47 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
               </TabsContent>
 
               <TabsContent value="edr_solutions">
-                <div className="space-y-4">
-                  <h4 className="font-semibold flex items-center gap-2">
-                    <Eye className="h-4 w-4" />
-                    EDR Solutions
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {comprehensiveVendorEcosystem.edr_solutions.map(vendor => {
-                      const isSelected = scopingData.vendor_ecosystem.edr_solutions?.some(v => v.name === vendor.name);
-                      return (
-                        <Card
-                          key={vendor.name}
-                          className={`cursor-pointer transition-all ${isSelected ? 'ring-2 ring-primary bg-primary/5' : 'hover:shadow-md'}`}
-                          onClick={() => handleVendorSelection('edr_solutions', vendor)}
-                        >
-                          <CardContent className="p-3">
-                            <div className="flex items-center justify-between mb-2">
-                              <h5 className="font-medium text-sm">{vendor.name}</h5>
-                              {isSelected && <CheckCircle className="h-4 w-4 text-primary" />}
-                            </div>
-                            <Badge variant="outline" className="text-xs mb-2">{vendor.category}</Badge>
-                            <div className="text-xs text-muted-foreground">
-                              Models: {vendor.models.slice(0, 2).join(', ')}
-                              {vendor.models.length > 2 && '...'}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
-                  </div>
-                </div>
+                <EnhancedVendorSelector
+                  category="edr_solutions"
+                  title="EDR Solutions"
+                  icon={<Eye className="h-5 w-5" />}
+                  vendors={comprehensiveVendorEcosystem.edr_solutions}
+                  selectedVendors={scopingData.vendor_ecosystem.edr_solutions}
+                  onVendorChange={(vendors) => setScopingData(prev => ({
+                    ...prev,
+                    vendor_ecosystem: { ...prev.vendor_ecosystem, edr_solutions: vendors }
+                  }))}
+                />
               </TabsContent>
 
               <TabsContent value="identity" className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-semibold flex items-center gap-2 mb-3">
-                      <UserCheck className="h-4 w-4" />
-                      MFA Solutions
-                    </h4>
-                    <div className="grid grid-cols-1 gap-2">
-                      {comprehensiveVendorEcosystem.mfa_solutions.map(vendor => {
-                        const isSelected = scopingData.vendor_ecosystem.mfa_solutions?.some(v => v.name === vendor.name);
-                        return (
-                          <Card
-                            key={vendor.name}
-                            className={`cursor-pointer transition-all ${isSelected ? 'ring-2 ring-primary bg-primary/5' : 'hover:shadow-md'}`}
-                            onClick={() => handleVendorSelection('mfa_solutions', vendor)}
-                          >
-                            <CardContent className="p-3">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <h5 className="font-medium text-sm">{vendor.name}</h5>
-                                  <Badge variant="outline" className="text-xs">{vendor.category}</Badge>
-                                </div>
-                                {isSelected && <CheckCircle className="h-4 w-4 text-primary" />}
-                              </div>
-                            </CardContent>
-                          </Card>
-                        );
-                      })}
-                    </div>
+                    <EnhancedVendorSelector
+                      category="mfa_solutions"
+                      title="MFA Solutions"
+                      icon={<UserCheck className="h-5 w-5" />}
+                      vendors={comprehensiveVendorEcosystem.mfa_solutions}
+                      selectedVendors={scopingData.vendor_ecosystem.mfa_solutions}
+                      onVendorChange={(vendors) => setScopingData(prev => ({
+                        ...prev,
+                        vendor_ecosystem: { ...prev.vendor_ecosystem, mfa_solutions: vendors }
+                      }))}
+                    />
                   </div>
 
                   <div>
-                    <h4 className="font-semibold flex items-center gap-2 mb-3">
-                      <Key className="h-4 w-4" />
-                      SSO Solutions
-                    </h4>
-                    <div className="grid grid-cols-1 gap-2">
-                      {comprehensiveVendorEcosystem.sso_solutions.map(vendor => {
-                        const isSelected = scopingData.vendor_ecosystem.sso_solutions?.some(v => v.name === vendor.name);
-                        return (
-                          <Card
-                            key={vendor.name}
-                            className={`cursor-pointer transition-all ${isSelected ? 'ring-2 ring-primary bg-primary/5' : 'hover:shadow-md'}`}
-                            onClick={() => handleVendorSelection('sso_solutions', vendor)}
-                          >
-                            <CardContent className="p-3">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <h5 className="font-medium text-sm">{vendor.name}</h5>
-                                  <Badge variant="outline" className="text-xs">{vendor.category}</Badge>
-                                </div>
-                                {isSelected && <CheckCircle className="h-4 w-4 text-primary" />}
-                              </div>
-                            </CardContent>
-                          </Card>
-                        );
-                      })}
-                    </div>
+                    <EnhancedVendorSelector
+                      category="sso_solutions"
+                      title="SSO Solutions"
+                      icon={<Key className="h-5 w-5" />}
+                      vendors={comprehensiveVendorEcosystem.sso_solutions}
+                      selectedVendors={scopingData.vendor_ecosystem.sso_solutions}
+                      onVendorChange={(vendors) => setScopingData(prev => ({
+                        ...prev,
+                        vendor_ecosystem: { ...prev.vendor_ecosystem, sso_solutions: vendors }
+                      }))}
+                    />
                   </div>
                 </div>
               </TabsContent>
