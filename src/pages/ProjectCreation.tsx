@@ -1,14 +1,110 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Target, Brain, Building2, Users, CheckSquare } from "lucide-react";
+import { ArrowLeft, Target, Brain, Building2, Users, CheckSquare, Calendar, FileText, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useCreateProject } from "@/hooks/useProjects";
+import { useToast } from "@/hooks/use-toast";
 import EnhancedProjectCreationWizard from "@/components/comprehensive/EnhancedProjectCreationWizard";
 
 const ProjectCreation = () => {
   const navigate = useNavigate();
   const [wizardStep, setWizardStep] = useState(0);
+  const [savedSessions, setSavedSessions] = useState<any[]>([]);
+  const createProject = useCreateProject();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Load saved scoping sessions
+    const saved = localStorage.getItem('scopingSessions');
+    if (saved) {
+      setSavedSessions(JSON.parse(saved));
+    }
+  }, []);
+
+  const getDeploymentTypeFromOrganization = (organization: any): string => {
+    const userCount = organization?.total_users || 0;
+    const siteCount = organization?.site_count || 1;
+    
+    // Determine deployment type based on organization size
+    if (userCount < 100 && siteCount <= 1) return 'SMB';
+    if (userCount < 1000 && siteCount <= 5) return 'Mid-Market';
+    if (userCount < 5000 && siteCount <= 20) return 'Enterprise';
+    return 'Global';
+  };
+
+  const createProjectFromScoping = async (sessionData: any) => {
+    try {
+      const formData = sessionData.data;
+      
+      if (!formData.organization?.name) {
+        toast({
+          title: "Missing Information",
+          description: "Organization name is required to create a project.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const projectData = {
+        name: `${formData.organization.name} NAC Implementation`,
+        description: `Comprehensive NAC deployment scoped through AI wizard`,
+        client_name: formData.organization.name,
+        industry: formData.organization.industry || 'Technology',
+        deployment_type: getDeploymentTypeFromOrganization(formData.organization),
+        security_level: 'enhanced',
+        total_sites: formData.network_infrastructure?.site_count || 1,
+        total_endpoints: (formData.organization?.total_users || 0) + 
+          Object.values(formData.network_infrastructure?.device_inventory || {}).reduce((sum: number, count: any) => {
+            return sum + (typeof count === 'number' ? count : 0);
+          }, 0),
+        compliance_frameworks: formData.integration_compliance?.compliance_frameworks || [],
+        pain_points: [
+          ...(formData.organization?.pain_points || []),
+          ...(formData.organization?.custom_pain_points?.map((p: any) => ({ title: p.title, description: p.description })) || [])
+        ],
+        success_criteria: formData.use_cases_requirements?.success_criteria || [],
+        integration_requirements: formData.integration_compliance?.required_integrations || [],
+        status: 'scoping' as const,
+        current_phase: 'scoping' as const,
+        progress_percentage: 25,
+        business_summary: `Comprehensive Portnox NAC deployment for ${formData.organization.name} in the ${formData.organization.industry || 'Technology'} industry.`,
+        additional_stakeholders: [],
+        bulk_sites_data: [],
+        migration_scope: {
+          aiRecommendations: formData.templates_ai?.ai_recommendations || {},
+          scopingData: formData
+        }
+      };
+
+      createProject.mutate(projectData, {
+        onSuccess: (project) => {
+          toast({
+            title: "Project Created Successfully",
+            description: `Project "${project.name}" has been created from your scoping session.`,
+          });
+          
+          navigate(`/projects/${project.id}`);
+        },
+        onError: (error) => {
+          console.error("Project creation failed:", error);
+          toast({
+            title: "Failed to Create Project",
+            description: error.message || "An unexpected error occurred while creating the project.",
+            variant: "destructive",
+          });
+        }
+      });
+    } catch (error) {
+      console.error("Error preparing project data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to prepare project data. Please check your inputs.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const creationMethods = [
     {
@@ -158,6 +254,65 @@ const ProjectCreation = () => {
               </CardHeader>
               <CardContent>
                 <EnhancedProjectCreationWizard />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Saved Scoping Sessions */}
+          {wizardStep === 0 && savedSessions.length > 0 && (
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle>Saved Scoping Sessions</CardTitle>
+                <CardDescription>
+                  Create projects from your previously saved scoping sessions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {savedSessions.slice(0, 6).map((session) => (
+                    <Card key={session.id} className="cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-primary">
+                      <CardContent className="pt-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <h3 className="font-medium text-sm mb-1">{session.name}</h3>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                              <Calendar className="h-3 w-3" />
+                              {new Date(session.date).toLocaleDateString()}
+                            </div>
+                            {session.data.organization && (
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge variant="outline" className="text-xs">
+                                  {session.data.organization.industry || 'Technology'}
+                                </Badge>
+                                <Badge variant="secondary" className="text-xs">
+                                  {session.data.network_infrastructure?.site_count || 1} sites
+                                </Badge>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            className="flex-1"
+                            onClick={() => createProjectFromScoping(session)}
+                            disabled={createProject.isPending}
+                          >
+                            <ArrowRight className="h-3 w-3 mr-1" />
+                            {createProject.isPending ? 'Creating...' : 'Create Project'}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                {savedSessions.length > 6 && (
+                  <div className="text-center mt-4">
+                    <Button variant="outline" onClick={() => navigate('/scoping')}>
+                      View All Sessions ({savedSessions.length})
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
