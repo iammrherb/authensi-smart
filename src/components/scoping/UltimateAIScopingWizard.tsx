@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -558,14 +557,20 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
   ];
 
   const handleInputChange = useCallback((section: keyof ScopingData, field: string, value: any) => {
-    setScopingData(prev => ({
-      ...prev,
-      last_modified: new Date().toISOString(),
-      [section]: {
-        ...prev[section],
-        [field]: value
+    setScopingData(prev => {
+      const currentSection = prev[section];
+      if (typeof currentSection === 'object' && currentSection !== null) {
+        return {
+          ...prev,
+          last_modified: new Date().toISOString(),
+          [section]: {
+            ...currentSection,
+            [field]: value
+          }
+        };
       }
-    }));
+      return prev;
+    });
   }, []);
 
   const handlePainPointToggle = useCallback((painPoint: typeof commonPainPoints[0]) => {
