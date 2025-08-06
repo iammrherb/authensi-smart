@@ -7,10 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { useCreateProject } from "@/hooks/useProjects";
 import { useToast } from "@/hooks/use-toast";
 import EnhancedProjectCreationWizard from "@/components/comprehensive/EnhancedProjectCreationWizard";
+import UltimateAIScopingWizard from "@/components/scoping/UltimateAIScopingWizard";
 
 const ProjectCreation = () => {
   const navigate = useNavigate();
   const [wizardStep, setWizardStep] = useState(0);
+  const [activeWizard, setActiveWizard] = useState<'none' | 'creation' | 'ultimate-scoping'>('none');
   const [savedSessions, setSavedSessions] = useState<any[]>([]);
   const createProject = useCreateProject();
   const { toast } = useToast();
@@ -113,7 +115,7 @@ const ProjectCreation = () => {
       description: 'Start with intelligent questionnaire and AI recommendations',
       icon: Brain,
       color: 'from-purple-500 to-blue-600',
-      path: '/scoping'
+      action: 'ultimate-scoping'
     },
     {
       id: 'template-based',
@@ -191,9 +193,12 @@ const ProjectCreation = () => {
                     method.recommended ? 'ring-2 ring-primary' : ''
                   }`}
                   onClick={() => {
-                    if (method.path) {
+                    if ('path' in method && method.path) {
                       navigate(method.path);
+                    } else if ('action' in method && method.action === 'ultimate-scoping') {
+                      setActiveWizard('ultimate-scoping');
                     } else {
+                      setActiveWizard('creation');
                       setWizardStep(1);
                     }
                   }}
@@ -243,8 +248,59 @@ const ProjectCreation = () => {
             </CardContent>
           </Card>
 
+          {/* Ultimate AI Scoping Wizard */}
+          {activeWizard === 'ultimate-scoping' && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Ultimate AI Scoping Wizard</CardTitle>
+                <CardDescription>
+                  Comprehensive scoping with AI-driven insights and vendor selection
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <UltimateAIScopingWizard 
+                  onComplete={(sessionId, scopingData) => {
+                    // Convert scoping data to project format and create project
+                    createProjectFromScoping({
+                      id: sessionId,
+                      name: scopingData.session_name,
+                      date: scopingData.created_at,
+                      data: scopingData
+                    });
+                  }}
+                  onSave={(sessionId, scopingData) => {
+                    // Save session to localStorage
+                    const sessions = JSON.parse(localStorage.getItem('scopingSessions') || '[]');
+                    const sessionIndex = sessions.findIndex((s: any) => s.id === sessionId);
+                    const sessionData = {
+                      id: sessionId,
+                      name: scopingData.session_name,
+                      date: scopingData.last_modified,
+                      data: scopingData
+                    };
+                    
+                    if (sessionIndex >= 0) {
+                      sessions[sessionIndex] = sessionData;
+                    } else {
+                      sessions.push(sessionData);
+                    }
+                    
+                    localStorage.setItem('scopingSessions', JSON.stringify(sessions));
+                    setSavedSessions(sessions);
+                    
+                    toast({
+                      title: "Session Saved",
+                      description: "Your scoping session has been saved successfully.",
+                    });
+                  }}
+                  onCancel={() => setActiveWizard('none')}
+                />
+              </CardContent>
+            </Card>
+          )}
+
           {/* Project Creation Wizard */}
-          {wizardStep > 0 && (
+          {activeWizard === 'creation' && wizardStep > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle>Project Creation Wizard</CardTitle>
@@ -259,7 +315,7 @@ const ProjectCreation = () => {
           )}
 
           {/* Saved Scoping Sessions */}
-          {wizardStep === 0 && savedSessions.length > 0 && (
+          {activeWizard === 'none' && savedSessions.length > 0 && (
             <Card className="mb-8">
               <CardHeader>
                 <CardTitle>Saved Scoping Sessions</CardTitle>
@@ -318,7 +374,7 @@ const ProjectCreation = () => {
           )}
 
           {/* Quick Start Templates */}
-          {wizardStep === 0 && (
+          {activeWizard === 'none' && (
             <Card>
               <CardHeader>
                 <CardTitle>Quick Start Templates</CardTitle>
