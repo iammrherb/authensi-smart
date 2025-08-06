@@ -598,6 +598,631 @@ export const comprehensiveVendorData: ComprehensiveVendor[] = [
         capabilities: ["Identity Protection", "PIM", "Access Reviews", "Advanced Security"]
       }
     ]
+  },
+  {
+    id: "palo-alto",
+    name: "Palo Alto Networks",
+    category: "Firewall",
+    icon: "🛡️",
+    color: "bg-red-600",
+    description: "Next-Generation Firewall & Network Security",
+    supportLevel: "full",
+    commonFeatures: ["User-ID", "GlobalProtect", "App-ID", "Zero Trust", "Cloud Security"],
+    models: [
+      // PA-220 Series
+      {
+        id: "pa-220",
+        name: "PA-220",
+        series: "220 Series",
+        category: "Desktop Firewall",
+        ports: "8x GbE",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["11.1.3", "11.0.4", "10.2.9", "10.1.11", "10.0.12"],
+        capabilities: ["User-ID", "App-ID", "Content-ID", "GlobalProtect", "VPN"]
+      },
+      // PA-400 Series
+      {
+        id: "pa-415",
+        name: "PA-415",
+        series: "400 Series",
+        category: "Branch Firewall",
+        ports: "16x GbE + 4x SFP",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["11.1.3", "11.0.4", "10.2.9", "10.1.11"],
+        capabilities: ["User-ID", "App-ID", "Content-ID", "GlobalProtect", "SD-WAN", "ML-Powered"]
+      },
+      {
+        id: "pa-440",
+        name: "PA-440",
+        series: "400 Series",
+        category: "Branch Firewall",
+        ports: "16x GbE + 4x SFP",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["11.1.3", "11.0.4", "10.2.9", "10.1.11"],
+        capabilities: ["User-ID", "App-ID", "Content-ID", "GlobalProtect", "SD-WAN", "ML-Powered"]
+      },
+      // PA-800 Series
+      {
+        id: "pa-820",
+        name: "PA-820",
+        series: "800 Series",
+        category: "Branch Firewall",
+        ports: "8x GbE + 8x SFP",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["11.1.3", "11.0.4", "10.2.9", "10.1.11"],
+        capabilities: ["User-ID", "App-ID", "Content-ID", "GlobalProtect", "VPN", "SD-WAN"]
+      },
+      {
+        id: "pa-850",
+        name: "PA-850",
+        series: "800 Series",
+        category: "Branch Firewall",
+        ports: "8x GbE + 8x SFP",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["11.1.3", "11.0.4", "10.2.9", "10.1.11"],
+        capabilities: ["User-ID", "App-ID", "Content-ID", "GlobalProtect", "VPN", "SD-WAN"]
+      },
+      // PA-3200 Series
+      {
+        id: "pa-3220",
+        name: "PA-3220",
+        series: "3200 Series",
+        category: "Enterprise Firewall",
+        ports: "16x GbE + 4x SFP+",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["11.1.3", "11.0.4", "10.2.9", "10.1.11"],
+        capabilities: ["User-ID", "App-ID", "Content-ID", "GlobalProtect", "HA", "Clustering"]
+      },
+      {
+        id: "pa-3260",
+        name: "PA-3260",
+        series: "3200 Series",
+        category: "Enterprise Firewall",
+        ports: "16x GbE + 4x SFP+",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["11.1.3", "11.0.4", "10.2.9", "10.1.11"],
+        capabilities: ["User-ID", "App-ID", "Content-ID", "GlobalProtect", "HA", "Clustering"]
+      },
+      // PA-5200 Series
+      {
+        id: "pa-5220",
+        name: "PA-5220",
+        series: "5200 Series",
+        category: "Data Center Firewall",
+        ports: "16x SFP+ + 4x QSFP+",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["11.1.3", "11.0.4", "10.2.9", "10.1.11"],
+        capabilities: ["User-ID", "App-ID", "Content-ID", "GlobalProtect", "HA", "Clustering", "WildFire"]
+      },
+      {
+        id: "pa-5260",
+        name: "PA-5260",
+        series: "5200 Series",
+        category: "Data Center Firewall",
+        ports: "16x SFP+ + 4x QSFP+",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["11.1.3", "11.0.4", "10.2.9", "10.1.11"],
+        capabilities: ["User-ID", "App-ID", "Content-ID", "GlobalProtect", "HA", "Clustering", "WildFire"]
+      }
+    ]
+  },
+  {
+    id: "hp-aruba",
+    name: "HP Aruba",
+    category: "Wireless",
+    icon: "📡",
+    color: "bg-blue-500",
+    description: "Enterprise Wireless & Networking Solutions",
+    supportLevel: "full",
+    commonFeatures: ["Instant", "Central", "ClearPass", "AirWave", "AI Insights"],
+    models: [
+      // Aruba 500 Series
+      {
+        id: "ap-505",
+        name: "AP-505",
+        series: "500 Series",
+        category: "Wi-Fi 6 Access Point",
+        firmwareVersions: ["8.11.2.2", "8.10.0.8", "8.9.0.5", "10.4.1.0"],
+        capabilities: ["Wi-Fi 6", "4x4 MIMO", "PoE+", "BLE", "IoT Ready"]
+      },
+      {
+        id: "ap-515",
+        name: "AP-515",
+        series: "500 Series",
+        category: "Wi-Fi 6 Access Point",
+        firmwareVersions: ["8.11.2.2", "8.10.0.8", "8.9.0.5", "10.4.1.0"],
+        capabilities: ["Wi-Fi 6", "4x4 MIMO", "PoE+", "BLE", "IoT Ready", "External Antenna"]
+      },
+      {
+        id: "ap-555",
+        name: "AP-555",
+        series: "500 Series",
+        category: "Wi-Fi 6 Access Point",
+        firmwareVersions: ["8.11.2.2", "8.10.0.8", "8.9.0.5", "10.4.1.0"],
+        capabilities: ["Wi-Fi 6", "4x4 MIMO", "PoE++", "BLE", "IoT Ready", "High Density"]
+      },
+      // Aruba 600 Series
+      {
+        id: "ap-635",
+        name: "AP-635",
+        series: "600 Series",
+        category: "Wi-Fi 6E Access Point",
+        firmwareVersions: ["8.11.2.2", "8.10.0.8", "10.4.1.0"],
+        capabilities: ["Wi-Fi 6E", "4x4 MIMO", "6GHz", "PoE++", "BLE", "Zigbee"]
+      },
+      {
+        id: "ap-655",
+        name: "AP-655",
+        series: "600 Series",
+        category: "Wi-Fi 6E Access Point",
+        firmwareVersions: ["8.11.2.2", "8.10.0.8", "10.4.1.0"],
+        capabilities: ["Wi-Fi 6E", "4x4 MIMO", "6GHz", "PoE++", "BLE", "Zigbee", "High Density"]
+      },
+      // Aruba 670 Series
+      {
+        id: "ap-675",
+        name: "AP-675",
+        series: "670 Series",
+        category: "Wi-Fi 6E Access Point",
+        firmwareVersions: ["8.11.2.2", "8.10.0.8", "10.4.1.0"],
+        capabilities: ["Wi-Fi 6E", "4x4 MIMO", "6GHz", "PoE++", "BLE", "Zigbee", "External Antenna"]
+      },
+      // Aruba 7000 Series Controllers
+      {
+        id: "7005",
+        name: "7005",
+        series: "7000 Series",
+        category: "Wireless Controller",
+        firmwareVersions: ["8.11.2.2", "8.10.0.8", "8.9.0.5"],
+        capabilities: ["128 APs", "AirMatch", "ClientMatch", "Adaptive Radio Management"]
+      },
+      {
+        id: "7010",
+        name: "7010",
+        series: "7000 Series",
+        category: "Wireless Controller",
+        firmwareVersions: ["8.11.2.2", "8.10.0.8", "8.9.0.5"],
+        capabilities: ["512 APs", "AirMatch", "ClientMatch", "Adaptive Radio Management", "Redundancy"]
+      },
+      {
+        id: "7030",
+        name: "7030",
+        series: "7000 Series",
+        category: "Wireless Controller",
+        firmwareVersions: ["8.11.2.2", "8.10.0.8", "8.9.0.5"],
+        capabilities: ["2048 APs", "AirMatch", "ClientMatch", "Adaptive Radio Management", "Clustering"]
+      }
+    ]
+  },
+  {
+    id: "dell",
+    name: "Dell Technologies",
+    category: "Enterprise",
+    icon: "💻",
+    color: "bg-blue-700",
+    description: "Enterprise Networking & Infrastructure",
+    supportLevel: "full",
+    commonFeatures: ["OS10", "SmartFabric", "VLT", "OpenManage", "Campus Fabric"],
+    models: [
+      // PowerSwitch N1100 Series
+      {
+        id: "n1108t-on",
+        name: "N1108T-ON",
+        series: "N1100 Series",
+        category: "Access",
+        ports: "8x GbE + 2x SFP+",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["10.5.6.0", "10.5.5.0", "10.5.4.0", "10.5.3.0"],
+        capabilities: ["802.1X", "VLAN", "QoS", "LLDP", "ONIE"]
+      },
+      {
+        id: "n1124t-on",
+        name: "N1124T-ON",
+        series: "N1100 Series",
+        category: "Access",
+        ports: "24x GbE + 4x SFP+",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["10.5.6.0", "10.5.5.0", "10.5.4.0", "10.5.3.0"],
+        capabilities: ["802.1X", "VLAN", "QoS", "LLDP", "ONIE", "Multi-Auth"]
+      },
+      {
+        id: "n1148t-on",
+        name: "N1148T-ON",
+        series: "N1100 Series",
+        category: "Access",
+        ports: "48x GbE + 4x SFP+",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["10.5.6.0", "10.5.5.0", "10.5.4.0", "10.5.3.0"],
+        capabilities: ["802.1X", "VLAN", "QoS", "LLDP", "ONIE", "Multi-Auth"]
+      },
+      // PowerSwitch N2200 Series
+      {
+        id: "n2224px-on",
+        name: "N2224PX-ON",
+        series: "N2200 Series",
+        category: "Access",
+        ports: "24x GbE + 4x SFP+",
+        stackable: true,
+        poe: true,
+        firmwareVersions: ["10.5.6.0", "10.5.5.0", "10.5.4.0", "10.5.3.0"],
+        capabilities: ["802.1X", "VLT", "PoE+", "Stacking", "Multi-Auth", "Campus Fabric"]
+      },
+      {
+        id: "n2248px-on",
+        name: "N2248PX-ON",
+        series: "N2200 Series",
+        category: "Access",
+        ports: "48x GbE + 4x SFP+",
+        stackable: true,
+        poe: true,
+        firmwareVersions: ["10.5.6.0", "10.5.5.0", "10.5.4.0", "10.5.3.0"],
+        capabilities: ["802.1X", "VLT", "PoE+", "Stacking", "Multi-Auth", "Campus Fabric"]
+      },
+      // PowerSwitch N3200 Series
+      {
+        id: "n3224t-on",
+        name: "N3224T-ON",
+        series: "N3200 Series",
+        category: "Distribution",
+        ports: "24x GbE + 4x 10GbE SFP+",
+        stackable: true,
+        poe: false,
+        firmwareVersions: ["10.5.6.0", "10.5.5.0", "10.5.4.0", "10.5.3.0"],
+        capabilities: ["802.1X", "VLT", "L3", "BGP", "OSPF", "Multi-Auth", "Campus Fabric"]
+      },
+      {
+        id: "n3248te-on",
+        name: "N3248TE-ON",
+        series: "N3200 Series",
+        category: "Distribution",
+        ports: "48x GbE + 4x 10GbE SFP+",
+        stackable: true,
+        poe: false,
+        firmwareVersions: ["10.5.6.0", "10.5.5.0", "10.5.4.0", "10.5.3.0"],
+        capabilities: ["802.1X", "VLT", "L3", "BGP", "OSPF", "Multi-Auth", "Campus Fabric"]
+      },
+      // PowerSwitch Z9100 Series
+      {
+        id: "z9100-on",
+        name: "Z9100-ON",
+        series: "Z9100 Series",
+        category: "Core",
+        ports: "32x 100GbE QSFP28",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["10.5.6.0", "10.5.5.0", "10.5.4.0"],
+        capabilities: ["802.1X", "VLT", "L3", "BGP", "EVPN", "VXLAN", "Data Center Fabric"]
+      }
+    ]
+  },
+  {
+    id: "sonicwall",
+    name: "SonicWall",
+    category: "Firewall",
+    icon: "🔒",
+    color: "bg-orange-600",
+    description: "Network Security & Firewall Solutions",
+    supportLevel: "full",
+    commonFeatures: ["SonicOS", "Deep Packet Inspection", "Anti-Malware", "VPN", "Capture Security"],
+    models: [
+      // TZ Series
+      {
+        id: "tz270",
+        name: "TZ270",
+        series: "TZ Series",
+        category: "Desktop Firewall",
+        ports: "5x GbE",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["7.0.1-5035", "7.0.1-5030", "7.0.0-5020"],
+        capabilities: ["Deep Packet Inspection", "VPN", "Anti-Malware", "Content Filtering"]
+      },
+      {
+        id: "tz370",
+        name: "TZ370",
+        series: "TZ Series",
+        category: "Desktop Firewall",
+        ports: "5x GbE",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["7.0.1-5035", "7.0.1-5030", "7.0.0-5020"],
+        capabilities: ["Deep Packet Inspection", "VPN", "Anti-Malware", "Content Filtering", "Wi-Fi"]
+      },
+      {
+        id: "tz470",
+        name: "TZ470",
+        series: "TZ Series",
+        category: "Desktop Firewall",
+        ports: "8x GbE",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["7.0.1-5035", "7.0.1-5030", "7.0.0-5020"],
+        capabilities: ["Deep Packet Inspection", "VPN", "Anti-Malware", "Content Filtering", "PoE"]
+      },
+      {
+        id: "tz570",
+        name: "TZ570",
+        series: "TZ Series",
+        category: "Desktop Firewall",
+        ports: "8x GbE + 2x SFP",
+        stackable: false,
+        poe: true,
+        firmwareVersions: ["7.0.1-5035", "7.0.1-5030", "7.0.0-5020"],
+        capabilities: ["Deep Packet Inspection", "VPN", "Anti-Malware", "Content Filtering", "PoE+"]
+      },
+      // NSa Series
+      {
+        id: "nsa2700",
+        name: "NSa2700",
+        series: "NSa Series",
+        category: "Branch Firewall",
+        ports: "8x GbE + 2x SFP+",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["7.0.1-5035", "7.0.1-5030", "7.0.0-5020"],
+        capabilities: ["Deep Packet Inspection", "VPN", "Anti-Malware", "HA", "Clustering"]
+      },
+      {
+        id: "nsa3700",
+        name: "NSa3700",
+        series: "NSa Series",
+        category: "Branch Firewall",
+        ports: "16x GbE + 4x SFP+",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["7.0.1-5035", "7.0.1-5030", "7.0.0-5020"],
+        capabilities: ["Deep Packet Inspection", "VPN", "Anti-Malware", "HA", "Clustering"]
+      },
+      {
+        id: "nsa4700",
+        name: "NSa4700",
+        series: "NSa Series",
+        category: "Enterprise Firewall",
+        ports: "16x GbE + 4x SFP+",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["7.0.1-5035", "7.0.1-5030", "7.0.0-5020"],
+        capabilities: ["Deep Packet Inspection", "VPN", "Anti-Malware", "HA", "Clustering", "Advanced Threat Protection"]
+      },
+      // NSsp Series
+      {
+        id: "nssp12400",
+        name: "NSsp12400",
+        series: "NSsp Series",
+        category: "Data Center Firewall",
+        ports: "24x SFP+ + 2x QSFP+",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["7.0.1-5035", "7.0.1-5030"],
+        capabilities: ["Deep Packet Inspection", "VPN", "Anti-Malware", "HA", "Clustering", "Real-Time Deep Memory Inspection"]
+      }
+    ]
+  },
+  {
+    id: "meraki",
+    name: "Cisco Meraki",
+    category: "Cloud Managed",
+    icon: "☁️",
+    color: "bg-green-600",
+    description: "Cloud-Managed Networking Solutions",
+    supportLevel: "full",
+    commonFeatures: ["Cloud Dashboard", "Zero-Touch Provisioning", "SD-WAN", "Insight Analytics", "Systems Manager"],
+    models: [
+      // MS Series Switches
+      {
+        id: "ms120-24",
+        name: "MS120-24",
+        series: "MS120 Series",
+        category: "Access",
+        ports: "24x GbE + 4x SFP",
+        stackable: true,
+        poe: false,
+        firmwareVersions: ["MS.15.21.1", "MS.14.33.1", "MS.14.32.1"],
+        capabilities: ["802.1X", "Cloud Managed", "Stacking", "Dynamic VLAN", "Multi-Auth"]
+      },
+      {
+        id: "ms120-48",
+        name: "MS120-48",
+        series: "MS120 Series",
+        category: "Access",
+        ports: "48x GbE + 4x SFP",
+        stackable: true,
+        poe: false,
+        firmwareVersions: ["MS.15.21.1", "MS.14.33.1", "MS.14.32.1"],
+        capabilities: ["802.1X", "Cloud Managed", "Stacking", "Dynamic VLAN", "Multi-Auth"]
+      },
+      {
+        id: "ms125-24",
+        name: "MS125-24",
+        series: "MS125 Series",
+        category: "Access",
+        ports: "24x GbE + 4x SFP+",
+        stackable: true,
+        poe: true,
+        firmwareVersions: ["MS.15.21.1", "MS.14.33.1", "MS.14.32.1"],
+        capabilities: ["802.1X", "Cloud Managed", "PoE+", "Stacking", "Dynamic VLAN", "Multi-Auth"]
+      },
+      {
+        id: "ms125-48",
+        name: "MS125-48",
+        series: "MS125 Series",
+        category: "Access",
+        ports: "48x GbE + 4x SFP+",
+        stackable: true,
+        poe: true,
+        firmwareVersions: ["MS.15.21.1", "MS.14.33.1", "MS.14.32.1"],
+        capabilities: ["802.1X", "Cloud Managed", "PoE+", "Stacking", "Dynamic VLAN", "Multi-Auth"]
+      },
+      // MR Series Access Points
+      {
+        id: "mr36",
+        name: "MR36",
+        series: "MR30 Series",
+        category: "Wi-Fi 6 Access Point",
+        firmwareVersions: ["MR.28.7", "MR.27.7", "MR.26.8"],
+        capabilities: ["Wi-Fi 6", "4x4 MIMO", "Cloud Managed", "Location Analytics", "Air Marshal"]
+      },
+      {
+        id: "mr46",
+        name: "MR46",
+        series: "MR40 Series",
+        category: "Wi-Fi 6 Access Point",
+        firmwareVersions: ["MR.28.7", "MR.27.7", "MR.26.8"],
+        capabilities: ["Wi-Fi 6", "4x4 MIMO", "Cloud Managed", "BLE", "Location Analytics"]
+      },
+      {
+        id: "mr56",
+        name: "MR56",
+        series: "MR50 Series",
+        category: "Wi-Fi 6E Access Point",
+        firmwareVersions: ["MR.28.7", "MR.27.7"],
+        capabilities: ["Wi-Fi 6E", "4x4 MIMO", "6GHz", "Cloud Managed", "BLE", "IoT Radio"]
+      },
+      // MX Series Security Appliances
+      {
+        id: "mx67",
+        name: "MX67",
+        series: "MX60 Series",
+        category: "Branch Security",
+        ports: "12x GbE",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["MX.17.10.2", "MX.16.16", "MX.15.44"],
+        capabilities: ["SD-WAN", "Advanced Security", "Auto VPN", "Content Filtering", "IPS"]
+      },
+      {
+        id: "mx75",
+        name: "MX75",
+        series: "MX70 Series",
+        category: "Branch Security",
+        ports: "12x GbE + 2x SFP",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["MX.17.10.2", "MX.16.16", "MX.15.44"],
+        capabilities: ["SD-WAN", "Advanced Security", "Auto VPN", "Content Filtering", "IPS", "Advanced Malware Protection"]
+      },
+      {
+        id: "mx105",
+        name: "MX105",
+        series: "MX100 Series",
+        category: "Enterprise Security",
+        ports: "8x GbE + 2x SFP+",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["MX.17.10.2", "MX.16.16", "MX.15.44"],
+        capabilities: ["SD-WAN", "Advanced Security", "Auto VPN", "Content Filtering", "IPS", "Advanced Malware Protection", "HA"]
+      }
+    ]
+  },
+  {
+    id: "ubiquiti",
+    name: "Ubiquiti",
+    category: "Enterprise",
+    icon: "📶",
+    color: "bg-blue-400",
+    description: "UniFi Enterprise Networking Solutions",
+    supportLevel: "partial",
+    commonFeatures: ["UniFi Controller", "Cloud Key", "RADIUS", "VLAN", "PoE"],
+    models: [
+      // UniFi Switch Enterprise
+      {
+        id: "usw-enterprise-24-poe",
+        name: "USW-Enterprise-24-PoE",
+        series: "Enterprise Series",
+        category: "Access",
+        ports: "24x GbE + 2x SFP+",
+        stackable: false,
+        poe: true,
+        firmwareVersions: ["6.5.59", "6.2.26", "6.0.45"],
+        capabilities: ["802.1X", "VLAN", "PoE++", "UniFi Controller", "Multi-Auth"]
+      },
+      {
+        id: "usw-enterprise-48-poe",
+        name: "USW-Enterprise-48-PoE",
+        series: "Enterprise Series",
+        category: "Access",
+        ports: "48x GbE + 4x SFP+",
+        stackable: false,
+        poe: true,
+        firmwareVersions: ["6.5.59", "6.2.26", "6.0.45"],
+        capabilities: ["802.1X", "VLAN", "PoE++", "UniFi Controller", "Multi-Auth"]
+      },
+      // UniFi Switch Pro
+      {
+        id: "usw-pro-24",
+        name: "USW-Pro-24",
+        series: "Pro Series",
+        category: "Access",
+        ports: "24x GbE + 2x SFP+",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["6.5.59", "6.2.26", "6.0.45"],
+        capabilities: ["802.1X", "VLAN", "L3", "UniFi Controller"]
+      },
+      {
+        id: "usw-pro-48",
+        name: "USW-Pro-48",
+        series: "Pro Series",
+        category: "Access",
+        ports: "48x GbE + 4x SFP+",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["6.5.59", "6.2.26", "6.0.45"],
+        capabilities: ["802.1X", "VLAN", "L3", "UniFi Controller"]
+      },
+      // UniFi Access Points
+      {
+        id: "u6-enterprise",
+        name: "U6-Enterprise",
+        series: "WiFi 6 Series",
+        category: "Wi-Fi 6 Access Point",
+        firmwareVersions: ["6.5.59", "6.2.26", "6.0.45"],
+        capabilities: ["Wi-Fi 6", "4x4 MIMO", "2.5GbE", "PoE++", "UniFi Controller"]
+      },
+      {
+        id: "u6-pro",
+        name: "U6-Pro",
+        series: "WiFi 6 Series",
+        category: "Wi-Fi 6 Access Point",
+        firmwareVersions: ["6.5.59", "6.2.26", "6.0.45"],
+        capabilities: ["Wi-Fi 6", "4x4 MIMO", "2.5GbE", "PoE+", "UniFi Controller"]
+      },
+      // UniFi Dream Machine
+      {
+        id: "udm-pro",
+        name: "UDM-Pro",
+        series: "Dream Machine",
+        category: "Security Gateway",
+        ports: "8x GbE + 2x SFP+",
+        stackable: false,
+        poe: false,
+        firmwareVersions: ["3.2.9", "3.1.15", "2.4.27"],
+        capabilities: ["Firewall", "IPS", "DPI", "VPN", "UniFi Controller", "Protect"]
+      },
+      {
+        id: "udm-pro-max",
+        name: "UDM-Pro-Max",
+        series: "Dream Machine",
+        category: "Security Gateway",
+        ports: "8x GbE + 2x SFP+",
+        stackable: false,
+        poe: true,
+        firmwareVersions: ["3.2.9", "3.1.15"],
+        capabilities: ["Firewall", "IPS", "DPI", "VPN", "UniFi Controller", "Protect", "PoE++"]
+      }
+    ]
   }
 ];
 
