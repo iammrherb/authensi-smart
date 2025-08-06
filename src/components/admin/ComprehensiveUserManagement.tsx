@@ -123,6 +123,9 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
   const [newUserPassword, setNewUserPassword] = useState('');
   const [newUserRole, setNewUserRole] = useState<AppRole>('viewer');
   const [generatePassword, setGeneratePassword] = useState(true);
+  const [userScopeType, setUserScopeType] = useState('global');
+  const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
+  const [selectedSites, setSelectedSites] = useState<string[]>([]);
   const [isCreatingUser, setIsCreatingUser] = useState(false);
   const [resetPasswordEmail, setResetPasswordEmail] = useState('');
 
@@ -132,6 +135,31 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
   const { data: canManage = false } = useCanManageRoles(scopeType, scopeId);
   const { mutate: assignRoleMutation } = useAssignRole();
   const { mutate: removeRole } = useRemoveRole();
+
+  // Fetch projects and sites for scope selection
+  const { data: projects = [] } = useQuery({
+    queryKey: ['projects'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('id, name, client_name')
+        .order('name');
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  const { data: sites = [] } = useQuery({
+    queryKey: ['sites'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sites')
+        .select('id, name, location')
+        .order('name');
+      if (error) throw error;
+      return data;
+    }
+  });
 
   // Fetch all users with enhanced profile data
   const { data: allUsers = [], isLoading: isLoadingUsers } = useQuery({
@@ -177,6 +205,9 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
       last_name: string;
       role: AppRole;
       password?: string;
+      scope_type?: string;
+      selected_projects?: string[];
+      selected_sites?: string[];
     }) => {
       const { data, error } = await supabase.functions.invoke('user-management', {
         body: {
@@ -185,8 +216,10 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
           first_name: userData.first_name,
           last_name: userData.last_name,
           role: userData.role,
-          scope_type: scopeType || 'global',
-          scope_id: scopeId,
+          password: userData.password,
+          scope_type: userData.scope_type || 'global',
+          selected_projects: userData.selected_projects || [],
+          selected_sites: userData.selected_sites || [],
           send_welcome_email: true
         }
       });
@@ -403,6 +436,9 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
     setNewUserPassword('');
     setNewUserRole('viewer');
     setGeneratePassword(true);
+    setUserScopeType('global');
+    setSelectedProjects([]);
+    setSelectedSites([]);
   };
 
   const handleCreateUser = () => {
@@ -429,7 +465,10 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
       first_name: newUserFirstName,
       last_name: newUserLastName,
       role: newUserRole,
-      password: generatePassword ? undefined : newUserPassword
+      password: generatePassword ? undefined : newUserPassword,
+      scope_type: userScopeType,
+      selected_projects: selectedProjects,
+      selected_sites: selectedSites
     });
   };
 
@@ -584,6 +623,77 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
                       </p>
                     )}
                   </div>
+
+                  <div className="space-y-3">
+                    <Label>Access Scope</Label>
+                    <Select value={userScopeType} onValueChange={setUserScopeType}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="global">Global Access</SelectItem>
+                        <SelectItem value="project">Project Specific</SelectItem>
+                        <SelectItem value="site">Site Specific</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {userScopeType === 'project' && (
+                    <div className="space-y-2">
+                      <Label>Select Projects</Label>
+                      <div className="max-h-32 overflow-y-auto space-y-2 border rounded-md p-2">
+                        {projects.map((project) => (
+                          <div key={project.id} className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              id={`project-${project.id}`}
+                              checked={selectedProjects.includes(project.id)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedProjects([...selectedProjects, project.id]);
+                                } else {
+                                  setSelectedProjects(selectedProjects.filter(id => id !== project.id));
+                                }
+                              }}
+                              className="rounded border-gray-300"
+                            />
+                            <Label htmlFor={`project-${project.id}`} className="text-sm">
+                              {project.name} - {project.client_name}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {userScopeType === 'site' && (
+                    <div className="space-y-2">
+                      <Label>Select Sites</Label>
+                      <div className="max-h-32 overflow-y-auto space-y-2 border rounded-md p-2">
+                        {sites.map((site) => (
+                          <div key={site.id} className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              id={`site-${site.id}`}
+                              checked={selectedSites.includes(site.id)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedSites([...selectedSites, site.id]);
+                                } else {
+                                  setSelectedSites(selectedSites.filter(id => id !== site.id));
+                                }
+                              }}
+                              className="rounded border-gray-300"
+                            />
+                            <Label htmlFor={`site-${site.id}`} className="text-sm">
+                              {site.name} - {site.location}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                   )}
+
                   <div className="flex justify-end space-x-2 pt-4">
                     <Button
                       variant="outline"
