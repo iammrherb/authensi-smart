@@ -120,7 +120,9 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserFirstName, setNewUserFirstName] = useState('');
   const [newUserLastName, setNewUserLastName] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
   const [newUserRole, setNewUserRole] = useState<AppRole>('viewer');
+  const [generatePassword, setGeneratePassword] = useState(true);
   const [isCreatingUser, setIsCreatingUser] = useState(false);
   const [resetPasswordEmail, setResetPasswordEmail] = useState('');
 
@@ -174,15 +176,19 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
       first_name: string;
       last_name: string;
       role: AppRole;
+      password?: string;
     }) => {
-      const { data, error } = await supabase.rpc('create_user_safely', {
-        p_email: userData.email,
-        p_password: 'TemporaryPassword123!', // Will be reset via email
-        p_first_name: userData.first_name,
-        p_last_name: userData.last_name,
-        p_role: userData.role,
-        p_scope_type: scopeType || 'global',
-        p_scope_id: scopeId
+      const { data, error } = await supabase.functions.invoke('user-management', {
+        body: {
+          action: 'create-user',
+          email: userData.email,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          role: userData.role,
+          scope_type: scopeType || 'global',
+          scope_id: scopeId,
+          send_welcome_email: true
+        }
       });
 
       if (error) {
@@ -190,9 +196,8 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
         throw error;
       }
       
-      const result = data as any;
-      if (!result?.success) {
-        throw new Error(result?.error || 'Failed to create user');
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to create user');
       }
       
       return data;
@@ -395,7 +400,9 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
     setNewUserEmail('');
     setNewUserFirstName('');
     setNewUserLastName('');
+    setNewUserPassword('');
     setNewUserRole('viewer');
+    setGeneratePassword(true);
   };
 
   const handleCreateUser = () => {
@@ -408,11 +415,21 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
       return;
     }
 
+    if (!generatePassword && !newUserPassword) {
+      toast({
+        title: "Password Required",
+        description: "Please enter a password or enable auto-generation",
+        variant: "destructive"
+      });
+      return;
+    }
+
     createUserMutation.mutate({
       email: newUserEmail,
       first_name: newUserFirstName,
       last_name: newUserLastName,
-      role: newUserRole
+      role: newUserRole,
+      password: generatePassword ? undefined : newUserPassword
     });
   };
 
@@ -530,6 +547,42 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="passwordToggle">Password</Label>
+                      <div className="flex items-center space-x-2">
+                        <Label htmlFor="passwordToggle" className="text-sm font-normal">
+                          Generate automatically
+                        </Label>
+                        <Switch
+                          id="passwordToggle"
+                          checked={generatePassword}
+                          onCheckedChange={setGeneratePassword}
+                        />
+                      </div>
+                    </div>
+                    
+                    {!generatePassword && (
+                      <div className="space-y-2">
+                        <Input
+                          type="password"
+                          value={newUserPassword}
+                          onChange={(e) => setNewUserPassword(e.target.value)}
+                          placeholder="Enter password"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Password must be at least 8 characters long
+                        </p>
+                      </div>
+                    )}
+                    
+                    {generatePassword && (
+                      <p className="text-xs text-muted-foreground">
+                        A temporary password will be generated automatically. User will receive an email to set their own password.
+                      </p>
+                    )}
                   </div>
                   <div className="flex justify-end space-x-2 pt-4">
                     <Button
