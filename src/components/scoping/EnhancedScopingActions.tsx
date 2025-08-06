@@ -69,7 +69,7 @@ const EnhancedScopingActions: React.FC<ScopingActionsProps> = ({
         description: `Comprehensive NAC deployment scoped through AI wizard`,
         client_name: formData.organization.name,
         industry: formData.organization.industry || 'Technology',
-        deployment_type: formData.integration_compliance?.current_nac_vendor || 'greenfield',
+        deployment_type: getDeploymentTypeFromOrganization(formData.organization),
         security_level: 'enhanced',
         total_sites: formData.network_infrastructure?.site_count || 1,
         total_endpoints: (formData.organization?.total_users || 0) + 
@@ -138,6 +138,17 @@ const EnhancedScopingActions: React.FC<ScopingActionsProps> = ({
     const existingSessions = JSON.parse(localStorage.getItem('scopingSessions') || '[]');
     existingSessions.push(scopingSession);
     localStorage.setItem('scopingSessions', JSON.stringify(existingSessions));
+  };
+
+  const getDeploymentTypeFromOrganization = (organization: any): string => {
+    const userCount = organization?.total_users || 0;
+    const siteCount = organization?.site_count || 1;
+    
+    // Determine deployment type based on organization size
+    if (userCount < 100 && siteCount <= 1) return 'SMB';
+    if (userCount < 1000 && siteCount <= 5) return 'Mid-Market';
+    if (userCount < 5000 && siteCount <= 20) return 'Enterprise';
+    return 'Global';
   };
 
   const generateBusinessSummary = (): string => {
