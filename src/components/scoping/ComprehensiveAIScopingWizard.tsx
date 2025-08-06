@@ -675,7 +675,7 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
         client_name: formData.organization.name,
         industry: formData.organization.industry,
         deployment_type: 'comprehensive',
-        security_level: 'enhanced',
+        security_level: 'Advanced',
         total_sites: formData.network_infrastructure.site_count,
         total_endpoints: formData.organization.total_users,
         compliance_frameworks: formData.integration_compliance.compliance_frameworks,

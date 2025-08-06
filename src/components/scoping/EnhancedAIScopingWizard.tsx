@@ -215,7 +215,7 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
       client_name: scopingData.organization.name,
       industry: scopingData.organization.industry,
       deployment_type: scopingData.network_infrastructure.topology_type?.toLowerCase() || 'hybrid',
-      security_level: 'enhanced',
+      security_level: 'Advanced',
       total_sites: scopingData.network_infrastructure.site_count || 1,
       total_endpoints: scopingData.organization.total_users || 100,
       compliance_frameworks: scopingData.organization.compliance_needs || [],

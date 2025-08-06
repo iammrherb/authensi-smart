@@ -70,7 +70,7 @@ const EnhancedScopingActions: React.FC<ScopingActionsProps> = ({
         client_name: formData.organization.name,
         industry: formData.organization.industry || 'Technology',
         deployment_type: getDeploymentTypeFromOrganization(formData.organization),
-        security_level: 'enhanced',
+        security_level: 'Advanced',
         total_sites: formData.network_infrastructure?.site_count || 1,
         total_endpoints: (formData.organization?.total_users || 0) + 
           Object.values(formData.network_infrastructure?.device_inventory || {}).reduce((sum: number, count: any) => {
