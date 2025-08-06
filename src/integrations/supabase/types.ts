@@ -3629,26 +3629,16 @@ export type Database = {
         Returns: undefined
       }
       create_user_safely: {
-        Args:
-          | {
-              p_email: string
-              p_password: string
-              p_first_name?: string
-              p_last_name?: string
-              p_role?: Database["public"]["Enums"]["app_role"]
-              p_scope_type?: string
-              p_scope_id?: string
-            }
-          | {
-              p_email: string
-              p_password?: string
-              p_first_name?: string
-              p_last_name?: string
-              p_role?: Database["public"]["Enums"]["app_role"]
-              p_scope_type?: string
-              p_scope_id?: string
-              p_send_invitation?: boolean
-            }
+        Args: {
+          p_email: string
+          p_password?: string
+          p_first_name?: string
+          p_last_name?: string
+          p_role?: Database["public"]["Enums"]["app_role"]
+          p_scope_type?: string
+          p_scope_id?: string
+          p_send_invitation?: boolean
+        }
         Returns: Json
       }
       delete_user_safely: {
