@@ -217,27 +217,74 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
     if (!selectedVendor || !configType || !aiRequirements) {
       toast({
         title: "Missing Information",
-        description: "Please select vendor, config type, and provide requirements.",
+        description: "Please select vendor, config type, and provide detailed requirements.",
         variant: "destructive",
       });
       return;
     }
 
     try {
-      const selectedVendorName = vendors?.find(v => v.id === selectedVendor)?.vendor_name || '';
-      const selectedModelName = vendorModels?.find(m => m.id === selectedModel)?.model_name || '';
+      const selectedVendorData = vendors?.find(v => v.id === selectedVendor);
+      const selectedModelData = vendorModels?.find(m => m.id === selectedModel);
+      
+      // Enhanced prompt for comprehensive configuration generation
+      const enhancedPrompt = `COMPREHENSIVE NETWORK CONFIGURATION REQUEST
+
+DEVICE SPECIFICATIONS:
+- Vendor: ${selectedVendorData?.vendor_name || 'Generic'}
+- Model: ${selectedModelData?.model_name || 'Generic Model'}
+- Model Series: ${selectedModelData?.model_series || 'Standard'}
+- Firmware: ${selectedFirmware || 'Latest Stable'}
+- Configuration Type: ${configType}
+
+DETAILED REQUIREMENTS:
+${aiRequirements}
+
+CONFIGURATION SCOPE:
+Please generate a comprehensive, enterprise-grade configuration that includes:
+1. Complete device configuration with all necessary commands
+2. Security hardening and best practices implementation
+3. Detailed inline documentation and comments
+4. RADIUS/AAA integration for authentication
+5. Dynamic VLAN assignment configuration
+6. Quality of Service (QoS) configuration
+7. SNMP and monitoring setup
+8. Access control lists and security policies
+9. Backup and recovery procedures
+10. Comprehensive troubleshooting guide
+11. Implementation and validation steps
+12. Maintenance and update procedures
+
+ADDITIONAL REQUIREMENTS:
+- Follow vendor-specific best practices for ${selectedVendorData?.vendor_name || 'the selected vendor'}
+- Include security considerations for ${configType}
+- Provide production-ready configuration suitable for enterprise deployment
+- Include performance optimization settings
+- Add comprehensive error handling and failover configurations
+
+FORMAT: Provide a well-structured, professional configuration document with clear sections, detailed explanations, and actionable implementation guidance.`;
       
       const result = await generateWithAI.mutateAsync({
-        vendor: selectedVendorName,
-        model: selectedModelName,
+        vendor: selectedVendorData?.vendor_name || '',
+        model: selectedModelData?.model_name || '',
         firmware: selectedFirmware,
         configType,
-        requirements: aiRequirements,
+        requirements: enhancedPrompt,
       });
 
       setGeneratedConfig(result.content);
+      
+      toast({
+        title: "Configuration Generated Successfully",
+        description: "Comprehensive enterprise-grade configuration has been generated with best practices and troubleshooting guide.",
+      });
     } catch (error) {
       console.error('Failed to generate config:', error);
+      toast({
+        title: "Generation Failed",
+        description: "Failed to generate configuration. Please check your inputs and try again.",
+        variant: "destructive",
+      });
     }
   };
 

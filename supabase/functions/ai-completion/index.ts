@@ -27,19 +27,39 @@ async function callOpenAI(request: AIRequest) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages: [
         {
           role: 'system',
-          content: `You are a Portnox NAC (Network Access Control) expert assistant. You help with deployment planning, troubleshooting, best practices, and recommendations. Always provide accurate, actionable advice based on enterprise network security best practices.${request.context ? ` Context: ${request.context}` : ''}`
+          content: `You are an expert network security engineer specializing in 802.1X, NAC, and enterprise network security. You have deep knowledge of Portnox NAC solutions and network infrastructure. Your expertise includes:
+
+- Enterprise 802.1X authentication and authorization
+- Network Access Control (NAC) implementations
+- RADIUS server configuration and integration
+- Dynamic VLAN assignment and network segmentation
+- Security policy enforcement and compliance
+- Multi-vendor network equipment configuration
+- Troubleshooting network authentication issues
+- Industry best practices and security standards
+
+Always provide comprehensive, production-ready configurations that include:
+- Complete configuration commands
+- Security hardening measures
+- Best practices implementation
+- Detailed documentation and comments
+- Troubleshooting guides
+- Implementation procedures
+- Validation steps
+
+${request.context ? ` Context: ${request.context}` : ''}`
         },
         {
           role: 'user',
           content: request.prompt
         }
       ],
-      temperature: request.temperature || 0.7,
-      max_tokens: request.maxTokens || 2000,
+      temperature: request.temperature || 0.1,
+      max_tokens: request.maxTokens || 4000,
     }),
   });
 

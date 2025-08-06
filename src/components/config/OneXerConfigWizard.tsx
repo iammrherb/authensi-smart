@@ -229,50 +229,89 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
       const selectedModel = vendorModels?.find(m => m.id === wizardData.basic.model);
       const scenario = configurationScenarios.find(s => s.id === wizardData.scenario.selectedScenario);
 
-      const prompt = `Generate a comprehensive 802.1X configuration for:
-        Vendor: ${selectedVendor?.vendor_name}
-        Model: ${selectedModel?.model_name || 'Generic'}
-        Firmware: ${wizardData.basic.firmwareVersion || 'Latest'}
-        Scenario: ${scenario?.name}
-        Authentication Methods: ${wizardData.scenario.authMethods.join(', ')}
-        Industry: ${wizardData.requirements.industry}
-        Security Level: ${wizardData.requirements.securityLevel}
-        Compliance: ${wizardData.scenario.compliance.join(', ')}
-        Requirements: ${wizardData.requirements.selectedRequirements.length} specific requirements
-        ${wizardData.scenario.networkSegmentation ? 'Include network segmentation' : ''}
-        ${wizardData.scenario.guestAccess ? 'Include guest network configuration' : ''}
-        
-        Please include:
-        - Complete switch configuration
-        - RADIUS server settings
-        - VLAN configurations
-        - Security policies
-        - Best practices comments
-        - Troubleshooting commands`;
+      // Build comprehensive context for AI generation
+      const contextData = {
+        vendor: selectedVendor?.vendor_name || 'Generic',
+        model: selectedModel?.model_name || 'Generic Model',
+        firmware: wizardData.basic.firmwareVersion || 'Latest',
+        deviceType: wizardData.basic.deviceType,
+        scenario: scenario?.name || 'Custom Configuration',
+        authMethods: wizardData.scenario.authMethods,
+        industry: wizardData.requirements.industry,
+        securityLevel: wizardData.requirements.securityLevel,
+        compliance: wizardData.scenario.compliance,
+        networkSegmentation: wizardData.scenario.networkSegmentation,
+        guestAccess: wizardData.scenario.guestAccess,
+        requirements: wizardData.requirements.selectedRequirements,
+        vlans: wizardData.advanced.vlans,
+        radiusServers: wizardData.advanced.radiusServers,
+        certificates: wizardData.advanced.certificates,
+        policies: wizardData.advanced.policies
+      };
+
+      const detailedPrompt = `Generate a comprehensive, production-ready 802.1X configuration for the following specifications:
+
+DEVICE INFORMATION:
+- Vendor: ${contextData.vendor}
+- Model: ${contextData.model}
+- Firmware: ${contextData.firmware}
+- Device Type: ${contextData.deviceType}
+
+DEPLOYMENT SCENARIO:
+- Configuration Type: ${contextData.scenario}
+- Authentication Methods: ${contextData.authMethods.join(', ') || 'EAP-TLS, PEAP'}
+- Industry: ${contextData.industry || 'Enterprise'}
+- Security Level: ${contextData.securityLevel}
+- Compliance Requirements: ${contextData.compliance.join(', ') || 'Best Practices'}
+
+NETWORK REQUIREMENTS:
+- Network Segmentation: ${contextData.networkSegmentation ? 'Required' : 'Not Required'}
+- Guest Network Access: ${contextData.guestAccess ? 'Required' : 'Not Required'}
+- VLANs: ${contextData.vlans.length} configured
+- RADIUS Servers: ${contextData.radiusServers.length} configured
+
+SPECIFIC REQUIREMENTS:
+${wizardData.requirements.customRequirements.map(req => `- ${req}`).join('\n') || '- Standard enterprise deployment'}
+
+Please provide:
+1. Complete device configuration with all necessary commands
+2. RADIUS server integration settings
+3. Dynamic VLAN assignment configuration
+4. Security hardening and best practices
+5. Quality of Service (QoS) settings for authentication traffic
+6. Monitoring and logging configuration
+7. Troubleshooting guide with common issues and solutions
+8. Implementation and validation procedures
+9. Backup and recovery procedures
+10. Maintenance and update procedures
+
+Make this an enterprise-grade, production-ready configuration that follows industry best practices for security, performance, and reliability.`;
 
       const result = await generateWithAI.mutateAsync({
-        vendor: selectedVendor?.vendor_name || '',
-        model: selectedModel?.model_name || '',
-        configType: '802.1X',
-        requirements: prompt
+        vendor: contextData.vendor,
+        model: contextData.model,
+        firmware: contextData.firmware,
+        configType: 'Comprehensive 802.1X Configuration',
+        requirements: detailedPrompt
       });
 
       // Update wizard data with generated configuration
       updateWizardData('review', {
         generatedConfig: result.content,
-        configGenerated: true
+        configGenerated: true,
+        generationContext: contextData
       });
 
       toast({
-        title: "Configuration Generated",
-        description: "AI has generated your 802.1X configuration successfully.",
+        title: "Configuration Generated Successfully",
+        description: "Comprehensive 802.1X configuration with best practices and troubleshooting guide has been generated.",
       });
 
     } catch (error) {
       console.error('Failed to generate configuration:', error);
       toast({
-        title: "Generation Failed",
-        description: "Failed to generate configuration. Please try again.",
+        title: "Configuration Generation Failed",
+        description: "Please check your inputs and try again. Ensure all required fields are completed.",
         variant: "destructive",
       });
     }
@@ -361,10 +400,9 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="switch">Switch</SelectItem>
-              <SelectItem value="router">Router</SelectItem>
-              <SelectItem value="firewall">Firewall</SelectItem>
-              <SelectItem value="wireless">Wireless Controller</SelectItem>
+              <SelectItem value="switch">Wired Switch</SelectItem>
+              <SelectItem value="wireless">Wireless Controller/AP</SelectItem>
+              <SelectItem value="firewall">Firewall/Security Appliance</SelectItem>
             </SelectContent>
           </Select>
         </div>
