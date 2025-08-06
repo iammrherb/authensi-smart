@@ -31,7 +31,7 @@ import {
   UserCheck,
   Cloud,
   Key,
-  Certificate,
+  Award,
   Smartphone,
   Laptop,
   Monitor,
@@ -299,7 +299,7 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
       ...prev,
       last_modified: new Date().toISOString(),
       [section]: {
-        ...prev[section],
+        ...(prev[section] as object),
         [field]: value
       }
     }));
