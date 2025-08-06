@@ -246,8 +246,29 @@ serve(async (req) => {
             message = 'User unblocked successfully';
             break;
           case 'delete':
-            updateData = { is_active: false, is_blocked: true };
-            message = 'User deactivated successfully';
+            // For delete, we need to remove from auth.users and all related data
+            try {
+              // First remove from auth.users using admin API
+              const { error: authDeleteError } = await serviceClient.auth.admin.deleteUser(user_id);
+              if (authDeleteError) {
+                console.error('Auth user deletion error:', authDeleteError);
+                // Continue with soft delete if auth deletion fails
+              }
+
+              // Remove from profiles and other tables
+              await serviceClient.from('user_roles').delete().eq('user_id', user_id);
+              await serviceClient.from('user_sessions').delete().eq('user_id', user_id);
+              await serviceClient.from('user_activity_log').delete().eq('user_id', user_id);
+              await serviceClient.from('security_audit_log').delete().eq('user_id', user_id);
+              await serviceClient.from('profiles').delete().eq('id', user_id);
+
+              message = 'User completely deleted from system';
+            } catch (deleteError) {
+              console.error('User deletion error:', deleteError);
+              // Fallback to soft delete
+              updateData = { is_active: false, is_blocked: true };
+              message = 'User deactivated (soft delete)';
+            }
             break;
           case 'activate':
             updateData = { is_active: true, is_blocked: false };
@@ -265,31 +286,25 @@ serve(async (req) => {
             throw new Error('Invalid action');
         }
 
-        // Update user profile
-        const { error: updateError } = await serviceClient
-          .from('profiles')
-          .update({
-            ...updateData,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', user_id);
+        // Only update profile if not doing a full delete
+        if (actualAction !== 'delete' && Object.keys(updateData).length > 0) {
+          const { error: updateError } = await serviceClient
+            .from('profiles')
+            .update({
+              ...updateData,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', user_id);
 
-        if (updateError) throw updateError;
+          if (updateError) throw updateError;
 
-        // If blocking or deleting, invalidate sessions
-        if (['block', 'delete'].includes(actualAction)) {
-          await serviceClient
-            .from('user_sessions')
-            .update({ is_active: false })
-            .eq('user_id', user_id);
-        }
-
-        // If deleting, remove roles
-        if (actualAction === 'delete') {
-          await serviceClient
-            .from('user_roles')
-            .delete()
-            .eq('user_id', user_id);
+          // If blocking, invalidate sessions
+          if (actualAction === 'block') {
+            await serviceClient
+              .from('user_sessions')
+              .update({ is_active: false })
+              .eq('user_id', user_id);
+          }
         }
 
         // Log activity
@@ -307,6 +322,57 @@ serve(async (req) => {
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
+      }
+
+      if (action === 'delete-auth-user') {
+        const { user_id: targetUserId } = await req.json();
+        
+        // Check permissions
+        const { data: canManage } = await supabaseClient.rpc('can_manage_roles', {
+          _user_id: user.id,
+          _scope_type: 'global'
+        });
+
+        if (!canManage) {
+          throw new Error('Insufficient permissions to delete users');
+        }
+
+        // Prevent self-deletion
+        if (targetUserId === user.id) {
+          throw new Error('Cannot delete your own account');
+        }
+
+        try {
+          // Delete from auth.users using admin API
+          const { error: authDeleteError } = await serviceClient.auth.admin.deleteUser(targetUserId);
+          if (authDeleteError) throw authDeleteError;
+
+          // Clean up any remaining data in public schema
+          await serviceClient.from('user_roles').delete().eq('user_id', targetUserId);
+          await serviceClient.from('user_sessions').delete().eq('user_id', targetUserId);
+          await serviceClient.from('user_activity_log').delete().eq('user_id', targetUserId);
+          await serviceClient.from('security_audit_log').delete().eq('user_id', targetUserId);
+          await serviceClient.from('profiles').delete().eq('id', targetUserId);
+
+          // Log activity
+          await serviceClient
+            .from('user_activity_log')
+            .insert({
+              user_id: user.id,
+              action: 'user_completely_deleted',
+              metadata: { target_user_id: targetUserId }
+            });
+
+          return new Response(JSON.stringify({ 
+            success: true,
+            message: 'User completely removed from authentication system'
+          }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        } catch (error) {
+          console.error('Complete user deletion error:', error);
+          throw new Error('Failed to completely delete user from authentication system');
+        }
       }
     }
 

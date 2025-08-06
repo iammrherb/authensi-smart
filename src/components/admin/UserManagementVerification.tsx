@@ -152,6 +152,34 @@ const UserManagementVerification: React.FC = () => {
     }
   });
 
+  // Complete user deletion from auth system
+  const deleteFromAuthMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const { data, error } = await supabase.functions.invoke('user-management/delete-auth-user', {
+        body: {
+          user_id: userId
+        }
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "User Completely Deleted",
+        description: "User has been permanently removed from the authentication system",
+      });
+      refetchUsers();
+      refetchRoles();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Complete Deletion Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
+
   const getStatusColor = (user: DatabaseUser) => {
     if (!user.is_active) return 'destructive';
     if (user.is_blocked) return 'secondary';
@@ -232,6 +260,58 @@ const UserManagementVerification: React.FC = () => {
           </Button>
         </div>
       </div>
+
+      {/* Orphaned Users Cleanup */}
+      <Card className="border-destructive/50 bg-destructive/5">
+        <CardHeader>
+          <CardTitle className="flex items-center text-destructive">
+            <AlertTriangle className="h-5 w-5 mr-2" />
+            Auth System Cleanup
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              These users still exist in the auth.users table but have been removed from the application database. 
+              Use the buttons below to completely remove them from the authentication system.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                onClick={() => {
+                  if (confirm('This will PERMANENTLY delete user 2d7e65f7-698a-4e59-ae15-a415ad3c9dd8 from the authentication system. Continue?')) {
+                    deleteFromAuthMutation.mutate('2d7e65f7-698a-4e59-ae15-a415ad3c9dd8');
+                  }
+                }}
+                disabled={deleteFromAuthMutation.isPending}
+                variant="destructive"
+                size="sm"
+              >
+                <Trash2 className="h-3 w-3 mr-1" />
+                Delete 2d7e65f7 (matt.herbert@portnox.com)
+              </Button>
+              <Button
+                onClick={() => {
+                  if (confirm('This will PERMANENTLY delete user 08c1181f-bccd-4cef-ba70-2541b6c55024 from the authentication system. Continue?')) {
+                    deleteFromAuthMutation.mutate('08c1181f-bccd-4cef-ba70-2541b6c55024');
+                  }
+                }}
+                disabled={deleteFromAuthMutation.isPending}
+                variant="destructive"
+                size="sm"
+              >
+                <Trash2 className="h-3 w-3 mr-1" />
+                Delete 08c1181f (Garrett Gross)
+              </Button>
+            </div>
+            {deleteFromAuthMutation.isPending && (
+              <p className="text-sm text-muted-foreground">
+                <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-destructive mr-2"></div>
+                Deleting user from authentication system...
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Database Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
