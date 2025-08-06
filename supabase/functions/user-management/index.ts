@@ -215,7 +215,7 @@ serve(async (req) => {
       }
 
       if (action === 'update-user-status') {
-        const { user_id, action: statusAction }: UserStatusRequest = await req.json();
+        const { user_id, action: statusAction, user_action }: UserStatusRequest & { user_action?: string } = await req.json();
         
         // Check permissions
         const { data: canManage } = await supabaseClient.rpc('can_manage_roles', {
@@ -234,8 +234,9 @@ serve(async (req) => {
 
         let updateData: any = {};
         let message = '';
+        const actualAction = statusAction || user_action;
 
-        switch (statusAction) {
+        switch (actualAction) {
           case 'block':
             updateData = { is_blocked: true };
             message = 'User blocked successfully';
@@ -276,7 +277,7 @@ serve(async (req) => {
         if (updateError) throw updateError;
 
         // If blocking or deleting, invalidate sessions
-        if (['block', 'delete'].includes(statusAction)) {
+        if (['block', 'delete'].includes(actualAction)) {
           await serviceClient
             .from('user_sessions')
             .update({ is_active: false })
@@ -284,7 +285,7 @@ serve(async (req) => {
         }
 
         // If deleting, remove roles
-        if (statusAction === 'delete') {
+        if (actualAction === 'delete') {
           await serviceClient
             .from('user_roles')
             .delete()
@@ -296,7 +297,7 @@ serve(async (req) => {
           .from('user_activity_log')
           .insert({
             user_id: user.id,
-            action: `user_${statusAction}`,
+            action: `user_${actualAction}`,
             metadata: { target_user_id: user_id }
           });
 
