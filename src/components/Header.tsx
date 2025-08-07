@@ -23,7 +23,6 @@ const Header = () => {
     { title: "AI Scoping", url: "/scoping", icon: Sparkles, active: ["/scoping"], description: "Intelligent Project Scoping" },
     { title: "Project Tracker", url: "/tracker", icon: Zap, active: ["/tracker", "/project"], description: "Live Project Management" },
     { title: "AI Config Gen1Xer", url: "/ai-config", icon: Settings, active: ["/ai-config", "/onexer-wizard"], description: "Intelligent 802.1X Config" },
-    { title: "Implementation", url: "/implementation", icon: Rocket, active: ["/implementation"], description: "Deployment Center" },
     { title: "Analytics", url: "/reports", icon: BarChart3, active: ["/reports"], description: "Performance Insights" },
   ];
 

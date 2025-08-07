@@ -35,7 +35,7 @@ import ProjectTracking from "./pages/ProjectTracking";
 import UseCaseLibrary from "./pages/UseCaseLibrary";
 import ProjectDetails from "./pages/ProjectDetails";
 import IntelligenceTrackerHub from "./pages/IntelligenceTrackerHub";
-import ImplementationCenter from "./pages/ImplementationCenter";
+
 
 import UnifiedResourceCenter from "./pages/UnifiedResourceCenter";
 import ProjectCreation from "./pages/ProjectCreation";
@@ -95,11 +95,6 @@ const App = () => (
                 </ProtectedRoute>
               } />
               <Route path="/tracker" element={
-                <ProtectedRoute>
-                  <UnifiedProjectHub />
-                </ProtectedRoute>
-              } />
-              <Route path="/implementation" element={
                 <ProtectedRoute>
                   <UnifiedProjectHub />
                 </ProtectedRoute>
