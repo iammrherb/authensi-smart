@@ -30,6 +30,7 @@ import { useRecommendations, useCreateRecommendation } from '@/hooks/useRecommen
 import { useIndustryOptions, useComplianceFrameworks } from '@/hooks/useResourceLibrary';
 import { AppRole } from '@/hooks/useUserRoles';
 import { useAI } from '@/hooks/useAI';
+import InfrastructureSelector, { InfrastructureSelection } from "@/components/resources/InfrastructureSelector";
 
 interface StakeholderEntry {
   email: string;
