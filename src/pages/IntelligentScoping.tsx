@@ -4,7 +4,6 @@ import ComprehensiveAIScopingWizard from '@/components/scoping/ComprehensiveAISc
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { EnhancedResourceManager } from '@/components/resources/EnhancedResourceManager';
 import { Brain, Target, Zap, CheckCircle, Plus, FileText, History, Building2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
