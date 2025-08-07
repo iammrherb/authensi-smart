@@ -252,7 +252,7 @@ const UnifiedProjectHub = () => {
             </TabsContent>
 
             <TabsContent value="projects" className="space-y-6">
-              <UnifiedProjectManager />
+              <ProjectManagementHub />
             </TabsContent>
 
 
@@ -275,16 +275,6 @@ const UnifiedProjectHub = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="tracking" className="space-y-6">
-              {!loading && stats && (
-                <TrackerDashboard
-                  sites={[]}
-                  stats={stats}
-                  milestones={milestones || []}
-                  onCreateSite={() => {}}
-                />
-              )}
-            </TabsContent>
           </Tabs>
         </div>
       </div>
