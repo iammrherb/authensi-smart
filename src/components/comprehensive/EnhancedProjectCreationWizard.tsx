@@ -31,6 +31,7 @@ import { useIndustryOptions, useComplianceFrameworks } from '@/hooks/useResource
 import { AppRole } from '@/hooks/useUserRoles';
 import { useAI } from '@/hooks/useAI';
 import InfrastructureSelector, { InfrastructureSelection } from "@/components/resources/InfrastructureSelector";
+import { jsPDF } from 'jspdf';
 
 interface StakeholderEntry {
   email: string;
@@ -202,7 +203,7 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
   const [isEnhancingPainPoints, setIsEnhancingPainPoints] = useState(false);
   const [showAddPainPointToLibrary, setShowAddPainPointToLibrary] = useState<string | null>(null);
   const [showAddRecommendationToLibrary, setShowAddRecommendationToLibrary] = useState<string | null>(null);
-  
+  const [reportMarkdown, setReportMarkdown] = useState<string>("");
   // Bulk operations state
   const [showBulkSiteCreator, setShowBulkSiteCreator] = useState(false);
   const [showBulkUserCreator, setShowBulkUserCreator] = useState(false);
@@ -304,7 +305,8 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
       target_completion: formData.target_completion?.toISOString().split('T')[0],
       status: 'planning' as const,
       current_phase: 'discovery' as const,
-      progress_percentage: 0
+      progress_percentage: 0,
+      migration_scope: { infrastructure }
     };
 
     createProject(projectData, {
@@ -510,29 +512,65 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
     }
   };
 
+  const generateReport = () => {
+    const lines: string[] = [];
+    lines.push(`# Scoping & Deployment Summary: ${formData.name || 'Project'}`);
+    lines.push(`\n## Organization`);
+    lines.push(`- Client: ${formData.client_name || 'N/A'}`);
+    lines.push(`- Industry: ${formData.industry || 'N/A'}`);
+    lines.push(`- Type: ${formData.project_type ? projectTemplates[formData.project_type].title : 'N/A'}`);
+    lines.push(`\n## Compliance & Requirements`);
+    lines.push(`- Frameworks: ${(formData.compliance_frameworks || []).join(', ') || 'None'}`);
+    lines.push(`- Requirements:\n${(formData.integration_requirements || []).map(r => `  - ${r}`).join('\n') || '  - Standard best practices'}`);
+    lines.push(`- Pain Points:\n${(formData.pain_points || []).map(p => `  - ${p}`).join('\n') || '  - None provided'}`);
+    lines.push(`\n## Infrastructure`);
+    lines.push(`- NAC Vendors: ${infrastructure.nac_vendors.length}`);
+    lines.push(`- Wired Vendors: ${infrastructure.network.wired_vendors.length}`);
+    lines.push(`- Wireless Vendors: ${infrastructure.network.wireless_vendors.length}`);
+    lines.push(`- Security Stack: Firewalls(${infrastructure.security.firewalls.length}), VPN(${infrastructure.security.vpn.length}), IDP/SSO(${infrastructure.security.idp_sso.length}), EDR(${infrastructure.security.edr.length}), SIEM(${infrastructure.security.siem.length})`);
+    lines.push(`- Device Inventory:`);
+    if (infrastructure.device_inventory.length) {
+      infrastructure.device_inventory.forEach(d => lines.push(`  - ${d.name}: ${d.count}`));
+    } else {
+      lines.push('  - Not specified');
+    }
+    lines.push(`\n## Scale & Timeline`);
+    lines.push(`- Sites: ${formData.total_sites || 0}`);
+    lines.push(`- Endpoints: ${formData.total_endpoints || 0}`);
+    lines.push(`- Start: ${formData.start_date ? format(formData.start_date, 'PPP') : 'N/A'}`);
+    lines.push(`- Target Completion: ${formData.target_completion ? format(formData.target_completion, 'PPP') : 'N/A'}`);
+    lines.push(`\n## AI Recommendations`);
+    lines.push(`- Business Summary: ${formData.business_summary || 'Pending'}`);
+    setReportMarkdown(lines.join('\n'));
+  };
+
+  const downloadPDF = () => {
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const margin = 40;
+    const maxWidth = 515; // A4 width 595 - margins
+    const text = reportMarkdown || 'No report generated yet.';
+    const lines = doc.splitTextToSize(text, maxWidth);
+    doc.text(lines, margin, margin);
+    doc.save(`${(formData.name || 'project').replace(/\s+/g, '-')}-scoping-summary.pdf`);
+  };
   // Generate sites automatically based on count
   const generateSitesFromCount = () => {
     if (!formData.total_sites || formData.total_sites <= 1) return;
-    
     const generatedSites = Array.from({ length: formData.total_sites }, (_, index) => ({
       name: `Site ${index + 1}`,
       location: `Location ${index + 1}`,
       device_count: Math.floor(formData.total_endpoints! / formData.total_sites!),
       site_type: 'office'
     }));
-    
     setFormData(prev => ({
       ...prev,
       bulk_sites_data: generatedSites
     }));
-    
     toast({
       title: "Sites Generated",
       description: `${formData.total_sites} sites have been auto-generated.`
     });
   };
-
-  // Handle bulk site submission
   const handleBulkSiteSubmit = (sites: any[]) => {
     setFormData(prev => ({
       ...prev,
@@ -1300,6 +1338,23 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
                   <strong>Pain Points:</strong> {formData.pain_points.length}
                 </div>
               </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Button type="button" variant="outline" size="sm" onClick={generateReport} className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" /> Generate Markdown Report
+                </Button>
+                <Button type="button" variant="default" size="sm" onClick={downloadPDF} disabled={!reportMarkdown} className="flex items-center gap-2">
+                  <Download className="h-4 w-4" /> Download PDF
+                </Button>
+              </div>
+              {reportMarkdown && (
+                <div className="p-3 bg-card rounded border">
+                  <Label className="text-sm mb-2 block">Report (Markdown)</Label>
+                  <Textarea className="min-h-[180px]" value={reportMarkdown} readOnly />
+                </div>
+              )}
             </div>
           </div>
         );

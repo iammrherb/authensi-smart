@@ -304,7 +304,23 @@ const EnhancedSiteCreationWizard: React.FC<EnhancedSiteCreationWizardProps> = ({
       site_manager: formData.site_manager,
       site_manager_email: formData.site_manager_email,
       technical_contact: formData.technical_contact,
-      security_level: formData.security_requirements.security_level
+      security_level: formData.security_requirements.security_level,
+      deployment_config: {
+        network: {
+          wired_vendors: infrastructure.network.wired_vendors,
+          wireless_vendors: infrastructure.network.wireless_vendors,
+          switch_vendors: infrastructure.network.wired_vendors,
+          firewall_vendors: infrastructure.security.firewalls
+        },
+        security_stack: {
+          vpn: infrastructure.security.vpn,
+          idp_sso: infrastructure.security.idp_sso,
+          edr: infrastructure.security.edr,
+          siem: infrastructure.security.siem,
+          nac_vendors: infrastructure.nac_vendors
+        },
+        device_types: Object.fromEntries(infrastructure.device_inventory.map(d => [d.name, d.count]))
+      }
     };
 
     createSite(siteData, {
