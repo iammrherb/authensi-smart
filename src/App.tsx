@@ -39,6 +39,7 @@ import ImplementationCenter from "./pages/ImplementationCenter";
 
 import UnifiedResourceCenter from "./pages/UnifiedResourceCenter";
 import ProjectCreation from "./pages/ProjectCreation";
+import UnifiedProjectHub from "./pages/UnifiedProjectHub";
 import OneXerWizardPage from "./pages/OneXerWizard";
 import AIConfigCenter from "./pages/AIConfigCenter";
 
@@ -87,20 +88,25 @@ const App = () => (
                 </ProtectedRoute>
               } />
               
-              {/* Project Management */}
+              {/* Unified Project Management */}
+              <Route path="/projects" element={
+                <ProtectedRoute>
+                  <UnifiedProjectHub />
+                </ProtectedRoute>
+              } />
               <Route path="/tracker" element={
                 <ProtectedRoute>
-                  <Tracker />
+                  <UnifiedProjectHub />
+                </ProtectedRoute>
+              } />
+              <Route path="/implementation" element={
+                <ProtectedRoute>
+                  <UnifiedProjectHub />
                 </ProtectedRoute>
               } />
               <Route path="/project/:projectId/tracking" element={
                 <ProtectedRoute>
                   <ProjectTracking />
-                </ProtectedRoute>
-              } />
-              <Route path="/implementation" element={
-                <ProtectedRoute>
-                  <ImplementationCenter />
                 </ProtectedRoute>
               } />
               <Route path="/deployment" element={
