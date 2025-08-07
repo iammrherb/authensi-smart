@@ -7,7 +7,7 @@ import { ArrowLeft, Building2, Target, Settings, Rocket, MapPin, Activity, Brain
 import { useNavigate } from "react-router-dom";
 
 // Import existing components
-import ProjectCreationWizard from "@/components/comprehensive/EnhancedProjectCreationWizard";
+import IntelligentProjectCreationWizard from "@/components/comprehensive/IntelligentProjectCreationWizard";
 import UltimateAIScopingWizard from "@/components/scoping/UltimateAIScopingWizard";
 import UnifiedProjectManager from "@/components/tracker/UnifiedProjectManager";
 import TrackerDashboard from "@/components/tracker/TrackerDashboard";
@@ -28,10 +28,10 @@ const UnifiedProjectHub = () => {
     {
       id: 'create',
       title: 'Create Project',
-      description: 'Start new NAC deployment projects with AI-powered scoping',
+      description: 'AI-integrated project creation with automatic site generation',
       icon: Brain,
       color: 'from-purple-500 to-blue-600',
-      action: () => setActiveCreationWizard('scoping')
+      action: () => setActiveCreationWizard('creation')
     },
     {
       id: 'manage',
@@ -40,14 +40,6 @@ const UnifiedProjectHub = () => {
       icon: Settings,
       color: 'from-blue-500 to-cyan-600',
       action: () => setActiveTab('projects')
-    },
-    {
-      id: 'implement',
-      title: 'Implementation',
-      description: 'Deploy and monitor NAC implementations',
-      icon: Rocket,
-      color: 'from-green-500 to-emerald-600',
-      action: () => setActiveTab('implementation')
     },
     {
       id: 'sites',
@@ -85,9 +77,9 @@ const UnifiedProjectHub = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>
-                  {activeCreationWizard === 'scoping' ? 'AI-Powered Project Scoping' : 'Project Creation Wizard'}
-                </CardTitle>
+              <CardTitle>
+                {activeCreationWizard === 'scoping' ? 'AI-Powered Project Scoping' : 'Intelligent Project Creation'}
+              </CardTitle>
               </CardHeader>
               <CardContent>
                 {activeCreationWizard === 'scoping' ? (
@@ -97,7 +89,7 @@ const UnifiedProjectHub = () => {
                     onCancel={() => setActiveCreationWizard('none')}
                   />
                 ) : (
-                  <ProjectCreationWizard />
+                  <IntelligentProjectCreationWizard />
                 )}
               </CardContent>
             </Card>
@@ -159,10 +151,9 @@ const UnifiedProjectHub = () => {
 
           {/* Main Navigation */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="projects">Projects</TabsTrigger>
-              <TabsTrigger value="implementation">Implementation</TabsTrigger>
               <TabsTrigger value="sites">Sites</TabsTrigger>
               <TabsTrigger value="tracking">Tracking</TabsTrigger>
             </TabsList>
@@ -250,9 +241,6 @@ const UnifiedProjectHub = () => {
               <UnifiedProjectManager />
             </TabsContent>
 
-            <TabsContent value="implementation" className="space-y-6">
-              <ImplementationCenter />
-            </TabsContent>
 
             <TabsContent value="sites" className="space-y-6">
               <Card>
