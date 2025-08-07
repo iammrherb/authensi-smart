@@ -4,7 +4,8 @@ import ComprehensiveAIScopingWizard from '@/components/scoping/ComprehensiveAISc
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Brain, Target, Zap, CheckCircle, Plus, FileText, History } from 'lucide-react';
+import { EnhancedResourceManager } from '@/components/resources/EnhancedResourceManager';
+import { Brain, Target, Zap, CheckCircle, Plus, FileText, History, Building2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const IntelligentScoping = () => {
@@ -172,6 +173,22 @@ const IntelligentScoping = () => {
                   }}
                   onCancel={() => setShowScopingDialog(false)}
                 />
+                <div className="mt-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Building2 className="h-5 w-5" />
+                        Resource Library Integration
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Select or create Vendors, Vendor types, Use Cases, Compliance, Industry, Authentication, Network Segments and more directly from here.
+                      </p>
+                      <EnhancedResourceManager />
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             )}
           </div>
