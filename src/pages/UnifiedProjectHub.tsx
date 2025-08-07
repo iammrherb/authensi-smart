@@ -10,7 +10,7 @@ import { toast } from "sonner";
 // Import existing components
 import RobustProjectCreationWizard from "@/components/comprehensive/RobustProjectCreationWizard";
 import UltimateAIScopingWizard from "@/components/scoping/UltimateAIScopingWizard";
-import UnifiedProjectManager from "@/components/tracker/UnifiedProjectManager";
+import ProjectManagementHub from "@/components/management/ProjectManagementHub";
 import TrackerDashboard from "@/components/tracker/TrackerDashboard";
 import SitesTable from "@/components/sites/SitesTable";
 import { useSites } from "@/hooks/useSites";
