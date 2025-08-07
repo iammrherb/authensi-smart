@@ -166,7 +166,13 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
     enable_bulk_users: false,
     enable_auto_vendors: false
   });
-
+  const [infrastructure, setInfrastructure] = useState<InfrastructureSelection>({
+    nac_vendors: [],
+    network: { wired_vendors: [], wired_models: {}, wireless_vendors: [], wireless_models: {} },
+    security: { firewalls: [], vpn: [], idp_sso: [], edr: [], siem: [] },
+    device_inventory: []
+  });
+  
   const [newStakeholder, setNewStakeholder] = useState<StakeholderEntry>({
     email: '',
     role: 'contact',
@@ -1209,6 +1215,15 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
                     </div>
                   </div>
                 )}
+              </div>
+              {/* Infrastructure & Inventory */}
+              <div className="pt-6">
+                <Separator className="my-6" />
+                <div className="flex items-center justify-between mb-2">
+                  <Label className="text-base font-medium">Infrastructure & Inventory</Label>
+                  <Badge variant="outline">Multi-select</Badge>
+                </div>
+                <InfrastructureSelector value={infrastructure} onChange={setInfrastructure} />
               </div>
             </div>
           </div>

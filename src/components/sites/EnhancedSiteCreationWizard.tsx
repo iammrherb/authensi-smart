@@ -18,6 +18,7 @@ import {
 import { useCreateSite } from '@/hooks/useSites';
 import { useCountries, useRegionsByCountry } from '@/hooks/useCountriesRegions';
 import { useToast } from '@/hooks/use-toast';
+import InfrastructureSelector, { InfrastructureSelection } from "@/components/resources/InfrastructureSelector";
 
 interface EnhancedSiteFormData {
   // Basic Information
@@ -203,7 +204,14 @@ const EnhancedSiteCreationWizard: React.FC<EnhancedSiteCreationWizardProps> = ({
       change_management_process: 'Standard'
     }
   });
-
+  
+  const [infrastructure, setInfrastructure] = useState<InfrastructureSelection>({
+    nac_vendors: [],
+    network: { wired_vendors: [], wired_models: {}, wireless_vendors: [], wireless_models: {} },
+    security: { firewalls: [], vpn: [], idp_sso: [], edr: [], siem: [] },
+    device_inventory: []
+  });
+  
   const { data: countries = [] } = useCountries();
   const { data: regions = [] } = useRegionsByCountry(formData.country);
   const { mutate: createSite, isPending } = useCreateSite();
@@ -717,6 +725,16 @@ const EnhancedSiteCreationWizard: React.FC<EnhancedSiteCreationWizardProps> = ({
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            {/* Infrastructure Selection */}
+            <div className="pt-4">
+              <Separator className="my-6" />
+              <div className="flex items-center justify-between mb-2">
+                <Label className="text-base font-medium">Infrastructure & Inventory</Label>
+                <Badge variant="outline">Multi-select</Badge>
+              </div>
+              <InfrastructureSelector value={infrastructure} onChange={setInfrastructure} />
             </div>
           </div>
         );

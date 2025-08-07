@@ -47,6 +47,7 @@ import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { useToast } from '@/hooks/use-toast';
 import EnhancedVendorSelector from './EnhancedVendorSelector';
+import InfrastructureSelector, { InfrastructureSelection } from "@/components/resources/InfrastructureSelector";
 
 interface OneXerConfigWizardProps {
   projectId?: string;
@@ -94,6 +95,12 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
       firmwareVersion: '',
       deviceType: 'switch'
     },
+    infrastructure: {
+      nac_vendors: [],
+      network: { wired_vendors: [], wired_models: {}, wireless_vendors: [], wireless_models: {} },
+      security: { firewalls: [], vpn: [], idp_sso: [], edr: [], siem: [] },
+      device_inventory: []
+    } as InfrastructureSelection,
     scenario: {
       selectedScenario: '',
       customScenario: false,
@@ -246,7 +253,8 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
         vlans: wizardData.advanced.vlans,
         radiusServers: wizardData.advanced.radiusServers,
         certificates: wizardData.advanced.certificates,
-        policies: wizardData.advanced.policies
+         policies: wizardData.advanced.policies,
+         infrastructure: wizardData.infrastructure
       };
 
       const detailedPrompt = `Generate a comprehensive, production-ready 802.1X configuration for the following specifications:
@@ -428,6 +436,15 @@ Make this an enterprise-grade, production-ready configuration that follows indus
         compact={true}
         showDetails={false}
       />
+
+      <div className="pt-4">
+        <Label className="font-medium">Infrastructure (multi-select)</Label>
+        <InfrastructureSelector
+          value={wizardData.infrastructure}
+          onChange={(val) => updateWizardData('infrastructure', val)}
+          sections={{ devices: false }}
+        />
+      </div>
     </div>
   );
 
