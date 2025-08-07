@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Building2, Target, Settings, Rocket, MapPin, Activity, Brain, CheckSquare, Users, Calendar, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 // Import existing components
-import IntelligentProjectCreationWizard from "@/components/comprehensive/IntelligentProjectCreationWizard";
+import RobustProjectCreationWizard from "@/components/comprehensive/RobustProjectCreationWizard";
 import UltimateAIScopingWizard from "@/components/scoping/UltimateAIScopingWizard";
 import UnifiedProjectManager from "@/components/tracker/UnifiedProjectManager";
 import TrackerDashboard from "@/components/tracker/TrackerDashboard";
-import ImplementationCenter from "@/pages/ImplementationCenter";
 import SitesTable from "@/components/sites/SitesTable";
 import { useSites } from "@/hooks/useSites";
 import { useTrackerData } from "@/hooks/useTrackerData";
@@ -20,6 +20,7 @@ const UnifiedProjectHub = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [activeCreationWizard, setActiveCreationWizard] = useState<'none' | 'scoping' | 'creation'>('none');
+  const [scopingData, setScopingData] = useState<any>(null);
 
   const { data: sites = [] } = useSites();
   const { stats, milestones, loading } = useTrackerData();
@@ -84,12 +85,26 @@ const UnifiedProjectHub = () => {
               <CardContent>
                 {activeCreationWizard === 'scoping' ? (
                   <UltimateAIScopingWizard 
-                    onComplete={() => setActiveCreationWizard('none')}
-                    onSave={() => setActiveCreationWizard('none')}
+                    onComplete={(sessionId, data) => {
+                      setScopingData(data);
+                      setActiveCreationWizard('creation');
+                    }}
+                    onSave={(sessionId, data) => {
+                      setScopingData(data);
+                      setActiveCreationWizard('creation');
+                    }}
                     onCancel={() => setActiveCreationWizard('none')}
                   />
                 ) : (
-                  <IntelligentProjectCreationWizard />
+                  <RobustProjectCreationWizard 
+                    scopingData={activeCreationWizard === 'creation' ? scopingData : undefined}
+                    onSave={(projectData) => {
+                      console.log('Project created:', projectData);
+                      toast.success('Project created successfully!');
+                      setActiveCreationWizard('none');
+                    }}
+                    onCancel={() => setActiveCreationWizard('none')}
+                  />
                 )}
               </CardContent>
             </Card>
@@ -151,11 +166,10 @@ const UnifiedProjectHub = () => {
 
           {/* Main Navigation */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="projects">Projects</TabsTrigger>
               <TabsTrigger value="sites">Sites</TabsTrigger>
-              <TabsTrigger value="tracking">Tracking</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
