@@ -16,26 +16,9 @@ import { EnhancedResourceManager } from '@/components/resources/EnhancedResource
 import EnhancedVendorManagement from '@/components/vendors/EnhancedVendorManagement';
 import UseCaseLibraryBrowser from '@/components/use-cases/UseCaseLibraryBrowser';
 import RequirementsManagement from '@/components/requirements/RequirementsManagement';
-// Temporary placeholders for missing components
-const EnhancedConfigTemplateManager = () => (
-  <div className="p-8 text-center">
-    <h2 className="text-2xl font-bold mb-4">Configuration Templates</h2>
-    <p className="text-muted-foreground">
-      Configuration template management coming soon. This will include device-specific configurations,
-      automation templates, and deployment scripts.
-    </p>
-  </div>
-);
-
-const ProjectTemplatesManager = () => (
-  <div className="p-8 text-center">
-    <h2 className="text-2xl font-bold mb-4">Project Templates</h2>
-    <p className="text-muted-foreground">
-      Project template management coming soon. This will include industry-specific templates,
-      deployment scenarios, and pre-configured project setups.
-    </p>
-  </div>
-);
+// Import actual components
+import EnhancedConfigTemplateManager from '@/components/config/EnhancedConfigTemplateManager';
+import ProjectTemplatesManager from '@/components/templates/ProjectTemplatesManager';
 
 // Import hooks for real data
 import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
