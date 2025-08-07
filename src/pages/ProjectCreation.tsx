@@ -8,6 +8,7 @@ import { useCreateProject } from "@/hooks/useProjects";
 import { useToast } from "@/hooks/use-toast";
 import EnhancedProjectCreationWizard from "@/components/comprehensive/EnhancedProjectCreationWizard";
 import UltimateAIScopingWizard from "@/components/scoping/UltimateAIScopingWizard";
+import { useScopingManagement } from "@/hooks/useScopingManagement";
 
 const ProjectCreation = () => {
   const navigate = useNavigate();
@@ -16,14 +17,15 @@ const ProjectCreation = () => {
   const [savedSessions, setSavedSessions] = useState<any[]>([]);
   const createProject = useCreateProject();
   const { toast } = useToast();
+  const { sessions: scopingSessions, loadSessions, createSession } = useScopingManagement();
 
   useEffect(() => {
-    // Load saved scoping sessions
-    const saved = localStorage.getItem('scopingSessions');
-    if (saved) {
-      setSavedSessions(JSON.parse(saved));
-    }
+    loadSessions();
   }, []);
+
+  useEffect(() => {
+    setSavedSessions(scopingSessions as any[]);
+  }, [scopingSessions]);
 
   const getDeploymentTypeFromOrganization = (organization: any): string => {
     const userCount = organization?.total_users || 0;
@@ -269,25 +271,16 @@ const ProjectCreation = () => {
                     });
                   }}
                   onSave={(sessionId, scopingData) => {
-                    // Save session to localStorage
-                    const sessions = JSON.parse(localStorage.getItem('scopingSessions') || '[]');
-                    const sessionIndex = sessions.findIndex((s: any) => s.id === sessionId);
-                    const sessionData = {
+                    // Save session via Scoping Management hook
+                    createSession({
                       id: sessionId,
-                      name: scopingData.session_name,
-                      date: scopingData.last_modified,
+                      name: scopingData.session_name || `Scoping Session ${new Date().toISOString()}`,
+                      organizationName: scopingData.organization?.name || 'Unknown Organization',
+                      industry: scopingData.organization?.industry || 'Unknown',
+                      status: 'draft',
                       data: scopingData
-                    };
-                    
-                    if (sessionIndex >= 0) {
-                      sessions[sessionIndex] = sessionData;
-                    } else {
-                      sessions.push(sessionData);
-                    }
-                    
-                    localStorage.setItem('scopingSessions', JSON.stringify(sessions));
-                    setSavedSessions(sessions);
-                    
+                    });
+
                     toast({
                       title: "Session Saved",
                       description: "Your scoping session has been saved successfully.",
@@ -333,7 +326,7 @@ const ProjectCreation = () => {
                             <h3 className="font-medium text-sm mb-1">{session.name}</h3>
                             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
                               <Calendar className="h-3 w-3" />
-                              {new Date(session.date).toLocaleDateString()}
+                              {new Date((session.createdAt || session.date)).toLocaleDateString()}
                             </div>
                             {session.data.organization && (
                               <div className="flex items-center gap-2 mb-2">

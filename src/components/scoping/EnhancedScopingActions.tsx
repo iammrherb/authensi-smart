@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateProject } from '@/hooks/useProjects';
+import { useScopingManagement } from '@/hooks/useScopingManagement';
 
 interface ScopingActionsProps {
   formData: any;
@@ -28,29 +29,27 @@ const EnhancedScopingActions: React.FC<ScopingActionsProps> = ({
   const [sessionNotes, setSessionNotes] = useState('');
   const { toast } = useToast();
   const createProject = useCreateProject();
+  const { createSession, completeSession } = useScopingManagement();
 
   const saveScopingSession = () => {
-    const scopingSession = {
-      id: Date.now().toString(),
+    const sessionId = createSession({
       name: sessionName || `${formData.organization?.name || 'Unnamed'} Scoping Session`,
-      notes: sessionNotes,
-      date: new Date().toISOString(),
-      data: formData,
-      projectId: null
-    };
-    
-    const existingSessions = JSON.parse(localStorage.getItem('scopingSessions') || '[]');
-    existingSessions.push(scopingSession);
-    localStorage.setItem('scopingSessions', JSON.stringify(existingSessions));
-    
+      organizationName: formData.organization?.name || 'Unknown Organization',
+      industry: formData.organization?.industry || 'Unknown',
+      status: 'draft',
+      data: { ...formData, _notes: sessionNotes }
+    });
+
     toast({
       title: "Scoping Session Saved",
       description: "Your scoping data has been saved locally for future reference.",
     });
-    
+
     setShowSaveDialog(false);
     setSessionName('');
     setSessionNotes('');
+
+    return sessionId;
   };
 
   const handleCreateProject = async () => {
@@ -97,8 +96,15 @@ const EnhancedScopingActions: React.FC<ScopingActionsProps> = ({
 
       createProject.mutate(projectData, {
         onSuccess: (project) => {
-          // Save scoping session with project reference
-          saveScopingSessionWithProject(project.id);
+          // Create a session from this scoping and mark it completed with project reference
+          const newSessionId = createSession({
+            name: `${formData.organization?.name || 'Organization'} Scoping Session`,
+            organizationName: formData.organization?.name || 'Unknown Organization',
+            industry: formData.organization?.industry || 'Unknown',
+            status: 'draft',
+            data: formData
+          });
+          completeSession(newSessionId, project.id);
           
           toast({
             title: "Project Created Successfully",
@@ -126,19 +132,6 @@ const EnhancedScopingActions: React.FC<ScopingActionsProps> = ({
     }
   };
 
-  const saveScopingSessionWithProject = (projectId: string) => {
-    const scopingSession = {
-      id: Date.now().toString(),
-      name: `${formData.organization?.name || 'Unnamed'} Scoping Session`,
-      date: new Date().toISOString(),
-      data: formData,
-      projectId: projectId
-    };
-    
-    const existingSessions = JSON.parse(localStorage.getItem('scopingSessions') || '[]');
-    existingSessions.push(scopingSession);
-    localStorage.setItem('scopingSessions', JSON.stringify(existingSessions));
-  };
 
   const getDeploymentTypeFromOrganization = (organization: any): string => {
     const userCount = organization?.total_users || 0;

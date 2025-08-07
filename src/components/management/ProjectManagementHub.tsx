@@ -23,12 +23,16 @@ const ProjectManagementHub: React.FC = () => {
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
+  const [editSession, setEditSession] = useState<{ id: string; name: string; status: 'draft' | 'completed' | 'archived' } | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editStatus, setEditStatus] = useState<'draft' | 'completed' | 'archived'>('draft');
 
   const { data: projects = [], isLoading } = useProjects();
   const deleteProjectMutation = useDeleteProject();
   const { 
     sessions: scopingSessions, 
     deleteSession: deleteScopingSession,
+    updateSession: updateScopingSession,
     getStatistics: getScopingStats,
     bulkDelete: bulkDeleteSessions 
   } = useScopingManagement();
@@ -416,6 +420,17 @@ const ProjectManagementHub: React.FC = () => {
                   </div>
                   
                   <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setEditSession({ id: session.id, name: session.name, status: session.status });
+                        setEditName(session.name);
+                        setEditStatus(session.status);
+                      }}
+                    >
+                      <Edit3 className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
