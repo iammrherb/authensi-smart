@@ -1,7 +1,11 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export class DocumentationCrawlerService {
-  static async crawlPortnoxDocsForVendors(vendorNames: string[], maxPages = 10) {
+  static async crawlPortnoxDocsForVendors(
+    vendorNames: string[],
+    maxPages = 10,
+    options?: { extraSeeds?: string[]; includePatterns?: string[]; excludePatterns?: string[] }
+  ) {
     // 1) Get Portnox documentation links for provided vendors
     const scraper = await supabase.functions.invoke("portnox-doc-scraper", {
       body: { vendors: vendorNames },
@@ -14,7 +18,10 @@ export class DocumentationCrawlerService {
     const linksRecord = (scraper.data?.documentationLinks || {}) as Record<string, string[]>;
     const urls = Array.from(
       new Set(
-        Object.values(linksRecord).flat().filter((u) => typeof u === "string" && u.length > 0)
+        [
+          ...Object.values(linksRecord).flat().filter((u) => typeof u === "string" && u.length > 0),
+          ...(options?.extraSeeds || []).filter((u) => typeof u === "string" && u.length > 0),
+        ]
       )
     );
 
@@ -24,7 +31,7 @@ export class DocumentationCrawlerService {
 
     // 2) Crawl discovered URLs using the documentation-crawler (Firecrawl-backed)
     const crawl = await supabase.functions.invoke("documentation-crawler", {
-      body: { urls, maxPages },
+      body: { urls, maxPages, includePatterns: options?.includePatterns, excludePatterns: options?.excludePatterns },
     });
 
     if (crawl.error) {

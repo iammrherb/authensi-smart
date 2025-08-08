@@ -11,6 +11,8 @@ const corsHeaders = {
 interface CrawlRequestBody {
   urls: string[];
   maxPages?: number; // per seed url
+  includePatterns?: string[];
+  excludePatterns?: string[];
 }
 
 Deno.serve(async (req) => {
@@ -30,7 +32,7 @@ Deno.serve(async (req) => {
     }
 
     const body: CrawlRequestBody = await req.json();
-    const { urls, maxPages = 10 } = body || {};
+    const { urls, maxPages = 10, includePatterns = [], excludePatterns = [] } = body || {};
 
     if (!urls || !Array.isArray(urls) || urls.length === 0) {
       return new Response(
@@ -53,6 +55,8 @@ Deno.serve(async (req) => {
           body: JSON.stringify({
             url,
             limit: limited,
+            includePaths: includePatterns && includePatterns.length ? includePatterns : undefined,
+            excludePaths: excludePatterns && excludePatterns.length ? excludePatterns : undefined,
             scrapeOptions: {
               formats: ["markdown", "html"],
             },
