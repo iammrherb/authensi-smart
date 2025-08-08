@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
@@ -141,7 +141,7 @@ const UltimateIntelligentWizard: React.FC = () => {
       <CardContent className="space-y-4">
         <p className="text-muted-foreground">Create at least one site for deployment. You can add more later.</p>
         <div className="flex gap-2">
-          <Button onClick={() => setShowSiteWizard(true)} disabled={!state.project}>
+          <Button onClick={() => setShowSiteWizard(true)}>
             Launch Site Wizard
           </Button>
           {state.siteId && <Badge variant="secondary">Primary Site Created</Badge>}
@@ -154,9 +154,10 @@ const UltimateIntelligentWizard: React.FC = () => {
 
       {/* Site Wizard Dialog */}
       <Dialog open={showSiteWizard} onOpenChange={setShowSiteWizard}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto bg-card z-50">
           <DialogHeader>
             <DialogTitle>Enhanced Site Creation</DialogTitle>
+            <DialogDescription>Create and link a site to your project. You can add more sites later.</DialogDescription>
           </DialogHeader>
           {state.project ? (
             <EnhancedSiteCreationWizard
@@ -196,9 +197,10 @@ const UltimateIntelligentWizard: React.FC = () => {
       </CardContent>
 
       <Dialog open={showScopingWizard} onOpenChange={setShowScopingWizard}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto bg-card z-50">
           <DialogHeader>
             <DialogTitle>Enhanced AI Scoping Wizard</DialogTitle>
+            <DialogDescription>Analyze requirements and generate scoped documentation for your deployment.</DialogDescription>
           </DialogHeader>
           <EnhancedAIScopingWizard
             onComplete={(session) => {
@@ -221,7 +223,7 @@ const UltimateIntelligentWizard: React.FC = () => {
       <CardContent className="space-y-4">
         <p className="text-muted-foreground">Generate validated 802.1X configurations with templates and best practices.</p>
         <div className="flex gap-2">
-          <Button onClick={() => setShowConfigWizard(true)} disabled={!state.project}>
+          <Button onClick={() => setShowConfigWizard(true)}>
             Launch Config Wizard
           </Button>
           {state.generatedConfig && <Badge variant="secondary">Config Generated</Badge>}
@@ -233,9 +235,10 @@ const UltimateIntelligentWizard: React.FC = () => {
       </CardContent>
 
       <Dialog open={showConfigWizard} onOpenChange={setShowConfigWizard}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto bg-card z-50">
           <DialogHeader>
             <DialogTitle>DotXer Config Gen</DialogTitle>
+            <DialogDescription>Generate validated 802.1X configuration templates with best practices.</DialogDescription>
           </DialogHeader>
           {state.project ? (
             <OneXerConfigWizard
