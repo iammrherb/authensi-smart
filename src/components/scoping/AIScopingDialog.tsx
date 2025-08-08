@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Brain, Save, FileDown, FolderPlus, ArrowRight } from 'lucide-react';
-import ComprehensiveAIScopingWizard from './ComprehensiveAIScopingWizard';
+import UltimateAIScopingWizard from './UltimateAIScopingWizard';
 import { useToast } from '@/hooks/use-toast';
 
 interface AIScopingDialogProps {
@@ -30,7 +30,7 @@ const AIScopingDialog: React.FC<AIScopingDialogProps> = ({
   const [currentSession, setCurrentSession] = useState<ScopingSession | null>(null);
   const { toast } = useToast();
 
-  const handleScopingComplete = async (projectId: string, scopingData: any) => {
+  const handleScopingComplete = async (_sessionId: string, scopingData: any) => {
     const session: ScopingSession = {
       id: Date.now().toString(),
       name: scopingData.organization?.name || `Scoping Session ${new Date().toLocaleDateString()}`,
@@ -205,8 +205,9 @@ const AIScopingDialog: React.FC<AIScopingDialogProps> = ({
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto max-h-[80vh]">
-          <ComprehensiveAIScopingWizard
+          <UltimateAIScopingWizard
             onComplete={handleScopingComplete}
+            onSave={() => { /* draft saved */ }}
             onCancel={onClose}
           />
         </div>

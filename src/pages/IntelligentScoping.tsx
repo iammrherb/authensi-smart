@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AIScopingDialog from '@/components/scoping/AIScopingDialog';
-import ComprehensiveAIScopingWizard from '@/components/scoping/ComprehensiveAIScopingWizard';
+import UltimateAIScopingWizard from '@/components/scoping/UltimateAIScopingWizard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -165,11 +165,12 @@ const IntelligentScoping = () => {
                     Close
                   </Button>
                 </div>
-                <ComprehensiveAIScopingWizard
-                  onComplete={(projectId, scopingData) => {
+                <UltimateAIScopingWizard
+                  onComplete={(_sessionId, scopingData) => {
                     handleCreateProject(scopingData);
                     setShowScopingDialog(false);
                   }}
+                  onSave={() => { /* draft saved */ }}
                   onCancel={() => setShowScopingDialog(false)}
                 />
               </div>

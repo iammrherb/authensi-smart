@@ -7,15 +7,15 @@ import AIRecommendationEngine from '@/components/ai/AIRecommendationEngine';
 import AIWorkflowEngine from '@/components/ai/AIWorkflowEngine';
 import SmartProjectDashboard from '@/components/ai/SmartProjectDashboard';
 import UnifiedProjectManager from '@/components/tracker/UnifiedProjectManager';
-import ComprehensiveAIScopingWizard from '@/components/scoping/ComprehensiveAIScopingWizard';
+import UltimateAIScopingWizard from '@/components/scoping/UltimateAIScopingWizard';
 import { Brain, Sparkles, Target, TrendingUp, Rocket, Zap, Building2, Plus, ArrowRight } from 'lucide-react';
 
 const IntelligenceTrackerHub = () => {
   const [activeTab, setActiveTab] = useState("ai-scoping");
   const [showProjectWizard, setShowProjectWizard] = useState(false);
 
-  const handleScopingComplete = (projectId: string, scopingData: any) => {
-    console.log('Scoping completed:', projectId, scopingData);
+  const handleScopingComplete = (sessionId: string, scopingData: any) => {
+    console.log('Scoping completed:', sessionId, scopingData);
     setActiveTab("project-management");
   };
 
@@ -131,8 +131,9 @@ const IntelligenceTrackerHub = () => {
                 </p>
               </CardHeader>
               <CardContent>
-                <ComprehensiveAIScopingWizard
+                <UltimateAIScopingWizard
                   onComplete={handleScopingComplete}
+                  onSave={() => setShowProjectWizard(false)}
                   onCancel={() => setShowProjectWizard(false)}
                 />
               </CardContent>
