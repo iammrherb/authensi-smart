@@ -1214,8 +1214,8 @@ const EnhancedSiteCreationWizard: React.FC<EnhancedSiteCreationWizardProps> = ({
   const progress = (currentStep / steps.length) * 100;
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-4xl max-h-[90vh] flex flex-col">
+    <div className="w-full">
+      <Card className="w-full max-w-none md:w-[90vw] lg:w-[1100px] h-[80vh] flex flex-col">
         <CardHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>

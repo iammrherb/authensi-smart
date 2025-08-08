@@ -252,17 +252,22 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
   };
 
   const generateBusinessSummary = (scopingData: any, documentation: PortnoxDocumentationResult | null): string => {
-    let summary = `Comprehensive Portnox NAC deployment for ${scopingData.organization.name}`;
+    const orgName = scopingData?.organization?.name ?? 'Project';
+    let summary = `Comprehensive Portnox NAC deployment for ${orgName}`;
     
     if (documentation) {
       summary += `\n\nDeployment Overview:`;
-      summary += `\n- ${documentation.vendorSpecificDocs.length} vendor integrations configured`;
-      summary += `\n- ${documentation.integrationSpecs.length} system integrations planned`;
-      summary += `\n- ${documentation.deploymentGuide.length} deployment phases defined`;
+      const vendorCount = documentation.vendorSpecificDocs?.length ?? 0;
+      const integrationCount = documentation.integrationSpecs?.length ?? 0;
+      const phasesCount = documentation.deploymentGuide?.length ?? 0;
+      summary += `\n- ${vendorCount} vendor integrations configured`;
+      summary += `\n- ${integrationCount} system integrations planned`;
+      summary += `\n- ${phasesCount} deployment phases defined`;
       summary += `\n- Complete prerequisite documentation generated`;
       
-      if (documentation.generalRequirements.length > 0) {
-        summary += `\n\nKey Requirements: ${documentation.generalRequirements.map(req => req.title).join(', ')}`;
+      const generalReqs = documentation.generalRequirements ?? [];
+      if (generalReqs.length > 0) {
+        summary += `\n\nKey Requirements: ${generalReqs.map(req => req.title).join(', ')}`;
       }
     }
     
@@ -354,17 +359,17 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
                     <div className="text-center p-4 border rounded-lg">
                       <Network className="h-8 w-8 mx-auto mb-2 text-primary" />
                       <div className="font-medium">Vendors</div>
-                      <div className="text-sm text-muted-foreground">{selectedVendors.length} selected</div>
+                      <div className="text-sm text-muted-foreground">{selectedVendors?.length ?? 0} selected</div>
                     </div>
                     <div className="text-center p-4 border rounded-lg">
                       <Target className="h-8 w-8 mx-auto mb-2 text-primary" />
                       <div className="font-medium">Use Cases</div>
-                      <div className="text-sm text-muted-foreground">{selectedUseCases.length} selected</div>
+                      <div className="text-sm text-muted-foreground">{selectedUseCases?.length ?? 0} selected</div>
                     </div>
                     <div className="text-center p-4 border rounded-lg">
                       <CheckCircle className="h-8 w-8 mx-auto mb-2 text-primary" />
                       <div className="font-medium">Requirements</div>
-                      <div className="text-sm text-muted-foreground">{selectedRequirements.length} selected</div>
+                      <div className="text-sm text-muted-foreground">{selectedRequirements?.length ?? 0} selected</div>
                     </div>
                   </div>
                   
@@ -442,9 +447,9 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
                   <div>
                     <h4 className="font-medium mb-2">Documentation Included</h4>
                     <div className="space-y-1 text-sm">
-                      <div>✓ Vendor integration guides ({generatedDocumentation?.vendorSpecificDocs.length})</div>
-                      <div>✓ Deployment phases ({generatedDocumentation?.deploymentGuide.length})</div>
-                      <div>✓ Integration specifications ({generatedDocumentation?.integrationSpecs.length})</div>
+                      <div>✓ Vendor integration guides ({generatedDocumentation?.vendorSpecificDocs?.length ?? 0})</div>
+                      <div>✓ Deployment phases ({generatedDocumentation?.deploymentGuide?.length ?? 0})</div>
+                      <div>✓ Integration specifications ({generatedDocumentation?.integrationSpecs?.length ?? 0})</div>
                       <div>✓ Prerequisites and requirements</div>
                     </div>
                   </div>
@@ -540,7 +545,7 @@ const DocumentationViewer: React.FC<{ documentation: PortnoxDocumentationResult 
               <CardTitle className="text-sm">Vendors</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{documentation.vendorSpecificDocs.length}</div>
+              <div className="text-2xl font-bold">{documentation.vendorSpecificDocs?.length ?? 0}</div>
               <div className="text-sm text-muted-foreground">Configured</div>
             </CardContent>
           </Card>
@@ -549,7 +554,7 @@ const DocumentationViewer: React.FC<{ documentation: PortnoxDocumentationResult 
               <CardTitle className="text-sm">Phases</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{documentation.deploymentGuide.length}</div>
+              <div className="text-2xl font-bold">{documentation.deploymentGuide?.length ?? 0}</div>
               <div className="text-sm text-muted-foreground">Deployment phases</div>
             </CardContent>
           </Card>
@@ -558,7 +563,7 @@ const DocumentationViewer: React.FC<{ documentation: PortnoxDocumentationResult 
               <CardTitle className="text-sm">Integrations</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{documentation.integrationSpecs.length}</div>
+              <div className="text-2xl font-bold">{documentation.integrationSpecs?.length ?? 0}</div>
               <div className="text-sm text-muted-foreground">System integrations</div>
             </CardContent>
           </Card>
