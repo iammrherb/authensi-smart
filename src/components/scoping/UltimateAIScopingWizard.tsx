@@ -529,6 +529,55 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
           </div>
         );
 
+      case 'infrastructure':
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <Network className="h-12 w-12 mx-auto mb-4 text-primary" />
+              <h3 className="text-2xl font-bold mb-2">Network Infrastructure</h3>
+              <p className="text-muted-foreground">Define sites, topology and key device inventory</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="site-count">Total Sites</Label>
+                <Input
+                  id="site-count"
+                  type="number"
+                  min={1}
+                  value={scopingData.network_infrastructure.site_count}
+                  onChange={(e) => handleInputChange('network_infrastructure', 'site_count', Number(e.target.value) || 1)}
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="topology">Network Topology</Label>
+                <Select
+                  value={scopingData.network_infrastructure.network_topology}
+                  onValueChange={(value) => handleInputChange('network_infrastructure', 'network_topology', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select topology" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {['Campus','Hub-and-Spoke','Mesh','Star','Branch/Remote'].map(opt => (
+                      <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Device Inventory (high level)</Label>
+              <DeviceInventoryEditor
+                inventory={scopingData.network_infrastructure.device_inventory || {}}
+                onChange={(inv) => handleInputChange('network_infrastructure', 'device_inventory', inv)}
+              />
+            </div>
+          </div>
+        );
+
       case 'vendors':
         return (
           <div className="space-y-6">
@@ -1020,6 +1069,49 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
           {renderCurrentStep()}
         </CardContent>
       </Card>
+    </div>
+  );
+};
+
+// Simple inline editor for key/value device inventory
+const DeviceInventoryEditor: React.FC<{
+  inventory: Record<string, number>;
+  onChange: (inv: Record<string, number>) => void;
+}> = ({ inventory, onChange }) => {
+  const [keyName, setKeyName] = React.useState("");
+  const [count, setCount] = React.useState<number>(1);
+
+  const addItem = () => {
+    if (!keyName.trim()) return;
+    onChange({ ...inventory, [keyName.trim()]: Number(count) || 0 });
+    setKeyName("");
+    setCount(1);
+  };
+
+  const removeItem = (k: string) => {
+    const next = { ...inventory };
+    delete next[k];
+    onChange(next);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+        <Input placeholder="e.g., Access Points" value={keyName} onChange={(e) => setKeyName(e.target.value)} />
+        <Input type="number" min={0} value={count} onChange={(e) => setCount(Number(e.target.value) || 0)} />
+        <Button onClick={addItem}>Add</Button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        {Object.entries(inventory).map(([k, v]) => (
+          <div key={k} className="flex items-center justify-between p-2 border rounded">
+            <div className="text-sm font-medium">{k}</div>
+            <div className="flex items-center gap-3">
+              <Badge variant="outline" className="text-xs">{v}x</Badge>
+              <Button variant="outline" size="sm" onClick={() => removeItem(k)}>Remove</Button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

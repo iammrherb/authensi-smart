@@ -126,7 +126,7 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
     setSelectedUseCases(mappedUseCases);
     setSelectedRequirements(mappedRequirements);
     
-    // Create session
+    // Create session (local)
     const session: EnhancedScopingSession = {
       id: Date.now().toString(),
       name: completedScopingData.organization?.name || 'Unnamed Project',
@@ -136,8 +136,18 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
       selectedRequirements: mappedRequirements,
       createdAt: new Date().toISOString()
     };
-    
     setCurrentSession(session);
+
+    // Persist to DB (create or update)
+    const sessionName = completedScopingData.organization?.name || 'Scoping Session';
+    if (!dbSessionId && !createSessionDb.isPending) {
+      createSessionDb.mutate({ name: sessionName, data: completedScopingData, status: 'draft' }, {
+        onSuccess: (row) => setDbSessionId(row.id)
+      });
+    } else if (dbSessionId && !updateSessionDb.isPending) {
+      updateSessionDb.mutate({ id: dbSessionId, name: sessionName, data: completedScopingData });
+    }
+    
     setCurrentPhase('documentation');
     
     toast({
@@ -168,8 +178,11 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
       };
       setCurrentSession(updatedSession);
       
-      // Save to local storage
+      // Save to local storage & DB
       localStorage.setItem(`scoping_session_${currentSession.id}`, JSON.stringify(updatedSession));
+      if (dbSessionId && !updateSessionDb.isPending) {
+        updateSessionDb.mutate({ id: dbSessionId, data: scopingData, status: 'documentation' });
+      }
       
       toast({
         title: "Documentation Generated",
@@ -293,7 +306,16 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
             <div className="space-y-6">
               <UltimateAIScopingWizard
                 onComplete={(sessionId, data) => handleScopingComplete(sessionId, data)}
-                onSave={() => { /* draft saved */ }}
+                onSave={(sessionId, data) => {
+                  const name = (data?.organization?.name as string) || 'Scoping Session';
+                  if (!dbSessionId && !createSessionDb.isPending) {
+                    createSessionDb.mutate({ name, data, status: 'draft' }, {
+                      onSuccess: (row) => setDbSessionId(row.id)
+                    });
+                  } else if (dbSessionId && !updateSessionDb.isPending) {
+                    updateSessionDb.mutate({ id: dbSessionId, name, data, status: 'draft' });
+                  }
+                }}
                 onCancel={onCancel}
               />
               
