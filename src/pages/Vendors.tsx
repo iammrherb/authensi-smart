@@ -1,7 +1,7 @@
 import EnhancedVendorManagement from "@/components/vendors/EnhancedVendorManagement";
 import { Badge } from "@/components/ui/badge";
 import { VendorsDocsCrawlerPanel } from "@/components/vendors/VendorsDocsCrawlerPanel";
-
+import { GlobalDocsEnrichmentPanel } from "@/components/docs/GlobalDocsEnrichmentPanel";
 const Vendors = () => {
   return (
     <div className="min-h-screen bg-background">
@@ -22,6 +22,7 @@ const Vendors = () => {
           
           <EnhancedVendorManagement />
           <VendorsDocsCrawlerPanel />
+          <GlobalDocsEnrichmentPanel />
         </div>
       </div>
     </div>
