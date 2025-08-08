@@ -16,6 +16,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Brain, Network, Target, Settings, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useCountries, useRegionsByCountry } from "@/hooks/useCountriesRegions";
+import { useAI } from "@/hooks/useAI";
+import OwnerContactsEditor from "@/components/projects/OwnerContactsEditor";
 
 interface UnifiedState {
   project?: Project | null;
@@ -40,7 +45,7 @@ const UltimateIntelligentWizard: React.FC = () => {
   const [showScopingWizard, setShowScopingWizard] = useState(false);
   const [showConfigWizard, setShowConfigWizard] = useState(false);
 
-  // Minimal project form for step 1
+  // Project form for step 1 with enhanced fields
   const [projectForm, setProjectForm] = useState<Partial<Project>>({
     name: "",
     client_name: "",
@@ -48,10 +53,29 @@ const UltimateIntelligentWizard: React.FC = () => {
     status: "planning",
     current_phase: "scoping",
     progress_percentage: 10,
+    // New fields
+    website_url: "",
+    linkedin_url: "",
+    industry: "",
+    country_code: "",
+    region_name: "",
+    timezone: "",
+    business_summary: "",
+    overall_goal: "",
+    initiative_type: "greenfield",
+    ai_recommendations: "",
+    project_owners: [],
+    technical_owners: [],
   } as Partial<Project>);
 
   const createProjectMutation = useCreateProject();
 
+  // Data helpers
+  const { data: countries = [] } = useCountries();
+  const { data: regions = [] } = useRegionsByCountry(projectForm.country_code || "");
+
+  // AI helpers
+  const { generateProjectSummary, generateCompletion, isLoading: aiLoading } = useAI();
   const progress = useMemo(() => {
     const completed = [
       state.project ? 1 : 0,
@@ -90,6 +114,19 @@ const canNext = useMemo(() => {
         status: projectForm.status || "planning",
         current_phase: projectForm.current_phase || "scoping",
         progress_percentage: projectForm.progress_percentage ?? 10,
+        // New fields persisted
+        website_url: projectForm.website_url || undefined,
+        linkedin_url: projectForm.linkedin_url || undefined,
+        industry: projectForm.industry || undefined,
+        country_code: projectForm.country_code || undefined,
+        region_name: projectForm.region_name || undefined,
+        timezone: projectForm.timezone || undefined,
+        business_summary: projectForm.business_summary || undefined,
+        overall_goal: projectForm.overall_goal || undefined,
+        initiative_type: projectForm.initiative_type || undefined,
+        ai_recommendations: projectForm.ai_recommendations || undefined,
+        project_owners: projectForm.project_owners || [],
+        technical_owners: projectForm.technical_owners || [],
       } as any,
       {
         onSuccess: (project) => {
@@ -106,29 +143,141 @@ const canNext = useMemo(() => {
       <CardHeader>
         <CardTitle>Project Basics</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="name">Project Name</Label>
             <Input id="name" value={projectForm.name || ""} onChange={(e) => setProjectForm((p) => ({ ...p, name: e.target.value }))} placeholder="e.g., ACME NAC Rollout" />
           </div>
           <div>
-            <Label htmlFor="client">Client/Org</Label>
+            <Label htmlFor="client">Company / Client</Label>
             <Input id="client" value={projectForm.client_name || ""} onChange={(e) => setProjectForm((p) => ({ ...p, client_name: e.target.value }))} placeholder="e.g., ACME Corp" />
           </div>
+          <div>
+            <Label htmlFor="website">Website</Label>
+            <Input id="website" type="url" value={projectForm.website_url || ""} onChange={(e) => setProjectForm((p) => ({ ...p, website_url: e.target.value }))} placeholder="https://www.example.com" />
+          </div>
+          <div>
+            <Label htmlFor="linkedin">LinkedIn</Label>
+            <Input id="linkedin" type="url" value={projectForm.linkedin_url || ""} onChange={(e) => setProjectForm((p) => ({ ...p, linkedin_url: e.target.value }))} placeholder="https://www.linkedin.com/company/..." />
+          </div>
         </div>
-        <div>
-          <Label htmlFor="desc">Description</Label>
-          <Textarea id="desc" value={projectForm.description || ""} onChange={(e) => setProjectForm((p) => ({ ...p, description: e.target.value }))} placeholder="High-level scope, goals, constraints..." />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <Label>Industry</Label>
+            <Input value={projectForm.industry || ""} onChange={(e) => setProjectForm((p) => ({ ...p, industry: e.target.value }))} placeholder="e.g., Healthcare" />
+          </div>
+          <div>
+            <Label>Country</Label>
+            <Select value={projectForm.country_code || ""} onValueChange={(val) => setProjectForm((p) => ({ ...p, country_code: val, region_name: "", timezone: "" }))}>
+              <SelectTrigger className="w-full"><SelectValue placeholder="Select country" /></SelectTrigger>
+              <SelectContent className="z-50">
+                {countries.map((c: any) => (
+                  <SelectItem key={c.country_code} value={c.country_code}>{c.country_name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Region / State</Label>
+            <Select value={projectForm.region_name || ""} onValueChange={(val) => {
+              const tz = (regions || []).find((r: any) => r.region_name === val)?.timezone || "";
+              setProjectForm((p) => ({ ...p, region_name: val, timezone: tz }));
+            }}>
+              <SelectTrigger className="w-full"><SelectValue placeholder="Select region" /></SelectTrigger>
+              <SelectContent className="z-50 max-h-64 overflow-y-auto">
+                {(regions || []).map((r: any) => (
+                  <SelectItem key={r.region_name} value={r.region_name}>{r.region_name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <div className="flex justify-end gap-2">
-          {state.project && (
-            <Button variant="outline" onClick={next}>Skip</Button>
-          )}
-          <Button onClick={handleCreateProject} disabled={!projectForm.name || !projectForm.client_name || createProjectMutation.isPending}>
-            {createProjectMutation.isPending ? "Saving..." : "Save & Continue"}
-            <ArrowRight className="h-4 w-4 ml-2" />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <Label>Timezone</Label>
+            <Input value={projectForm.timezone || ""} onChange={(e) => setProjectForm((p) => ({ ...p, timezone: e.target.value }))} placeholder="e.g., America/New_York" />
+          </div>
+          <div>
+            <Label>Initiative Type</Label>
+            <RadioGroup className="flex gap-4 pt-2" value={projectForm.initiative_type || "greenfield"} onValueChange={(val) => setProjectForm((p) => ({ ...p, initiative_type: val }))}>
+              <div className="flex items-center space-x-2"><RadioGroupItem value="greenfield" id="init-green" /><Label htmlFor="init-green">Greenfield</Label></div>
+              <div className="flex items-center space-x-2"><RadioGroupItem value="migration" id="init-mig" /><Label htmlFor="init-mig">Migration</Label></div>
+              <div className="flex items-center space-x-2"><RadioGroupItem value="expansion" id="init-exp" /><Label htmlFor="init-exp">Expansion</Label></div>
+              <div className="flex items-center space-x-2"><RadioGroupItem value="other" id="init-oth" /><Label htmlFor="init-oth">Other</Label></div>
+            </RadioGroup>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <OwnerContactsEditor
+            label="Project Owners"
+            value={(projectForm.project_owners as any[]) || []}
+            onChange={(val) => setProjectForm((p) => ({ ...p, project_owners: val as any }))}
+          />
+          <OwnerContactsEditor
+            label="Technical Owners"
+            value={(projectForm.technical_owners as any[]) || []}
+            onChange={(val) => setProjectForm((p) => ({ ...p, technical_owners: val as any }))}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="desc">Description</Label>
+            <Textarea id="desc" value={projectForm.description || ""} onChange={(e) => setProjectForm((p) => ({ ...p, description: e.target.value }))} placeholder="High-level scope, challenges, constraints..." />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="summary">Business Summary (AI)</Label>
+            <Textarea id="summary" value={projectForm.business_summary || ""} onChange={(e) => setProjectForm((p) => ({ ...p, business_summary: e.target.value }))} placeholder="AI-generated business overview" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="goal">Overall Goal</Label>
+          <Input id="goal" value={projectForm.overall_goal || ""} onChange={(e) => setProjectForm((p) => ({ ...p, overall_goal: e.target.value }))} placeholder="e.g., Reduce onboarding time, migrate from legacy NAC, etc." />
+        </div>
+
+        <div className="space-y-2">
+          <Label>AI Recommendations & Pain Points</Label>
+          <Textarea value={projectForm.ai_recommendations || ""} onChange={(e) => setProjectForm((p) => ({ ...p, ai_recommendations: e.target.value }))} placeholder="Short AI suggestions on scope, risks, and next steps" />
+        </div>
+
+        <div className="flex flex-wrap justify-between gap-2 pt-2">
+          <Button variant="secondary" onClick={async () => {
+            const summary = await generateProjectSummary({
+              name: projectForm.client_name,
+              website: projectForm.website_url,
+              description: projectForm.description,
+              industry: projectForm.industry,
+            } as any);
+            const rec = await generateCompletion({
+              provider: 'openai',
+              prompt: `Given the following company and project basics, suggest top pain points/challenges, and high-level recommendations to guide NAC scoping. Keep it under 10 bullet points.\n\nCompany: ${projectForm.client_name || ''}\nWebsite: ${projectForm.website_url || ''}\nIndustry: ${projectForm.industry || ''}\nDescription: ${projectForm.description || ''}`,
+              temperature: 0.2,
+              maxTokens: 400,
+            } as any);
+            setProjectForm((p) => ({
+              ...p,
+              business_summary: summary || p.business_summary,
+              ai_recommendations: (rec as any)?.content || p.ai_recommendations,
+            }));
+            toast({ title: "AI Updated", description: "Generated business summary and recommendations" });
+          }} disabled={aiLoading}>
+            {aiLoading ? 'Generating…' : 'Generate Summary & Suggestions'}
           </Button>
+
+          <div className="flex gap-2">
+            {state.project && (
+              <Button variant="outline" onClick={next}>Skip</Button>
+            )}
+            <Button onClick={handleCreateProject} disabled={!projectForm.name || !projectForm.client_name || createProjectMutation.isPending}>
+              {createProjectMutation.isPending ? "Saving..." : "Save & Continue"}
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

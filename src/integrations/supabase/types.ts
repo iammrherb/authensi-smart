@@ -1925,6 +1925,7 @@ export type Database = {
         Row: {
           actual_completion: string | null
           additional_stakeholders: Json | null
+          ai_recommendations: string | null
           budget: number | null
           bulk_sites_data: Json | null
           business_domain: string | null
@@ -1932,6 +1933,7 @@ export type Database = {
           business_website: string | null
           client_name: string | null
           compliance_frameworks: string[] | null
+          country_code: string | null
           created_at: string
           created_by: string | null
           current_phase: string | null
@@ -1942,9 +1944,12 @@ export type Database = {
           enable_bulk_users: boolean | null
           id: string
           industry: string | null
+          initiative_type: string | null
           integration_requirements: Json | null
+          linkedin_url: string | null
           migration_scope: Json | null
           name: string
+          overall_goal: string | null
           pain_points: Json | null
           poc_status: string | null
           portnox_owner: string | null
@@ -1953,22 +1958,27 @@ export type Database = {
           progress_percentage: number | null
           project_manager: string | null
           project_owner: string | null
+          project_owners: Json
           project_type: string | null
+          region_name: string | null
           security_level: string | null
           start_date: string | null
           status: string | null
           success_criteria: Json | null
           target_completion: string | null
           technical_owner: string | null
+          technical_owners: Json
           template_id: string | null
           timezone: string | null
           total_endpoints: number | null
           total_sites: number | null
           updated_at: string
+          website_url: string | null
         }
         Insert: {
           actual_completion?: string | null
           additional_stakeholders?: Json | null
+          ai_recommendations?: string | null
           budget?: number | null
           bulk_sites_data?: Json | null
           business_domain?: string | null
@@ -1976,6 +1986,7 @@ export type Database = {
           business_website?: string | null
           client_name?: string | null
           compliance_frameworks?: string[] | null
+          country_code?: string | null
           created_at?: string
           created_by?: string | null
           current_phase?: string | null
@@ -1986,9 +1997,12 @@ export type Database = {
           enable_bulk_users?: boolean | null
           id?: string
           industry?: string | null
+          initiative_type?: string | null
           integration_requirements?: Json | null
+          linkedin_url?: string | null
           migration_scope?: Json | null
           name: string
+          overall_goal?: string | null
           pain_points?: Json | null
           poc_status?: string | null
           portnox_owner?: string | null
@@ -1997,22 +2011,27 @@ export type Database = {
           progress_percentage?: number | null
           project_manager?: string | null
           project_owner?: string | null
+          project_owners?: Json
           project_type?: string | null
+          region_name?: string | null
           security_level?: string | null
           start_date?: string | null
           status?: string | null
           success_criteria?: Json | null
           target_completion?: string | null
           technical_owner?: string | null
+          technical_owners?: Json
           template_id?: string | null
           timezone?: string | null
           total_endpoints?: number | null
           total_sites?: number | null
           updated_at?: string
+          website_url?: string | null
         }
         Update: {
           actual_completion?: string | null
           additional_stakeholders?: Json | null
+          ai_recommendations?: string | null
           budget?: number | null
           bulk_sites_data?: Json | null
           business_domain?: string | null
@@ -2020,6 +2039,7 @@ export type Database = {
           business_website?: string | null
           client_name?: string | null
           compliance_frameworks?: string[] | null
+          country_code?: string | null
           created_at?: string
           created_by?: string | null
           current_phase?: string | null
@@ -2030,9 +2050,12 @@ export type Database = {
           enable_bulk_users?: boolean | null
           id?: string
           industry?: string | null
+          initiative_type?: string | null
           integration_requirements?: Json | null
+          linkedin_url?: string | null
           migration_scope?: Json | null
           name?: string
+          overall_goal?: string | null
           pain_points?: Json | null
           poc_status?: string | null
           portnox_owner?: string | null
@@ -2041,18 +2064,22 @@ export type Database = {
           progress_percentage?: number | null
           project_manager?: string | null
           project_owner?: string | null
+          project_owners?: Json
           project_type?: string | null
+          region_name?: string | null
           security_level?: string | null
           start_date?: string | null
           status?: string | null
           success_criteria?: Json | null
           target_completion?: string | null
           technical_owner?: string | null
+          technical_owners?: Json
           template_id?: string | null
           timezone?: string | null
           total_endpoints?: number | null
           total_sites?: number | null
           updated_at?: string
+          website_url?: string | null
         }
         Relationships: [
           {

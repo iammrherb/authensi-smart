@@ -47,6 +47,17 @@ export interface Project {
   migration_scope?: any;
   template_id?: string;
   poc_status?: string;
+
+  // Newly added fields for enhanced basics
+  website_url?: string;
+  linkedin_url?: string;
+  project_owners?: { name: string; email: string }[];
+  technical_owners?: { name: string; email: string }[];
+  country_code?: string;
+  region_name?: string;
+  overall_goal?: string;
+  initiative_type?: 'greenfield' | 'migration' | 'expansion' | 'other' | string;
+  ai_recommendations?: string;
 }
 
 export interface ProjectSite {
@@ -64,7 +75,7 @@ export const useProjects = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('projects')
-        .select('id, name, description, client_name, business_domain, business_website, business_summary, project_type, industry, primary_country, primary_region, timezone, deployment_type, security_level, total_sites, total_endpoints, budget, project_manager, project_owner, technical_owner, portnox_owner, additional_stakeholders, compliance_frameworks, pain_points, success_criteria, integration_requirements, enable_bulk_sites, enable_bulk_users, enable_auto_vendors, start_date, target_completion, status, current_phase, progress_percentage, created_by, bulk_sites_data, migration_scope, created_at, updated_at, actual_completion, template_id, poc_status')
+        .select('id, name, description, client_name, business_domain, business_website, business_summary, project_type, industry, primary_country, primary_region, timezone, deployment_type, security_level, total_sites, total_endpoints, budget, project_manager, project_owner, technical_owner, portnox_owner, additional_stakeholders, compliance_frameworks, pain_points, success_criteria, integration_requirements, enable_bulk_sites, enable_bulk_users, enable_auto_vendors, start_date, target_completion, status, current_phase, progress_percentage, created_by, bulk_sites_data, migration_scope, created_at, updated_at, actual_completion, template_id, poc_status, website_url, linkedin_url, project_owners, technical_owners, country_code, region_name, overall_goal, initiative_type, ai_recommendations')
         .order('created_at', { ascending: false });
       
       if (error) {
@@ -88,7 +99,7 @@ export const useProject = (id: string) => {
 
       const { data, error } = await supabase
         .from('projects')
-        .select('id, name, description, client_name, business_domain, business_website, business_summary, project_type, industry, primary_country, primary_region, timezone, deployment_type, security_level, total_sites, total_endpoints, budget, project_manager, project_owner, technical_owner, portnox_owner, additional_stakeholders, compliance_frameworks, pain_points, success_criteria, integration_requirements, enable_bulk_sites, enable_bulk_users, enable_auto_vendors, start_date, target_completion, status, current_phase, progress_percentage, created_by, bulk_sites_data, migration_scope, created_at, updated_at, actual_completion, template_id, poc_status')
+        .select('id, name, description, client_name, business_domain, business_website, business_summary, project_type, industry, primary_country, primary_region, timezone, deployment_type, security_level, total_sites, total_endpoints, budget, project_manager, project_owner, technical_owner, portnox_owner, additional_stakeholders, compliance_frameworks, pain_points, success_criteria, integration_requirements, enable_bulk_sites, enable_bulk_users, enable_auto_vendors, start_date, target_completion, status, current_phase, progress_percentage, created_by, bulk_sites_data, migration_scope, created_at, updated_at, actual_completion, template_id, poc_status, website_url, linkedin_url, project_owners, technical_owners, country_code, region_name, overall_goal, initiative_type, ai_recommendations')
         .eq('id', id)
         .maybeSingle();
       
