@@ -54,6 +54,8 @@ import { useAI } from "@/hooks/useAI";
 import EnhancedVendorSelector from "./EnhancedVendorSelector";
 import DecisionTreeEngine from "./DecisionTreeEngine";
 import ScopingFlowManager from "./ScopingFlowManager";
+import InlineSelectCreate from "@/components/common/InlineSelectCreate";
+import type { CatalogItem } from "@/hooks/useCatalog";
 
 interface VendorModel {
   name: string;
@@ -193,6 +195,32 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
       ai_recommendations: {}
     }
   });
+
+  const [siemItems, setSiemItems] = useState<CatalogItem[]>([]);
+  const [mdmItems, setMdmItems] = useState<CatalogItem[]>([]);
+  const [firewallItems, setFirewallItems] = useState<CatalogItem[]>([]);
+  const [vpnItems, setVpnItems] = useState<CatalogItem[]>([]);
+  const [idpItems, setIdpItems] = useState<CatalogItem[]>([]);
+  const [nacItems, setNacItems] = useState<CatalogItem[]>([]);
+
+  useEffect(() => {
+    // Merge selected catalog items into required integrations by name (deduped)
+    const names = new Set<string>([
+      ...(scopingData.integration_compliance.required_integrations || []),
+      ...siemItems.map((i) => i.name),
+      ...mdmItems.map((i) => i.name),
+      ...firewallItems.map((i) => i.name),
+      ...vpnItems.map((i) => i.name),
+      ...idpItems.map((i) => i.name),
+      ...nacItems.map((i) => i.name),
+    ]);
+    handleInputChange(
+      'integration_compliance',
+      'required_integrations',
+      Array.from(names)
+    );
+  }, [siemItems, mdmItems, firewallItems, vpnItems, idpItems, nacItems]);
+
 
   const { toast } = useToast();
   const { generateRecommendations, isLoading: aiLoading } = useAI();
@@ -596,9 +624,57 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
                   </div>
                 </div>
               </TabsContent>
-            </Tabs>
-          </div>
-        );
+              </Tabs>
+
+              <div className="space-y-4">
+                <h4 className="text-base font-semibold">Other Integrations</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <InlineSelectCreate
+                    categoryKey="siem"
+                    label="SIEM Platforms"
+                    description="Select or add your SIEM (e.g., Splunk, QRadar)"
+                    value={siemItems}
+                    onChange={setSiemItems}
+                  />
+                  <InlineSelectCreate
+                    categoryKey="mdm"
+                    label="MDM/UEM"
+                    description="Select or add your MDM (e.g., Intune, Jamf)"
+                    value={mdmItems}
+                    onChange={setMdmItems}
+                  />
+                  <InlineSelectCreate
+                    categoryKey="firewall"
+                    label="Firewalls"
+                    description="Select or add your firewall platforms"
+                    value={firewallItems}
+                    onChange={setFirewallItems}
+                  />
+                  <InlineSelectCreate
+                    categoryKey="vpn"
+                    label="VPN / Zero Trust"
+                    description="Select or add remote access solutions"
+                    value={vpnItems}
+                    onChange={setVpnItems}
+                  />
+                  <InlineSelectCreate
+                    categoryKey="idp"
+                    label="Identity Providers (IdP)"
+                    description="Select or add your IdP (e.g., Okta, Azure AD)"
+                    value={idpItems}
+                    onChange={setIdpItems}
+                  />
+                  <InlineSelectCreate
+                    categoryKey="nac"
+                    label="Current NAC Vendors"
+                    description="Track current NAC solutions in place"
+                    value={nacItems}
+                    onChange={setNacItems}
+                  />
+                </div>
+              </div>
+            </div>
+          );
 
       case 'use_cases':
         return (

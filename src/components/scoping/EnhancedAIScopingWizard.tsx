@@ -29,6 +29,7 @@ import { useCreateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
 import { PortnoxDocumentationService, type PortnoxDocumentationResult } from '@/services/PortnoxDocumentationService';
 import UltimateAIScopingWizard from './UltimateAIScopingWizard';
+import { useCreateScopingSession, useUpdateScopingSession } from '@/hooks/useScopingSessionsDb';
 
 interface EnhancedScopingSession {
   id: string;
@@ -63,6 +64,9 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
   const [isGeneratingDocs, setIsGeneratingDocs] = useState(false);
   const [currentSession, setCurrentSession] = useState<EnhancedScopingSession | null>(existingSession || null);
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
+  const createSessionDb = useCreateScopingSession();
+  const updateSessionDb = useUpdateScopingSession();
+  const [dbSessionId, setDbSessionId] = useState<string | null>(null);
 
   const { data: vendors = [] } = useEnhancedVendors();
   const { data: useCases = [] } = useUseCases();
