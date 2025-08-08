@@ -5,12 +5,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { FileText, Download, TrendingUp, BarChart3, PieChart, Calendar } from "lucide-react";
 import ComprehensiveReports from "@/components/reports/ComprehensiveReports";
-
+import PortnoxDeploymentReportBuilder from "@/components/reports/PortnoxDeploymentReportBuilder";
 const Reports = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="pt-8">
         <div className="container mx-auto px-6 py-8">
+          <PortnoxDeploymentReportBuilder />
+          <div className="my-6" />
           <ComprehensiveReports />
         </div>
       </div>
