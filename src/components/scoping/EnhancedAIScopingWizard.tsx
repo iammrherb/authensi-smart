@@ -30,7 +30,7 @@ import { ResourceCreationDialog } from '@/components/wizards/ResourceCreationDia
 import { useCreateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
 import { PortnoxDocumentationService, type PortnoxDocumentationResult } from '@/services/PortnoxDocumentationService';
-import ComprehensiveAIScopingWizard from './ComprehensiveAIScopingWizard';
+import UltimateAIScopingWizard from './UltimateAIScopingWizard';
 
 interface EnhancedScopingSession {
   id: string;
@@ -308,8 +308,9 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
             </Alert>
             
             <div className="space-y-6">
-              <ComprehensiveAIScopingWizard
-                onComplete={handleScopingComplete}
+              <UltimateAIScopingWizard
+                onComplete={(sessionId, data) => handleScopingComplete(sessionId, data)}
+                onSave={() => { /* draft saved */ }}
                 onCancel={onCancel}
               />
               
