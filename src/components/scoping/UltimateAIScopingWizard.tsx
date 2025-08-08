@@ -213,6 +213,10 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
   const [vpnItems, setVpnItems] = useState<CatalogItem[]>([]);
   const [idpItems, setIdpItems] = useState<CatalogItem[]>([]);
   const [nacItems, setNacItems] = useState<CatalogItem[]>([]);
+  // Added controlled selections for categories that previously couldn't be selected
+  const [wiredWirelessItems, setWiredWirelessItems] = useState<CatalogItem[]>([]);
+  const [edrItems, setEdrItems] = useState<CatalogItem[]>([]);
+  const [ssoItems, setSsoItems] = useState<CatalogItem[]>([]);
 
   useEffect(() => {
     // Merge selected catalog items into required integrations by name (deduped)
