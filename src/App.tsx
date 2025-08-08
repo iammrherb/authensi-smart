@@ -42,6 +42,7 @@ import ProjectCreation from "./pages/ProjectCreation";
 import UnifiedProjectHub from "./pages/UnifiedProjectHub";
 import OneXerWizardPage from "./pages/OneXerWizard";
 import AIConfigCenter from "./pages/AIConfigCenter";
+import UltimateWizard from "./pages/UltimateWizard";
 
 const queryClient = new QueryClient();
 
@@ -129,6 +130,11 @@ const App = () => (
               <Route path="/onexer-wizard" element={
                 <ProtectedRoute>
                   <OneXerWizardPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/wizard" element={
+                <ProtectedRoute>
+                  <UltimateWizard />
                 </ProtectedRoute>
               } />
               

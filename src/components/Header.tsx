@@ -20,6 +20,7 @@ const Header = () => {
 
   const primaryNavItems = [
     { title: "Command Center", url: "/", icon: Target, active: ["/", "/dashboard"], description: "AI Hub & Overview" },
+    { title: "Ultimate Wizard", url: "/wizard", icon: Rocket, active: ["/wizard"], description: "Unified Scoping • Sites • Config" },
     { title: "AI Scoping", url: "/scoping", icon: Sparkles, active: ["/scoping"], description: "Intelligent Project Scoping" },
     { title: "Project Tracker", url: "/tracker", icon: Zap, active: ["/tracker", "/project"], description: "Live Project Management" },
     { title: "AI Config Gen1Xer", url: "/ai-config", icon: Settings, active: ["/ai-config", "/onexer-wizard"], description: "Intelligent 802.1X Config" },
