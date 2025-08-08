@@ -497,7 +497,7 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Progress Header */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AIScopingDialog from '@/components/scoping/AIScopingDialog';
-import UltimateAIScopingWizard from '@/components/scoping/UltimateAIScopingWizard';
+import EnhancedAIScopingWizard from '@/components/scoping/EnhancedAIScopingWizard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,25 @@ const IntelligentScoping = () => {
       } 
     });
   };
+
+  React.useEffect(() => {
+    document.title = "AI Scoping Wizard | Portnox NAC";
+    const metaDesc = "AI Scoping Wizard for Portnox NAC: personalized recommendations, documentation, and project creation.";
+    let tag = document.querySelector('meta[name="description"]');
+    if (!tag) {
+      tag = document.createElement('meta');
+      tag.setAttribute('name','description');
+      document.head.appendChild(tag);
+    }
+    tag.setAttribute('content', metaDesc);
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', window.location.href);
+  }, []);
 
   React.useEffect(() => {
     // Load saved scoping sessions
@@ -54,12 +73,12 @@ const IntelligentScoping = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background animate-fade-in">
       <div className="pt-8">
         <div className="container mx-auto px-6 py-8">
           <div className="space-y-8">
             {/* Hero Section */}
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-4 animate-fade-in">
               <Badge variant="glow" className="mb-4">
                 <Brain className="h-4 w-4 mr-2" />
                 AI-Powered Scoping
@@ -76,7 +95,7 @@ const IntelligentScoping = () => {
             {/* Features Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {features.map((feature, index) => (
-                <Card key={index} className="text-center hover:shadow-lg transition-shadow">
+                <Card key={index} className="text-center hover:shadow-lg transition-shadow hover-scale animate-fade-in">
                   <CardHeader>
                     <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-2">
                       {feature.icon}
@@ -165,12 +184,10 @@ const IntelligentScoping = () => {
                     Close
                   </Button>
                 </div>
-                <UltimateAIScopingWizard
-                  onComplete={(_sessionId, scopingData) => {
-                    handleCreateProject(scopingData);
+                <EnhancedAIScopingWizard
+                  onComplete={() => {
                     setShowScopingDialog(false);
                   }}
-                  onSave={() => { /* draft saved */ }}
                   onCancel={() => setShowScopingDialog(false)}
                 />
               </div>
