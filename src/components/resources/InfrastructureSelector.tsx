@@ -170,13 +170,13 @@ const InfrastructureSelector: React.FC<InfrastructureSelectorProps> = ({ value, 
           <h5 className="font-medium">Security Infrastructure</h5>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {([
-              ['Firewalls', 'firewall'],
-              ['VPN', 'vpn'],
-              ['IDP / SSO', 'idp'],
-              ['EDR', 'edr'],
-              ['SIEM', 'siem'],
-            ] as const).map(([label, key]) => (
-              <Card key={key}>
+              ['Firewalls', 'firewall', 'firewalls'],
+              ['VPN', 'vpn', 'vpn'],
+              ['IDP / SSO', 'idp', 'idp_sso'],
+              ['EDR', 'edr', 'edr'],
+              ['SIEM', 'siem', 'siem'],
+            ] as const).map(([label, filterKey, propKey]) => (
+              <Card key={propKey}>
                 <CardHeader className="py-3">
                   <CardTitle className="text-sm">{label}</CardTitle>
                 </CardHeader>
@@ -184,16 +184,16 @@ const InfrastructureSelector: React.FC<InfrastructureSelectorProps> = ({ value, 
                   <ScrollArea className="h-32 pr-2">
                     <div className="space-y-2">
                       {vendors
-                        .filter(v => matchCategory(v.category, key) || matchCategory(v.vendor_type, key))
+                        .filter(v => matchCategory(v.category, filterKey) || matchCategory(v.vendor_type, filterKey))
                         .map(v => {
-                          const selected = (value.security as any)[key].includes(v.id);
+                          const selected = ((value.security as any)[propKey] || []).includes(v.id);
                           return (
                             <label key={v.id} className="flex items-center gap-2 text-sm">
                               <Checkbox
                                 checked={selected}
                                 onCheckedChange={() => {
                                   const copy = { ...value } as any;
-                                  copy.security[key] = toggleId(copy.security[key], v.id);
+                                  copy.security[propKey] = toggleId(copy.security[propKey] || [], v.id);
                                   onChange(copy);
                                 }}
                               />
