@@ -362,6 +362,17 @@ const canNext = useMemo(() => {
               toast({ title: "Scoping Complete", description: "Documentation generated and stored" });
             }}
             onCancel={() => setShowScopingWizard(false)}
+            organizationPrefill={{
+              name: projectForm.client_name || projectForm.name,
+              industry: projectForm.industry,
+              total_users: undefined,
+              size: undefined,
+            }}
+            skipOrganizationStep
+            onRequestEditOrganization={() => {
+              setShowScopingWizard(false);
+              setCurrentStep(1);
+            }}
           />
         </DialogContent>
       </Dialog>

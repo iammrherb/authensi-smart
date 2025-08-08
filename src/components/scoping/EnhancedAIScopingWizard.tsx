@@ -48,12 +48,18 @@ interface EnhancedAIScopingWizardProps {
   onComplete?: (session: EnhancedScopingSession) => void;
   onCancel?: () => void;
   existingSession?: EnhancedScopingSession;
+  organizationPrefill?: { name?: string; industry?: string; size?: string; total_users?: number };
+  skipOrganizationStep?: boolean;
+  onRequestEditOrganization?: () => void;
 }
 
 const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
   onComplete,
   onCancel,
-  existingSession
+  existingSession,
+  organizationPrefill,
+  skipOrganizationStep,
+  onRequestEditOrganization
 }) => {
   const [currentPhase, setCurrentPhase] = useState<'scoping' | 'documentation' | 'project-creation'>('scoping');
   const [scopingData, setScopingData] = useState<any>(null);
@@ -322,6 +328,9 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
                   }
                 }}
                 onCancel={onCancel}
+                organizationPrefill={organizationPrefill}
+                skipOrganizationStep={skipOrganizationStep}
+                onRequestEditOrganization={onRequestEditOrganization}
               />
               
             </div>

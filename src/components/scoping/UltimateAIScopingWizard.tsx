@@ -144,14 +144,25 @@ interface UltimateAIScopingWizardProps {
   onComplete: (sessionId: string, data: ScopingData) => void;
   onSave: (sessionId: string, data: ScopingData) => void;
   onCancel: () => void;
+  organizationPrefill?: {
+    name?: string;
+    industry?: string;
+    size?: string;
+    total_users?: number;
+  };
+  skipOrganizationStep?: boolean;
+  onRequestEditOrganization?: () => void;
 }
 
 const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
   onComplete,
   onSave,
-  onCancel
+  onCancel,
+  organizationPrefill,
+  skipOrganizationStep,
+  onRequestEditOrganization
 }) => {
-  const [currentStep, setCurrentStep] = useState('organization');
+  const [currentStep, setCurrentStep] = useState(skipOrganizationStep ? 'infrastructure' : 'organization');
   const [scopingData, setScopingData] = useState<ScopingData>({
     session_name: '',
     created_at: new Date().toISOString(),
@@ -237,6 +248,26 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
   const { data: enhancedVendors = [] } = useEnhancedVendors();
   const { refreshAll } = useRefreshResources();
   useEffect(() => { refreshAll(); }, []);
+
+  // Prefill organization data from Project Basics if provided and optionally skip org step
+  useEffect(() => {
+    if (organizationPrefill) {
+      setScopingData(prev => ({
+        ...prev,
+        organization: {
+          ...prev.organization,
+          name: organizationPrefill.name || prev.organization.name,
+          industry: organizationPrefill.industry || prev.organization.industry,
+          size: organizationPrefill.size || prev.organization.size,
+          total_users: organizationPrefill.total_users ?? prev.organization.total_users,
+        },
+      }));
+    }
+    if (skipOrganizationStep) {
+      setCurrentStep('infrastructure');
+    }
+  }, [organizationPrefill, skipOrganizationStep]);
+
 
   const mapVendor = (ev: any) => ({
     id: ev.id,
