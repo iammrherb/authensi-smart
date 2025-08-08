@@ -47,6 +47,9 @@ import {
   Download
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useEnhancedVendors } from "@/hooks/useEnhancedVendors";
+import { useIndustryOptions } from "@/hooks/useResourceLibrary";
+import { useRefreshResources } from "@/hooks/useRefreshResources";
 import { useAI } from "@/hooks/useAI";
 import EnhancedVendorSelector from "./EnhancedVendorSelector";
 import DecisionTreeEngine from "./DecisionTreeEngine";
@@ -202,10 +205,36 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
     { id: 5, title: "AI Analysis & Templates", icon: Brain, color: "from-indigo-500 to-purple-600" }
   ];
 
-  const industryOptions = [
-    "Healthcare", "Finance", "Education", "Manufacturing", "Retail", "Government",
-    "Technology", "Legal", "Energy", "Transportation", "Other"
-  ];
+  const { data: industryOptionsData = [] } = useIndustryOptions();
+  const { data: enhancedVendors = [] } = useEnhancedVendors();
+  const { refreshAll } = useRefreshResources();
+  useEffect(() => { refreshAll(); }, []);
+
+  const mapVendor = (ev: any) => ({
+    id: ev.id,
+    name: ev.vendor_name,
+    category: ev.category,
+    icon: (ev.vendor_name || '?').toString().charAt(0).toUpperCase(),
+    color: 'bg-primary',
+    models: (ev.models || []).map((m: any) => ({
+      name: m.name || m.model_name || 'Model',
+      series: m.series,
+      firmware_versions: m.firmware_versions || [],
+      features: m.features || [],
+      eol_status: (m.eol_status || 'active') as 'active' | 'eol' | 'eos'
+    })),
+    integration_level: ((ev.portnox_integration_level || 'supported') as 'native' | 'supported' | 'limited' | 'manual')
+  });
+
+  const vendorsWiredWireless = enhancedVendors.filter((v: any) => ['Wired Switch','Wireless','Router'].includes(v.category) || ['Switch','Access Point','Router'].includes(v.vendor_type)).map(mapVendor);
+  const vendorsSecuritySolutions = enhancedVendors.filter((v: any) => ['Firewall','Security'].includes(v.category) || v.vendor_type === 'Security').map(mapVendor);
+  const vendorsEdrSolutions = enhancedVendors.filter((v: any) => ['EDR','XDR'].includes(v.category)).map(mapVendor);
+  const vendorsMfaSolutions = enhancedVendors.filter((v: any) => v.category === 'MFA' || v.vendor_type === 'Authentication').map(mapVendor);
+  const vendorsSsoSolutions = enhancedVendors.filter((v: any) => v.category === 'SSO' || v.vendor_type === 'Identity').map(mapVendor);
+  const vendorsIdentityProviders = enhancedVendors.filter((v: any) => v.category === 'IDP' || v.vendor_type === 'Identity').map(mapVendor);
+  const vendorsCloudPlatforms = enhancedVendors.filter((v: any) => v.category === 'Cloud' || v.vendor_type === 'Cloud').map(mapVendor);
+
+  const industryOptions = (industryOptionsData || []).map((o: any) => o.name);
 
   const organizationSizes = [
     { value: "startup", label: "Startup (1-50)", users: 25 },
@@ -800,7 +829,7 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
                   category="wired_wireless"
                   title="Network Infrastructure"
                   icon={<Router className="h-5 w-5" />}
-                  vendors={comprehensiveVendorEcosystem.wired_wireless}
+                  vendors={vendorsWiredWireless}
                   selectedVendors={scopingData.vendor_ecosystem.wired_wireless}
                   onVendorChange={(vendors) => setScopingData(prev => ({
                     ...prev,

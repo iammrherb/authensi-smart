@@ -15,6 +15,11 @@ import {
   Globe, Server, Wifi, Lock, Smartphone, Database, FileCheck
 } from 'lucide-react';
 import { useCreateProject } from '@/hooks/useProjects';
+import { useIndustryOptions, useComplianceFrameworks, useAuthenticationMethods } from '@/hooks/useResourceLibrary';
+import { useDeviceTypes } from '@/hooks/useDeviceTypes';
+import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
+import { useUseCases } from '@/hooks/useUseCases';
+import { useRefreshResources } from '@/hooks/useRefreshResources';
 import { useToast } from '@/hooks/use-toast';
 
 interface ScopingData {
@@ -144,45 +149,26 @@ const IntelligentScopingWizard: React.FC<IntelligentScopingWizardProps> = ({ onC
     }
   ];
 
-  const industries = [
-    "Healthcare & Life Sciences", "Financial Services", "Government & Public Sector",
-    "Education", "Manufacturing", "Retail & Hospitality", "Technology", 
-    "Energy & Utilities", "Transportation", "Legal Services", "Other"
-  ];
+  // Resource Center data
+  const { data: industryOptions = [] } = useIndustryOptions();
+  const { data: complianceData = [] } = useComplianceFrameworks();
+  const { data: authMethods = [] } = useAuthenticationMethods();
+  const { data: deviceTypes = [] } = useDeviceTypes();
+  const { data: enhancedVendors = [] } = useEnhancedVendors();
+  const { data: useCases = [] } = useUseCases();
+  const { refreshAll } = useRefreshResources();
 
-  const complianceFrameworks = [
-    "HIPAA", "PCI-DSS", "SOX", "GDPR", "SOC 2", "ISO 27001",
-    "NIST", "FedRAMP", "FISMA", "CMMC", "NERC CIP", "21 CFR Part 11"
-  ];
+  useEffect(() => { refreshAll(); }, []);
 
-  const endpointTypes = [
-    "Corporate Laptops", "Desktop Workstations", "Mobile Devices", "Tablets",
-    "IoT Devices", "Printers & MFPs", "Security Cameras", "VoIP Phones",
-    "Medical Devices", "Industrial Controls", "Point of Sale", "Digital Signage"
-  ];
-
-  const networkVendors = [
-    "Cisco", "Aruba/HPE", "Juniper", "Extreme Networks", "Dell/EMC",
-    "Fortinet", "Palo Alto Networks", "Meraki", "Ubiquiti", "Ruckus"
-  ];
-
-  const primaryGoals = [
-    "Zero Trust Network Architecture", "Compliance Requirements", "Device Visibility & Control",
-    "Secure Guest Access", "BYOD Management", "IoT Security", "Incident Response",
-    "Network Segmentation", "Certificate Management", "Identity Integration"
-  ];
-
-  const authenticationMethods = [
-    "802.1X with Certificates", "802.1X with Credentials", "MAC Authentication Bypass",
-    "Web Authentication (Captive Portal)", "SAML/SSO Integration", "Multi-Factor Authentication",
-    "Mobile Device Certificates", "Guest Self-Registration", "Sponsored Guest Access"
-  ];
-
-  const integrationNeeds = [
-    "Microsoft Active Directory", "Azure AD/Entra ID", "Okta", "Google Workspace",
-    "Microsoft Intune", "VMware Workspace ONE", "Jamf Pro", "ServiceNow",
-    "Splunk", "QRadar", "Microsoft Sentinel", "CrowdStrike", "Carbon Black"
-  ];
+  const industries = industryOptions.map((i: any) => i.name);
+  const complianceFrameworks = complianceData.map((c: any) => c.name);
+  const endpointTypes = deviceTypes.map((d: any) => d.device_name);
+  const networkVendors = enhancedVendors
+    .filter((v: any) => ['Wired Switch', 'Wireless', 'Router'].includes(v.category) || ['Switch','Access Point','Router'].includes(v.vendor_type))
+    .map((v: any) => v.vendor_name);
+  const primaryGoals = useCases.map((uc: any) => uc.name);
+  const authenticationMethods = authMethods.map((m: any) => m.name);
+  const integrationNeeds = enhancedVendors.map((v: any) => v.vendor_name);
 
   const calculateProgress = () => {
     if (currentStep === steps.length - 1 && formData.ai_recommendations) return 100;
