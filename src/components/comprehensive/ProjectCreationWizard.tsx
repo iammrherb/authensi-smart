@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,10 +10,14 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, ArrowLeft, ArrowRight, CheckCircle, Briefcase, Building2, Users, Shield, Target, Calendar as CalendarIconOutline } from 'lucide-react';
+import { CalendarIcon, ArrowLeft, ArrowRight, CheckCircle, Briefcase, Building2, Users, Shield, Target, Calendar as CalendarIconOutline, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { useCreateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
+import InlineSelectCreate from '@/components/common/InlineSelectCreate';
+import { useScopingSessions } from '@/hooks/useScopingSessionsDb';
+import { useCatalogItems, type CatalogItem } from '@/hooks/useCatalog';
+import { useIndustryOptions, useComplianceFrameworks } from '@/hooks/useResourceLibrary';
 
 interface ProjectFormData {
   // Basic Information
@@ -62,6 +66,39 @@ const ProjectCreationWizard: React.FC<ProjectCreationWizardProps> = ({ onComplet
 
   const { mutate: createProject, isPending } = useCreateProject();
   const { toast } = useToast();
+  const { data: scopingSessions = [] } = useScopingSessions();
+  const { data: industryData = [] } = useIndustryOptions();
+  const { data: complianceData = [] } = useComplianceFrameworks();
+
+  // Catalog items for vendor selection
+  const [selectedVendors, setSelectedVendors] = useState<CatalogItem[]>([]);
+  const [selectedUseCases, setSelectedUseCases] = useState<CatalogItem[]>([]);
+  const [selectedRequirements, setSelectedRequirements] = useState<CatalogItem[]>([]);
+  const [selectedSiem, setSelectedSiem] = useState<CatalogItem[]>([]);
+  const [selectedMdm, setSelectedMdm] = useState<CatalogItem[]>([]);
+  const [selectedFirewall, setSelectedFirewall] = useState<CatalogItem[]>([]);
+  const [importedFrom, setImportedFrom] = useState<string>('');
+
+  // Import from scoping session
+  const importFromScoping = (sessionId: string) => {
+    const session = scopingSessions.find(s => s.id === sessionId);
+    if (!session) return;
+    
+    const data = session.data;
+    setFormData(prev => ({
+      ...prev,
+      name: data.organization?.name || '',
+      client_name: data.organization?.name || '',
+      industry: data.organization?.industry || '',
+      total_sites: data.network_infrastructure?.site_count || 1,
+      total_endpoints: data.organization?.total_users || 100,
+      compliance_frameworks: data.integration_compliance?.compliance_frameworks || [],
+      pain_points: (data.organization?.pain_points || []).map((p: any) => p.title || p),
+      success_criteria: data.use_cases_requirements?.success_criteria || []
+    }));
+    setImportedFrom(sessionId);
+    toast({ title: "Imported from scoping session", description: "Project data populated from scoping" });
+  };
 
   const steps = [
     {
@@ -84,6 +121,12 @@ const ProjectCreationWizard: React.FC<ProjectCreationWizardProps> = ({ onComplet
     },
     {
       id: 4,
+      title: "Vendor Selection",
+      description: "Select vendors, use cases and requirements",
+      icon: Building2
+    },
+    {
+      id: 5,
       title: "Requirements",
       description: "Pain points and success criteria",
       icon: CheckCircle
@@ -181,6 +224,37 @@ const ProjectCreationWizard: React.FC<ProjectCreationWizardProps> = ({ onComplet
       case 1:
         return (
           <div className="space-y-6">
+            {/* Import from Scoping Session */}
+            {scopingSessions.length > 0 && (
+              <Card className="bg-blue-50 border-blue-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Download className="h-4 w-4" />
+                    Import from Scoping Session
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Select onValueChange={importFromScoping}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select scoping session to import" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {scopingSessions.map(session => (
+                        <SelectItem key={session.id} value={session.id}>
+                          {session.name} ({session.status})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {importedFrom && (
+                    <Badge variant="outline" className="mt-2">
+                      Imported from: {scopingSessions.find(s => s.id === importedFrom)?.name}
+                    </Badge>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
             <div className="space-y-4">
               <div>
                 <Label htmlFor="name">Project Name *</Label>
@@ -211,9 +285,9 @@ const ProjectCreationWizard: React.FC<ProjectCreationWizardProps> = ({ onComplet
                     <SelectValue placeholder="Select industry" />
                   </SelectTrigger>
                   <SelectContent>
-                    {industries.map((industry) => (
-                      <SelectItem key={industry} value={industry.toLowerCase().replace(/\s+/g, '-')}>
-                        {industry}
+                    {(industryData.length > 0 ? industryData : industries).map((industry: any) => (
+                      <SelectItem key={typeof industry === 'string' ? industry : industry.name} value={typeof industry === 'string' ? industry.toLowerCase().replace(/\s+/g, '-') : industry.name}>
+                        {typeof industry === 'string' ? industry : industry.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -393,6 +467,42 @@ const ProjectCreationWizard: React.FC<ProjectCreationWizardProps> = ({ onComplet
         );
 
       case 4:
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <InlineSelectCreate
+                categoryKey="wired_wireless"
+                label="Network Infrastructure"
+                description="Select switches, APs, controllers"
+                value={selectedVendors}
+                onChange={setSelectedVendors}
+              />
+              <InlineSelectCreate
+                categoryKey="siem"
+                label="SIEM Platforms"
+                description="Select SIEM solutions"
+                value={selectedSiem}
+                onChange={setSelectedSiem}
+              />
+              <InlineSelectCreate
+                categoryKey="mdm"
+                label="MDM/UEM"
+                description="Select mobile device management"
+                value={selectedMdm}
+                onChange={setSelectedMdm}
+              />
+              <InlineSelectCreate
+                categoryKey="firewall"
+                label="Firewalls"
+                description="Select firewall platforms"
+                value={selectedFirewall}
+                onChange={setSelectedFirewall}
+              />
+            </div>
+          </div>
+        );
+
+      case 5:
         return (
           <div className="space-y-6">
             <div>

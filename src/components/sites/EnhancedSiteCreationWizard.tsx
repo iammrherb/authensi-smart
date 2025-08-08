@@ -13,12 +13,16 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   ArrowLeft, ArrowRight, CheckCircle, Building2, MapPin, 
-  Users, Shield, Network, Server, Plus, X, Upload
+  Users, Shield, Network, Server, Plus, X, Upload, Download
 } from 'lucide-react';
 import { useCreateSite } from '@/hooks/useSites';
 import { useCountries, useRegionsByCountry } from '@/hooks/useCountriesRegions';
 import { useToast } from '@/hooks/use-toast';
 import InfrastructureSelector, { InfrastructureSelection } from "@/components/resources/InfrastructureSelector";
+import InlineSelectCreate from '@/components/common/InlineSelectCreate';
+import { useScopingSessions } from '@/hooks/useScopingSessionsDb';
+import type { CatalogItem } from '@/hooks/useCatalog';
+import ReportExporter from '@/components/common/ReportExporter';
 
 interface EnhancedSiteFormData {
   // Basic Information
@@ -211,11 +215,41 @@ const EnhancedSiteCreationWizard: React.FC<EnhancedSiteCreationWizardProps> = ({
     security: { firewalls: [], vpn: [], idp_sso: [], edr: [], siem: [] },
     device_inventory: []
   });
+
+  // Unified catalog selections
+  const [selectedNetworkVendors, setSelectedNetworkVendors] = useState<CatalogItem[]>([]);
+  const [selectedSiemVendors, setSelectedSiemVendors] = useState<CatalogItem[]>([]);
+  const [selectedMdmVendors, setSelectedMdmVendors] = useState<CatalogItem[]>([]);
+  const [selectedFirewallVendors, setSelectedFirewallVendors] = useState<CatalogItem[]>([]);
+  const [selectedVpnVendors, setSelectedVpnVendors] = useState<CatalogItem[]>([]);
+  const [selectedEdrVendors, setSelectedEdrVendors] = useState<CatalogItem[]>([]);
+  const [selectedIdpVendors, setSelectedIdpVendors] = useState<CatalogItem[]>([]);
   
   const { data: countries = [] } = useCountries();
   const { data: regions = [] } = useRegionsByCountry(formData.country);
+  const { data: scopingSessions = [] } = useScopingSessions();
   const { mutate: createSite, isPending } = useCreateSite();
   const { toast } = useToast();
+
+  const importFromScoping = (sessionId: string) => {
+    const session = scopingSessions.find(s => s.id === sessionId);
+    if (!session) return;
+    const data = session.data;
+    setFormData(prev => ({
+      ...prev,
+      site_name: `${data.organization?.name || ''} Site`,
+      description: `Site for ${data.organization?.name || 'organization'} NAC deployment`,
+      network_details: {
+        ...prev.network_details,
+        total_users: data.organization?.total_users || 50,
+      },
+      security_requirements: {
+        ...prev.security_requirements,
+        compliance_frameworks: data.integration_compliance?.compliance_frameworks || [],
+      }
+    }));
+    toast({ title: "Imported from scoping", description: "Site data populated from scoping session" });
+  };
 
   const steps = [
     {
