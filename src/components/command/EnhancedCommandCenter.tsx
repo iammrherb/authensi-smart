@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useProjects } from '@/hooks/useProjects';
-import ResourceCenter from '@/pages/ResourceCenter';
+import UnifiedResourceCenter from '@/pages/UnifiedResourceCenter';
 import { PortnoxProjectReport } from '@/components/reports/PortnoxProjectReport';
 
 interface QuickAction {
@@ -48,12 +48,12 @@ const EnhancedCommandCenter: React.FC = () => {
       path: '/project-creation'
     },
     {
-      id: 'resource-center',
-      title: 'Resource Center',
+      id: 'resource-library',
+      title: 'Resource Library',
       description: 'Unified management for vendors, use cases, templates & requirements',
       icon: Building2,
       color: 'from-blue-500 to-cyan-600',
-      path: '/resource-center'
+      path: '/resource-library'
     },
     {
       id: 'reports',
@@ -225,7 +225,7 @@ const EnhancedCommandCenter: React.FC = () => {
   );
 
   const renderResources = () => (
-    <ResourceCenter />
+    <UnifiedResourceCenter />
   );
 
   const renderReports = () => (

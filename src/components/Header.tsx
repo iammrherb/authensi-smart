@@ -27,7 +27,7 @@ const Header = () => {
   ];
 
   const secondaryNavItems = [
-    { title: "Resource Center", url: "/resource-center", icon: FolderOpen, active: ["/resource-center"], description: "Resource Center" },
+    { title: "Resource Library", url: "/resource-library", icon: FolderOpen, active: ["/resource-library"], description: "Resource Library" },
     { title: "Use Cases", url: "/use-cases", icon: BookOpen, active: ["/use-cases"], description: "Knowledge Library" },
     { title: "Sites", url: "/sites", icon: Building2, active: ["/sites"], description: "Network Sites" },
     { title: "Requirements", url: "/requirements", icon: FileText, active: ["/requirements"], description: "Project Requirements" },
@@ -189,12 +189,12 @@ const Header = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center space-x-2 text-nav-foreground/80 hover:text-nav-foreground hover:bg-nav-hover/50">
                     <BookOpen className="h-4 w-4" />
-                    <span className="font-medium">Resource Center</span>
+                    <span className="font-medium">Resource Library</span>
                     <ChevronDown className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>Resource Center</DropdownMenuLabel>
+                  <DropdownMenuLabel>Resource Library</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {secondaryNavItems.map((item) => (
                     <DropdownMenuItem key={item.url} asChild>

@@ -133,6 +133,11 @@ const App = () => (
               } />
               
               {/* Knowledge & Resources */}
+              <Route path="/resource-library" element={
+                <ProtectedRoute>
+                  <UnifiedResourceCenter />
+                </ProtectedRoute>
+              } />
               <Route path="/resources" element={
                 <ProtectedRoute>
                   <UnifiedResourceCenter />

@@ -1,8 +1,8 @@
-// Redirect to the unified ResourceCenter component
-import ResourceCenter from './ResourceCenter';
+// Redirect to the unified Resource Library component
+import UnifiedResourceCenter from './UnifiedResourceCenter';
 
 const Resources = () => {
-  return <ResourceCenter />;
+  return <UnifiedResourceCenter />;
 };
 
 export default Resources;
