@@ -1,5 +1,6 @@
 import EnhancedVendorManagement from "@/components/vendors/EnhancedVendorManagement";
 import { Badge } from "@/components/ui/badge";
+import { VendorsDocsCrawlerPanel } from "@/components/vendors/VendorsDocsCrawlerPanel";
 
 const Vendors = () => {
   return (
@@ -20,6 +21,7 @@ const Vendors = () => {
           </div>
           
           <EnhancedVendorManagement />
+          <VendorsDocsCrawlerPanel />
         </div>
       </div>
     </div>
