@@ -92,6 +92,7 @@ export type Database = {
           name: string
           portnox_integration: Json | null
           security_level: string | null
+          tags: Json
           updated_at: string | null
           vendor_support: Json | null
         }
@@ -107,6 +108,7 @@ export type Database = {
           name: string
           portnox_integration?: Json | null
           security_level?: string | null
+          tags?: Json
           updated_at?: string | null
           vendor_support?: Json | null
         }
@@ -122,6 +124,7 @@ export type Database = {
           name?: string
           portnox_integration?: Json | null
           security_level?: string | null
+          tags?: Json
           updated_at?: string | null
           vendor_support?: Json | null
         }
@@ -238,6 +241,7 @@ export type Database = {
           industry_alignment: Json | null
           is_active: boolean | null
           name: string
+          tags: Json
           typical_use_cases: Json | null
           updated_at: string | null
         }
@@ -249,6 +253,7 @@ export type Database = {
           industry_alignment?: Json | null
           is_active?: boolean | null
           name: string
+          tags?: Json
           typical_use_cases?: Json | null
           updated_at?: string | null
         }
@@ -260,10 +265,94 @@ export type Database = {
           industry_alignment?: Json | null
           is_active?: boolean | null
           name?: string
+          tags?: Json
           typical_use_cases?: Json | null
           updated_at?: string | null
         }
         Relationships: []
+      }
+      catalog_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          key: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          key: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          key?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      catalog_items: {
+        Row: {
+          category_key: string
+          created_at: string
+          created_by: string | null
+          firmware_version: string | null
+          id: string
+          is_active: boolean | null
+          labels: Json
+          metadata: Json
+          model: string | null
+          name: string
+          tags: Json
+          updated_at: string
+          vendor: string | null
+        }
+        Insert: {
+          category_key: string
+          created_at?: string
+          created_by?: string | null
+          firmware_version?: string | null
+          id?: string
+          is_active?: boolean | null
+          labels?: Json
+          metadata?: Json
+          model?: string | null
+          name: string
+          tags?: Json
+          updated_at?: string
+          vendor?: string | null
+        }
+        Update: {
+          category_key?: string
+          created_at?: string
+          created_by?: string | null
+          firmware_version?: string | null
+          id?: string
+          is_active?: boolean | null
+          labels?: Json
+          metadata?: Json
+          model?: string | null
+          name?: string
+          tags?: Json
+          updated_at?: string
+          vendor?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalog_items_category_key_fkey"
+            columns: ["category_key"]
+            isOneToOne: false
+            referencedRelation: "catalog_categories"
+            referencedColumns: ["key"]
+          },
+        ]
       }
       compliance_frameworks: {
         Row: {
@@ -275,6 +364,7 @@ export type Database = {
           is_active: boolean | null
           name: string
           requirements: Json | null
+          tags: Json
           updated_at: string | null
         }
         Insert: {
@@ -286,6 +376,7 @@ export type Database = {
           is_active?: boolean | null
           name: string
           requirements?: Json | null
+          tags?: Json
           updated_at?: string | null
         }
         Update: {
@@ -297,6 +388,7 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           requirements?: Json | null
+          tags?: Json
           updated_at?: string | null
         }
         Relationships: []
@@ -782,6 +874,7 @@ export type Database = {
           is_active: boolean | null
           name: string
           requirements: Json | null
+          tags: Json
           typical_timeline: string | null
           updated_at: string | null
         }
@@ -794,6 +887,7 @@ export type Database = {
           is_active?: boolean | null
           name: string
           requirements?: Json | null
+          tags?: Json
           typical_timeline?: string | null
           updated_at?: string | null
         }
@@ -806,6 +900,7 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           requirements?: Json | null
+          tags?: Json
           typical_timeline?: string | null
           updated_at?: string | null
         }
@@ -821,12 +916,14 @@ export type Database = {
           deployment_considerations: Json | null
           description: string | null
           device_name: string
+          documentation_links: Json
           id: string
           integration_complexity: string | null
           management_options: Json | null
           manufacturer: string
           operating_systems: Json | null
           security_features: Json | null
+          tags: Json
           typical_use_cases: Json | null
           updated_at: string | null
         }
@@ -839,12 +936,14 @@ export type Database = {
           deployment_considerations?: Json | null
           description?: string | null
           device_name: string
+          documentation_links?: Json
           id?: string
           integration_complexity?: string | null
           management_options?: Json | null
           manufacturer: string
           operating_systems?: Json | null
           security_features?: Json | null
+          tags?: Json
           typical_use_cases?: Json | null
           updated_at?: string | null
         }
@@ -857,12 +956,14 @@ export type Database = {
           deployment_considerations?: Json | null
           description?: string | null
           device_name?: string
+          documentation_links?: Json
           id?: string
           integration_complexity?: string | null
           management_options?: Json | null
           manufacturer?: string
           operating_systems?: Json | null
           security_features?: Json | null
+          tags?: Json
           typical_use_cases?: Json | null
           updated_at?: string | null
         }
@@ -940,6 +1041,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           name: string
+          tags: Json
           updated_at: string | null
         }
         Insert: {
@@ -950,6 +1052,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name: string
+          tags?: Json
           updated_at?: string | null
         }
         Update: {
@@ -960,6 +1063,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name?: string
+          tags?: Json
           updated_at?: string | null
         }
         Relationships: []
@@ -1028,6 +1132,7 @@ export type Database = {
           name: string
           security_requirements: Json | null
           segment_type: string
+          tags: Json
           typical_size_range: string | null
           updated_at: string | null
           vendor_considerations: Json | null
@@ -1041,6 +1146,7 @@ export type Database = {
           name: string
           security_requirements?: Json | null
           segment_type: string
+          tags?: Json
           typical_size_range?: string | null
           updated_at?: string | null
           vendor_considerations?: Json | null
@@ -1054,6 +1160,7 @@ export type Database = {
           name?: string
           security_requirements?: Json | null
           segment_type?: string
+          tags?: Json
           typical_size_range?: string | null
           updated_at?: string | null
           vendor_considerations?: Json | null
@@ -1432,6 +1539,7 @@ export type Database = {
           phase_order: number | null
           prerequisites: Json | null
           success_criteria: Json | null
+          tags: Json
           typical_duration: string | null
           updated_at: string | null
         }
@@ -1446,6 +1554,7 @@ export type Database = {
           phase_order?: number | null
           prerequisites?: Json | null
           success_criteria?: Json | null
+          tags?: Json
           typical_duration?: string | null
           updated_at?: string | null
         }
@@ -1460,6 +1569,7 @@ export type Database = {
           phase_order?: number | null
           prerequisites?: Json | null
           success_criteria?: Json | null
+          tags?: Json
           typical_duration?: string | null
           updated_at?: string | null
         }
@@ -2518,6 +2628,97 @@ export type Database = {
           },
         ]
       }
+      scoping_session_items: {
+        Row: {
+          attributes: Json
+          category_key: string
+          created_at: string
+          custom_name: string | null
+          id: string
+          item_id: string | null
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          attributes?: Json
+          category_key: string
+          created_at?: string
+          custom_name?: string | null
+          id?: string
+          item_id?: string | null
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          attributes?: Json
+          category_key?: string
+          created_at?: string
+          custom_name?: string | null
+          id?: string
+          item_id?: string | null
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scoping_session_items_category_key_fkey"
+            columns: ["category_key"]
+            isOneToOne: false
+            referencedRelation: "catalog_categories"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "scoping_session_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "catalog_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scoping_session_items_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "scoping_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scoping_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          data: Json
+          id: string
+          name: string
+          project_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          created_by: string
+          data?: Json
+          id?: string
+          name: string
+          project_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          data?: Json
+          id?: string
+          name?: string
+          project_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       security_audit_log: {
         Row: {
           created_at: string | null
@@ -3410,6 +3611,7 @@ export type Database = {
           firmware_requirements: Json | null
           id: string
           integration_methods: Json | null
+          is_nac_vendor: boolean
           known_limitations: Json | null
           last_tested_date: string | null
           models: Json | null
@@ -3440,6 +3642,7 @@ export type Database = {
           firmware_requirements?: Json | null
           id?: string
           integration_methods?: Json | null
+          is_nac_vendor?: boolean
           known_limitations?: Json | null
           last_tested_date?: string | null
           models?: Json | null
@@ -3470,6 +3673,7 @@ export type Database = {
           firmware_requirements?: Json | null
           id?: string
           integration_methods?: Json | null
+          is_nac_vendor?: boolean
           known_limitations?: Json | null
           last_tested_date?: string | null
           models?: Json | null
@@ -3503,6 +3707,7 @@ export type Database = {
           model_series: string | null
           port_configurations: Json | null
           supported_features: Json | null
+          tags: Json
           updated_at: string
           vendor_id: string
         }
@@ -3520,6 +3725,7 @@ export type Database = {
           model_series?: string | null
           port_configurations?: Json | null
           supported_features?: Json | null
+          tags?: Json
           updated_at?: string
           vendor_id: string
         }
@@ -3537,6 +3743,7 @@ export type Database = {
           model_series?: string | null
           port_configurations?: Json | null
           supported_features?: Json | null
+          tags?: Json
           updated_at?: string
           vendor_id?: string
         }
@@ -3721,6 +3928,10 @@ export type Database = {
       }
       user_owns_project: {
         Args: { project_uuid: string }
+        Returns: boolean
+      }
+      user_owns_scoping_session: {
+        Args: { session_uuid: string }
         Returns: boolean
       }
       user_owns_site: {
