@@ -14,7 +14,7 @@ import CustomRoleManager from "@/components/admin/CustomRoleManager";
 import AISettings from "@/components/ai/AISettings";
 import APIKeyManager from "@/components/ai/APIKeyManager";
 import { Settings as SettingsIcon, User, Bell, Shield, Database, Globe, Users, Brain } from "lucide-react";
-
+import TaxonomySeederPanel from "@/components/admin/TaxonomySeederPanel";
 const Settings = () => {
   const { data: isAdmin } = useHasRole('super_admin', 'global');
   const { data: canManageUsers } = useHasRole('product_manager', 'global');
@@ -268,6 +268,15 @@ const Settings = () => {
                     </CardHeader>
                     <CardContent>
                       <CustomRoleManager />
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Taxonomy Seeder</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <TaxonomySeederPanel />
                     </CardContent>
                   </Card>
                 </div>
