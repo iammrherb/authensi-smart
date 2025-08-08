@@ -48,7 +48,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useEnhancedVendors } from "@/hooks/useEnhancedVendors";
-import { useIndustryOptions } from "@/hooks/useResourceLibrary";
+import { useIndustryOptions, useComplianceFrameworks } from "@/hooks/useResourceLibrary";
 import { useRefreshResources } from "@/hooks/useRefreshResources";
 import { useAI } from "@/hooks/useAI";
 import EnhancedVendorSelector from "./EnhancedVendorSelector";
@@ -234,6 +234,16 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
   const vendorsIdentityProviders = enhancedVendors.filter((v: any) => v.category === 'IDP' || v.vendor_type === 'Identity').map(mapVendor);
   const vendorsCloudPlatforms = enhancedVendors.filter((v: any) => v.category === 'Cloud' || v.vendor_type === 'Cloud').map(mapVendor);
 
+  const allVendorsFlat = [
+    ...vendorsWiredWireless,
+    ...vendorsSecuritySolutions,
+    ...vendorsEdrSolutions,
+    ...vendorsMfaSolutions,
+    ...vendorsSsoSolutions,
+    ...vendorsCloudPlatforms,
+    ...vendorsIdentityProviders,
+  ];
+
   const industryOptions = (industryOptionsData || []).map((o: any) => o.name);
 
   const organizationSizes = [
@@ -244,318 +254,8 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
     { value: "global", label: "Global Enterprise (5000+)", users: 10000 }
   ];
 
-  const comprehensiveVendorEcosystem = {
-    wired_wireless: [
-      { 
-        id: 'cisco',
-        name: "Cisco", 
-        category: "Enterprise Networking",
-        icon: "C",
-        color: "bg-blue-600",
-        integration_level: "native" as const,
-        models: [
-          { 
-            name: "Catalyst 9300", 
-            series: "Campus Core",
-            firmware_versions: ["16.12.09", "17.06.05", "17.09.04"],
-            features: ["StackWise-480", "mGig", "DNA Ready"],
-            eol_status: "active" as const
-          },
-          {
-            name: "Catalyst 9200",
-            series: "Campus Access", 
-            firmware_versions: ["16.12.09", "17.06.05"],
-            features: ["StackWise-160", "PoE+", "DNA Ready"],
-            eol_status: "active" as const
-          }
-        ]
-      },
-      {
-        id: 'aruba',
-        name: "Aruba",
-        category: "Wireless Solutions", 
-        icon: "A",
-        color: "bg-orange-600",
-        integration_level: "native" as const,
-        models: [
-          {
-            name: "AP-635",
-            series: "Wi-Fi 6E",
-            firmware_versions: ["8.10.0.4", "8.11.0.1"],
-            features: ["Wi-Fi 6E", "IoT Ready", "AI Insights"],
-            eol_status: "active" as const
-          }
-        ]
-      },
-      { 
-        id: 'juniper',
-        name: "Juniper", 
-        category: "Enterprise", 
-        icon: "J",
-        color: "bg-green-600",
-        integration_level: "supported" as const,
-        models: [
-          { name: "EX4400", firmware_versions: ["20.4R3"], features: ["Virtual Chassis"], eol_status: "active" as const },
-          { name: "SRX300", firmware_versions: ["15.1X49-D200"], features: ["UTM"], eol_status: "active" as const }
-        ]
-      },
-      { 
-        id: 'fortinet_network',
-        name: "Fortinet", 
-        category: "Security-First", 
-        icon: "F",
-        color: "bg-red-600",
-        integration_level: "supported" as const,
-        models: [
-          { name: "FortiGate", firmware_versions: ["7.0.12", "7.2.5"], features: ["NGFW"], eol_status: "active" as const },
-          { name: "FortiSwitch", firmware_versions: ["7.0.6"], features: ["Security Fabric"], eol_status: "active" as const }
-        ]
-      }
-    ],
-    security_solutions: [
-      {
-        id: 'palo_alto',
-        name: "Palo Alto",
-        category: "NGFW",
-        icon: "P", 
-        color: "bg-red-600",
-        integration_level: "supported" as const,
-        models: [
-          {
-            name: "PA-5220",
-            series: "PA-5000",
-            firmware_versions: ["10.2.4", "11.0.1"],
-            features: ["Threat Prevention", "URL Filtering", "App-ID"],
-            eol_status: "active" as const
-          }
-        ]
-      },
-      { 
-        id: 'fortinet_security',
-        name: "Fortinet", 
-        category: "Security Fabric", 
-        icon: "F",
-        color: "bg-red-600",
-        integration_level: "native" as const,
-        models: [
-          { name: "FortiGate", firmware_versions: ["7.0.12"], features: ["NGFW"], eol_status: "active" as const },
-          { name: "FortiAnalyzer", firmware_versions: ["7.0.10"], features: ["Logging"], eol_status: "active" as const }
-        ]
-      },
-      { 
-        id: 'checkpoint',
-        name: "Check Point", 
-        category: "Advanced Threat", 
-        icon: "C",
-        color: "bg-blue-600",
-        integration_level: "supported" as const,
-        models: [
-          { name: "Quantum", firmware_versions: ["R81.20"], features: ["Threat Prevention"], eol_status: "active" as const }
-        ]
-      }
-    ],
-    edr_solutions: [
-      { 
-        id: 'crowdstrike',
-        name: "CrowdStrike", 
-        category: "Cloud-Native", 
-        icon: "C",
-        color: "bg-gray-800",
-        integration_level: "supported" as const,
-        models: [
-          { name: "Falcon", firmware_versions: ["7.10"], features: ["AI-Powered"], eol_status: "active" as const }
-        ]
-      },
-      { 
-        id: 'ms_defender',
-        name: "Microsoft Defender", 
-        category: "Integrated", 
-        icon: "M",
-        color: "bg-blue-600",
-        integration_level: "native" as const,
-        models: [
-          { name: "Defender for Endpoint", firmware_versions: ["Current"], features: ["Cloud-Native"], eol_status: "active" as const }
-        ]
-      },
-      { 
-        id: 'sentinelone',
-        name: "SentinelOne", 
-        category: "AI-Powered", 
-        icon: "S",
-        color: "bg-purple-600",
-        integration_level: "supported" as const,
-        models: [
-          { name: "Singularity", firmware_versions: ["22.3"], features: ["Autonomous"], eol_status: "active" as const }
-        ]
-      }
-    ],
-    vpn_solutions: [
-      { 
-        id: 'cisco_anyconnect',
-        name: "Cisco AnyConnect", 
-        category: "Enterprise VPN", 
-        icon: "C",
-        color: "bg-blue-600",
-        integration_level: "native" as const,
-        models: [
-          { name: "AnyConnect", firmware_versions: ["4.10.06079"], features: ["SSL VPN"], eol_status: "active" as const }
-        ]
-      },
-      { 
-        id: 'palo_globalprotect',
-        name: "Palo Alto GlobalProtect", 
-        category: "SASE", 
-        icon: "P",
-        color: "bg-red-600",
-        integration_level: "supported" as const,
-        models: [
-          { name: "GlobalProtect", firmware_versions: ["6.0.4"], features: ["Zero Trust"], eol_status: "active" as const }
-        ]
-      }
-    ],
-    mfa_solutions: [
-      { 
-        id: 'ms_authenticator',
-        name: "Microsoft Authenticator", 
-        category: "Integrated", 
-        icon: "M",
-        color: "bg-blue-600",
-        integration_level: "native" as const,
-        models: [
-          { name: "Azure MFA", firmware_versions: ["Current"], features: ["Conditional Access"], eol_status: "active" as const }
-        ]
-      },
-      { 
-        id: 'okta_verify',
-        name: "Okta", 
-        category: "Identity-First", 
-        icon: "O",
-        color: "bg-blue-500",
-        integration_level: "native" as const,
-        models: [
-          { name: "Verify", firmware_versions: ["Current"], features: ["Adaptive MFA"], eol_status: "active" as const }
-        ]
-      },
-      { 
-        id: 'duo_security',
-        name: "Duo Security", 
-        category: "Cisco", 
-        icon: "D",
-        color: "bg-green-600",
-        integration_level: "native" as const,
-        models: [
-          { name: "Duo MFA", firmware_versions: ["Current"], features: ["Push Auth"], eol_status: "active" as const }
-        ]
-      }
-    ],
-    sso_solutions: [
-      { 
-        id: 'azure_ad',
-        name: "Microsoft Azure AD", 
-        category: "Cloud-First", 
-        icon: "M",
-        color: "bg-blue-600",
-        integration_level: "native" as const,
-        models: [
-          { name: "Azure AD", firmware_versions: ["Current"], features: ["Conditional Access"], eol_status: "active" as const }
-        ]
-      },
-      { 
-        id: 'okta_sso',
-        name: "Okta", 
-        category: "Identity Platform", 
-        icon: "O",
-        color: "bg-blue-500",
-        integration_level: "native" as const,
-        models: [
-          { name: "Single Sign-On", firmware_versions: ["Current"], features: ["Universal Directory"], eol_status: "active" as const }
-        ]
-      },
-      { 
-        id: 'ping_sso',
-        name: "Ping Identity", 
-        category: "Hybrid", 
-        icon: "P",
-        color: "bg-orange-600",
-        integration_level: "supported" as const,
-        models: [
-          { name: "PingFederate", firmware_versions: ["11.3"], features: ["Federation"], eol_status: "active" as const }
-        ]
-      }
-    ],
-    cloud_platforms: [
-      { 
-        id: 'azure_cloud',
-        name: "Microsoft Azure", 
-        category: "Enterprise Cloud", 
-        icon: "M",
-        color: "bg-blue-600",
-        integration_level: "native" as const,
-        models: [
-          { name: "Azure AD", firmware_versions: ["Current"], features: ["Cloud Identity"], eol_status: "active" as const }
-        ]
-      },
-      { 
-        id: 'aws_cloud',
-        name: "Amazon AWS", 
-        category: "Market Leader", 
-        icon: "A",
-        color: "bg-orange-500",
-        integration_level: "supported" as const,
-        models: [
-          { name: "IAM", firmware_versions: ["Current"], features: ["Identity Management"], eol_status: "active" as const }
-        ]
-      }
-    ],
-    identity_providers: [
-      { 
-        id: 'active_directory',
-        name: "Active Directory", 
-        category: "On-Premises", 
-        icon: "A",
-        color: "bg-gray-600",
-        integration_level: "native" as const,
-        models: [
-          { name: "AD DS", firmware_versions: ["2019", "2022"], features: ["LDAP"], eol_status: "active" as const }
-        ]
-      },
-      { 
-        id: 'azure_ad_idp',
-        name: "Azure Active Directory", 
-        category: "Cloud", 
-        icon: "A",
-        color: "bg-blue-600",
-        integration_level: "native" as const,
-        models: [
-          { name: "Azure AD", firmware_versions: ["Current"], features: ["Cloud Identity"], eol_status: "active" as const }
-        ]
-      }
-    ],
-    pki_solutions: [
-      { 
-        id: 'ms_ca',
-        name: "Microsoft CA", 
-        category: "Windows-Integrated", 
-        icon: "M",
-        color: "bg-blue-600",
-        integration_level: "native" as const,
-        models: [
-          { name: "Enterprise CA", firmware_versions: ["2019", "2022"], features: ["Auto Enrollment"], eol_status: "active" as const }
-        ]
-      },
-      { 
-        id: 'digicert',
-        name: "DigiCert", 
-        category: "Commercial", 
-        icon: "D",
-        color: "bg-green-600",
-        integration_level: "supported" as const,
-        models: [
-          { name: "CertCentral", firmware_versions: ["Current"], features: ["Cloud PKI"], eol_status: "active" as const }
-        ]
-      }
-    ]
-  };
+  // Using Resource Center data for vendor ecosystem
+
 
   const commonPainPoints = [
     { id: 'visibility', title: 'Lack of Network Visibility', description: 'Cannot see all devices connecting to the network' },
@@ -581,9 +281,8 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
     { id: 'policy_enforcement', name: 'Policy Enforcement', category: 'Governance' }
   ];
 
-  const complianceFrameworks = [
-    'HIPAA', 'PCI-DSS', 'SOX', 'GDPR', 'NIST', 'ISO 27001', 'FISMA', 'FERPA', 'SOC 2', 'CMMC'
-  ];
+  const { data: complianceFrameworksData = [] } = useComplianceFrameworks();
+  const complianceFrameworks = (complianceFrameworksData || []).map((cf: any) => cf.name);
 
   const handleInputChange = useCallback((section: keyof ScopingData, field: string, value: any) => {
     setScopingData(prev => {
@@ -632,10 +331,10 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
     if (!scopingData.organization.name) return;
 
     try {
-      const recommendations = await generateRecommendations(
+       const recommendations = await generateRecommendations(
         scopingData,
         useCaseLibrary,
-        Object.values(comprehensiveVendorEcosystem).flat()
+        allVendorsFlat
       );
 
       if (recommendations) {
@@ -843,7 +542,7 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
                   category="security_solutions"
                   title="Security Solutions"
                   icon={<Shield className="h-5 w-5" />}
-                  vendors={comprehensiveVendorEcosystem.security_solutions}
+                  vendors={vendorsSecuritySolutions}
                   selectedVendors={scopingData.vendor_ecosystem.security_solutions}
                   onVendorChange={(vendors) => setScopingData(prev => ({
                     ...prev,
@@ -857,7 +556,7 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
                   category="edr_solutions"
                   title="EDR Solutions"
                   icon={<Eye className="h-5 w-5" />}
-                  vendors={comprehensiveVendorEcosystem.edr_solutions}
+                  vendors={vendorsEdrSolutions}
                   selectedVendors={scopingData.vendor_ecosystem.edr_solutions}
                   onVendorChange={(vendors) => setScopingData(prev => ({
                     ...prev,
@@ -873,7 +572,7 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
                       category="mfa_solutions"
                       title="MFA Solutions"
                       icon={<UserCheck className="h-5 w-5" />}
-                      vendors={comprehensiveVendorEcosystem.mfa_solutions}
+                      vendors={vendorsMfaSolutions}
                       selectedVendors={scopingData.vendor_ecosystem.mfa_solutions}
                       onVendorChange={(vendors) => setScopingData(prev => ({
                         ...prev,
@@ -887,7 +586,7 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
                       category="sso_solutions"
                       title="SSO Solutions"
                       icon={<Key className="h-5 w-5" />}
-                      vendors={comprehensiveVendorEcosystem.sso_solutions}
+                      vendors={vendorsSsoSolutions}
                       selectedVendors={scopingData.vendor_ecosystem.sso_solutions}
                       onVendorChange={(vendors) => setScopingData(prev => ({
                         ...prev,
@@ -981,11 +680,11 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
-                      {comprehensiveVendorEcosystem.identity_providers.map(provider => {
+                      {vendorsIdentityProviders.map(provider => {
                         const isSelected = scopingData.integration_compliance.required_integrations?.includes(provider.name);
                         return (
                           <div
-                            key={provider.name}
+                            key={provider.id}
                             className={`p-2 rounded cursor-pointer transition-colors ${isSelected ? 'bg-primary/10 text-primary' : 'hover:bg-muted'}`}
                             onClick={() => {
                               const currentIntegrations = scopingData.integration_compliance.required_integrations || [];
@@ -1014,11 +713,11 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
-                      {comprehensiveVendorEcosystem.cloud_platforms.map(platform => {
+                      {vendorsCloudPlatforms.map(platform => {
                         const isSelected = scopingData.integration_compliance.required_integrations?.includes(platform.name);
                         return (
                           <div
-                            key={platform.name}
+                            key={platform.id}
                             className={`p-2 rounded cursor-pointer transition-colors ${isSelected ? 'bg-primary/10 text-primary' : 'hover:bg-muted'}`}
                             onClick={() => {
                               const currentIntegrations = scopingData.integration_compliance.required_integrations || [];
