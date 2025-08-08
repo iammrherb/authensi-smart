@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Brain, Network, Target, Settings, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface UnifiedState {
   project?: Project | null;
@@ -159,19 +160,22 @@ const UltimateIntelligentWizard: React.FC = () => {
             <DialogTitle>Enhanced Site Creation</DialogTitle>
             <DialogDescription>Create and link a site to your project. You can add more sites later.</DialogDescription>
           </DialogHeader>
-          {state.project ? (
-            <EnhancedSiteCreationWizard
-              projectId={state.project.id}
-              onComplete={(siteId) => {
-                setState((p) => ({ ...p, siteId }));
-                setShowSiteWizard(false);
-                toast({ title: "Site Created", description: "Site linked to project" });
-              }}
-              onCancel={() => setShowSiteWizard(false)}
-            />
-          ) : (
-            <div className="p-6 text-muted-foreground">Please create the project first.</div>
+          {!state.project && (
+            <Alert className="mb-4">
+              <AlertDescription>
+                You can create a site now; it will be linked once you create the project.
+              </AlertDescription>
+            </Alert>
           )}
+          <EnhancedSiteCreationWizard
+            projectId={state.project?.id}
+            onComplete={(siteId) => {
+              setState((p) => ({ ...p, siteId }));
+              setShowSiteWizard(false);
+              toast({ title: "Site Created", description: "Site linked to project" });
+            }}
+            onCancel={() => setShowSiteWizard(false)}
+          />
         </DialogContent>
       </Dialog>
     </Card>
@@ -240,20 +244,23 @@ const UltimateIntelligentWizard: React.FC = () => {
             <DialogTitle>DotXer Config Gen</DialogTitle>
             <DialogDescription>Generate validated 802.1X configuration templates with best practices.</DialogDescription>
           </DialogHeader>
-          {state.project ? (
-            <OneXerConfigWizard
-              projectId={state.project.id}
-              siteId={state.siteId || undefined}
-              onSave={(config) => {
-                setState((p) => ({ ...p, generatedConfig: config }));
-                setShowConfigWizard(false);
-                toast({ title: "Configuration Saved", description: "Config template generated" });
-              }}
-              onCancel={() => setShowConfigWizard(false)}
-            />
-          ) : (
-            <div className="p-6 text-muted-foreground">Please create the project first.</div>
+          {!state.project && (
+            <Alert className="mb-4">
+              <AlertDescription>
+                You can generate a config now; it will be associated once you create the project.
+              </AlertDescription>
+            </Alert>
           )}
+          <OneXerConfigWizard
+            projectId={state.project?.id}
+            siteId={state.siteId || undefined}
+            onSave={(config) => {
+              setState((p) => ({ ...p, generatedConfig: config }));
+              setShowConfigWizard(false);
+              toast({ title: "Configuration Saved", description: "Config template generated" });
+            }}
+            onCancel={() => setShowConfigWizard(false)}
+          />
         </DialogContent>
       </Dialog>
     </Card>
