@@ -359,30 +359,7 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
     monitoring_tools: enhancedVendors.filter(v => v.category === 'Monitoring' || v.vendor_type === 'Management').map(v => v.vendor_name)
   };
 
-  // Fallback default vendors if database is empty
-  const defaultVendorsByCategory = {
-    nac_vendors: ["Portnox", "Cisco ISE", "Aruba ClearPass", "ForeScout CounterACT", "Bradford Campus Manager", "Impulse SafeConnect", "Extreme Control", "Microsoft NPS", "Juniper Policy Enforcer", "PacketFence"],
-    wired_switches: ["Cisco", "HPE/Aruba", "Juniper", "Extreme Networks", "Dell", "Netgear", "D-Link", "TP-Link", "Ubiquiti", "Huawei"],
-    wireless_aps: ["Cisco", "HPE/Aruba", "Ruckus", "Meraki", "Ubiquiti", "Fortinet", "SonicWall", "Extreme Networks", "Mist", "Cambium"],
-    routers: ["Cisco", "Juniper", "HPE/Aruba", "Fortinet", "SonicWall", "Mikrotik", "Ubiquiti", "Palo Alto", "Check Point", "pfSense"],
-    firewalls: ["Palo Alto", "Fortinet", "Check Point", "SonicWall", "Cisco ASA", "pfSense", "WatchGuard", "Barracuda", "Sophos", "Juniper SRX"],
-    vpn_solutions: ["Cisco AnyConnect", "Palo Alto GlobalProtect", "Fortinet FortiClient", "SonicWall NetExtender", "OpenVPN", "WireGuard", "Pulse Secure", "Check Point Mobile", "F5 BIG-IP Edge", "Microsoft DirectAccess"],
-    edr_xdr: ["CrowdStrike Falcon", "SentinelOne", "Microsoft Defender", "Carbon Black", "Cylance", "Trend Micro", "Symantec", "McAfee", "FireEye", "Cortex XDR"],
-    siem_mdr: ["Splunk", "IBM QRadar", "Microsoft Sentinel", "LogRhythm", "ArcSight", "AlienVault", "Rapid7", "SumoLogic", "Elastic SIEM", "Chronicle"],
-    mfa_solutions: ["Microsoft Authenticator", "Okta Verify", "Duo Security", "RSA SecurID", "Google Authenticator", "Authy", "YubiKey", "Ping Identity", "Auth0", "OneLogin"],
-    sso_solutions: ["Microsoft Azure AD", "Okta", "Ping Identity", "Auth0", "OneLogin", "Google Workspace", "AWS SSO", "JumpCloud", "SailPoint", "CyberArk"],
-    identity_providers: ["Microsoft Azure AD", "Active Directory", "Okta", "Ping Identity", "Auth0", "OneLogin", "Google Workspace", "AWS Cognito", "JumpCloud", "LDAP"],
-    radius_vendors: ["Microsoft NPS", "FreeRADIUS", "Cisco ISE", "Aruba ClearPass", "Steel-Belted RADIUS", "RSA Authentication Manager", "TekRADIUS", "Radiator", "Elektron", "WinRadius"],
-    pki_cert_authorities: ["Microsoft ADCS", "DigiCert", "Entrust", "GlobalSign", "Verisign", "Comodo", "OpenSSL CA", "AWS Certificate Manager", "Azure Key Vault", "HashiCorp Vault"],
-    monitoring_tools: ["SolarWinds", "PRTG", "Nagios", "Zabbix", "ManageEngine", "WhatsUp Gold", "Datadog", "New Relic", "Dynatrace", "AppDynamics"]
-  };
-
-  // Merge enhanced vendors with defaults
-  Object.keys(defaultVendorsByCategory).forEach(category => {
-    if (vendorsByCategory[category as keyof typeof vendorsByCategory].length === 0) {
-      vendorsByCategory[category as keyof typeof vendorsByCategory] = defaultVendorsByCategory[category as keyof typeof defaultVendorsByCategory];
-    }
-  });
+  // Removed static fallbacks to ensure wizards only use Resource Center data
 
   const authenticationMethods = [
     // Traditional Methods
