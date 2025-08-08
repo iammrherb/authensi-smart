@@ -592,136 +592,150 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
               onSuggestion={handleSuggestionApply}
             />
 
-            <Tabs defaultValue="wired_wireless" className="w-full">
-              <TabsList className="grid grid-cols-4 mb-6">
-                <TabsTrigger value="wired_wireless">Network</TabsTrigger>
-                <TabsTrigger value="security_solutions">Security</TabsTrigger>
-                <TabsTrigger value="edr_solutions">EDR</TabsTrigger>
-                <TabsTrigger value="identity">Identity</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="wired_wireless">
-                <EnhancedVendorSelector
-                  category="wired_wireless"
-                  title="Network Infrastructure"
-                  icon={<Router className="h-5 w-5" />}
-                  vendors={vendorsWiredWireless}
-                  selectedVendors={scopingData.vendor_ecosystem.wired_wireless}
-                  onVendorChange={(vendors) => setScopingData(prev => ({
-                    ...prev,
-                    vendor_ecosystem: { ...prev.vendor_ecosystem, wired_wireless: vendors }
-                  }))}
+            {/* Unified Vendor Ecosystem Selection */}
+            <div className="space-y-6">
+              <h4 className="text-lg font-semibold text-center mb-6">Select Your Vendor Ecosystem</h4>
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                <InlineSelectCreate
+                  categoryKey="wired_wireless"
+                  label="Network (Wired/Wireless)"
+                  description="Switches, access points, routers, controllers"
+                  value={[]}
+                  onChange={(items) => {
+                    // Convert CatalogItem to SelectedVendor format
+                    const vendors: SelectedVendor[] = items.map(item => ({
+                      id: item.id,
+                      name: item.name,
+                      category: 'Network',
+                      icon: item.vendor?.charAt(0) || 'N',
+                      color: 'bg-primary',
+                      models: [{
+                        name: item.model || item.name,
+                        firmware_versions: item.firmware_version ? [item.firmware_version] : [],
+                        features: item.labels || [],
+                        eol_status: 'active' as const
+                      }],
+                      integration_level: 'supported' as const,
+                      selected_models: [item.model || item.name],
+                      selected_firmware: {}
+                    }));
+                    setScopingData(prev => ({
+                      ...prev,
+                      vendor_ecosystem: { ...prev.vendor_ecosystem, wired_wireless: vendors }
+                    }));
+                  }}
                 />
-              </TabsContent>
 
-              <TabsContent value="security_solutions">
-                <EnhancedVendorSelector
-                  category="security_solutions"
-                  title="Security Solutions"
-                  icon={<Shield className="h-5 w-5" />}
-                  vendors={vendorsSecuritySolutions}
-                  selectedVendors={scopingData.vendor_ecosystem.security_solutions}
-                  onVendorChange={(vendors) => setScopingData(prev => ({
-                    ...prev,
-                    vendor_ecosystem: { ...prev.vendor_ecosystem, security_solutions: vendors }
-                  }))}
+                <InlineSelectCreate
+                  categoryKey="firewall"
+                  label="Firewalls"
+                  description="Next-gen firewalls, UTM devices"
+                  value={firewallItems}
+                  onChange={setFirewallItems}
                 />
-              </TabsContent>
 
-              <TabsContent value="edr_solutions">
-                <EnhancedVendorSelector
-                  category="edr_solutions"
-                  title="EDR Solutions"
-                  icon={<Eye className="h-5 w-5" />}
-                  vendors={vendorsEdrSolutions}
-                  selectedVendors={scopingData.vendor_ecosystem.edr_solutions}
-                  onVendorChange={(vendors) => setScopingData(prev => ({
-                    ...prev,
-                    vendor_ecosystem: { ...prev.vendor_ecosystem, edr_solutions: vendors }
-                  }))}
+                <InlineSelectCreate
+                  categoryKey="vpn"
+                  label="VPN/Zero Trust"
+                  description="Remote access, ZTNA, SASE solutions"
+                  value={vpnItems}
+                  onChange={setVpnItems}
                 />
-              </TabsContent>
 
-              <TabsContent value="identity" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div>
-                    <EnhancedVendorSelector
-                      category="mfa_solutions"
-                      title="MFA Solutions"
-                      icon={<UserCheck className="h-5 w-5" />}
-                      vendors={vendorsMfaSolutions}
-                      selectedVendors={scopingData.vendor_ecosystem.mfa_solutions}
-                      onVendorChange={(vendors) => setScopingData(prev => ({
-                        ...prev,
-                        vendor_ecosystem: { ...prev.vendor_ecosystem, mfa_solutions: vendors }
-                      }))}
-                    />
-                  </div>
+                <InlineSelectCreate
+                  categoryKey="nac"
+                  label="NAC/Zero Trust"
+                  description="Network Access Control, 802.1X"
+                  value={nacItems}
+                  onChange={setNacItems}
+                />
 
-                  <div>
-                    <EnhancedVendorSelector
-                      category="sso_solutions"
-                      title="SSO Solutions"
-                      icon={<Key className="h-5 w-5" />}
-                      vendors={vendorsSsoSolutions}
-                      selectedVendors={scopingData.vendor_ecosystem.sso_solutions}
-                      onVendorChange={(vendors) => setScopingData(prev => ({
-                        ...prev,
-                        vendor_ecosystem: { ...prev.vendor_ecosystem, sso_solutions: vendors }
-                      }))}
-                    />
-                  </div>
-                </div>
-              </TabsContent>
-              </Tabs>
+                <InlineSelectCreate
+                  categoryKey="siem"
+                  label="SIEM"
+                  description="Security Information Event Management"
+                  value={siemItems}
+                  onChange={setSiemItems}
+                />
 
-              <div className="space-y-4">
-                <h4 className="text-base font-semibold">Other Integrations</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <InlineSelectCreate
-                    categoryKey="siem"
-                    label="SIEM Platforms"
-                    description="Select or add your SIEM (e.g., Splunk, QRadar)"
-                    value={siemItems}
-                    onChange={setSiemItems}
-                  />
-                  <InlineSelectCreate
-                    categoryKey="mdm"
-                    label="MDM/UEM"
-                    description="Select or add your MDM (e.g., Intune, Jamf)"
-                    value={mdmItems}
-                    onChange={setMdmItems}
-                  />
-                  <InlineSelectCreate
-                    categoryKey="firewall"
-                    label="Firewalls"
-                    description="Select or add your firewall platforms"
-                    value={firewallItems}
-                    onChange={setFirewallItems}
-                  />
-                  <InlineSelectCreate
-                    categoryKey="vpn"
-                    label="VPN / Zero Trust"
-                    description="Select or add remote access solutions"
-                    value={vpnItems}
-                    onChange={setVpnItems}
-                  />
-                  <InlineSelectCreate
-                    categoryKey="idp"
-                    label="Identity Providers (IdP)"
-                    description="Select or add your IdP (e.g., Okta, Azure AD)"
-                    value={idpItems}
-                    onChange={setIdpItems}
-                  />
-                  <InlineSelectCreate
-                    categoryKey="nac"
-                    label="Current NAC Vendors"
-                    description="Track current NAC solutions in place"
-                    value={nacItems}
-                    onChange={setNacItems}
-                  />
-                </div>
+                <InlineSelectCreate
+                  categoryKey="mdm"
+                  label="MDM/UEM"
+                  description="Mobile/Unified Endpoint Management"
+                  value={mdmItems}
+                  onChange={setMdmItems}
+                />
+
+                <InlineSelectCreate
+                  categoryKey="edr"
+                  label="EDR/XDR"
+                  description="Endpoint/Extended detection and response"
+                  value={[]}
+                  onChange={(items) => {
+                    // Convert CatalogItem to SelectedVendor format
+                    const vendors: SelectedVendor[] = items.map(item => ({
+                      id: item.id,
+                      name: item.name,
+                      category: 'EDR',
+                      icon: item.vendor?.charAt(0) || 'E',
+                      color: 'bg-primary',
+                      models: [{
+                        name: item.model || item.name,
+                        firmware_versions: item.firmware_version ? [item.firmware_version] : [],
+                        features: item.labels || [],
+                        eol_status: 'active' as const
+                      }],
+                      integration_level: 'supported' as const,
+                      selected_models: [item.model || item.name],
+                      selected_firmware: {}
+                    }));
+                    setScopingData(prev => ({
+                      ...prev,
+                      vendor_ecosystem: { ...prev.vendor_ecosystem, edr_solutions: vendors }
+                    }));
+                  }}
+                />
+
+                <InlineSelectCreate
+                  categoryKey="idp"
+                  label="Identity Providers"
+                  description="Identity providers, directories"
+                  value={idpItems}
+                  onChange={setIdpItems}
+                />
+
+                <InlineSelectCreate
+                  categoryKey="sso"
+                  label="SSO"
+                  description="Single sign-on solutions"
+                  value={[]}
+                  onChange={(items) => {
+                    // Convert CatalogItem to SelectedVendor format
+                    const vendors: SelectedVendor[] = items.map(item => ({
+                      id: item.id,
+                      name: item.name,
+                      category: 'SSO',
+                      icon: item.vendor?.charAt(0) || 'S',
+                      color: 'bg-primary',
+                      models: [{
+                        name: item.model || item.name,
+                        firmware_versions: item.firmware_version ? [item.firmware_version] : [],
+                        features: item.labels || [],
+                        eol_status: 'active' as const
+                      }],
+                      integration_level: 'supported' as const,
+                      selected_models: [item.model || item.name],
+                      selected_firmware: {}
+                    }));
+                    setScopingData(prev => ({
+                      ...prev,
+                      vendor_ecosystem: { ...prev.vendor_ecosystem, sso_solutions: vendors }
+                    }));
+                  }}
+                />
               </div>
+            </div>
+
             </div>
           );
 
