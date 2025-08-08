@@ -14,6 +14,9 @@ const DATASETS: { id: SeedableDataset; label: string }[] = [
   { id: "industry_options", label: "Industry Options" },
   { id: "network_segments", label: "Network Segments" },
   { id: "compliance_frameworks", label: "Compliance Frameworks" },
+  { id: "vendor_library", label: "Vendor Library" },
+  { id: "use_case_library", label: "Use Case Library" },
+  { id: "config_templates", label: "Configuration Templates" },
 ];
 
 const TaxonomySeederPanel = () => {
