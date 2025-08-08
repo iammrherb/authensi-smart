@@ -9,8 +9,8 @@ import { Separator } from '@/components/ui/separator';
 import { 
   Brain, FileText, Network, Shield, Target, Users, CheckCircle, 
   ArrowRight, ArrowLeft, Download, Save, Zap, BookOpen, Settings,
-  Globe, Server, Database, Monitor, Smartphone, Lock, Building2
-} from 'lucide-react';
+   Globe, Server, Database, Monitor, Smartphone, Lock
+ } from 'lucide-react';
 
 import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
 import { useUseCases } from '@/hooks/useUseCases';
@@ -25,8 +25,6 @@ import {
   useNetworkSegments,
   useProjectPhases
 } from '@/hooks/useResourceLibrary';
-import { EnhancedResourceManager } from '@/components/resources/EnhancedResourceManager';
-import { ResourceCreationDialog } from '@/components/wizards/ResourceCreationDialog';
 import { useCreateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
 import { PortnoxDocumentationService, type PortnoxDocumentationResult } from '@/services/PortnoxDocumentationService';
@@ -144,25 +142,6 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
     });
   };
 
-  const handleResourceSelect = (resource: any, type: 'vendor' | 'usecase' | 'requirement') => {
-    switch (type) {
-      case 'vendor':
-        if (!selectedVendors.some(v => v.id === resource.id)) {
-          setSelectedVendors([...selectedVendors, resource]);
-        }
-        break;
-      case 'usecase':
-        if (!selectedUseCases.some(uc => uc.id === resource.id)) {
-          setSelectedUseCases([...selectedUseCases, resource]);
-        }
-        break;
-      case 'requirement':
-        if (!selectedRequirements.some(req => req.id === resource.id)) {
-          setSelectedRequirements([...selectedRequirements, resource]);
-        }
-        break;
-    }
-  };
 
   const generateComprehensiveDocumentation = async () => {
     if (!scopingData || !currentSession) return;
@@ -303,7 +282,7 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
             <Alert>
               <Brain className="h-4 w-4" />
               <AlertDescription>
-                This enhanced AI scoping wizard integrates with your Resource Library and generates comprehensive Portnox documentation.
+                This enhanced AI scoping wizard lets you select and create resources inline, then generates comprehensive Portnox documentation.
               </AlertDescription>
             </Alert>
             
@@ -314,28 +293,6 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
                 onCancel={onCancel}
               />
               
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5" />
-                    Resource Library Integration
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Select additional vendors, use cases, and requirements from your resource library
-                  </p>
-                  
-                  <EnhancedResourceManager 
-                    onResourceSelect={handleResourceSelect}
-                    selectedResources={{
-                      vendors: selectedVendors,
-                      useCases: selectedUseCases,
-                      requirements: selectedRequirements
-                    }}
-                  />
-                </CardContent>
-              </Card>
             </div>
           </div>
         );
