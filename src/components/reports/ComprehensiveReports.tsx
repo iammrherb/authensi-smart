@@ -18,7 +18,11 @@ import {
   FileText, Download, TrendingUp, BarChart3, PieChart, Calendar,
   Filter, Search, Printer, Mail, Share2, AlertCircle, CheckCircle,
   Clock, Target, Building2, Users, Globe, Shield, Zap, Brain, Rocket
-} from 'lucide-react';
+ } from 'lucide-react';
+
+import { PortnoxDocumentationService, PortnoxDocumentationResult } from '@/services/PortnoxDocumentationService';
+import { useVendors } from '@/hooks/useVendors';
+import { Document, Packer, Paragraph, HeadingLevel, TextRun } from 'docx';
 
 interface ReportFilters {
   projects: string[];
@@ -32,6 +36,7 @@ const ComprehensiveReports = () => {
   const { data: projects = [] } = useProjects();
   const { data: sites = [] } = useSites();
   const { data: useCases = [] } = useUseCases();
+  const { data: vendors = [] } = useVendors();
   const { generateCompletion, isLoading } = useAI();
   const { toast } = useToast();
 
@@ -105,12 +110,98 @@ const ComprehensiveReports = () => {
       description: 'AI-generated insights and recommendations',
       icon: Brain,
       color: 'text-pink-500'
+    },
+    {
+      id: 'portnox-deployment',
+      name: 'Portnox Deployment Guide',
+      description: 'Onboarding and deployment guide powered by Portnox docs',
+      icon: Globe,
+      color: 'text-primary'
     }
   ];
+
+  const buildPortnoxDocText = (doc: PortnoxDocumentationResult): string => {
+    let out = 'Portnox Onboarding & Deployment Guide\n\n';
+    if (doc.deploymentGuide?.length) {
+      out += 'Deployment Plan\n';
+      doc.deploymentGuide.forEach((section) => {
+        out += `\nPhase: ${section.phase} - ${section.title}\n${section.description || ''}\n`;
+        if (section.prerequisites?.length) {
+          out += 'Prerequisites:\n- ' + section.prerequisites.join('\n- ') + '\n';
+        }
+        if (section.steps?.length) {
+          out += 'Steps:\n' + section.steps.map((s, i) => `${i + 1}. ${s.title} - ${s.description || ''}`).join('\n') + '\n';
+        }
+        if (section.validationCriteria?.length) {
+          out += 'Validation:\n- ' + section.validationCriteria.join('\n- ') + '\n';
+        }
+        if (section.troubleshooting?.length) {
+          out += 'Troubleshooting:\n- ' + section.troubleshooting.map(t => `${t.issue}: ${(t.resolution || []).join('; ')}`).join('\n- ') + '\n';
+        }
+      });
+    }
+    if (doc.vendorSpecificDocs?.length) {
+      out += '\nVendor Guidance\n';
+      doc.vendorSpecificDocs.forEach((v) => {
+        out += `\n${v.vendorName} (${v.supportLevel})\n`;
+        if (v.recommendedModels?.length) out += `Recommended Models: ${v.recommendedModels.join(', ')}\n`;
+        if (v.configurationRequirements?.length) out += 'Key Requirements:\n- ' + v.configurationRequirements.join('\n- ') + '\n';
+        if (v.documentationLinks?.length) out += 'Docs:\n- ' + v.documentationLinks.join('\n- ') + '\n';
+      });
+    }
+    if (doc.generalRequirements?.length) {
+      out += '\nGeneral Requirements\n';
+      doc.generalRequirements.forEach((r) => {
+        out += `\n[${r.category}] ${r.title}\n${r.description || ''}\n`;
+        if (r.requirements?.length) out += 'Requirements:\n- ' + r.requirements.join('\n- ') + '\n';
+        if (r.portnoxFeatures?.length) out += 'Portnox Features:\n- ' + r.portnoxFeatures.join('\n- ') + '\n';
+        if (r.documentationLinks?.length) out += 'Docs:\n- ' + r.documentationLinks.join('\n- ') + '\n';
+      });
+    }
+    return out.trim();
+  };
+
+  useEffect(() => {
+    document.title = 'Reports | NAC Project Reports';
+  }, []);
 
   const generateAIReport = async (type: string) => {
     setGeneratingReport(true);
     try {
+      if (type === 'portnox-deployment') {
+        const projectsData = projects.map(p => ({
+          name: p.name,
+          status: p.status,
+          progress: p.progress_percentage,
+          client: p.client_name,
+          industry: p.industry
+        }));
+        const scopingData = { projects: projectsData, sitesCount: sites.length };
+        const selectedVendors = vendors || [];
+        const selectedUseCases = useCases || [];
+        const selectedRequirements: any[] = [];
+
+        const doc = await PortnoxDocumentationService.generateComprehensiveDocumentation(
+          scopingData,
+          selectedVendors,
+          selectedUseCases,
+          selectedRequirements
+        );
+
+        setReportData({
+          type,
+          content: buildPortnoxDocText(doc),
+          generatedAt: new Date().toISOString(),
+          analytics
+        });
+        setActiveTab('generated');
+        toast({
+          title: 'Report Generated',
+          description: 'Portnox deployment guide generated successfully',
+        });
+        return;
+      }
+
       const projectsData = projects.map(p => ({
         name: p.name,
         status: p.status,
@@ -119,21 +210,7 @@ const ComprehensiveReports = () => {
         industry: p.industry
       }));
 
-      const prompt = `Generate a comprehensive ${type} report for the following NAC deployment projects:
-      
-Projects: ${JSON.stringify(projectsData, null, 2)}
-Sites: ${sites.length} total sites
-Use Cases: ${useCases.length} available use cases
-
-Please provide:
-1. Executive Summary
-2. Key Performance Indicators
-3. Project Status Overview
-4. Risk Assessment
-5. Recommendations
-6. Next Steps
-
-Format the report professionally with clear sections and actionable insights.`;
+      const prompt = `Generate a comprehensive ${type} report for the following NAC deployment projects:\n      \n      Projects: ${JSON.stringify(projectsData, null, 2)}\n      Sites: ${sites.length} total sites\n      Use Cases: ${useCases.length} available use cases\n      \n      Please provide:\n      1. Executive Summary\n      2. Key Performance Indicators\n      3. Project Status Overview\n      4. Risk Assessment\n      5. Recommendations\n      6. Next Steps\n      \n      Format the report professionally with clear sections and actionable insights.`;
 
       const response = await generateCompletion({
         prompt,
@@ -152,25 +229,61 @@ Format the report professionally with clear sections and actionable insights.`;
         });
         setActiveTab('generated');
         toast({
-          title: "Report Generated",
-          description: "AI-powered report has been generated successfully",
+          title: 'Report Generated',
+          description: 'AI-powered report has been generated successfully',
         });
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to generate report. Please try again.",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to generate report. Please try again.',
+        variant: 'destructive'
       });
     } finally {
       setGeneratingReport(false);
     }
   };
 
-  const exportReport = (format: 'pdf' | 'excel' | 'csv') => {
-    // Mock export functionality
+const exportDocx = async () => {
+    if (!reportData) return;
+    try {
+      const doc = new Document({
+        sections: [
+          {
+            properties: {},
+            children: [
+              new Paragraph({ text: `AI-Generated ${reportTypes.find(t => t.id === reportData.type)?.name || 'Report'}`, heading: HeadingLevel.TITLE }),
+              new Paragraph({ text: `Generated on ${new Date(reportData.generatedAt).toLocaleString()}`, spacing: { after: 200 } }),
+              ...reportData.content.split('\n').map((line: string) => new Paragraph({
+                children: [ new TextRun(line) ],
+                spacing: { after: 120 }
+              }))
+            ]
+          }
+        ]
+      });
+      const blob = await Packer.toBlob(doc);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `report-${reportData.type}-${new Date().toISOString().slice(0,10)}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast({ title: 'Exported', description: 'DOCX file downloaded.' });
+    } catch (e) {
+      toast({ title: 'Export failed', description: 'Could not generate DOCX.', variant: 'destructive' });
+    }
+  };
+
+  const exportReport = (format: 'pdf' | 'excel' | 'csv' | 'docx') => {
+    if (format === 'docx') {
+      exportDocx();
+      return;
+    }
     toast({
-      title: "Exporting Report",
+      title: 'Exporting Report',
       description: `Report will be exported as ${format.toUpperCase()}`,
     });
   };
@@ -386,6 +499,7 @@ Format the report professionally with clear sections and actionable insights.`;
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="pdf">PDF Document</SelectItem>
+                      <SelectItem value="docx">Word (DOCX)</SelectItem>
                       <SelectItem value="excel">Excel Spreadsheet</SelectItem>
                       <SelectItem value="csv">CSV Data</SelectItem>
                       <SelectItem value="pptx">PowerPoint</SelectItem>
@@ -447,20 +561,24 @@ Format the report professionally with clear sections and actionable insights.`;
                       Generated on {new Date(reportData.generatedAt).toLocaleString()}
                     </p>
                   </div>
-                  <div className="flex space-x-2">
-                    <Button onClick={() => exportReport('pdf')} variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      Export PDF
-                    </Button>
-                    <Button onClick={shareReport} variant="outline" size="sm">
-                      <Share2 className="h-4 w-4 mr-2" />
-                      Share
-                    </Button>
-                    <Button onClick={() => window.print()} variant="outline" size="sm">
-                      <Printer className="h-4 w-4 mr-2" />
-                      Print
-                    </Button>
-                  </div>
+                    <div className="flex space-x-2">
+                      <Button onClick={() => exportReport('pdf')} variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-2" />
+                        Export PDF
+                      </Button>
+                      <Button onClick={() => exportReport('docx')} variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-2" />
+                        Export DOCX
+                      </Button>
+                      <Button onClick={shareReport} variant="outline" size="sm">
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share
+                      </Button>
+                      <Button onClick={() => window.print()} variant="outline" size="sm">
+                        <Printer className="h-4 w-4 mr-2" />
+                        Print
+                      </Button>
+                    </div>
                 </div>
               </CardHeader>
               <CardContent>
