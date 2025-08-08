@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useCreateProject, type Project } from "@/hooks/useProjects";
 import EnhancedSiteCreationWizard from "@/components/sites/EnhancedSiteCreationWizard";
 import EnhancedAIScopingWizard from "@/components/scoping/EnhancedAIScopingWizard";
@@ -26,9 +26,9 @@ interface UnifiedState {
 
 const steps = [
   { id: 1, title: "Project Basics", icon: Target },
-  { id: 2, title: "Sites", icon: Network },
-  { id: 3, title: "AI Scoping", icon: Brain },
-  { id: 4, title: "AI Config Gen (802.1X)", icon: Settings },
+  { id: 2, title: "AI Scoping", icon: Brain },
+  { id: 3, title: "AI Config Gen (802.1X)", icon: Settings },
+  { id: 4, title: "Sites (Optional)", icon: Network },
   { id: 5, title: "Review & Finish", icon: CheckCircle },
 ];
 
@@ -62,20 +62,20 @@ const UltimateIntelligentWizard: React.FC = () => {
     return Math.round(((completed + (currentStep === 5 ? 1 : 0)) / steps.length) * 100);
   }, [state, currentStep]);
 
-  const canNext = useMemo(() => {
-    switch (currentStep) {
-      case 1:
-        return !!projectForm.name && !!projectForm.client_name && !createProjectMutation.isPending;
-      case 2:
-        return !!state.siteId || !!state.project; // allow skipping sites
-      case 3:
-        return !!state.scopingSession || !!state.project; // allow skipping but recommended
-      case 4:
-        return !!state.generatedConfig || !!state.project; // allow skipping but recommended
-      default:
-        return true;
-    }
-  }, [currentStep, projectForm, state, createProjectMutation.isPending]);
+const canNext = useMemo(() => {
+  switch (currentStep) {
+    case 1:
+      return !!projectForm.name && !!projectForm.client_name && !createProjectMutation.isPending;
+    case 2:
+      return !!state.scopingSession || !!state.project; // allow skipping but recommended
+    case 3:
+      return !!state.generatedConfig || !!state.project; // allow skipping but recommended
+    case 4:
+      return !!state.siteId || !!state.project; // sites optional
+    default:
+      return true;
+  }
+}, [currentStep, projectForm, state, createProjectMutation.isPending]);
 
   const next = () => setCurrentStep((s) => Math.min(s + 1, steps.length));
   const prev = () => setCurrentStep((s) => Math.max(s - 1, 1));
@@ -155,7 +155,7 @@ const UltimateIntelligentWizard: React.FC = () => {
 
       {/* Site Wizard Dialog */}
       <Dialog open={showSiteWizard} onOpenChange={setShowSiteWizard}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto bg-card z-50">
+        <DialogContent className="max-w-none w-[95vw] md:w-[90vw] lg:max-w-6xl max-h-[95vh] overflow-y-auto bg-card z-50">
           <DialogHeader>
             <DialogTitle>Enhanced Site Creation</DialogTitle>
             <DialogDescription>Create and link a site to your project. You can add more sites later.</DialogDescription>
@@ -201,7 +201,7 @@ const UltimateIntelligentWizard: React.FC = () => {
       </CardContent>
 
       <Dialog open={showScopingWizard} onOpenChange={setShowScopingWizard}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto bg-card z-50">
+        <DialogContent className="max-w-none w-[95vw] md:w-[90vw] lg:max-w-6xl max-h-[95vh] overflow-y-auto bg-card z-50">
           <DialogHeader>
             <DialogTitle>Enhanced AI Scoping Wizard</DialogTitle>
             <DialogDescription>Analyze requirements and generate scoped documentation for your deployment.</DialogDescription>
@@ -239,7 +239,7 @@ const UltimateIntelligentWizard: React.FC = () => {
       </CardContent>
 
       <Dialog open={showConfigWizard} onOpenChange={setShowConfigWizard}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto bg-card z-50">
+        <DialogContent className="max-w-none w-[95vw] md:w-[90vw] lg:max-w-6xl max-h-[95vh] overflow-y-auto bg-card z-50">
           <DialogHeader>
             <DialogTitle>DotXer Config Gen</DialogTitle>
             <DialogDescription>Generate validated 802.1X configuration templates with best practices.</DialogDescription>
@@ -346,11 +346,11 @@ const UltimateIntelligentWizard: React.FC = () => {
             </div>
           </div>
 
-          {currentStep === 1 && renderStep1()}
-          {currentStep === 2 && renderStep2()}
-          {currentStep === 3 && renderStep3()}
-          {currentStep === 4 && renderStep4()}
-          {currentStep === 5 && renderStep5()}
+{currentStep === 1 && renderStep1()}
+{currentStep === 2 && renderStep3()}
+{currentStep === 3 && renderStep4()}
+{currentStep === 4 && renderStep2()}
+{currentStep === 5 && renderStep5()}
         </CardContent>
       </Card>
     </div>
