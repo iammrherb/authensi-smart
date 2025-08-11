@@ -61,7 +61,7 @@ const EnhancedCommandCenter = () => {
       description: 'API management and automation setup',
       icon: Network,
       color: 'from-orange-500 to-red-600',
-      action: () => navigate('/project-tracking')
+      action: () => navigate('/tracker')
     }
   ];
 
@@ -70,7 +70,7 @@ const EnhancedCommandCenter = () => {
       title: 'Project Tracking',
       description: 'Monitor active projects and milestones',
       icon: BarChart3,
-      action: () => navigate('/project-tracking'),
+      action: () => navigate('/tracker'),
       stats: '12 Active'
     },
     {

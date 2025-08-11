@@ -333,7 +333,7 @@ export class UnifiedProjectCreationService {
       security_level: projectData.security_level,
       total_sites: projectData.total_sites,
       total_endpoints: projectData.total_endpoints,
-      estimated_duration: projectData.estimated_duration,
+      
       budget: projectData.budget,
       project_owner: projectData.project_owner,
       technical_owner: projectData.technical_owner,
@@ -351,7 +351,7 @@ export class UnifiedProjectCreationService {
       enable_bulk_sites: projectData.enable_bulk_sites,
       enable_bulk_users: projectData.enable_bulk_users,
       enable_auto_vendors: projectData.enable_auto_vendors,
-      enable_ai_insights: projectData.enable_ai_insights,
+      
       status: projectData.status || 'scoping',
       current_phase: projectData.current_phase || 'scoping',
       progress_percentage: typeof projectData.progress_percentage === 'number' ? 
@@ -413,9 +413,10 @@ export class UnifiedProjectCreationService {
         portnoxSync: true
       }
     };
+    const sb = supabase as any;
 
     // Store automation configuration
-    await supabase
+    await sb
       .from('project_automations')
       .upsert({
         project_id: projectId,
@@ -426,15 +427,16 @@ export class UnifiedProjectCreationService {
 
   private static async integrateResourceLibrary(projectId: string, projectData: any): Promise<void> {
     // Link relevant resources from the resource library
-    const industryResources = await supabase
+    const sb = supabase as any;
+    const { data: resources } = await sb
       .from('resources')
       .select('*')
       .eq('category', 'industry_templates')
       .ilike('tags', `%${projectData.industry}%`);
 
-    if (industryResources.data) {
-      for (const resource of industryResources.data) {
-        await supabase
+    if (resources && Array.isArray(resources)) {
+      for (const resource of resources) {
+        await sb
           .from('project_resources')
           .insert({
             project_id: projectId,

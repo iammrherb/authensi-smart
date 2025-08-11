@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Brain, Template, Settings, Rocket, Database, Zap, Globe } from 'lucide-react';
+import { Brain, LayoutTemplate, Settings, Rocket, Database, Zap, Globe } from 'lucide-react';
 import { UnifiedProjectCreationService, PROJECT_TEMPLATES, type ProjectCreationOptions } from '@/services/UnifiedProjectCreationService';
 import UltimateAIScopingWizard from '@/components/scoping/UltimateAIScopingWizard';
 import { useCreateProject } from '@/hooks/useProjects';
@@ -60,7 +60,7 @@ const UnifiedCreationWizard: React.FC<UnifiedCreationWizardProps> = ({
       id: 'template-based' as const,
       title: 'Template-Based Creation',
       description: 'Use industry-specific templates with pre-configured settings',
-      icon: Template,
+      icon: LayoutTemplate,
       color: 'from-blue-500 to-cyan-600',
       features: ['Industry templates', 'Pre-configured settings', 'Best practices', 'Quick setup']
     },
