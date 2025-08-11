@@ -135,6 +135,7 @@ interface EnhancedProjectFormData {
   enable_bulk_sites: boolean;
   enable_bulk_users: boolean;
   enable_auto_vendors: boolean;
+  enable_portnox_automation: boolean;
   bulk_sites_data?: any[];
 }
 
@@ -165,7 +166,8 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
     integration_requirements: [],
     enable_bulk_sites: false,
     enable_bulk_users: false,
-    enable_auto_vendors: false
+    enable_auto_vendors: false,
+    enable_portnox_automation: false
   });
   const [infrastructure, setInfrastructure] = useState<InfrastructureSelection>({
     nac_vendors: [],
@@ -316,6 +318,11 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
           description: `${formData.name} has been created with comprehensive settings.`,
         });
         onComplete?.(project.id);
+        if (formData.enable_portnox_automation) {
+          setTimeout(() => {
+            window.location.assign(`/project/${project.id}/tracking`);
+          }, 150);
+        }
       },
       onError: (error) => {
         toast({
@@ -1522,7 +1529,21 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
               </div>
             </div>
 
-            {/* Summary Section */}
+            {/* Optional: Portnox Automation After Create */}
+            <div className="space-y-2 p-4 border rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium">Run Portnox Automation after creating the project</div>
+                  <div className="text-sm text-muted-foreground">We’ll take you to the project’s Portnox tabs to run bulk operations (optional).</div>
+                </div>
+                <Checkbox
+                  id="enable_portnox_automation"
+                  checked={formData.enable_portnox_automation}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, enable_portnox_automation: checked as boolean }))}
+                />
+              </div>
+            </div>
+
             <div className="bg-muted p-4 rounded-lg">
               <h4 className="font-medium mb-2">Bulk Operations Summary</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
