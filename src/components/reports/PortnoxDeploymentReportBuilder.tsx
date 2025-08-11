@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -15,6 +15,7 @@ import { DocumentationCrawlerService } from "@/services/DocumentationCrawlerServ
 import { useUseCases } from "@/hooks/useUseCases";
 import { useRecommendations } from "@/hooks/useRecommendations";
 import { Packer, Document, Paragraph, HeadingLevel, TextRun, Table, TableRow, TableCell, AlignmentType } from "docx";
+import { PortnoxApiService } from "@/services/PortnoxApiService";
 
 interface SectionToggles {
   overview: boolean;
@@ -22,6 +23,7 @@ interface SectionToggles {
   vendorDocs: boolean;
   useCases: boolean;
   recommendations: boolean;
+  portnoxDevices: boolean;
   appendices: boolean;
 }
 
@@ -44,15 +46,17 @@ export const PortnoxDeploymentReportBuilder: React.FC = () => {
 
   const [query, setQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [toggles, setToggles] = useState<SectionToggles>({
-    overview: true,
-    checklist: true,
-    vendorDocs: true,
-    useCases: true,
-    recommendations: true,
-    appendices: false,
-  });
-  const [isGenerating, setIsGenerating] = useState(false);
+const [toggles, setToggles] = useState<SectionToggles>({
+  overview: true,
+  checklist: true,
+  vendorDocs: true,
+  useCases: true,
+  recommendations: true,
+  portnoxDevices: true,
+  appendices: false,
+});
+const [isGenerating, setIsGenerating] = useState(false);
+const portnoxSummaryRef = useRef<any>(null);
 
   const filteredProjects = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -183,25 +187,56 @@ export const PortnoxDeploymentReportBuilder: React.FC = () => {
         );
       }
 
-      if (toggles.useCases) {
-        const ucs = useCasesByProject[project.id] || [];
-        children.push(
-          new Paragraph({ text: "Relevant Use Cases", heading: HeadingLevel.HEADING_2 }),
-          ...ucs.slice(0, 25).map((u: any) => new Paragraph({ text: `• ${u.title || u.name}` }))
-        );
-      }
+if (toggles.useCases) {
+  const ucs = useCasesByProject[project.id] || [];
+  children.push(
+    new Paragraph({ text: "Relevant Use Cases", heading: HeadingLevel.HEADING_2 }),
+    ...ucs.slice(0, 25).map((u: any) => new Paragraph({ text: `• ${u.title || u.name}` }))
+  );
+}
 
-      if (toggles.recommendations) {
-        const recs = recsByProject[project.id] || [];
-        children.push(
-          new Paragraph({ text: "Recommendations", heading: HeadingLevel.HEADING_2 }),
-          ...recs.slice(0, 25).map((r: any) =>
-            new Paragraph({
-              children: [new TextRun({ text: `${r.title}: `, bold: true }), new TextRun(r.description || "")],
-            })
-          )
-        );
-      }
+if (toggles.recommendations) {
+  const recs = recsByProject[project.id] || [];
+  children.push(
+    new Paragraph({ text: "Recommendations", heading: HeadingLevel.HEADING_2 }),
+    ...recs.slice(0, 25).map((r: any) =>
+      new Paragraph({
+        children: [new TextRun({ text: `${r.title}: `, bold: true }), new TextRun(r.description || "")],
+      })
+    )
+  );
+}
+
+if (toggles.portnoxDevices && portnoxSummaryRef.current) {
+  const c = portnoxSummaryRef.current.counts;
+  children.push(
+    new Paragraph({ text: "Portnox Device Inventory", heading: HeadingLevel.HEADING_2 }),
+    new Table({
+      rows: [
+        new TableRow({
+          children: [
+            new TableCell({ children: [new Paragraph("Metric")] }),
+            new TableCell({ children: [new Paragraph("Count")] }),
+          ],
+        }),
+        ...[
+          ["Total Devices", String(c.total ?? 0)],
+          ["Seen in last 7 days", String(c.last7d ?? 0)],
+          ["Seen in last 30 days", String(c.last30d ?? 0)],
+          ["Not seen > 30 days", String(c.older30d ?? 0)],
+          ["Unknown last seen", String(c.unknown ?? 0)],
+        ].map(([k, v]) =>
+          new TableRow({
+            children: [
+              new TableCell({ children: [new Paragraph(String(k))] }),
+              new TableCell({ children: [new Paragraph(String(v))] }),
+            ],
+          })
+        ),
+      ],
+    })
+  );
+}
     }
 
     const doc = new Document({
@@ -235,22 +270,45 @@ export const PortnoxDeploymentReportBuilder: React.FC = () => {
 
       const selected = (projects as Project[]).filter((p) => selectedIds.includes(p.id));
 
-      const [checklistsByProject, crawlsByProject] = await Promise.all([
-        fetchChecklists(selectedIds),
-        (async () => {
-          const map: Record<string, any> = {};
-          for (const p of selected) {
-            const vendors = inferVendorsFromScoping(p.id);
-            if (vendors.length) {
-              const crawl = await DocumentationCrawlerService.crawlPortnoxDocsForVendors(vendors, {
-                maxPages: 10,
-              } as any);
-              map[p.id] = crawl?.data || crawl;
-            }
-          }
-          return map;
-        })(),
-      ]);
+const [checklistsByProject, crawlsByProject] = await Promise.all([
+  fetchChecklists(selectedIds),
+  (async () => {
+    const map: Record<string, any> = {};
+    for (const p of selected) {
+      const vendors = inferVendorsFromScoping(p.id);
+      if (vendors.length) {
+        const crawl = await DocumentationCrawlerService.crawlPortnoxDocsForVendors(vendors, {
+          maxPages: 10,
+        } as any);
+        map[p.id] = crawl?.data || crawl;
+      }
+    }
+    return map;
+  })(),
+]);
+
+let portnoxSummary: any = null;
+if (toggles.portnoxDevices) {
+  try {
+    const resp = await PortnoxApiService.listDevices({ limit: 500 });
+    const devices = Array.isArray(resp?.items) ? resp.items : Array.isArray(resp?.data) ? resp.data : Array.isArray(resp) ? resp : [];
+    const parseDate = (v: any) => (v ? new Date(v) : null);
+    const getLastSeen = (d: any) => parseDate(d?.last_seen || d?.lastSeen || d?.last_connected || d?.lastConnected || d?.seen_at);
+    const now = Date.now();
+    const daysDiff = (dt: Date | null) => (dt ? Math.floor((now - dt.getTime()) / 86400000) : Infinity);
+    const counts = {
+      total: devices.length,
+      last7d: devices.filter((d: any) => daysDiff(getLastSeen(d)) <= 7).length,
+      last30d: devices.filter((d: any) => daysDiff(getLastSeen(d)) <= 30).length,
+      older30d: devices.filter((d: any) => daysDiff(getLastSeen(d)) > 30).length,
+      unknown: devices.filter((d: any) => !getLastSeen(d)).length,
+    };
+    portnoxSummary = { counts };
+  } catch (e) {
+    console.warn('Portnox device fetch failed', e);
+  }
+}
+portnoxSummaryRef.current = portnoxSummary;
 
       // Basic relevance filtering for use cases and recommendations
       const useCasesByProject: Record<string, any[]> = {};
