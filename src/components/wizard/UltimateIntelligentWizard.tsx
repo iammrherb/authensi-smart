@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateProject, type Project } from "@/hooks/useProjects";
 import EnhancedSiteCreationWizard from "@/components/sites/EnhancedSiteCreationWizard";
@@ -44,6 +45,7 @@ const UltimateIntelligentWizard: React.FC = () => {
   const [showSiteWizard, setShowSiteWizard] = useState(false);
   const [showScopingWizard, setShowScopingWizard] = useState(false);
   const [showConfigWizard, setShowConfigWizard] = useState(false);
+  const [enablePortnoxAutomation, setEnablePortnoxAutomation] = useState(false);
 
   // Project form for step 1 with enhanced fields
   const [projectForm, setProjectForm] = useState<Partial<Project>>({
