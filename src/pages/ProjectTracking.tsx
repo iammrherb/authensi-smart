@@ -7,6 +7,8 @@ import ProjectTrackingDashboard from "@/components/projects/ProjectTrackingDashb
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PortnoxKeyManager from "@/components/portnox/PortnoxKeyManager";
 import PortnoxApiExplorer from "@/components/portnox/PortnoxApiExplorer";
+import BulkApiRunner from "@/components/portnox/BulkApiRunner";
+import DevicesExplorer from "@/components/portnox/DevicesExplorer";
 const ProjectTracking = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
@@ -59,12 +61,20 @@ const ProjectTracking = () => {
             <TabsList>
               <TabsTrigger value="credentials">Credentials</TabsTrigger>
               <TabsTrigger value="explorer">API Explorer</TabsTrigger>
+              <TabsTrigger value="bulk">Bulk Ops</TabsTrigger>
+              <TabsTrigger value="devices">Devices</TabsTrigger>
             </TabsList>
             <TabsContent value="credentials">
               <PortnoxKeyManager projectId={projectId!} />
             </TabsContent>
             <TabsContent value="explorer">
               <PortnoxApiExplorer projectId={projectId!} />
+            </TabsContent>
+            <TabsContent value="bulk">
+              <BulkApiRunner projectId={projectId!} />
+            </TabsContent>
+            <TabsContent value="devices">
+              <DevicesExplorer projectId={projectId!} />
             </TabsContent>
           </Tabs>
         </CardContent>
