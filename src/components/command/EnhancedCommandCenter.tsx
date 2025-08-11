@@ -34,6 +34,8 @@ import { useNavigate } from 'react-router-dom';
 import UnifiedCreationWizard from '@/components/unified/UnifiedCreationWizard';
 import { PROJECT_TEMPLATES } from '@/services/UnifiedProjectCreationService';
 import TaxonomySeederPanel from '@/components/admin/TaxonomySeederPanel';
+import ComprehensiveTaxonomyManager from '@/components/taxonomy/ComprehensiveTaxonomyManager';
+import EnhancedSeedingDashboard from '@/components/taxonomy/EnhancedSeedingDashboard';
 import PortnoxKeyManager from '@/components/portnox/PortnoxKeyManager';
 import PortnoxApiExplorer from '@/components/portnox/PortnoxApiExplorer';
 import EnhancedVendorManagement from '@/components/vendors/EnhancedVendorManagement';
@@ -194,7 +196,24 @@ const EnhancedCommandCenter = () => {
             <PortnoxApiExplorer />
           </div>
         )}
-        {activeManagementView === 'taxonomy' && <TaxonomySeederPanel />}
+        {activeManagementView === 'taxonomy' && (
+          <Tabs defaultValue="management" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="management">Taxonomy Management</TabsTrigger>
+              <TabsTrigger value="seeding">Enhanced Seeding</TabsTrigger>
+              <TabsTrigger value="legacy">Legacy Seeder</TabsTrigger>
+            </TabsList>
+            <TabsContent value="management">
+              <ComprehensiveTaxonomyManager />
+            </TabsContent>
+            <TabsContent value="seeding">
+              <EnhancedSeedingDashboard />
+            </TabsContent>
+            <TabsContent value="legacy">
+              <TaxonomySeederPanel />
+            </TabsContent>
+          </Tabs>
+        )}
       </div>
     );
   }

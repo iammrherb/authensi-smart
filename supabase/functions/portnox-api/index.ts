@@ -57,6 +57,7 @@ serve(async (req) => {
     const fallbackToken = Deno.env.get("PORTNOX_API_TOKEN");
 
     if (!supabaseUrl || !serviceRoleKey) {
+      console.error("Missing Supabase credentials:", { supabaseUrl: !!supabaseUrl, serviceRoleKey: !!serviceRoleKey });
       return new Response(
         JSON.stringify({ error: "Missing Supabase service credentials in environment" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -119,6 +120,7 @@ serve(async (req) => {
     const { base: API_BASE, token: TOKEN } = await resolveCredentials();
 
     if (!TOKEN) {
+      console.error("No Portnox API token available");
       return new Response(
         JSON.stringify({ error: "No Portnox API token available (DB or env). Add credentials first." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -187,8 +189,12 @@ serve(async (req) => {
     }
   } catch (e) {
     console.error("portnox-api error", e);
+    console.error("Stack trace:", e?.stack);
     return new Response(
-      JSON.stringify({ error: String(e?.message || e) }),
+      JSON.stringify({ 
+        error: String(e?.message || e),
+        details: e?.stack ? e.stack.substring(0, 500) : undefined 
+      }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
