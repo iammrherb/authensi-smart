@@ -1307,6 +1307,42 @@ export type Database = {
           },
         ]
       }
+      portnox_credentials: {
+        Row: {
+          api_token: string
+          base_url: string
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean
+          name: string
+          project_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          api_token: string
+          base_url?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          project_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          api_token?: string
+          base_url?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          project_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
