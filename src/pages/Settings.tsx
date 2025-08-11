@@ -17,6 +17,7 @@ import { Settings as SettingsIcon, User, Bell, Shield, Database, Globe, Users, B
 import TaxonomySeederPanel from "@/components/admin/TaxonomySeederPanel";
 import { PortnoxApiService } from "@/services/PortnoxApiService";
 import PortnoxKeyManager from "@/components/portnox/PortnoxKeyManager";
+import PortnoxApiExplorer from "@/components/portnox/PortnoxApiExplorer";
 const Settings = () => {
   const { data: isAdmin } = useHasRole('super_admin', 'global');
   const { data: canManageUsers } = useHasRole('product_manager', 'global');
@@ -253,6 +254,12 @@ const Settings = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* New: Portnox Credentials Manager */}
+              <PortnoxKeyManager />
+
+              {/* New: Portnox API Explorer */}
+              <PortnoxApiExplorer />
             </TabsContent>
 
             <TabsContent value="data" className="space-y-6">

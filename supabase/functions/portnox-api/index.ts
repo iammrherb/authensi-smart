@@ -34,6 +34,7 @@ function buildUrl(base: string, path = "/", query?: Record<string, any>) {
 }
 
 const ALLOWED_PREFIXES = [
+  "api",
   "devices",
   "sites",
   "nas",
@@ -41,6 +42,7 @@ const ALLOWED_PREFIXES = [
   "endpoints",
   "policies",
   "system",
+  "doc",
 ];
 
 serve(async (req) => {
