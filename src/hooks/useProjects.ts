@@ -196,14 +196,16 @@ export const useCreateProject = () => {
         ai_recommendations,
       } = projectData as any;
 
-      const cleanedDataRaw = {
+      type ProjectInsert = Database['public']['Tables']['projects']['Insert'];
+
+      const cleanedData: ProjectInsert = {
         name,
         description,
         client_name,
         business_domain,
         business_website,
         business_summary,
-        project_type,
+        project_type: project_type as any,
         industry,
         primary_country,
         primary_region,
@@ -217,11 +219,11 @@ export const useCreateProject = () => {
         project_owner,
         technical_owner,
         portnox_owner,
-        additional_stakeholders: Array.isArray(additional_stakeholders) ? additional_stakeholders : [],
+        additional_stakeholders: Array.isArray(additional_stakeholders) ? (additional_stakeholders as any) : [],
         compliance_frameworks: Array.isArray(compliance_frameworks) ? compliance_frameworks : [],
-        pain_points: Array.isArray(pain_points) ? pain_points : [],
-        success_criteria: Array.isArray(success_criteria) ? success_criteria : [],
-        integration_requirements: Array.isArray(integration_requirements) ? integration_requirements : [],
+        pain_points: Array.isArray(pain_points) ? (pain_points as any) : [],
+        success_criteria: Array.isArray(success_criteria) ? (success_criteria as any) : [],
+        integration_requirements: Array.isArray(integration_requirements) ? (integration_requirements as any) : [],
         enable_bulk_sites,
         enable_bulk_users,
         enable_auto_vendors,
@@ -231,30 +233,25 @@ export const useCreateProject = () => {
         current_phase,
         progress_percentage: typeof progress_percentage === 'number' ? progress_percentage : 0,
         created_by: user.id,
-        bulk_sites_data: Array.isArray(bulk_sites_data) ? bulk_sites_data : [],
-        migration_scope: migration_scope || {},
+        bulk_sites_data: Array.isArray(bulk_sites_data) ? (bulk_sites_data as any) : [],
+        migration_scope: (migration_scope as any) || {},
         actual_completion,
         template_id,
         poc_status,
         website_url,
         linkedin_url,
-        project_owners,
-        technical_owners,
+        project_owners: project_owners as any,
+        technical_owners: technical_owners as any,
         country_code,
         region_name,
         overall_goal,
         initiative_type,
         ai_recommendations,
-      } as Record<string, any>;
-
-      // Remove undefined values
-      const cleanedData = Object.fromEntries(
-        Object.entries(cleanedDataRaw).filter(([, v]) => v !== undefined)
-      );
+      };
 
       const { data, error } = await supabase
         .from('projects')
-        .insert([cleanedData])
+        .insert(cleanedData)
         .select()
         .maybeSingle();
 
