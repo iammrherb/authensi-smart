@@ -16,6 +16,7 @@ import APIKeyManager from "@/components/ai/APIKeyManager";
 import { Settings as SettingsIcon, User, Bell, Shield, Database, Globe, Users, Brain } from "lucide-react";
 import TaxonomySeederPanel from "@/components/admin/TaxonomySeederPanel";
 import { PortnoxApiService } from "@/services/PortnoxApiService";
+import PortnoxKeyManager from "@/components/portnox/PortnoxKeyManager";
 const Settings = () => {
   const { data: isAdmin } = useHasRole('super_admin', 'global');
   const { data: canManageUsers } = useHasRole('product_manager', 'global');

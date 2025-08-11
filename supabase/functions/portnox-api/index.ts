@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,6 +19,8 @@ interface ProxyRequest {
   path?: string; // e.g. "/devices"
   query?: Record<string, string | number | boolean>;
   body?: any;
+  projectId?: string | null;
+  credentialId?: string | null;
 }
 
 function buildUrl(base: string, path = "/", query?: Record<string, any>) {
@@ -46,23 +49,84 @@ serve(async (req) => {
   }
 
   try {
-    const API_BASE = Deno.env.get("PORTNOX_BASE_URL") || "https://clear.portnox.com/restapi";
-    const TOKEN = Deno.env.get("PORTNOX_API_TOKEN");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const fallbackBase = Deno.env.get("PORTNOX_BASE_URL") || "https://clear.portnox.com/restapi";
+    const fallbackToken = Deno.env.get("PORTNOX_API_TOKEN");
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      return new Response(
+        JSON.stringify({ error: "Missing Supabase service credentials in environment" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+    const payload = (await req.json().catch(() => ({}))) as ProxyRequest & {
+      projectId?: string | null;
+      credentialId?: string | null;
+    };
+    const action = payload.action || "proxy";
+
+    async function resolveCredentials() {
+      // If a credentialId is provided, use it directly
+      if (payload.credentialId) {
+        const { data, error } = await supabase
+          .from("portnox_credentials")
+          .select("id, base_url, api_token, is_active")
+          .eq("id", payload.credentialId)
+          .maybeSingle();
+        if (error) throw error;
+        if (data) return { base: data.base_url || fallbackBase, token: data.api_token };
+      }
+
+      // If a projectId is provided, get the latest active credential for that project
+      if (payload.projectId) {
+        const { data, error } = await supabase
+          .from("portnox_credentials")
+          .select("id, base_url, api_token, is_active, updated_at")
+          .eq("project_id", payload.projectId)
+          .eq("is_active", true)
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (error) throw error;
+        if (data) return { base: data.base_url || fallbackBase, token: data.api_token };
+      }
+
+      // Fallback to a global active credential (project_id IS NULL)
+      const { data: globalCred, error: globalErr } = await supabase
+        .from("portnox_credentials")
+        .select("id, base_url, api_token, is_active, updated_at")
+        .is("project_id", null)
+        .eq("is_active", true)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (globalErr) throw globalErr;
+      if (globalCred) return { base: globalCred.base_url || fallbackBase, token: globalCred.api_token };
+
+      // Finally, fall back to environment secrets if present
+      if (!fallbackToken) {
+        return { base: fallbackBase, token: undefined } as { base: string; token: string | undefined };
+      }
+      return { base: fallbackBase, token: fallbackToken };
+    }
+
+    const { base: API_BASE, token: TOKEN } = await resolveCredentials();
 
     if (!TOKEN) {
       return new Response(
-        JSON.stringify({ error: "Missing PORTNOX_API_TOKEN secret" }),
+        JSON.stringify({ error: "No Portnox API token available (DB or env). Add credentials first." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const payload = (await req.json().catch(() => ({}))) as ProxyRequest;
-    const action = payload.action || "proxy";
-
     const headers: HeadersInit = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${TOKEN}`,
-      "X-API-Key": TOKEN, // Some deployments expect X-API-Key
+      "X-API-Key": TOKEN,
     };
 
     async function forward(method: string, path: string, query?: Record<string, any>, body?: any) {
@@ -91,7 +155,6 @@ serve(async (req) => {
 
     switch (action) {
       case "test": {
-        // Probe a common resource; adjust if your tenant differs
         return await forward("GET", "/devices", { limit: 1 });
       }
       case "listDevices": {
@@ -112,7 +175,6 @@ serve(async (req) => {
       }
       case "createNAS": {
         const { body } = payload;
-        // Some APIs may name this differently, you can adjust to "/nas-devices"
         return await forward("POST", "/nas", undefined, body);
       }
       case "proxy":
