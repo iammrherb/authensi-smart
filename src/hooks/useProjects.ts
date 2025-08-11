@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
+import type { Database } from '@/integrations/supabase/types';
 export interface Project {
   id: string;
   name: string;
@@ -145,30 +145,112 @@ export const useCreateProject = () => {
         throw new Error('User must be authenticated to create projects');
       }
 
-      // Clean the project data to ensure arrays are properly formatted
-      const cleanedData = {
-        ...projectData,
+      // Whitelist only DB columns to avoid 400 errors from unknown fields
+      const {
+        name,
+        description,
+        client_name,
+        business_domain,
+        business_website,
+        business_summary,
+        project_type,
+        industry,
+        primary_country,
+        primary_region,
+        timezone,
+        deployment_type,
+        security_level,
+        total_sites,
+        total_endpoints,
+        budget,
+        project_manager,
+        project_owner,
+        technical_owner,
+        portnox_owner,
+        additional_stakeholders,
+        compliance_frameworks,
+        pain_points,
+        success_criteria,
+        integration_requirements,
+        enable_bulk_sites,
+        enable_bulk_users,
+        enable_auto_vendors,
+        start_date,
+        target_completion,
+        status,
+        current_phase,
+        progress_percentage,
+        bulk_sites_data,
+        migration_scope,
+        actual_completion,
+        template_id,
+        poc_status,
+        website_url,
+        linkedin_url,
+        project_owners,
+        technical_owners,
+        country_code,
+        region_name,
+        overall_goal,
+        initiative_type,
+        ai_recommendations,
+      } = projectData as any;
+
+      const cleanedDataRaw = {
+        name,
+        description,
+        client_name,
+        business_domain,
+        business_website,
+        business_summary,
+        project_type,
+        industry,
+        primary_country,
+        primary_region,
+        timezone,
+        deployment_type,
+        security_level,
+        total_sites,
+        total_endpoints,
+        budget,
+        project_manager,
+        project_owner,
+        technical_owner,
+        portnox_owner,
+        additional_stakeholders: Array.isArray(additional_stakeholders) ? additional_stakeholders : [],
+        compliance_frameworks: Array.isArray(compliance_frameworks) ? compliance_frameworks : [],
+        pain_points: Array.isArray(pain_points) ? pain_points : [],
+        success_criteria: Array.isArray(success_criteria) ? success_criteria : [],
+        integration_requirements: Array.isArray(integration_requirements) ? integration_requirements : [],
+        enable_bulk_sites,
+        enable_bulk_users,
+        enable_auto_vendors,
+        start_date,
+        target_completion,
+        status,
+        current_phase,
+        progress_percentage: typeof progress_percentage === 'number' ? progress_percentage : 0,
         created_by: user.id,
-        compliance_frameworks: Array.isArray(projectData.compliance_frameworks) 
-          ? projectData.compliance_frameworks 
-          : [],
-        additional_stakeholders: Array.isArray(projectData.additional_stakeholders) 
-          ? projectData.additional_stakeholders 
-          : [],
-        pain_points: Array.isArray(projectData.pain_points) 
-          ? projectData.pain_points 
-          : [],
-        success_criteria: Array.isArray(projectData.success_criteria) 
-          ? projectData.success_criteria 
-          : [],
-        integration_requirements: Array.isArray(projectData.integration_requirements) 
-          ? projectData.integration_requirements 
-          : [],
-        bulk_sites_data: Array.isArray(projectData.bulk_sites_data) 
-          ? projectData.bulk_sites_data 
-          : [],
-        migration_scope: projectData.migration_scope || {},
-      };
+        bulk_sites_data: Array.isArray(bulk_sites_data) ? bulk_sites_data : [],
+        migration_scope: migration_scope || {},
+        actual_completion,
+        template_id,
+        poc_status,
+        website_url,
+        linkedin_url,
+        project_owners,
+        technical_owners,
+        country_code,
+        region_name,
+        overall_goal,
+        initiative_type,
+        ai_recommendations,
+      } as Record<string, any>;
+
+      // Remove undefined values
+      const cleanedData = Object.fromEntries(
+        Object.entries(cleanedDataRaw).filter(([, v]) => v !== undefined)
+      );
 
       const { data, error } = await supabase
         .from('projects')
