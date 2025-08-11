@@ -18,15 +18,31 @@ import {
   CheckSquare,
   TrendingUp,
   Shield,
-  Network
+  Network,
+  Building2,
+  Lock,
+  Router,
+  Monitor,
+  Code,
+  Folder,
+  Plus,
+  Edit,
+  Search,
+  Filter
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import UnifiedCreationWizard from '@/components/unified/UnifiedCreationWizard';
 import { PROJECT_TEMPLATES } from '@/services/UnifiedProjectCreationService';
+import TaxonomySeederPanel from '@/components/admin/TaxonomySeederPanel';
+import PortnoxKeyManager from '@/components/portnox/PortnoxKeyManager';
+import PortnoxApiExplorer from '@/components/portnox/PortnoxApiExplorer';
+import EnhancedVendorManagement from '@/components/vendors/EnhancedVendorManagement';
+import UnifiedResourceCenter from '@/pages/UnifiedResourceCenter';
 
 const EnhancedCommandCenter = () => {
   const navigate = useNavigate();
   const [activeAction, setActiveAction] = useState<string | null>(null);
+  const [activeManagementView, setActiveManagementView] = useState<string | null>(null);
 
   const quickActions = [
     {
@@ -48,20 +64,22 @@ const EnhancedCommandCenter = () => {
       badge: 'Smart'
     },
     {
-      id: 'template-creation',
-      title: 'Template-Based Creation',
-      description: 'Quick setup using industry templates',
-      icon: Target,
-      color: 'from-green-500 to-blue-600',
-      action: () => setActiveAction('template-creation')
+      id: 'resource-library',
+      title: 'Resource Library',
+      description: 'Access unified vendor & template management',
+      icon: Database,
+      color: 'from-emerald-500 to-teal-600',
+      action: () => setActiveManagementView('resources'),
+      badge: 'Central'
     },
     {
       id: 'portnox-integration',
       title: 'Portnox Integration',
-      description: 'API management and automation setup',
+      description: 'API management, testing & automation',
       icon: Network,
       color: 'from-orange-500 to-red-600',
-      action: () => navigate('/tracker')
+      action: () => setActiveManagementView('portnox'),
+      badge: 'API'
     }
   ];
 
@@ -74,11 +92,32 @@ const EnhancedCommandCenter = () => {
       stats: '12 Active'
     },
     {
-      title: 'Resource Library',
-      description: 'Access templates, docs, and best practices',
+      title: 'Unified Resource Center',
+      description: 'Vendors, templates, use cases, compliance',
       icon: Database,
-      action: () => navigate('/resources'),
-      stats: '250+ Resources'
+      action: () => setActiveManagementView('resources'),
+      stats: '500+ Resources'
+    },
+    {
+      title: 'Vendor Management',
+      description: 'NAC, wireless, security vendor ecosystem',
+      icon: Building2,
+      action: () => setActiveManagementView('vendors'),
+      stats: '150+ Vendors'
+    },
+    {
+      title: 'Portnox Integration',
+      description: 'API keys, testing, documentation crawling',
+      icon: Network,
+      action: () => setActiveManagementView('portnox'),
+      stats: '8 APIs'
+    },
+    {
+      title: 'Taxonomy Management',
+      description: 'Seed and enrich all resource categories',
+      icon: Settings,
+      action: () => setActiveManagementView('taxonomy'),
+      stats: 'Seeding'
     },
     {
       title: 'User Management',
@@ -105,6 +144,7 @@ const EnhancedCommandCenter = () => {
 
   const recentTemplates = PROJECT_TEMPLATES.slice(0, 4);
 
+  // Handle project creation flows
   if (activeAction === 'project-creation' || activeAction === 'ai-scoping' || activeAction === 'template-creation') {
     return (
       <div className="p-6">
@@ -126,6 +166,35 @@ const EnhancedCommandCenter = () => {
           }}
           onCancel={() => setActiveAction(null)}
         />
+      </div>
+    );
+  }
+
+  // Handle management views
+  if (activeManagementView) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center gap-4 mb-6">
+          <Button variant="outline" onClick={() => setActiveManagementView(null)}>
+            ← Back to Command Center
+          </Button>
+          <h1 className="text-2xl font-bold">
+            {activeManagementView === 'resources' && 'Unified Resource Center'}
+            {activeManagementView === 'vendors' && 'Vendor Management'}
+            {activeManagementView === 'portnox' && 'Portnox Integration Hub'}
+            {activeManagementView === 'taxonomy' && 'Taxonomy Management'}
+          </h1>
+        </div>
+        
+        {activeManagementView === 'resources' && <UnifiedResourceCenter />}
+        {activeManagementView === 'vendors' && <EnhancedVendorManagement />}
+        {activeManagementView === 'portnox' && (
+          <div className="grid gap-6 lg:grid-cols-2">
+            <PortnoxKeyManager />
+            <PortnoxApiExplorer />
+          </div>
+        )}
+        {activeManagementView === 'taxonomy' && <TaxonomySeederPanel />}
       </div>
     );
   }
@@ -211,7 +280,7 @@ const EnhancedCommandCenter = () => {
         </TabsList>
 
         <TabsContent value="management" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {managementActions.map((action, index) => {
               const IconComponent = action.icon;
               return (
