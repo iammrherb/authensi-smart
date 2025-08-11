@@ -426,13 +426,13 @@ export class UnifiedProjectCreationService {
   }
 
   private static async integrateResourceLibrary(projectId: string, projectData: any): Promise<void> {
+    if (!projectData.industry) return;
     // Link relevant resources from the resource library
     const sb = supabase as any;
     const { data: resources } = await sb
-      .from('resources')
-      .select('*')
-      .eq('category', 'industry_templates')
-      .ilike('tags', `%${projectData.industry}%`);
+      .from('configuration_templates')
+      .select('id,name,tags')
+      .contains('tags', [projectData.industry]);
 
     if (resources && Array.isArray(resources)) {
       for (const resource of resources) {
