@@ -23,7 +23,7 @@ interface OperationRef {
   requestBody?: any;
 }
 
-export default function PortnoxApiExplorer() {
+export default function PortnoxApiExplorer({ projectId }: { projectId?: string }) {
   const [spec, setSpec] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [creds, setCreds] = useState<Credential[]>([]);
@@ -40,8 +40,10 @@ export default function PortnoxApiExplorer() {
       try {
         setLoading(true);
         const [s, c] = await Promise.all([
-          PortnoxOpenApi.fetchSpec(),
-          supabase.from("portnox_credentials").select("id, name, project_id").order("updated_at", { ascending: false }),
+          PortnoxOpenApi.fetchSpec(projectId ? { projectId } : undefined),
+          projectId
+            ? supabase.from("portnox_credentials").select("id, name, project_id").eq("project_id", projectId).order("updated_at", { ascending: false })
+            : supabase.from("portnox_credentials").select("id, name, project_id").order("updated_at", { ascending: false }),
         ]);
         setSpec(s);
         setCreds(c.data || []);
@@ -90,7 +92,10 @@ export default function PortnoxApiExplorer() {
       }
       const queryObj = query.trim() ? JSON.parse(query) : undefined;
       const bodyObj = body.trim() ? JSON.parse(body) : undefined;
-      const opts = selectedCred !== "__active__" ? { credentialId: selectedCred } : undefined;
+      const opts = {
+        ...(selectedCred !== "__active__" ? { credentialId: selectedCred } : {}),
+        ...(projectId ? { projectId } : {}),
+      };
       const res = await PortnoxApiService.proxy(selectedOp.method, path, queryObj, bodyObj, opts);
       setResponse(res);
       toast.success("Executed");
@@ -113,10 +118,10 @@ export default function PortnoxApiExplorer() {
               <Label>Credential</Label>
               <Select value={selectedCred} onValueChange={setSelectedCred as any}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Use active credential" />
+                  <SelectValue placeholder={projectId ? "Use project's active credential" : "Use active credential"} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__active__">Use active credential</SelectItem>
+                  <SelectItem value="__active__">{projectId ? "Use project's active credential" : "Use active credential"}</SelectItem>
                   {creds.map((c) => (
                     <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                   ))}

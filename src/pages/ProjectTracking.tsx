@@ -4,7 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import ProjectTrackingDashboard from "@/components/projects/ProjectTrackingDashboard";
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PortnoxKeyManager from "@/components/portnox/PortnoxKeyManager";
+import PortnoxApiExplorer from "@/components/portnox/PortnoxApiExplorer";
 const ProjectTracking = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
@@ -47,6 +49,26 @@ const ProjectTracking = () => {
       </div>
 
       <ProjectTrackingDashboard projectId={projectId!} projectData={project} />
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Portnox Integration</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="credentials">
+            <TabsList>
+              <TabsTrigger value="credentials">Credentials</TabsTrigger>
+              <TabsTrigger value="explorer">API Explorer</TabsTrigger>
+            </TabsList>
+            <TabsContent value="credentials">
+              <PortnoxKeyManager projectId={projectId!} />
+            </TabsContent>
+            <TabsContent value="explorer">
+              <PortnoxApiExplorer projectId={projectId!} />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 };

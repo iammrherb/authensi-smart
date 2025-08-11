@@ -15,9 +15,6 @@ import AISettings from "@/components/ai/AISettings";
 import APIKeyManager from "@/components/ai/APIKeyManager";
 import { Settings as SettingsIcon, User, Bell, Shield, Database, Globe, Users, Brain } from "lucide-react";
 import TaxonomySeederPanel from "@/components/admin/TaxonomySeederPanel";
-import { PortnoxApiService } from "@/services/PortnoxApiService";
-import PortnoxKeyManager from "@/components/portnox/PortnoxKeyManager";
-import PortnoxApiExplorer from "@/components/portnox/PortnoxApiExplorer";
 const Settings = () => {
   const { data: isAdmin } = useHasRole('super_admin', 'global');
   const { data: canManageUsers } = useHasRole('product_manager', 'global');
@@ -202,64 +199,9 @@ const Settings = () => {
                     <Button variant="outline">Configure</Button>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold">P</span>
-                      </div>
-                      <div>
-                        <Label>Portnox CLEAR API</Label>
-                        <p className="text-sm text-muted-foreground">Automate sites, NAS, devices, groups and fetch inventory for reports</p>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Button variant="outline" onClick={async () => {
-                        try {
-                          const res = await PortnoxApiService.testConnection();
-                          alert(`Portnox API reachable. Status: ${res?.status ?? 'ok'}`);
-                        } catch (e: any) {
-                          alert(`Portnox test failed: ${e?.message || e}`);
-                        }
-                      }}>Test</Button>
-                      <Button variant="outline" onClick={async () => {
-                        try {
-                          const list = await PortnoxApiService.listDevices({ limit: 20 });
-                          alert(`Fetched ${Array.isArray(list?.items || list?.data || list) ? (list.items || list.data || list).length : 0} devices`);
-                        } catch (e: any) {
-                          alert(`List devices failed: ${e?.message || e}`);
-                        }
-                      }}>List Devices</Button>
-                      <Button variant="outline" onClick={async () => {
-                        const name = window.prompt('New Site Name');
-                        if (!name) return;
-                        try {
-                          const created = await PortnoxApiService.createSite({ name });
-                          alert(`Site created: ${JSON.stringify(created)}`);
-                        } catch (e: any) {
-                          alert(`Create site failed: ${e?.message || e}`);
-                        }
-                      }}>Create Site</Button>
-                      <Button variant="outline" onClick={async () => {
-                        const name = window.prompt('NAS Name');
-                        if (!name) return;
-                        const ip = window.prompt('NAS IP (optional)') || undefined;
-                        try {
-                          const created = await PortnoxApiService.createNAS({ name, ip });
-                          alert(`NAS created: ${JSON.stringify(created)}`);
-                        } catch (e: any) {
-                          alert(`Create NAS failed: ${e?.message || e}`);
-                        }
-                      }}>Create NAS</Button>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
 
-              {/* New: Portnox Credentials Manager */}
-              <PortnoxKeyManager />
-
-              {/* New: Portnox API Explorer */}
-              <PortnoxApiExplorer />
             </TabsContent>
 
             <TabsContent value="data" className="space-y-6">

@@ -22,11 +22,11 @@ interface Credential {
   updated_at: string;
 }
 
-export default function PortnoxKeyManager() {
+export default function PortnoxKeyManager({ projectId }: { projectId?: string }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [creds, setCreds] = useState<Credential[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filterProject, setFilterProject] = useState<string | null>(null);
+  const [filterProject, setFilterProject] = useState<string | null>(projectId ?? null);
 
   const [form, setForm] = useState<{
     name: string;
@@ -39,14 +39,15 @@ export default function PortnoxKeyManager() {
     base_url: "https://clear.portnox.com/restapi",
     api_token: "",
     is_active: true,
-    project_id: null,
+    project_id: projectId ?? null,
   });
 
   const filteredCreds = useMemo(() => {
-    if (filterProject === undefined) return creds;
-    if (filterProject === null) return creds.filter(c => c.project_id === null);
-    return creds.filter(c => c.project_id === filterProject);
-  }, [creds, filterProject]);
+    const fp = projectId !== undefined ? projectId : filterProject;
+    if (fp === undefined) return creds;
+    if (fp === null) return creds.filter(c => c.project_id === null);
+    return creds.filter(c => c.project_id === fp);
+  }, [creds, filterProject, projectId]);
 
   async function load() {
     setLoading(true);
@@ -68,6 +69,12 @@ export default function PortnoxKeyManager() {
     load();
   }, []);
 
+  useEffect(() => {
+    if (projectId !== undefined) {
+      setForm((f) => ({ ...f, project_id: projectId ?? null }));
+      setFilterProject(projectId ?? null);
+    }
+  }, [projectId]);
   async function saveCredential() {
     if (!form.name || !form.api_token) {
       toast.warning("Please provide a name and API token");
@@ -93,7 +100,7 @@ export default function PortnoxKeyManager() {
       });
       if (error) throw error;
       toast.success("Credential saved");
-      setForm({ name: "", base_url: "https://clear.portnox.com/restapi", api_token: "", is_active: true, project_id: null });
+      setForm({ name: "", base_url: "https://clear.portnox.com/restapi", api_token: "", is_active: true, project_id: projectId ?? null });
       await load();
     } catch (e: any) {
       toast.error(`Save failed: ${e?.message || e}`);
@@ -157,20 +164,22 @@ export default function PortnoxKeyManager() {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label>Project</Label>
-            <Select onValueChange={(v) => setForm((f) => ({ ...f, project_id: v === "__global__" ? null : v }))}>
-              <SelectTrigger>
-                <SelectValue placeholder="Global (default)" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__global__">Global (no project)</SelectItem>
-                {projects.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {!projectId && (
+            <div className="space-y-2">
+              <Label>Project</Label>
+              <Select onValueChange={(v) => setForm((f) => ({ ...f, project_id: v === "__global__" ? null : v }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Global (default)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__global__">Global (no project)</SelectItem>
+                  {projects.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="space-y-2">
             <Label>Name</Label>
             <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Friendly name (e.g., Customer A)" />
@@ -198,21 +207,23 @@ export default function PortnoxKeyManager() {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label>Existing Credentials</Label>
-            <div className="flex items-center gap-2">
-              <Label>Filter by Project</Label>
-              <Select onValueChange={(v) => setFilterProject(v === "__all__" ? undefined as any : v === "__global__" ? null : v)}>
-                <SelectTrigger className="w-56">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__all__">All</SelectItem>
-                  <SelectItem value="__global__">Global</SelectItem>
-                  {projects.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {!projectId && (
+              <div className="flex items-center gap-2">
+                <Label>Filter by Project</Label>
+                <Select onValueChange={(v) => setFilterProject(v === "__all__" ? undefined as any : v === "__global__" ? null : v)}>
+                  <SelectTrigger className="w-56">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__all__">All</SelectItem>
+                    <SelectItem value="__global__">Global</SelectItem>
+                    {projects.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
           <div className="border rounded-md overflow-hidden">
             <Table>
