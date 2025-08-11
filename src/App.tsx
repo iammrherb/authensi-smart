@@ -43,6 +43,7 @@ import UnifiedProjectHub from "./pages/UnifiedProjectHub";
 import OneXerWizardPage from "./pages/OneXerWizard";
 import AIConfigCenter from "./pages/AIConfigCenter";
 import UltimateWizard from "./pages/UltimateWizard";
+import Portnox from "./pages/Portnox";
 
 const queryClient = new QueryClient();
 
@@ -172,6 +173,11 @@ const App = () => (
               <Route path="/questionnaires" element={
                 <ProtectedRoute>
                   <Questionnaires />
+                </ProtectedRoute>
+              } />
+              <Route path="/portnox" element={
+                <ProtectedRoute>
+                  <Portnox />
                 </ProtectedRoute>
               } />
               

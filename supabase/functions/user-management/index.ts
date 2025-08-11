@@ -57,7 +57,16 @@ serve(async (req) => {
 
     const url = new URL(req.url);
     const pathParts = url.pathname.split('/');
-    const action = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+    let action = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+    // Support action provided in JSON body when invoking the base function path
+    if (req.method === 'POST') {
+      try {
+        const body = await req.clone().json();
+        if (body?.action) action = body.action;
+      } catch (_) {
+        // ignore JSON parse errors here; body will be parsed later where needed
+      }
+    }
     
     console.log('User Management Request:', {
       method: req.method,

@@ -42,6 +42,7 @@ const navigationItems = [
     icon: BookOpen,
     items: [
       { title: "Resource Library", url: "/resource-library", icon: Archive, description: "Centralized vendors, templates, use cases & requirements" },
+      { title: "Portnox Integrations", url: "/portnox", icon: Network, description: "Keys, API explorer, automations" },
       { title: "Site Management", url: "/sites", icon: Building2, description: "Site configuration (Project-based)" },
       { title: "Scoping Questionnaires", url: "/questionnaires", icon: FileText, description: "Requirements capture" },
     ]
