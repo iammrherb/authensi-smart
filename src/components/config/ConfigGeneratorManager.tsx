@@ -107,6 +107,20 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
   const [isPasteOptimizeOpen, setIsPasteOptimizeOpen] = useState(false);
   const [pastedConfig, setPastedConfig] = useState("");
   const [optimizedConfig, setOptimizedConfig] = useState("");
+  const [optimizedAnalysis, setOptimizedAnalysis] = useState("");
+
+  // Paste & Optimize options
+  const [reviewOnly, setReviewOnly] = useState(false);
+  const [deviceAdmin, setDeviceAdmin] = useState(false);
+  const [coa, setCoa] = useState(false);
+  const [radsec, setRadsec] = useState(false);
+  const [saml, setSaml] = useState(false);
+  const [tuneTimeouts, setTuneTimeouts] = useState(false);
+  const [loadBalancing, setLoadBalancing] = useState(false);
+  const [vsasDacls, setVsasDacls] = useState(false);
+  const [ipHelpers, setIpHelpers] = useState(false);
+  const [loggingTroubleshooting, setLoggingTroubleshooting] = useState(false);
+  const [otherOptions, setOtherOptions] = useState("");
 
   const form = useForm<z.infer<typeof templateFormSchema>>({
     resolver: zodResolver(templateFormSchema),
@@ -292,6 +306,62 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
     setIsCreateDialogOpen(true);
   };
 
+  // Heuristic detection of Vendor/Model/Firmware from pasted config
+  const detectFromConfig = () => {
+    try {
+      if (!pastedConfig?.trim()) {
+        toast({ title: 'Nothing to analyze', description: 'Paste a configuration first.', variant: 'destructive' });
+        return;
+      }
+      const text = pastedConfig.toLowerCase();
+
+      // Detect vendor by keywords
+      let detectedVendorId = selectedVendor;
+      const findVendor = (namePart: string) => vendors?.find(v => v.vendor_name.toLowerCase().includes(namePart))?.id;
+      if (!detectedVendorId) {
+        if (text.includes('cisco') || text.includes('ios-xe') || text.includes('cat9')) detectedVendorId = findVendor('cisco') || '';
+        else if (text.includes('forti') || text.includes('fortiswitch') || text.includes('fortios')) detectedVendorId = findVendor('forti') || '';
+        else if (text.includes('aruba') || text.includes('arubaos') || text.includes('procurve')) detectedVendorId = findVendor('aruba') || '';
+      }
+
+      // Detect model by string containment
+      let detectedModelId = selectedModel;
+      if (detectedVendorId && !detectedModelId) {
+        const models = vendorModels?.filter(m => m.vendor_id === detectedVendorId) || [];
+        for (const m of models) {
+          const name = (m.model_name || '').toLowerCase();
+          if (name && text.includes(name)) { detectedModelId = m.id; break; }
+        }
+      }
+
+      // Detect firmware by regex patterns
+      let detectedFirmware = selectedFirmware;
+      if (!detectedFirmware) {
+        const regexes = [
+          /(version|ios-xe|software)\s*v?(\d+(?:\.\d+){1,2}(?:[\w()\-\.]+)?)/i,
+          /(fortios|fsw|fortiswitch)\s*v?(\d+(?:\.\d+){1,2}(?:[\w()\-\.]+)?)/i,
+          /(arubaos(?:-switch)?)\s*v?(\d+(?:\.\d+){1,2}(?:[\w()\-\.]+)?)/i,
+        ];
+        for (const rx of regexes) {
+          const m = pastedConfig.match(rx);
+          if (m?.[2]) { detectedFirmware = m[2]; break; }
+        }
+      }
+
+      if (detectedVendorId) setSelectedVendor(detectedVendorId);
+      if (detectedModelId) setSelectedModel(detectedModelId);
+      if (detectedFirmware) setSelectedFirmware(detectedFirmware);
+
+      toast({
+        title: 'Detection complete',
+        description: `${detectedVendorId ? 'Vendor detected' : 'Vendor unchanged'}${detectedModelId ? ' • Model detected' : ''}${detectedFirmware ? ' • Firmware detected' : ''}`,
+      });
+    } catch (e) {
+      console.error('Detection failed', e);
+      toast({ title: 'Detection failed', description: 'Could not infer details from the config.', variant: 'destructive' });
+    }
+  };
+
   if (templatesLoading || vendorsLoading) {
     return <div className="p-6">Loading configuration templates...</div>;
   }
@@ -428,11 +498,128 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
                     </SelectContent>
                   </Select>
                 </div>
+                {/* Target Device Context */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="font-medium">Target Device Context</Label>
+                    <Button type="button" variant="outline" size="sm" onClick={detectFromConfig}>
+                      Detect from pasted config
+                    </Button>
+                  </div>
+                  <EnhancedVendorSelector
+                    selectedVendor={selectedVendor}
+                    selectedModel={selectedModel}
+                    selectedFirmware={selectedFirmware}
+                    onVendorChange={setSelectedVendor}
+                    onModelChange={setSelectedModel}
+                    onFirmwareChange={setSelectedFirmware}
+                    compact={true}
+                    showDetails={false}
+                  />
+                </div>
+
+                {/* Optimization Options */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Mode</Label>
+                    <div className="flex items-center justify-between rounded-md border p-3">
+                      <div>
+                        <p className="text-sm font-medium">Review Only</p>
+                        <p className="text-xs text-muted-foreground">Provide recommendations without changing config</p>
+                      </div>
+                      <Switch checked={reviewOnly} onCheckedChange={setReviewOnly} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Device Administration</Label>
+                    <div className="flex items-center justify-between rounded-md border p-3">
+                      <div>
+                        <p className="text-sm font-medium">TACACS+/RADIUS Admin</p>
+                        <p className="text-xs text-muted-foreground">AAA for privileged exec and command authorization</p>
+                      </div>
+                      <Switch checked={deviceAdmin} onCheckedChange={setDeviceAdmin} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>CoA</Label>
+                    <div className="flex items-center justify-between rounded-md border p-3">
+                      <div>
+                        <p className="text-sm font-medium">Change of Authorization</p>
+                        <p className="text-xs text-muted-foreground">Enable/validate RFC 5176 CoA for Portnox</p>
+                      </div>
+                      <Switch checked={coa} onCheckedChange={setCoa} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>RADSEC</Label>
+                    <div className="flex items-center justify-between rounded-md border p-3">
+                      <div>
+                        <p className="text-sm font-medium">RADIUS over TLS</p>
+                        <p className="text-xs text-muted-foreground">Mutual TLS, ciphers, cert validation</p>
+                      </div>
+                      <Switch checked={radsec} onCheckedChange={setRadsec} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>SAML/SSO</Label>
+                    <div className="flex items-center justify-between rounded-md border p-3">
+                      <div>
+                        <p className="text-sm font-medium">SAML integration</p>
+                        <p className="text-xs text-muted-foreground">Where applicable (e.g., captive portal / admin)</p>
+                      </div>
+                      <Switch checked={saml} onCheckedChange={setSaml} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Tuning & Ops</Label>
+                    <div className="space-y-2 rounded-md border p-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Timeouts</span>
+                        <Switch checked={tuneTimeouts} onCheckedChange={setTuneTimeouts} />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Load balancing / redundancy</span>
+                        <Switch checked={loadBalancing} onCheckedChange={setLoadBalancing} />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">VSAs & dACLs</span>
+                        <Switch checked={vsasDacls} onCheckedChange={setVsasDacls} />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">IP Helpers / relay</span>
+                        <Switch checked={ipHelpers} onCheckedChange={setIpHelpers} />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Logging & troubleshooting</span>
+                        <Switch checked={loggingTroubleshooting} onCheckedChange={setLoggingTroubleshooting} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional notes */}
+                <div className="space-y-2">
+                  <Label>Other options or scenarios</Label>
+                  <Textarea
+                    rows={3}
+                    value={otherOptions}
+                    onChange={(e) => setOtherOptions(e.target.value)}
+                    placeholder="Anything else to include: site-specific constraints, VLANs, ACL naming standards, etc."
+                  />
+                </div>
+
+                {/* Existing configuration input */}
                 <div className="space-y-2">
                   <Label>Existing Configuration</Label>
                   <Textarea rows={10} value={pastedConfig} onChange={(e) => setPastedConfig(e.target.value)} placeholder="Paste your configuration here..." />
                 </div>
-                {optimizedConfig && (
+                {reviewOnly && optimizedAnalysis && (
+                  <div className="space-y-2">
+                    <Label>AI Review & Recommendations</Label>
+                    <CodeBlock code={optimizedAnalysis} heightClass="h-[60vh]" filename={`analysis.md`} />
+                  </div>
+                )}
+                {!reviewOnly && optimizedConfig && (
                   <div className="space-y-2">
                     <Label>Optimized Configuration</Label>
                     <CodeBlock code={optimizedConfig} heightClass="h-[60vh]" filename={`optimized-config.txt`} />
@@ -469,26 +656,56 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
                   </div>
                 )}
                 <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setIsPasteOptimizeOpen(false)}>Cancel</Button>
                   <Button onClick={async () => {
-                    if (!pastedConfig) return;
-                    const vendorName = vendors?.find(v => v.id === selectedVendor)?.vendor_name || '';
-                    const prompt = `Analyze and optimize the following configuration for ${vendorName || 'the selected vendor'} with Portnox NAC best practices.\n- Identify issues or risks and fix them\n- Reformat to be clean and professional\n- Align with model/firmware conventions when specified\n- Include comments where important\n- Output ONLY the final configuration code, no prose before or after.\n\nCONFIG TO REVIEW:\n\n${pastedConfig}`;
+                    if (!pastedConfig?.trim()) return;
+
+                    // Build context strings
+                    const vendorName = vendors?.find(v => v.id === selectedVendor)?.vendor_name || 'Unknown';
+                    const modelName = vendorModels?.find(m => m.id === selectedModel)?.model_name || '';
+                    const firmware = selectedFirmware || '';
+
+                    const featureLines = [
+                      deviceAdmin ? '- Include AAA for device administration (TACACS+ preferred, fall back to RADIUS if not supported). Configure command authorization where supported.' : null,
+                      coa ? '- Ensure Change of Authorization (RFC 5176) is enabled and validated.' : null,
+                      radsec ? '- Configure RADSEC (RADIUS over TLS) with mutual authentication, proper ciphers, and certificate validation.' : null,
+                      saml ? '- Include SAML/SSO integration guidance where applicable (admin portal / captive portal).' : null,
+                      tuneTimeouts ? '- Review and tune RADIUS/EAP/timeouts/retry behavior.' : null,
+                      loadBalancing ? '- Implement RADIUS server load balancing and redundancy/failover.' : null,
+                      vsasDacls ? '- Support Portnox VSAs and dynamic ACLs/VLANs as appropriate.' : null,
+                      ipHelpers ? '- Validate IP helper/DHCP relay for the appropriate VLANs.' : null,
+                      loggingTroubleshooting ? '- Enable logging/syslog and include troubleshooting and verification commands.' : null,
+                      otherOptions ? `- Other: ${otherOptions}` : null,
+                    ].filter(Boolean).join('\n');
+
+                    const header = `PASTE & OPTIMIZE REQUEST\n\nDEVICE CONTEXT (infer if Unknown):\n- Vendor: ${vendorName}\n- Model: ${modelName || 'Unknown'}\n- Firmware: ${firmware || 'Unknown'}\n`;
+
+                    const reviewInstructions = `\nTASK: Provide a thorough review and recommendations for the pasted configuration.\nInclude sections: Summary, Detected Platform, Issues/Risks, Recommended Changes, Best Practices, Validation Steps, Troubleshooting Tips.\nFocus on Portnox NAC alignment and enterprise practices.\n${featureLines ? `\nRequested options:\n${featureLines}\n` : ''}\nReturn well-structured Markdown (no code fences needed).`;
+
+                    const optimizeInstructions = `\nTASK: Output ONLY the final optimized configuration code with inline comments where needed (no prose before/after).\nIncorporate the requested options when supported by the detected platform.\nEnsure alignment with Portnox NAC best practices and vendor conventions.\n` + (featureLines ? `\nRequested options:\n${featureLines}\n` : '');
+
+                    const prompt = `${header}\nPASTED CONFIGURATION:\n\n${pastedConfig}\n\n` + (reviewOnly ? reviewInstructions : optimizeInstructions);
+
                     try {
                       const result = await generateWithAI.mutateAsync({
-                        vendor: vendorName,
-                        model: '',
-                        firmware: selectedFirmware,
-                        configType: 'Optimization',
+                        vendor: vendorName === 'Unknown' ? '' : vendorName,
+                        model: modelName,
+                        firmware,
+                        configType: reviewOnly ? 'Review' : 'Optimization',
                         requirements: prompt,
-                        provider
+                        provider,
                       });
-                      setOptimizedConfig(result.content);
+                      if (reviewOnly) {
+                        setOptimizedAnalysis(result.content);
+                        setOptimizedConfig('');
+                      } else {
+                        setOptimizedConfig(result.content);
+                        setOptimizedAnalysis('');
+                      }
                     } catch (e) {
                       console.error(e);
-                      toast({ title: 'Optimization Failed', description: 'Please try again.', variant: 'destructive' });
+                      toast({ title: reviewOnly ? 'Review Failed' : 'Optimization Failed', description: 'Please try again.', variant: 'destructive' });
                     }
-                  }}>Optimize</Button>
+                  }}> {reviewOnly ? 'Review' : 'Optimize'}</Button>
                 </div>
               </div>
             </DialogContent>
