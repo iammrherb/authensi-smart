@@ -178,6 +178,7 @@ serve(async (req) => {
 
     const headers: HeadersInit = {
       "Content-Type": "application/json",
+      Accept: "application/json",
       Authorization: `Bearer ${TOKEN}`,
       "X-API-Key": TOKEN,
     };
@@ -193,16 +194,17 @@ serve(async (req) => {
         );
       }
       const url = buildUrl(API_BASE, cleanPath, query);
+      const hasBody = !["GET", "HEAD"].includes(method.toUpperCase()) && body !== undefined && body !== null;
       const res = await fetch(url, {
         method,
         headers,
-        body: ["GET", "HEAD"].includes(method.toUpperCase()) ? undefined : JSON.stringify(body ?? {}),
+        body: hasBody ? (typeof body === "string" ? body : JSON.stringify(body)) : undefined,
       });
       const text = await res.text();
       let data: any = null;
       try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
       const responsePayload: any = { status: res.status, data };
-      if (debug) {
+      if (debug || !res.ok) {
         responsePayload.request = {
           method,
           url,
@@ -213,6 +215,11 @@ serve(async (req) => {
           headers: { Authorization: "Bearer ****", "X-API-Key": "****" },
           baseUsed: API_BASE,
           baseSource,
+        };
+        responsePayload.upstream = {
+          ok: res.ok,
+          status: res.status,
+          headers: Object.fromEntries(res.headers.entries()),
         };
       }
       return new Response(JSON.stringify(responsePayload), {
