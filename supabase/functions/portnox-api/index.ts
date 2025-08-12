@@ -152,6 +152,61 @@ serve(async (req) => {
     const action = payload.action || "proxy";
     const debug = !!(payload as any).debug;
 
+    // DB-backed OpenAPI cache settings
+    const CACHE_KEY = 'public-doc';
+    const DB_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+    async function readSpecFromDb() {
+      const { data, error } = await supabase
+        .from('portnox_openapi_cache')
+        .select('spec, derived_base, base_url, base_path, source, expires_at, fetched_at')
+        .eq('cache_key', CACHE_KEY)
+        .order('fetched_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) return null;
+      if (!data) return null;
+      const exp = data.expires_at ? new Date(data.expires_at).getTime() : 0;
+      if (!exp || exp > Date.now()) {
+        return data;
+      }
+      return null;
+    }
+
+    async function writeSpecToDb(spec: any, meta: { base: string; basePath: string; source: string }) {
+      const payload = {
+        cache_key: CACHE_KEY,
+        spec,
+        base_url: meta.base,
+        derived_base: meta.base,
+        base_path: meta.basePath,
+        source: meta.source,
+        fetched_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + DB_TTL_MS).toISOString(),
+      } as any;
+      await supabase.from('portnox_openapi_cache').upsert(payload, { onConflict: 'cache_key' });
+    }
+
+    // Override getSpecInfo to prefer DB cache, then remote, and always sync DB
+    const getSpecInfo = async () => {
+      // Try DB cache first
+      const cached = await readSpecFromDb();
+      if (cached?.spec) {
+        const spec = cached.spec;
+        const base = cached.derived_base || cached.base_url;
+        const basePath = cached.base_path || '';
+        const source = cached.source || 'cache';
+        const matchers = buildPathMatchers(spec?.paths || {}, basePath);
+        return { spec, base, baseSource: source, basePath, matchers, cache: 'db' as const };
+      }
+      // Fallback to remote + in-memory cache
+      const spec = await fetchOpenApiSpec();
+      const { base, source, basePath } = deriveBaseFromSpec(spec);
+      await writeSpecToDb(spec, { base, basePath, source });
+      const matchers = buildPathMatchers(spec?.paths || {}, basePath);
+      return { spec, base, baseSource: source, basePath, matchers, cache: 'remote' as const };
+    };
+
     async function resolveCredentials() {
       const defaultBaseInfo = await getOpenApiBase();
       const defaultBase = defaultBaseInfo.base;
@@ -307,13 +362,11 @@ serve(async (req) => {
         return await forward("POST", "/restapi/nas", undefined, body);
       }
       case "fetchSpec": {
-        // Fetch the OpenAPI spec from the documented public endpoint regardless of base
-        const spec = await fetchOpenApiSpec();
-        const { base, source, basePath } = deriveBaseFromSpec(spec);
-        return new Response(JSON.stringify({ status: 200, data: spec, meta: { derivedBase: base, basePath, source } }), {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        const info = await getSpecInfo();
+        return new Response(
+          JSON.stringify({ status: 200, data: info.spec, meta: { derivedBase: info.base, basePath: info.basePath, source: info.baseSource, cache: info.cache } }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
       case "proxy":
       default: {

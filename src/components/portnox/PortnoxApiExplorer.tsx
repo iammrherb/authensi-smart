@@ -26,6 +26,7 @@ interface OperationRef {
 
 export default function PortnoxApiExplorer({ projectId }: { projectId?: string }) {
   const [spec, setSpec] = useState<any>(null);
+  const [meta, setMeta] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [creds, setCreds] = useState<Credential[]>([]);
   const [selectedCred, setSelectedCred] = useState<string | "__active__">("__active__");
@@ -51,6 +52,7 @@ export default function PortnoxApiExplorer({ projectId }: { projectId?: string }
             : supabase.from("portnox_credentials").select("id, name, project_id").order("updated_at", { ascending: false }),
         ]);
         setSpec(s);
+        setMeta(PortnoxOpenApi.getMeta());
         setCreds(c.data || []);
       } catch (e: any) {
         toast.error(e?.message || "Failed to load spec");
@@ -120,6 +122,9 @@ export default function PortnoxApiExplorer({ projectId }: { projectId?: string }
     <Card>
       <CardHeader>
         <CardTitle>Portnox API Explorer</CardTitle>
+        {meta?.derivedBase && (
+          <div className="text-xs text-muted-foreground mt-1">Base from Swagger: {meta.derivedBase} {meta.source ? `(source: ${meta.source}${meta.cache ? `, cache: ${meta.cache}` : ''})` : ''}</div>
+        )}
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">

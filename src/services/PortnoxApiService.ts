@@ -62,6 +62,6 @@ export class PortnoxApiService {
       body: { action: "fetchSpec" },
     });
     if (error) throw error;
-    return data?.data || data;
+    return data; // return full payload to expose meta
   }
 }

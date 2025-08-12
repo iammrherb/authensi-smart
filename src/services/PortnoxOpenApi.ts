@@ -10,13 +10,16 @@ export interface OpenApiSpec {
 
 export class PortnoxOpenApi {
   private static cache: OpenApiSpec | null = null;
+  private static lastMeta: { derivedBase: string; basePath?: string; source?: string; cache?: string } | null = null;
 
   static async fetchSpec(opts?: { projectId?: string; credentialId?: string }): Promise<OpenApiSpec> {
     if (this.cache) return this.cache;
+    let resp: any = null;
     let spec: OpenApiSpec | null = null;
     try {
-      const s = await PortnoxApiService.fetchOpenApiSpec();
-      spec = (s?.data ?? s) as OpenApiSpec;
+      resp = await PortnoxApiService.fetchOpenApiSpec();
+      spec = (resp?.data ?? resp) as OpenApiSpec;
+      this.lastMeta = resp?.meta ?? null;
     } catch (e) {
       console.error("Failed to fetch OpenAPI spec from edge function", e);
     }
@@ -28,7 +31,13 @@ export class PortnoxOpenApi {
     return spec;
   }
 
+  static getMeta() {
+    return this.lastMeta;
+  }
+
   static clearCache() {
     this.cache = null;
+    this.lastMeta = null;
   }
 }
+
