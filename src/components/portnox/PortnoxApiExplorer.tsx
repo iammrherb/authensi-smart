@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -34,6 +35,9 @@ export default function PortnoxApiExplorer({ projectId }: { projectId?: string }
   const [pathParams, setPathParams] = useState<string>("");
   const [body, setBody] = useState<string>("");
   const [response, setResponse] = useState<any>(null);
+  const [useTemp, setUseTemp] = useState(false);
+  const [tempBase, setTempBase] = useState("https://clear.portnox.com:8081/CloudPortalBackEnd");
+  const [tempToken, setTempToken] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -92,10 +96,14 @@ export default function PortnoxApiExplorer({ projectId }: { projectId?: string }
       }
       const queryObj = query.trim() ? JSON.parse(query) : undefined;
       const bodyObj = body.trim() ? JSON.parse(body) : undefined;
-      const opts = {
+      const opts: any = {
         ...(selectedCred !== "__active__" ? { credentialId: selectedCred } : {}),
         ...(projectId ? { projectId } : {}),
       };
+      if (useTemp && tempToken) {
+        opts.directToken = tempToken;
+        if (tempBase) opts.baseUrl = tempBase;
+      }
       const res = await PortnoxApiService.proxy(selectedOp.method, path, queryObj, bodyObj, opts);
       setResponse(res);
       toast.success("Executed");
@@ -127,6 +135,24 @@ export default function PortnoxApiExplorer({ projectId }: { projectId?: string }
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-2 pt-2">
+              <div className="flex items-center justify-between">
+                <Label>Use temporary token</Label>
+                <Switch checked={useTemp} onCheckedChange={setUseTemp} />
+              </div>
+              {useTemp && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Base URL</Label>
+                    <Input value={tempBase} onChange={(e) => setTempBase(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>API Token</Label>
+                    <Input type="password" value={tempToken} onChange={(e) => setTempToken(e.target.value)} />
+                  </div>
+                </>
+              )}
             </div>
             <div className="space-y-2">
               <Label>Search endpoints</Label>

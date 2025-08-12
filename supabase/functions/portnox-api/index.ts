@@ -22,6 +22,8 @@ interface ProxyRequest {
   body?: any;
   projectId?: string | null;
   credentialId?: string | null;
+  directToken?: string | null;
+  base?: string | null;
 }
 
 function buildUrl(base: string, path = "/", query?: Record<string, any>) {
@@ -75,6 +77,13 @@ serve(async (req) => {
     const action = payload.action || "proxy";
 
     async function resolveCredentials() {
+      // If a direct (temporary) token is provided in the request, use it without storing
+      const anyPayload = payload as any;
+      if (anyPayload?.directToken) {
+        const directBase = (anyPayload.base as string | undefined) || fallbackBase;
+        return { base: directBase, token: String(anyPayload.directToken) };
+      }
+
       // If a credentialId is provided, use it directly
       if (payload.credentialId) {
         const { data, error } = await supabase

@@ -84,12 +84,16 @@ export default function PortnoxKeyManager({ projectId }: { projectId?: string })
       setLoading(true);
       // If setting active for a project, deactivate others first to satisfy unique index
       if (form.is_active) {
-        const { error: updErr } = await supabase
+        let q = supabase
           .from("portnox_credentials")
           .update({ is_active: false })
-          .eq("is_active", true)
-          .eq("project_id", form.project_id);
-        if (updErr) throw updErr;
+          .eq("is_active", true);
+        if (form.project_id === null) {
+          q = q.is("project_id", null);
+        } else {
+          q = q.eq("project_id", form.project_id);
+        }
+        const { error: updErr } = await q;
       }
       const { error } = await supabase.from("portnox_credentials").insert({
         name: form.name,
@@ -113,11 +117,16 @@ export default function PortnoxKeyManager({ projectId }: { projectId?: string })
     try {
       setLoading(true);
       // Deactivate others in same project scope
-      const { error: updErr } = await supabase
+      let q = supabase
         .from("portnox_credentials")
         .update({ is_active: false })
-        .eq("is_active", true)
-        .eq("project_id", cred.project_id);
+        .eq("is_active", true);
+      if (cred.project_id === null) {
+        q = q.is("project_id", null);
+      } else {
+        q = q.eq("project_id", cred.project_id);
+      }
+      const { error: updErr } = await q;
       if (updErr) throw updErr;
       const { error } = await supabase
         .from("portnox_credentials")
