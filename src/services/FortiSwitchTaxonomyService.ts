@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import fortiswitchTemplates from '../data/fortiswitchTemplates';
+import { fortinetTemplates } from '../data/templates/fortinet';
 
 export interface FortiSwitchModel {
   vendor_name: string;
@@ -331,7 +331,7 @@ export class FortiSwitchTaxonomyService {
     let inserted = 0;
     let skipped = 0;
 
-    for (const template of fortiswitchTemplates) {
+    for (const template of fortinetTemplates) {
       try {
         // Check if template already exists
         const { data: existing } = await supabase
@@ -345,32 +345,34 @@ export class FortiSwitchTaxonomyService {
           continue;
         }
 
-        // Insert new template
+        // Insert new template (mapped to unified BaseTemplate)
         const { error } = await supabase
           .from('configuration_templates')
-          .insert({
-            name: template.name,
-            description: template.description,
-            category: template.category,
-            subcategory: template.subcategory,
-            vendor_id: template.vendor_id,
-            configuration_type: template.configuration_type,
-            complexity_level: template.complexity_level,
-            template_content: template.template_content,
-            template_variables: template.template_variables,
-            supported_scenarios: template.supported_scenarios,
-            authentication_methods: template.authentication_methods,
-            security_features: template.security_features,
-            best_practices: template.best_practices,
-            troubleshooting_guide: template.troubleshooting_guide,
-            portnox_compatibility: template.portnox_integration,
-            is_validated: true,
-            is_public: true,
-            tags: template.model_compatibility || [],
-            firmware_requirements: {
-              supported_versions: template.firmware_versions
-            }
-          });
+          .insert([
+            {
+              name: template.name,
+              description: template.description,
+              category: template.category,
+              subcategory: template.subcategory,
+              configuration_type: 'CLI',
+              complexity_level: template.complexity_level,
+              template_content: template.content,
+              template_variables: template.variables as any,
+              supported_scenarios: template.use_cases as any,
+              security_features: template.tags as any,
+              troubleshooting_guide: (template.troubleshooting || []).map(t => ({
+                issue: t.issue,
+                solution: t.solution,
+                commands: t.commands || []
+              })) as any,
+              validation_commands: (template as any).validation_commands || [],
+              compatibility_matrix: (template as any).compatibility_matrix || [],
+              is_validated: true,
+              is_public: true,
+              tags: template.tags as any,
+              template_source: 'library'
+            } as any
+          ]);
 
         if (error) {
           console.error(`Failed to insert template ${template.name}:`, error);

@@ -7,6 +7,7 @@ import { TaxonomySeederService, type SeedableDataset } from "@/services/Taxonomy
 import { EnhancedTaxonomyService, type EnhancedSeedableDataset } from "@/services/EnhancedTaxonomyService";
 import { useHasRole } from "@/hooks/useUserRoles";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import UnifiedTemplateSeederService from "@/services/UnifiedTemplateSeederService";
 
 const BASIC_DATASETS: { id: SeedableDataset; label: string }[] = [
   { id: "authentication_methods", label: "Authentication Methods" },
@@ -61,6 +62,18 @@ const TaxonomySeederPanel = () => {
       toast({ title: "Basic seeding complete", description: "Taxonomy datasets updated" });
     } catch (e: any) {
       toast({ title: "Error", description: e.message || "Failed to seed taxonomy", variant: "destructive" });
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  const runUnifiedTemplates = async () => {
+    try {
+      setRunning(true);
+      const res = await UnifiedTemplateSeederService.seedAll();
+      toast({ title: "Library templates imported", description: `Templates imported: ${res.inserted}, skipped: ${res.skipped}` });
+    } catch (e: any) {
+      toast({ title: "Error", description: e.message || "Failed to import library templates", variant: "destructive" });
     } finally {
       setRunning(false);
     }
