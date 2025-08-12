@@ -43,6 +43,7 @@ const ALLOWED_PREFIXES = [
   "policies",
   "system",
   "doc",
+  "restapi",
 ];
 
 serve(async (req) => {
@@ -53,7 +54,7 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    const fallbackBase = Deno.env.get("PORTNOX_BASE_URL") || "https://clear.portnox.com/restapi";
+    const fallbackBase = Deno.env.get("PORTNOX_BASE_URL") || "https://clear.portnox.com:8081/CloudPortalBackEnd";
     const fallbackToken = Deno.env.get("PORTNOX_API_TOKEN");
 
     if (!supabaseUrl || !serviceRoleKey) {

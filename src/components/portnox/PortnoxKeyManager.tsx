@@ -36,7 +36,7 @@ export default function PortnoxKeyManager({ projectId }: { projectId?: string })
     project_id: string | null;
   }>({
     name: "",
-    base_url: "https://clear.portnox.com/restapi",
+    base_url: "https://clear.portnox.com:8081/CloudPortalBackEnd",
     api_token: "",
     is_active: true,
     project_id: projectId ?? null,
@@ -100,7 +100,7 @@ export default function PortnoxKeyManager({ projectId }: { projectId?: string })
       });
       if (error) throw error;
       toast.success("Credential saved");
-      setForm({ name: "", base_url: "https://clear.portnox.com/restapi", api_token: "", is_active: true, project_id: projectId ?? null });
+      setForm({ name: "", base_url: "https://clear.portnox.com:8081/CloudPortalBackEnd", api_token: "", is_active: true, project_id: projectId ?? null });
       await load();
     } catch (e: any) {
       toast.error(`Save failed: ${e?.message || e}`);

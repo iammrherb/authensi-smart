@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { PortnoxApiService } from "@/services/PortnoxApiService";
 
 interface BulkApiRunnerProps {
-  projectId: string;
+  projectId?: string;
 }
 
 interface RunResult {
