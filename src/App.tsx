@@ -121,6 +121,11 @@ const App = () => (
                   <ProjectDetails />
                 </ProtectedRoute>
               } />
+              <Route path="/projects/:id/edit" element={
+                <ProtectedRoute>
+                  <ProjectDetails />
+                </ProtectedRoute>
+              } />
               
               {/* AI Configuration Center */}
               <Route path="/ai-config" element={

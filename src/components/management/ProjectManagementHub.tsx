@@ -296,7 +296,7 @@ const ProjectManagementHub: React.FC = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => navigate(`/projects/${project.id}/edit`)}
+                      onClick={() => navigate(`/projects/${project.id}`)}
                     >
                       <Edit3 className="h-4 w-4" />
                     </Button>
