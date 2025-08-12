@@ -474,7 +474,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
                 Paste & Optimize
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl">
+            <DialogContent className="max-w-[95vw] md:max-w-5xl max-h-[90dvh] p-0 overflow-hidden flex flex-col">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Bot className="h-5 w-5" />
@@ -484,7 +484,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
                   Paste any configuration to analyze, align with Portnox best practices, and save as a reusable template.
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-4">
+              <div className="space-y-4 flex-1 overflow-y-auto px-6 pb-6">
                 <div className="space-y-2">
                   <Label>AI Provider</Label>
                   <Select value={provider} onValueChange={(v) => setProvider(v as any)}>
