@@ -36,21 +36,51 @@ function buildUrl(base: string, path = "/", query?: Record<string, any>) {
   return url.toString();
 }
 
-const ALLOWED_PREFIXES = [
-  "api",
-  "devices",
-  "sites",
-  "nas",
-  "groups",
-  "endpoints",
-  "policies",
-  "system",
-  "doc",
-  "restapi",
-];
+// Spec cache and helpers derived from the official doc
+let SPEC_CACHE: any = null;
+let SPEC_CACHE_TS = 0;
+const SPEC_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+async function fetchOpenApiSpec(): Promise<any> {
+  const now = Date.now();
+  if (SPEC_CACHE && now - SPEC_CACHE_TS < SPEC_TTL_MS) return SPEC_CACHE;
+  const res = await fetch('https://clear.portnox.com/restapi/doc', { method: 'GET' });
+  const text = await res.text();
+  let spec: any = null;
+  try { spec = text ? JSON.parse(text) : null; } catch { spec = null; }
+  SPEC_CACHE = spec;
+  SPEC_CACHE_TS = now;
+  return spec;
+}
 
 function trimTrailingSlash(s: string) {
   return s.endsWith('/') ? s.slice(0, -1) : s;
+}
+
+function deriveBaseFromSpec(spec: any): { base: string; source: string; basePath: string } {
+  let base = 'https://clear.portnox.com/restapi';
+  let source = 'default';
+  let basePath = '';
+  if (spec) {
+    if (Array.isArray(spec.servers) && spec.servers[0]?.url) {
+      base = spec.servers[0].url;
+      source = 'swagger.servers';
+      try {
+        const u = new URL(base);
+        basePath = u.pathname === '/' ? '' : u.pathname;
+      } catch {}
+    } else if (spec.host) {
+      const scheme = Array.isArray(spec.schemes) && spec.schemes.length ? spec.schemes[0] : 'https';
+      basePath = spec.basePath || '';
+      base = `${scheme}://${spec.host}${basePath}`;
+      source = 'swagger.host';
+    } else if (spec.basePath) {
+      basePath = spec.basePath;
+      base = `https://clear.portnox.com${basePath}`;
+      source = 'swagger.basePath';
+    }
+  }
+  return { base: trimTrailingSlash(base), source, basePath };
 }
 
 function adjustPathForBase(base: string, path: string) {
@@ -67,26 +97,28 @@ function adjustPathForBase(base: string, path: string) {
   return p;
 }
 
+function buildPathMatchers(pathsObj: Record<string, any>, basePath = '') {
+  const keys = Object.keys(pathsObj || {});
+  const regexes = keys.map((k) => {
+    const normalized = (k.startsWith('/') ? k : `/${k}`).replace(/\{[^}]+\}/g, '[^/]+');
+    // ensure we match the path AFTER stripping basePath
+    const pattern = `^${normalized.replace(/\//g, '/')}(?:$|[?])`;
+    return new RegExp(pattern);
+  });
+  return { keys, regexes, basePath };
+}
+
+async function getSpecInfo() {
+  const spec = await fetchOpenApiSpec();
+  const { base, source, basePath } = deriveBaseFromSpec(spec);
+  const matchers = buildPathMatchers(spec?.paths || {}, basePath);
+  return { spec, base, baseSource: source, basePath, matchers };
+}
+
 async function getOpenApiBase(): Promise<{ base: string; source: string }> {
   try {
-    const res = await fetch('https://clear.portnox.com/restapi/doc', { method: 'GET' });
-    const text = await res.text();
-    let spec: any = null;
-    try { spec = text ? JSON.parse(text) : null; } catch {}
-    let base = 'https://clear.portnox.com/restapi';
-    let source = 'default';
-    if (spec) {
-      if (Array.isArray(spec.servers) && spec.servers[0]?.url) {
-        base = spec.servers[0].url;
-        source = 'swagger.servers';
-      } else if (spec.host) {
-        const scheme = Array.isArray(spec.schemes) && spec.schemes.length ? spec.schemes[0] : 'https';
-        const basePath = spec.basePath || '';
-        base = `${scheme}://${spec.host}${basePath}`;
-        source = 'swagger.host';
-      }
-    }
-    return { base: trimTrailingSlash(base), source };
+    const info = await getSpecInfo();
+    return { base: info.base, source: info.baseSource };
   } catch {
     return { base: 'https://clear.portnox.com/restapi', source: 'default' };
   }
@@ -198,14 +230,22 @@ serve(async (req) => {
 
     async function forward(method: string, path: string, query?: Record<string, any>, body?: any) {
       const adjustedPath = adjustPathForBase(API_BASE, path);
-      const cleanPath = adjustedPath.replace(/^\//, "");
-      const allowed = ALLOWED_PREFIXES.some((p) => cleanPath.startsWith(p));
+      // Validate against OpenAPI spec paths
+      const { matchers, basePath: specBasePath } = await getSpecInfo();
+      const effectiveBasePath = specBasePath || (/\/restapi\/?$/i.test(API_BASE) ? '/restapi' : '');
+      let relative = adjustedPath;
+      if (effectiveBasePath && relative.toLowerCase().startsWith(effectiveBasePath.toLowerCase())) {
+        relative = relative.slice(effectiveBasePath.length) || '/';
+      }
+      if (!relative.startsWith('/')) relative = `/${relative}`;
+      const allowed = matchers.regexes.some((rx) => rx.test(relative));
       if (!allowed) {
         return new Response(
-          JSON.stringify({ error: `Path not allowed: ${adjustedPath}` }),
+          JSON.stringify({ error: `Path not allowed by OpenAPI spec: ${relative}`, adjustedPath, effectiveBasePath }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+      const cleanPath = adjustedPath.replace(/^\//, "");
       const url = buildUrl(API_BASE, cleanPath, query);
       const hasBody = !["GET", "HEAD"].includes(method.toUpperCase()) && body !== undefined && body !== null;
       const res = await fetch(url, {
@@ -228,6 +268,7 @@ serve(async (req) => {
           headers: { Authorization: "Bearer ****", "X-API-Key": "****" },
           baseUsed: API_BASE,
           baseSource,
+          validatedRelativePath: relative,
         };
         responsePayload.upstream = {
           ok: res.ok,
@@ -267,13 +308,10 @@ serve(async (req) => {
       }
       case "fetchSpec": {
         // Fetch the OpenAPI spec from the documented public endpoint regardless of base
-        const specUrl = "https://clear.portnox.com/restapi/doc";
-        const res = await fetch(specUrl, { method: "GET" });
-        const text = await res.text();
-        let data: any = null;
-        try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
-        return new Response(JSON.stringify({ status: res.status, data }), {
-          status: res.ok ? 200 : res.status,
+        const spec = await fetchOpenApiSpec();
+        const { base, source, basePath } = deriveBaseFromSpec(spec);
+        return new Response(JSON.stringify({ status: 200, data: spec, meta: { derivedBase: base, basePath, source } }), {
+          status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }

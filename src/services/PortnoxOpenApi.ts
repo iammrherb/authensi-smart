@@ -13,23 +13,16 @@ export class PortnoxOpenApi {
 
   static async fetchSpec(opts?: { projectId?: string; credentialId?: string }): Promise<OpenApiSpec> {
     if (this.cache) return this.cache;
-    // Try fetching spec from public endpoint via edge function
     let spec: OpenApiSpec | null = null;
     try {
       const s = await PortnoxApiService.fetchOpenApiSpec();
       spec = (s?.data ?? s) as OpenApiSpec;
-    } catch (_) {}
-
-    if (!spec || (!spec.swagger && !spec.openapi)) {
-      // Try the backend's /doc relative to base (for on-prem variations)
-      try {
-        const data = await PortnoxApiService.proxy("GET", "/doc", undefined, undefined, opts);
-        spec = (data?.data ?? data) as OpenApiSpec;
-      } catch (_) {}
+    } catch (e) {
+      console.error("Failed to fetch OpenAPI spec from edge function", e);
     }
 
     if (!spec || (!spec.swagger && !spec.openapi)) {
-      throw new Error("Failed to load Portnox OpenAPI spec");
+      throw new Error("Failed to load Portnox OpenAPI spec from https://clear.portnox.com/restapi/doc");
     }
     this.cache = spec;
     return spec;
