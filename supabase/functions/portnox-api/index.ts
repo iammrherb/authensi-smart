@@ -14,6 +14,7 @@ interface ProxyRequest {
     | "listGroups"
     | "createSite"
     | "createNAS"
+    | "fetchSpec"
     | "proxy";
   method?: string;
   path?: string; // e.g. "/devices"
@@ -181,6 +182,18 @@ serve(async (req) => {
       case "createNAS": {
         const { body } = payload;
         return await forward("POST", "/nas", undefined, body);
+      }
+      case "fetchSpec": {
+        // Fetch the OpenAPI spec from the documented public endpoint regardless of base
+        const specUrl = "https://clear.portnox.com/restapi/doc";
+        const res = await fetch(specUrl, { method: "GET" });
+        const text = await res.text();
+        let data: any = null;
+        try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
+        return new Response(JSON.stringify({ status: res.status, data }), {
+          status: res.ok ? 200 : res.status,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
       case "proxy":
       default: {

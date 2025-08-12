@@ -13,23 +13,23 @@ export class PortnoxOpenApi {
 
   static async fetchSpec(opts?: { projectId?: string; credentialId?: string }): Promise<OpenApiSpec> {
     if (this.cache) return this.cache;
-    // Try the documented /doc endpoint via our proxy
-    let data: any = null;
+    // Try fetching spec from public endpoint via edge function
+    let spec: OpenApiSpec | null = null;
     try {
-      data = await PortnoxApiService.proxy("GET", "/doc", undefined, undefined, opts);
+      const s = await PortnoxApiService.fetchOpenApiSpec();
+      spec = (s?.data ?? s) as OpenApiSpec;
     } catch (_) {}
-    let spec = (data?.data ?? data) as OpenApiSpec;
+
     if (!spec || (!spec.swagger && !spec.openapi)) {
-      // Fallback to /restapi/doc (served on some deployments)
-      let alt: any = null;
+      // Try the backend's /doc relative to base (for on-prem variations)
       try {
-        alt = await PortnoxApiService.proxy("GET", "/restapi/doc", undefined, undefined, opts);
+        const data = await PortnoxApiService.proxy("GET", "/doc", undefined, undefined, opts);
+        spec = (data?.data ?? data) as OpenApiSpec;
       } catch (_) {}
-      const altSpec = (alt?.data ?? alt) as OpenApiSpec;
-      if (!altSpec || (!altSpec.swagger && !altSpec.openapi)) {
-        throw new Error("Failed to load Portnox OpenAPI spec from /doc or /restapi/doc");
-      }
-      spec = altSpec;
+    }
+
+    if (!spec || (!spec.swagger && !spec.openapi)) {
+      throw new Error("Failed to load Portnox OpenAPI spec");
     }
     this.cache = spec;
     return spec;

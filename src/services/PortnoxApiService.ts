@@ -56,4 +56,12 @@ export class PortnoxApiService {
     if (error) throw error;
     return data?.data || data;
   }
+
+  static async fetchOpenApiSpec() {
+    const { data, error } = await supabase.functions.invoke("portnox-api", {
+      body: { action: "fetchSpec" },
+    });
+    if (error) throw error;
+    return data?.data || data;
+  }
 }
