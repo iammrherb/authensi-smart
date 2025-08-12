@@ -1343,6 +1343,54 @@ export type Database = {
         }
         Relationships: []
       }
+      portnox_openapi_cache: {
+        Row: {
+          base_path: string | null
+          base_url: string
+          cache_key: string
+          created_at: string
+          created_by: string | null
+          derived_base: string | null
+          etag: string | null
+          expires_at: string | null
+          fetched_at: string
+          id: string
+          source: string | null
+          spec: Json
+          updated_at: string
+        }
+        Insert: {
+          base_path?: string | null
+          base_url: string
+          cache_key: string
+          created_at?: string
+          created_by?: string | null
+          derived_base?: string | null
+          etag?: string | null
+          expires_at?: string | null
+          fetched_at?: string
+          id?: string
+          source?: string | null
+          spec: Json
+          updated_at?: string
+        }
+        Update: {
+          base_path?: string | null
+          base_url?: string
+          cache_key?: string
+          created_at?: string
+          created_by?: string | null
+          derived_base?: string | null
+          etag?: string | null
+          expires_at?: string | null
+          fetched_at?: string
+          id?: string
+          source?: string | null
+          spec?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
