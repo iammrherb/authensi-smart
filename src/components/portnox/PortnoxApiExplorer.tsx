@@ -38,6 +38,7 @@ export default function PortnoxApiExplorer({ projectId }: { projectId?: string }
   const [useTemp, setUseTemp] = useState(false);
   const [tempBase, setTempBase] = useState("https://clear.portnox.com:8081/CloudPortalBackEnd");
   const [tempToken, setTempToken] = useState("");
+  const [debugReq, setDebugReq] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -104,6 +105,7 @@ export default function PortnoxApiExplorer({ projectId }: { projectId?: string }
         opts.directToken = tempToken;
         if (tempBase) opts.baseUrl = tempBase;
       }
+      if (debugReq) opts.debug = true;
       const res = await PortnoxApiService.proxy(selectedOp.method, path, queryObj, bodyObj, opts);
       setResponse(res);
       toast.success("Executed");
@@ -153,6 +155,10 @@ export default function PortnoxApiExplorer({ projectId }: { projectId?: string }
                   </div>
                 </>
               )}
+            </div>
+            <div className="flex items-center justify-between">
+              <Label>Return request debug</Label>
+              <Switch checked={debugReq} onCheckedChange={setDebugReq} />
             </div>
             <div className="space-y-2">
               <Label>Search endpoints</Label>

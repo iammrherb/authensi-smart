@@ -49,9 +49,9 @@ export class PortnoxApiService {
     return data?.data || data;
   }
 
-  static async proxy(method: string, path: string, query?: Record<string, any>, body?: any, opts?: { projectId?: string; credentialId?: string; directToken?: string; baseUrl?: string }) {
+  static async proxy(method: string, path: string, query?: Record<string, any>, body?: any, opts?: { projectId?: string; credentialId?: string; directToken?: string; baseUrl?: string; debug?: boolean }) {
     const { data, error } = await supabase.functions.invoke("portnox-api", {
-      body: { action: "proxy", method, path, query, body, projectId: opts?.projectId, credentialId: opts?.credentialId, directToken: opts?.directToken, base: opts?.baseUrl },
+      body: { action: "proxy", method, path, query, body, projectId: opts?.projectId, credentialId: opts?.credentialId, directToken: opts?.directToken, base: opts?.baseUrl, debug: opts?.debug },
     });
     if (error) throw error;
     return data?.data || data;

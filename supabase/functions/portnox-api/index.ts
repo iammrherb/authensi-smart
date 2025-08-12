@@ -75,6 +75,7 @@ serve(async (req) => {
       credentialId?: string | null;
     };
     const action = payload.action || "proxy";
+    const debug = !!(payload as any).debug;
 
     async function resolveCredentials() {
       // If a direct (temporary) token is provided in the request, use it without storing
@@ -162,7 +163,18 @@ serve(async (req) => {
       const text = await res.text();
       let data: any = null;
       try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
-      return new Response(JSON.stringify({ status: res.status, data }), {
+      const responsePayload: any = { status: res.status, data };
+      if (debug) {
+        responsePayload.request = {
+          method,
+          url,
+          path,
+          query,
+          body,
+          headers: { Authorization: "Bearer ****", "X-API-Key": "****" },
+        };
+      }
+      return new Response(JSON.stringify(responsePayload), {
         status: res.ok ? 200 : res.status,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -170,27 +182,27 @@ serve(async (req) => {
 
     switch (action) {
       case "test": {
-        return await forward("GET", "/devices", { limit: 1 });
+        return await forward("GET", "/restapi/devices", { limit: 1 });
       }
       case "listDevices": {
         const { query } = payload;
-        return await forward("GET", "/devices", query);
+        return await forward("GET", "/restapi/devices", query);
       }
       case "listSites": {
         const { query } = payload;
-        return await forward("GET", "/sites", query);
+        return await forward("GET", "/restapi/sites", query);
       }
       case "listGroups": {
         const { query } = payload;
-        return await forward("GET", "/groups", query);
+        return await forward("GET", "/restapi/groups", query);
       }
       case "createSite": {
         const { body } = payload;
-        return await forward("POST", "/sites", undefined, body);
+        return await forward("POST", "/restapi/sites", undefined, body);
       }
       case "createNAS": {
         const { body } = payload;
-        return await forward("POST", "/nas", undefined, body);
+        return await forward("POST", "/restapi/nas", undefined, body);
       }
       case "fetchSpec": {
         // Fetch the OpenAPI spec from the documented public endpoint regardless of base
@@ -206,7 +218,7 @@ serve(async (req) => {
       }
       case "proxy":
       default: {
-        const { method = "GET", path = "/devices", query, body } = payload;
+        const { method = "GET", path = "/restapi/devices", query, body } = payload;
         return await forward(method, path, query, body);
       }
     }
