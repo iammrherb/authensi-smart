@@ -49,33 +49,46 @@ const ALLOWED_PREFIXES = [
   "restapi",
 ];
 
-function normalizePath(path: string) {
-  const p = path.startsWith("/") ? path : `/${path}`;
-  return p.startsWith("/restapi") ? p : `/restapi${p}`;
+function trimTrailingSlash(s: string) {
+  return s.endsWith('/') ? s.slice(0, -1) : s;
+}
+
+function adjustPathForBase(base: string, path: string) {
+  const p = path.startsWith('/') ? path : `/${path}`;
+  const baseHasRestapi = /\/restapi\/?$/i.test(base);
+  const pathHasRestapi = /^\/restapi(\/|$)/i.test(p);
+  if (baseHasRestapi && pathHasRestapi) {
+    // remove the duplicated /restapi from the path
+    return p.replace(/^\/restapi/i, '') || '/';
+  }
+  if (!baseHasRestapi && !pathHasRestapi) {
+    return `/restapi${p}`;
+  }
+  return p;
 }
 
 async function getOpenApiBase(): Promise<{ base: string; source: string }> {
   try {
-    const res = await fetch("https://clear.portnox.com/restapi/doc", { method: "GET" });
+    const res = await fetch('https://clear.portnox.com/restapi/doc', { method: 'GET' });
     const text = await res.text();
     let spec: any = null;
     try { spec = text ? JSON.parse(text) : null; } catch {}
-    let base = "https://clear.portnox.com/restapi";
-    let source = "default";
+    let base = 'https://clear.portnox.com/restapi';
+    let source = 'default';
     if (spec) {
       if (Array.isArray(spec.servers) && spec.servers[0]?.url) {
         base = spec.servers[0].url;
-        source = "swagger.servers";
+        source = 'swagger.servers';
       } else if (spec.host) {
-        const scheme = Array.isArray(spec.schemes) && spec.schemes.length ? spec.schemes[0] : "https";
-        const basePath = spec.basePath || "";
+        const scheme = Array.isArray(spec.schemes) && spec.schemes.length ? spec.schemes[0] : 'https';
+        const basePath = spec.basePath || '';
         base = `${scheme}://${spec.host}${basePath}`;
-        source = "swagger.host";
+        source = 'swagger.host';
       }
     }
-    return { base, source };
+    return { base: trimTrailingSlash(base), source };
   } catch {
-    return { base: "https://clear.portnox.com/restapi", source: "default" };
+    return { base: 'https://clear.portnox.com/restapi', source: 'default' };
   }
 }
 
@@ -184,12 +197,12 @@ serve(async (req) => {
     };
 
     async function forward(method: string, path: string, query?: Record<string, any>, body?: any) {
-      const normalizedPath = normalizePath(path);
-      const cleanPath = normalizedPath.replace(/^\//, "");
+      const adjustedPath = adjustPathForBase(API_BASE, path);
+      const cleanPath = adjustedPath.replace(/^\//, "");
       const allowed = ALLOWED_PREFIXES.some((p) => cleanPath.startsWith(p));
       if (!allowed) {
         return new Response(
-          JSON.stringify({ error: `Path not allowed: ${normalizedPath}` }),
+          JSON.stringify({ error: `Path not allowed: ${adjustedPath}` }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -208,7 +221,7 @@ serve(async (req) => {
         responsePayload.request = {
           method,
           url,
-          path: normalizedPath,
+          path: adjustedPath,
           originalPath: path,
           query,
           body,
