@@ -71,6 +71,10 @@ const BulkApiRunner: React.FC<BulkApiRunnerProps> = ({ projectId }) => {
   const [dryRun, setDryRun] = useState<boolean>(true);
   const [results, setResults] = useState<RunResult[]>([]);
   const [running, setRunning] = useState<boolean>(false);
+  // Temporary token usage (not stored in DB)
+  const [useTemp, setUseTemp] = useState<boolean>(false);
+  const [tempBase, setTempBase] = useState<string>("https://clear.portnox.com:8081/CloudPortalBackEnd");
+  const [tempToken, setTempToken] = useState<string>("");
 
   const preset = useMemo(() => presets.find(p => p.key === selectedPreset)!, [selectedPreset]);
 
@@ -134,7 +138,16 @@ const BulkApiRunner: React.FC<BulkApiRunnerProps> = ({ projectId }) => {
           return { index, status: "success", request };
         }
         try {
-          const res = await PortnoxApiService.proxy(method, path, undefined, body, { projectId });
+          const res = await PortnoxApiService.proxy(
+            method,
+            path,
+            undefined,
+            body,
+            {
+              projectId,
+              ...(useTemp && tempToken ? { directToken: tempToken, baseUrl: tempBase } : {}),
+            }
+          );
           return { index, status: "success", request, response: res };
         } catch (e: any) {
           return { index, status: "error", request, error: e?.message || String(e) };
@@ -229,6 +242,28 @@ const BulkApiRunner: React.FC<BulkApiRunnerProps> = ({ projectId }) => {
             </div>
           </TabsContent>
         </Tabs>
+
+        <div className="grid md:grid-cols-3 gap-4 border rounded-md p-3">
+          <div className="flex items-center justify-between md:col-span-3">
+            <div className="space-y-0.5">
+              <Label>Use temporary token (not stored)</Label>
+              <p className="text-xs text-muted-foreground">Pass a one-time token and optional base URL for this run only.</p>
+            </div>
+            <Switch checked={useTemp} onCheckedChange={setUseTemp} />
+          </div>
+          {useTemp && (
+            <>
+              <div className="md:col-span-2 space-y-2">
+                <Label>Base URL</Label>
+                <Input value={tempBase} onChange={(e) => setTempBase(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>API Token</Label>
+                <Input type="password" value={tempToken} onChange={(e) => setTempToken(e.target.value)} />
+              </div>
+            </>
+          )}
+        </div>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
