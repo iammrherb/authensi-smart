@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import CodeBlock from "@/components/ui/code-block";
 import { 
   Wand2, 
   Settings, 
@@ -129,6 +130,7 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
       saveAsTemplate: true,
       associateProject: !!projectId,
       associateSite: !!siteId,
+      provider: 'openai',
       tags: []
     }
   });
@@ -236,6 +238,10 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
       const selectedModel = vendorModels?.find(m => m.id === wizardData.basic.model);
       const scenario = configurationScenarios.find(s => s.id === wizardData.scenario.selectedScenario);
 
+      // Collect selected reference templates
+      const selectedTemplateIds: string[] = wizardData.advanced.templates || [];
+      const selectedTemplatesMeta = (templates || []).filter(t => selectedTemplateIds.includes(t.id));
+
       // Build comprehensive context for AI generation
       const contextData = {
         vendor: selectedVendor?.vendor_name || 'Generic',
@@ -253,54 +259,24 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
         vlans: wizardData.advanced.vlans,
         radiusServers: wizardData.advanced.radiusServers,
         certificates: wizardData.advanced.certificates,
-         policies: wizardData.advanced.policies,
-         infrastructure: wizardData.infrastructure
+        policies: wizardData.advanced.policies,
+        infrastructure: wizardData.infrastructure,
+        referenceTemplates: selectedTemplatesMeta.map(t => ({ id: t.id, name: t.name, category: t.category }))
       };
 
-      const detailedPrompt = `Generate a comprehensive, production-ready 802.1X configuration for the following specifications:
+      const templateInstructions = selectedTemplatesMeta.length
+        ? `\n\nREFERENCE TEMPLATES TO HARMONIZE:\n${selectedTemplatesMeta.map(t => `- ${t.name} (${t.category})`).join('\n')}`
+        : '';
 
-DEVICE INFORMATION:
-- Vendor: ${contextData.vendor}
-- Model: ${contextData.model}
-- Firmware: ${contextData.firmware}
-- Device Type: ${contextData.deviceType}
-
-DEPLOYMENT SCENARIO:
-- Configuration Type: ${contextData.scenario}
-- Authentication Methods: ${contextData.authMethods.join(', ') || 'EAP-TLS, PEAP'}
-- Industry: ${contextData.industry || 'Enterprise'}
-- Security Level: ${contextData.securityLevel}
-- Compliance Requirements: ${contextData.compliance.join(', ') || 'Best Practices'}
-
-NETWORK REQUIREMENTS:
-- Network Segmentation: ${contextData.networkSegmentation ? 'Required' : 'Not Required'}
-- Guest Network Access: ${contextData.guestAccess ? 'Required' : 'Not Required'}
-- VLANs: ${contextData.vlans.length} configured
-- RADIUS Servers: ${contextData.radiusServers.length} configured
-
-SPECIFIC REQUIREMENTS:
-${wizardData.requirements.customRequirements.map(req => `- ${req}`).join('\n') || '- Standard enterprise deployment'}
-
-Please provide:
-1. Complete device configuration with all necessary commands
-2. RADIUS server integration settings
-3. Dynamic VLAN assignment configuration
-4. Security hardening and best practices
-5. Quality of Service (QoS) settings for authentication traffic
-6. Monitoring and logging configuration
-7. Troubleshooting guide with common issues and solutions
-8. Implementation and validation procedures
-9. Backup and recovery procedures
-10. Maintenance and update procedures
-
-Make this an enterprise-grade, production-ready configuration that follows industry best practices for security, performance, and reliability.`;
+      const detailedPrompt = `Generate a comprehensive, production-ready 802.1X configuration for the following specifications:\n\nDEVICE INFORMATION:\n- Vendor: ${contextData.vendor}\n- Model: ${contextData.model}\n- Firmware: ${contextData.firmware}\n- Device Type: ${contextData.deviceType}\n\nDEPLOYMENT SCENARIO:\n- Configuration Type: ${contextData.scenario}\n- Authentication Methods: ${contextData.authMethods.join(', ') || 'EAP-TLS, PEAP'}\n- Industry: ${contextData.industry || 'Enterprise'}\n- Security Level: ${contextData.securityLevel}\n- Compliance Requirements: ${contextData.compliance.join(', ') || 'Best Practices'}\n\nNETWORK REQUIREMENTS:\n- Network Segmentation: ${contextData.networkSegmentation ? 'Required' : 'Not Required'}\n- Guest Network Access: ${contextData.guestAccess ? 'Required' : 'Not Required'}\n- VLANs: ${contextData.vlans.length} configured\n- RADIUS Servers: ${contextData.radiusServers.length} configured\n\nSPECIFIC REQUIREMENTS:\n${wizardData.requirements.customRequirements.map((req: string) => `- ${req}`).join('\n') || '- Standard enterprise deployment'}${templateInstructions}\n\nPlease provide:\n1. Complete device configuration with all necessary commands\n2. RADIUS server integration settings\n3. Dynamic VLAN assignment configuration\n4. Security hardening and best practices\n5. Quality of Service (QoS) settings for authentication traffic\n6. Monitoring and logging configuration\n7. Troubleshooting guide with common issues and solutions\n8. Implementation and validation procedures\n9. Backup and recovery procedures\n10. Maintenance and update procedures\n\nMake this an enterprise-grade, production-ready configuration that follows vendor-specific syntax and best practices based on model and firmware.`;
 
       const result = await generateWithAI.mutateAsync({
         vendor: contextData.vendor,
         model: contextData.model,
         firmware: contextData.firmware,
         configType: 'Comprehensive 802.1X Configuration',
-        requirements: detailedPrompt
+        requirements: detailedPrompt,
+        provider: wizardData.review.provider as 'openai' | 'claude' | 'gemini'
       });
 
       // Update wizard data with generated configuration
@@ -770,14 +746,22 @@ Make this an enterprise-grade, production-ready configuration that follows indus
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Reference Templates</h3>
             <div className="grid grid-cols-1 gap-3">
-              {templates?.filter(t => t.vendor_id === wizardData.basic.vendor).slice(0, 5).map(template => (
+              {templates?.filter(t => t.vendor_id === wizardData.basic.vendor).slice(0, 10).map(template => (
                 <Card key={template.id} className="p-3">
                   <div className="flex justify-between items-center">
                     <div>
                       <h4 className="font-medium">{template.name}</h4>
                       <p className="text-sm text-muted-foreground">{template.description}</p>
                     </div>
-                    <Checkbox />
+                    <Checkbox
+                      checked={(wizardData.advanced.templates || []).includes(template.id)}
+                      onCheckedChange={(checked) => {
+                        const current: string[] = wizardData.advanced.templates || [];
+                        const updated = checked ? Array.from(new Set([...current, template.id])) : current.filter(id => id !== template.id);
+                        updateWizardData('advanced', { templates: updated });
+                      }}
+                      aria-label={`Include template ${template.name}`}
+                    />
                   </div>
                 </Card>
               ))}
@@ -850,13 +834,28 @@ Make this an enterprise-grade, production-ready configuration that follows indus
                 onCheckedChange={(checked) => updateWizardData('review', { generateWithAI: checked })}
               />
             </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="saveTemplate">Save as Template</Label>
-              <Switch 
-                id="saveTemplate"
-                checked={wizardData.review.saveAsTemplate}
-                onCheckedChange={(checked) => updateWizardData('review', { saveAsTemplate: checked })}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>AI Provider</Label>
+                <Select value={wizardData.review.provider} onValueChange={(value) => updateWizardData('review', { provider: value })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="openai">OpenAI</SelectItem>
+                    <SelectItem value="claude">Anthropic Claude</SelectItem>
+                    <SelectItem value="gemini">Google Gemini</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="saveTemplate">Save as Template</Label>
+                <Switch 
+                  id="saveTemplate"
+                  checked={wizardData.review.saveAsTemplate}
+                  onCheckedChange={(checked) => updateWizardData('review', { saveAsTemplate: checked })}
+                />
+              </div>
             </div>
             {projectId && (
               <div className="flex items-center justify-between">
@@ -891,11 +890,7 @@ Make this an enterprise-grade, production-ready configuration that follows indus
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-64 w-full border rounded-md p-4">
-              <pre className="text-xs font-mono whitespace-pre-wrap">
-                {wizardData.review.generatedConfig}
-              </pre>
-            </ScrollArea>
+            <CodeBlock code={wizardData.review.generatedConfig} heightClass="h-[60vh]" filename={`${wizardData.basic.name || 'configuration'}.txt`} />
           </CardContent>
         </Card>
       )}

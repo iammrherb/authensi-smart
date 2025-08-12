@@ -225,7 +225,10 @@ export const useGenerateConfigWithAI = () => {
       firmware,
       configType,
       requirements,
-      variables
+      variables,
+      provider = 'openai',
+      temperature = 0.3,
+      maxTokens = 4000,
     }: {
       vendor: string;
       model?: string;
@@ -233,6 +236,9 @@ export const useGenerateConfigWithAI = () => {
       configType: string;
       requirements: string;
       variables?: Record<string, any>;
+      provider?: 'openai' | 'claude' | 'gemini';
+      temperature?: number;
+      maxTokens?: number;
     }) => {
       const { data, error } = await supabase.functions.invoke('ai-completion', {
         body: {
@@ -245,15 +251,14 @@ export const useGenerateConfigWithAI = () => {
             variables,
             task: 'config_generation'
           },
-          provider: 'openai',
-          model: 'gpt-4o',
-          temperature: 0.3,
-          max_tokens: 4000
+          provider,
+          temperature,
+          maxTokens
         }
       });
 
       if (error) throw error;
-      return data;
+      return data as { content: string };
     },
     onSuccess: () => {
       toast({

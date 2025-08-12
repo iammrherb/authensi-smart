@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import CodeBlock from "@/components/ui/code-block";
 import { 
   Settings, 
   Cpu, 
@@ -97,9 +98,15 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
   const [selectedModel, setSelectedModel] = useState("");
   const [selectedFirmware, setSelectedFirmware] = useState("");
   const [configType, setConfigType] = useState("");
+  const [provider, setProvider] = useState<'openai' | 'claude' | 'gemini'>('openai');
   const [aiRequirements, setAiRequirements] = useState("");
   const [generatedConfig, setGeneratedConfig] = useState("");
   const [currentEditTemplate, setCurrentEditTemplate] = useState<any>(null);
+
+  // Paste & Optimize
+  const [isPasteOptimizeOpen, setIsPasteOptimizeOpen] = useState(false);
+  const [pastedConfig, setPastedConfig] = useState("");
+  const [optimizedConfig, setOptimizedConfig] = useState("");
 
   const form = useForm<z.infer<typeof templateFormSchema>>({
     resolver: zodResolver(templateFormSchema),
@@ -217,7 +224,8 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
     if (!selectedVendor || !configType || !aiRequirements) {
       toast({
         title: "Missing Information",
-        description: "Please select vendor, config type, and provide detailed requirements.",
+        description: "Please select vendor, config type, and provide detailed requirements.
+",
         variant: "destructive",
       });
       return;
@@ -227,42 +235,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
       const selectedVendorData = vendors?.find(v => v.id === selectedVendor);
       const selectedModelData = vendorModels?.find(m => m.id === selectedModel);
       
-      // Enhanced prompt for comprehensive configuration generation
-      const enhancedPrompt = `COMPREHENSIVE NETWORK CONFIGURATION REQUEST
-
-DEVICE SPECIFICATIONS:
-- Vendor: ${selectedVendorData?.vendor_name || 'Generic'}
-- Model: ${selectedModelData?.model_name || 'Generic Model'}
-- Model Series: ${selectedModelData?.model_series || 'Standard'}
-- Firmware: ${selectedFirmware || 'Latest Stable'}
-- Configuration Type: ${configType}
-
-DETAILED REQUIREMENTS:
-${aiRequirements}
-
-CONFIGURATION SCOPE:
-Please generate a comprehensive, enterprise-grade configuration that includes:
-1. Complete device configuration with all necessary commands
-2. Security hardening and best practices implementation
-3. Detailed inline documentation and comments
-4. RADIUS/AAA integration for authentication
-5. Dynamic VLAN assignment configuration
-6. Quality of Service (QoS) configuration
-7. SNMP and monitoring setup
-8. Access control lists and security policies
-9. Backup and recovery procedures
-10. Comprehensive troubleshooting guide
-11. Implementation and validation steps
-12. Maintenance and update procedures
-
-ADDITIONAL REQUIREMENTS:
-- Follow vendor-specific best practices for ${selectedVendorData?.vendor_name || 'the selected vendor'}
-- Include security considerations for ${configType}
-- Provide production-ready configuration suitable for enterprise deployment
-- Include performance optimization settings
-- Add comprehensive error handling and failover configurations
-
-FORMAT: Provide a well-structured, professional configuration document with clear sections, detailed explanations, and actionable implementation guidance.`;
+      const enhancedPrompt = `COMPREHENSIVE NETWORK CONFIGURATION REQUEST\n\nDEVICE SPECIFICATIONS:\n- Vendor: ${selectedVendorData?.vendor_name || 'Generic'}\n- Model: ${selectedModelData?.model_name || 'Generic Model'}\n- Model Series: ${selectedModelData?.model_series || 'Standard'}\n- Firmware: ${selectedFirmware || 'Latest Stable'}\n- Configuration Type: ${configType}\n\nDETAILED REQUIREMENTS:\n${aiRequirements}\n\nCONFIGURATION SCOPE:\nPlease generate a comprehensive, enterprise-grade configuration that includes:\n1. Complete device configuration with all necessary commands\n2. Security hardening and best practices implementation\n3. Detailed inline documentation and comments\n4. RADIUS/AAA integration for authentication\n5. Dynamic VLAN assignment configuration\n6. Quality of Service (QoS) configuration\n7. SNMP and monitoring setup\n8. Access control lists and security policies\n9. Backup and recovery procedures\n10. Comprehensive troubleshooting guide\n11. Implementation and validation steps\n12. Maintenance and update procedures\n\nADDITIONAL REQUIREMENTS:\n- Follow vendor-specific best practices for ${selectedVendorData?.vendor_name || 'the selected vendor'}\n- Include security considerations for ${configType}\n- Provide production-ready configuration suitable for enterprise deployment\n- Include performance optimization settings\n- Add comprehensive error handling and failover configurations\n\nFORMAT: Provide a well-structured, professional configuration document with clear sections, detailed explanations, and actionable implementation guidance.`;
       
       const result = await generateWithAI.mutateAsync({
         vendor: selectedVendorData?.vendor_name || '',
@@ -270,6 +243,7 @@ FORMAT: Provide a well-structured, professional configuration document with clea
         firmware: selectedFirmware,
         configType,
         requirements: enhancedPrompt,
+        provider
       });
 
       setGeneratedConfig(result.content);
@@ -341,7 +315,7 @@ FORMAT: Provide a well-structured, professional configuration document with clea
                 1Xer Wizard
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-3xl">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Bot className="h-5 w-5" />
@@ -362,21 +336,34 @@ FORMAT: Provide a well-structured, professional configuration document with clea
                   compact={true}
                   showDetails={false}
                 />
-                
-                <div className="space-y-2">
-                  <Label>Configuration Type</Label>
-                  <Select value={configType} onValueChange={setConfigType}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select config type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {configTypes.map(type => (
-                        <SelectItem key={type} value={type}>{type}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Configuration Type</Label>
+                    <Select value={configType} onValueChange={setConfigType}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select config type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {configTypes.map(type => (
+                          <SelectItem key={type} value={type}>{type}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>AI Provider</Label>
+                    <Select value={provider} onValueChange={(v) => setProvider(v as any)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="openai">OpenAI</SelectItem>
+                        <SelectItem value="claude">Anthropic Claude</SelectItem>
+                        <SelectItem value="gemini">Google Gemini</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                
                 <div className="space-y-2">
                   <Label>Requirements & Use Cases</Label>
                   <Textarea 
@@ -390,12 +377,7 @@ FORMAT: Provide a well-structured, professional configuration document with clea
                 {generatedConfig && (
                   <div className="space-y-2">
                     <Label>Generated Configuration</Label>
-                    <Textarea 
-                      value={generatedConfig}
-                      onChange={(e) => setGeneratedConfig(e.target.value)}
-                      rows={10}
-                      className="font-mono text-sm"
-                    />
+                    <CodeBlock code={generatedConfig} heightClass="h-[60vh]" filename={`${configType || 'configuration'}.txt`} />
                     <Button onClick={handleSaveGeneratedConfig} className="w-full">
                       <Save className="h-4 w-4 mr-2" />
                       Save as Template
@@ -415,12 +397,109 @@ FORMAT: Provide a well-structured, professional configuration document with clea
               </div>
             </DialogContent>
           </Dialog>
-          
+
+          <Dialog open={isPasteOptimizeOpen} onOpenChange={setIsPasteOptimizeOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Wrench className="h-4 w-4 mr-2" />
+                Paste & Optimize
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Bot className="h-5 w-5" />
+                  Review, Optimize, and Validate Configuration
+                </DialogTitle>
+                <DialogDescription>
+                  Paste any configuration to analyze, align with Portnox best practices, and save as a reusable template.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>AI Provider</Label>
+                  <Select value={provider} onValueChange={(v) => setProvider(v as any)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="openai">OpenAI</SelectItem>
+                      <SelectItem value="claude">Anthropic Claude</SelectItem>
+                      <SelectItem value="gemini">Google Gemini</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Existing Configuration</Label>
+                  <Textarea rows={10} value={pastedConfig} onChange={(e) => setPastedConfig(e.target.value)} placeholder="Paste your configuration here..." />
+                </div>
+                {optimizedConfig && (
+                  <div className="space-y-2">
+                    <Label>Optimized Configuration</Label>
+                    <CodeBlock code={optimizedConfig} heightClass="h-[60vh]" filename={`optimized-config.txt`} />
+                    <Button onClick={() => {
+                      const vendorName = vendors?.find(v => v.id === selectedVendor)?.vendor_name || '';
+                      form.reset({
+                        name: `${vendorName || 'Generic'} Optimized Configuration`,
+                        description: `Optimized configuration generated by AI with Portnox best practices.`,
+                        vendor_id: selectedVendor || undefined,
+                        model_id: selectedModel || undefined,
+                        category: configType || 'Optimized Configuration',
+                        configuration_type: 'switch',
+                        complexity_level: 'intermediate',
+                        template_content: optimizedConfig,
+                        template_variables: {},
+                        supported_scenarios: [],
+                        authentication_methods: [],
+                        required_features: [],
+                        network_requirements: {},
+                        security_features: [],
+                        best_practices: [],
+                        troubleshooting_guide: [],
+                        validation_commands: [],
+                        tags: ['ai-optimized', 'portnox', 'best-practices'],
+                        is_public: true,
+                        is_validated: false,
+                      });
+                      setIsPasteOptimizeOpen(false);
+                      setIsCreateDialogOpen(true);
+                    }} className="w-full">
+                      <Save className="h-4 w-4 mr-2" />
+                      Save as Template
+                    </Button>
+                  </div>
+                )}
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" onClick={() => setIsPasteOptimizeOpen(false)}>Cancel</Button>
+                  <Button onClick={async () => {
+                    if (!pastedConfig) return;
+                    const vendorName = vendors?.find(v => v.id === selectedVendor)?.vendor_name || '';
+                    const prompt = `Analyze and optimize the following configuration for ${vendorName || 'the selected vendor'} with Portnox NAC best practices.\n- Identify issues or risks and fix them\n- Reformat to be clean and professional\n- Align with model/firmware conventions when specified\n- Include comments where important\n- Output ONLY the final configuration code, no prose before or after.\n\nCONFIG TO REVIEW:\n\n${pastedConfig}`;
+                    try {
+                      const result = await generateWithAI.mutateAsync({
+                        vendor: vendorName,
+                        model: '',
+                        firmware: selectedFirmware,
+                        configType: 'Optimization',
+                        requirements: prompt,
+                        provider
+                      });
+                      setOptimizedConfig(result.content);
+                    } catch (e) {
+                      console.error(e);
+                      toast({ title: 'Optimization Failed', description: 'Please try again.', variant: 'destructive' });
+                    }
+                  }}>Optimize</Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
           <Button variant="outline" size="sm">
             <Upload className="h-4 w-4 mr-2" />
             Import
           </Button>
-          
+
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm">
@@ -620,12 +699,7 @@ FORMAT: Provide a well-structured, professional configuration document with clea
               </div>
               <div>
                 <p className="text-sm font-medium mb-2">Configuration:</p>
-                <Textarea 
-                  value={selectedTemplate.template_content}
-                  readOnly
-                  rows={15}
-                  className="font-mono text-sm"
-                />
+                <CodeBlock code={selectedTemplate.template_content} heightClass="h-[60vh]" filename={`${selectedTemplate?.name || 'template'}.txt`} />
               </div>
             </div>
           )}
