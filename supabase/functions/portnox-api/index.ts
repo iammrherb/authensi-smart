@@ -49,6 +49,36 @@ const ALLOWED_PREFIXES = [
   "restapi",
 ];
 
+function normalizePath(path: string) {
+  const p = path.startsWith("/") ? path : `/${path}`;
+  return p.startsWith("/restapi") ? p : `/restapi${p}`;
+}
+
+async function getOpenApiBase(): Promise<{ base: string; source: string }> {
+  try {
+    const res = await fetch("https://clear.portnox.com/restapi/doc", { method: "GET" });
+    const text = await res.text();
+    let spec: any = null;
+    try { spec = text ? JSON.parse(text) : null; } catch {}
+    let base = "https://clear.portnox.com/restapi";
+    let source = "default";
+    if (spec) {
+      if (Array.isArray(spec.servers) && spec.servers[0]?.url) {
+        base = spec.servers[0].url;
+        source = "swagger.servers";
+      } else if (spec.host) {
+        const scheme = Array.isArray(spec.schemes) && spec.schemes.length ? spec.schemes[0] : "https";
+        const basePath = spec.basePath || "";
+        base = `${scheme}://${spec.host}${basePath}`;
+        source = "swagger.host";
+      }
+    }
+    return { base, source };
+  } catch {
+    return { base: "https://clear.portnox.com/restapi", source: "default" };
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -57,7 +87,7 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    const fallbackBase = Deno.env.get("PORTNOX_BASE_URL") || "https://clear.portnox.com:8081/CloudPortalBackEnd";
+    const fallbackBase = Deno.env.get("PORTNOX_BASE_URL") || "https://clear.portnox.com/restapi";
     const fallbackToken = Deno.env.get("PORTNOX_API_TOKEN");
 
     if (!supabaseUrl || !serviceRoleKey) {
@@ -78,11 +108,18 @@ serve(async (req) => {
     const debug = !!(payload as any).debug;
 
     async function resolveCredentials() {
+      const defaultBaseInfo = await getOpenApiBase();
+      const defaultBase = defaultBaseInfo.base;
+
       // If a direct (temporary) token is provided in the request, use it without storing
       const anyPayload = payload as any;
       if (anyPayload?.directToken) {
-        const directBase = (anyPayload.base as string | undefined) || fallbackBase;
-        return { base: directBase, token: String(anyPayload.directToken) };
+        let directBase = (anyPayload.base as string | undefined) || defaultBase || fallbackBase;
+        // Adjust common non-API bases to the API base from Swagger
+        if (/CloudPortalBackEnd|:8081/.test(directBase)) {
+          directBase = defaultBase;
+        }
+        return { base: directBase, token: String(anyPayload.directToken), baseSource: "direct" };
       }
 
       // If a credentialId is provided, use it directly
@@ -93,7 +130,7 @@ serve(async (req) => {
           .eq("id", payload.credentialId)
           .maybeSingle();
         if (error) throw error;
-        if (data) return { base: data.base_url || fallbackBase, token: data.api_token };
+        if (data) return { base: data.base_url || defaultBase || fallbackBase, token: data.api_token, baseSource: "credential" };
       }
 
       // If a projectId is provided, get the latest active credential for that project
@@ -107,7 +144,7 @@ serve(async (req) => {
           .limit(1)
           .maybeSingle();
         if (error) throw error;
-        if (data) return { base: data.base_url || fallbackBase, token: data.api_token };
+        if (data) return { base: data.base_url || defaultBase || fallbackBase, token: data.api_token, baseSource: "project" };
       }
 
       // Fallback to a global active credential (project_id IS NULL)
@@ -120,16 +157,16 @@ serve(async (req) => {
         .limit(1)
         .maybeSingle();
       if (globalErr) throw globalErr;
-      if (globalCred) return { base: globalCred.base_url || fallbackBase, token: globalCred.api_token };
+      if (globalCred) return { base: globalCred.base_url || defaultBase || fallbackBase, token: globalCred.api_token, baseSource: "global" };
 
       // Finally, fall back to environment secrets if present
       if (!fallbackToken) {
-        return { base: fallbackBase, token: undefined } as { base: string; token: string | undefined };
+        return { base: defaultBase || fallbackBase, token: undefined, baseSource: "default-no-token" } as { base: string; token: string | undefined; baseSource: string };
       }
-      return { base: fallbackBase, token: fallbackToken };
+      return { base: defaultBase || fallbackBase, token: fallbackToken, baseSource: "env" };
     }
 
-    const { base: API_BASE, token: TOKEN } = await resolveCredentials();
+    const { base: API_BASE, token: TOKEN, baseSource } = await resolveCredentials();
 
     if (!TOKEN) {
       console.error("No Portnox API token available");
@@ -146,11 +183,12 @@ serve(async (req) => {
     };
 
     async function forward(method: string, path: string, query?: Record<string, any>, body?: any) {
-      const cleanPath = path.replace(/^\//, "");
+      const normalizedPath = normalizePath(path);
+      const cleanPath = normalizedPath.replace(/^\//, "");
       const allowed = ALLOWED_PREFIXES.some((p) => cleanPath.startsWith(p));
       if (!allowed) {
         return new Response(
-          JSON.stringify({ error: `Path not allowed: ${path}` }),
+          JSON.stringify({ error: `Path not allowed: ${normalizedPath}` }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -168,10 +206,13 @@ serve(async (req) => {
         responsePayload.request = {
           method,
           url,
-          path,
+          path: normalizedPath,
+          originalPath: path,
           query,
           body,
           headers: { Authorization: "Bearer ****", "X-API-Key": "****" },
+          baseUsed: API_BASE,
+          baseSource,
         };
       }
       return new Response(JSON.stringify(responsePayload), {
