@@ -68,18 +68,28 @@ export const useUserRoles = (scopeType?: ScopeType, scopeId?: string) => {
         ...roles.map(role => role.assigned_by).filter(Boolean)
       ])];
 
-      // Fetch user profiles for all users
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, email, first_name, last_name')
-        .in('id', userIds);
+      // Fetch user profiles for involved users (RLS may restrict visibility)
+      let profiles = [] as Array<{ id: string; email: string; first_name: string; last_name: string }>;
+      try {
+        if (userIds.length > 0) {
+          const { data, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, email, first_name, last_name')
+            .in('id', userIds);
 
-      if (profilesError) throw profilesError;
+          if (profilesError) {
+            console.warn('Profiles fetch restricted by RLS; proceeding without some profile details:', profilesError.message || profilesError);
+          }
+          profiles = data || [];
+        }
+      } catch (e: any) {
+        console.warn('Profiles lookup skipped due to RLS or network error:', e?.message || e);
+      }
 
       // Create a map for quick lookup
-      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+      const profileMap = new Map(profiles.map(p => [p.id, p]));
 
-      // Combine roles with profile data
+      // Combine roles with profile data (null when not permitted by RLS)
       return roles.map(role => ({
         ...role,
         user_profile: profileMap.get(role.user_id) || null,
