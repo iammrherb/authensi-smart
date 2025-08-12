@@ -164,7 +164,7 @@ const EnhancedConfigTemplateManager: React.FC<EnhancedConfigTemplateManagerProps
       if (result) {
         setNewTemplateForm(prev => ({
           ...prev,
-          template_content: result.configuration || ""
+          template_content: result.content || ""
         }));
         toast({
           title: "Success",

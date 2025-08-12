@@ -224,8 +224,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
     if (!selectedVendor || !configType || !aiRequirements) {
       toast({
         title: "Missing Information",
-        description: "Please select vendor, config type, and provide detailed requirements.
-",
+        description: "Please select vendor, config type, and provide detailed requirements.",
         variant: "destructive",
       });
       return;
