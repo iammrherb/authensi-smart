@@ -45,6 +45,11 @@ import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
 import { useVendorModels } from '@/hooks/useVendorModels';
 import { useToast } from '@/hooks/use-toast';
 import EnhancedVendorSelector from './EnhancedVendorSelector';
+import ResourceLibraryIntegration from '@/components/resources/ResourceLibraryIntegration';
+import { useUseCases } from '@/hooks/useUseCases';
+import { useRequirements } from '@/hooks/useRequirements';
+import type { UseCase } from '@/hooks/useUseCases';
+import type { Requirement } from '@/hooks/useRequirements';
 
 interface ConfigGeneratorManagerProps {
   searchTerm: string;
@@ -108,6 +113,9 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
   const [pastedConfig, setPastedConfig] = useState("");
   const [optimizedConfig, setOptimizedConfig] = useState("");
   const [optimizedAnalysis, setOptimizedAnalysis] = useState("");
+  const [selectedConfigUseCases, setSelectedConfigUseCases] = useState<UseCase[]>([]);
+  const [selectedConfigRequirements, setSelectedConfigRequirements] = useState<Requirement[]>([]);
+  const [isResourceLibraryOpen, setIsResourceLibraryOpen] = useState(false);
 
   // Paste & Optimize options
   const [reviewOnly, setReviewOnly] = useState(false);
@@ -275,6 +283,26 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
     }
   };
 
+  const handleConfigUseCaseSelect = (useCase: UseCase) => {
+    setSelectedConfigUseCases(prev => {
+      const exists = prev.find(uc => uc.id === useCase.id);
+      if (exists) {
+        return prev.filter(uc => uc.id !== useCase.id);
+      }
+      return [...prev, useCase];
+    });
+  };
+
+  const handleConfigRequirementSelect = (requirement: Requirement) => {
+    setSelectedConfigRequirements(prev => {
+      const exists = prev.find(req => req.id === requirement.id);
+      if (exists) {
+        return prev.filter(req => req.id !== requirement.id);
+      }
+      return [...prev, requirement];
+    });
+  };
+
   const handleSaveGeneratedConfig = () => {
     const selectedVendorName = vendors?.find(v => v.id === selectedVendor)?.vendor_name || '';
     const selectedModelName = vendorModels?.find(m => m.id === selectedModel)?.model_name || '';
@@ -288,8 +316,12 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
       configuration_type: "switch",
       complexity_level: "intermediate",
       template_content: generatedConfig,
-      template_variables: { firmware_version: selectedFirmware },
-      supported_scenarios: [],
+      template_variables: { 
+        firmware_version: selectedFirmware,
+        use_cases: selectedConfigUseCases.map(uc => uc.name),
+        requirements: selectedConfigRequirements.map(req => req.title)
+      },
+      supported_scenarios: selectedConfigUseCases.map(uc => uc.name),
       authentication_methods: [],
       required_features: [],
       network_requirements: {},
@@ -297,7 +329,14 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
       best_practices: [],
       troubleshooting_guide: [],
       validation_commands: [],
-      tags: ["ai-generated", configType.toLowerCase(), selectedVendorName.toLowerCase(), ...(selectedFirmware ? [selectedFirmware] : [])],
+      tags: [
+        "ai-generated", 
+        configType.toLowerCase(), 
+        selectedVendorName.toLowerCase(), 
+        ...(selectedFirmware ? [selectedFirmware] : []),
+        ...selectedConfigUseCases.map(uc => uc.category.toLowerCase()),
+        ...selectedConfigRequirements.map(req => req.category.toLowerCase())
+      ],
       is_public: true,
       is_validated: false,
     });
@@ -379,10 +418,18 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
         <div className="flex gap-2">
           <Dialog open={isAIGeneratorOpen} onOpenChange={setIsAIGeneratorOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0">
-                <Wand2 className="h-4 w-4 mr-2" />
-                1Xer Wizard
-              </Button>
+          <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0">
+            <Wand2 className="h-4 w-4 mr-2" />
+            1Xer Wizard
+          </Button>
+        </DialogTrigger>
+      </Dialog>
+      <Dialog open={isResourceLibraryOpen} onOpenChange={setIsResourceLibraryOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm">
+            <FileText className="h-4 w-4 mr-2" />
+            Resource Library
+          </Button>
             </DialogTrigger>
             <DialogContent className="max-w-3xl">
               <DialogHeader>

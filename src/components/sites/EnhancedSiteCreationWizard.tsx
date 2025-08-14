@@ -13,7 +13,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   ArrowLeft, ArrowRight, CheckCircle, Building2, MapPin, 
-  Users, Shield, Network, Server, Plus, X, Upload, Download
+  Users, Shield, Network, Server, Plus, X, Upload, Download, Target
 } from 'lucide-react';
 import { useCreateSite } from '@/hooks/useSites';
 import { useCountries, useRegionsByCountry } from '@/hooks/useCountriesRegions';
@@ -23,6 +23,11 @@ import InlineSelectCreate from '@/components/common/InlineSelectCreate';
 import { useScopingSessions } from '@/hooks/useScopingSessionsDb';
 import type { CatalogItem } from '@/hooks/useCatalog';
 import ReportExporter from '@/components/common/ReportExporter';
+import ResourceLibraryIntegration from '@/components/resources/ResourceLibraryIntegration';
+import { useUseCases, useSiteUseCases, useAddUseCaseToSite } from '@/hooks/useUseCases';
+import { useRequirements, useSiteRequirements, useAddRequirementToSite } from '@/hooks/useRequirements';
+import type { UseCase } from '@/hooks/useUseCases';
+import type { Requirement } from '@/hooks/useRequirements';
 
 interface EnhancedSiteFormData {
   // Basic Information
@@ -224,11 +229,15 @@ const EnhancedSiteCreationWizard: React.FC<EnhancedSiteCreationWizardProps> = ({
   const [selectedVpnVendors, setSelectedVpnVendors] = useState<CatalogItem[]>([]);
   const [selectedEdrVendors, setSelectedEdrVendors] = useState<CatalogItem[]>([]);
   const [selectedIdpVendors, setSelectedIdpVendors] = useState<CatalogItem[]>([]);
+  const [selectedSiteUseCases, setSelectedSiteUseCases] = useState<UseCase[]>([]);
+  const [selectedSiteRequirements, setSelectedSiteRequirements] = useState<Requirement[]>([]);
   
   const { data: countries = [] } = useCountries();
   const { data: regions = [] } = useRegionsByCountry(formData.country);
   const { data: scopingSessions = [] } = useScopingSessions();
   const { mutate: createSite, isPending } = useCreateSite();
+  const addUseCaseToSite = useAddUseCaseToSite();
+  const addRequirementToSite = useAddRequirementToSite();
   const { toast } = useToast();
 
   const importFromScoping = (sessionId: string) => {
@@ -284,6 +293,12 @@ const EnhancedSiteCreationWizard: React.FC<EnhancedSiteCreationWizardProps> = ({
     },
     {
       id: 6,
+      title: "Use Cases & Requirements",
+      description: "Select relevant use cases and requirements from library",
+      icon: Target
+    },
+    {
+      id: 7,
       title: "Deployment & Integration",
       description: "Deployment planning and system integrations",
       icon: Users
@@ -315,6 +330,26 @@ const EnhancedSiteCreationWizard: React.FC<EnhancedSiteCreationWizardProps> = ({
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
+  };
+
+  const handleUseCaseSelect = (useCase: UseCase) => {
+    setSelectedSiteUseCases(prev => {
+      const exists = prev.find(uc => uc.id === useCase.id);
+      if (exists) {
+        return prev.filter(uc => uc.id !== useCase.id);
+      }
+      return [...prev, useCase];
+    });
+  };
+
+  const handleRequirementSelect = (requirement: Requirement) => {
+    setSelectedSiteRequirements(prev => {
+      const exists = prev.find(req => req.id === requirement.id);
+      if (exists) {
+        return prev.filter(req => req.id !== requirement.id);
+      }
+      return [...prev, requirement];
+    });
   };
 
   const handleCreateSite = async () => {
@@ -358,10 +393,38 @@ const EnhancedSiteCreationWizard: React.FC<EnhancedSiteCreationWizardProps> = ({
     };
 
     createSite(siteData, {
-      onSuccess: (site) => {
+      onSuccess: async (site) => {
+        // Add selected use cases to site
+        for (const useCase of selectedSiteUseCases) {
+          try {
+            await addUseCaseToSite.mutateAsync({
+              siteId: site.id,
+              useCaseId: useCase.id,
+              priority: 'medium',
+              implementationNotes: 'Added during site creation'
+            });
+          } catch (error) {
+            console.error('Failed to add use case to site:', error);
+          }
+        }
+
+        // Add selected requirements to site
+        for (const requirement of selectedSiteRequirements) {
+          try {
+            await addRequirementToSite.mutateAsync({
+              siteId: site.id,
+              requirementId: requirement.id,
+              implementationApproach: 'Standard implementation',
+              targetDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+            });
+          } catch (error) {
+            console.error('Failed to add requirement to site:', error);
+          }
+        }
+
         toast({
           title: "Site Created Successfully",
-          description: `${formData.site_name} has been created and configured.`,
+          description: `${formData.site_name} has been created and configured with ${selectedSiteUseCases.length} use cases and ${selectedSiteRequirements.length} requirements.`,
         });
         onComplete?.(site.id);
       },
@@ -1073,6 +1136,71 @@ const EnhancedSiteCreationWizard: React.FC<EnhancedSiteCreationWizardProps> = ({
         );
 
       case 6:
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <Target className="h-12 w-12 mx-auto mb-4 text-primary" />
+              <h3 className="text-xl font-semibold mb-2">Use Cases & Requirements</h3>
+              <p className="text-muted-foreground">
+                Select relevant use cases and requirements for this site from the resource library
+              </p>
+            </div>
+
+            <ResourceLibraryIntegration
+              onUseCaseSelect={handleUseCaseSelect}
+              onRequirementSelect={handleRequirementSelect}
+              selectedItems={{
+                useCases: selectedSiteUseCases.map(uc => uc.id),
+                requirements: selectedSiteRequirements.map(req => req.id)
+              }}
+              mode="select"
+              allowCreate={false}
+              allowEdit={false}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Selected Use Cases ({selectedSiteUseCases.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {selectedSiteUseCases.length > 0 ? (
+                    <div className="space-y-2">
+                      {selectedSiteUseCases.map(uc => (
+                        <Badge key={uc.id} variant="outline" className="mr-2">
+                          {uc.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground">No use cases selected</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Selected Requirements ({selectedSiteRequirements.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {selectedSiteRequirements.length > 0 ? (
+                    <div className="space-y-2">
+                      {selectedSiteRequirements.map(req => (
+                        <Badge key={req.id} variant="outline" className="mr-2">
+                          {req.title}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground">No requirements selected</p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        );
+
+      case 7:
         return (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

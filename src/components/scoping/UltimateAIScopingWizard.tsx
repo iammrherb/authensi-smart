@@ -51,6 +51,11 @@ import { useEnhancedVendors } from "@/hooks/useEnhancedVendors";
 import { useIndustryOptions, useComplianceFrameworks } from "@/hooks/useResourceLibrary";
 import { useRefreshResources } from "@/hooks/useRefreshResources";
 import { useAI } from "@/hooks/useAI";
+import ResourceLibraryIntegration from "@/components/resources/ResourceLibraryIntegration";
+import { useUseCases } from "@/hooks/useUseCases";
+import { useRequirements } from "@/hooks/useRequirements";
+import type { UseCase as LibraryUseCase } from "@/hooks/useUseCases";
+import type { Requirement } from "@/hooks/useRequirements";
 import EnhancedVendorSelector from "./EnhancedVendorSelector";
 import DecisionTreeEngine from "./DecisionTreeEngine";
 import ScopingFlowManager from "./ScopingFlowManager";
@@ -163,6 +168,10 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
   onRequestEditOrganization
 }) => {
   const [currentStep, setCurrentStep] = useState(skipOrganizationStep ? 'infrastructure' : 'organization');
+  const [resourceIntegrationData, setResourceIntegrationData] = useState({
+    selectedUseCases: [] as LibraryUseCase[],
+    selectedRequirements: [] as Requirement[]
+  });
   const [scopingData, setScopingData] = useState<ScopingData>({
     session_name: '',
     created_at: new Date().toISOString(),
@@ -239,13 +248,16 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
 
   const { toast } = useToast();
   const { generateRecommendations, isLoading: aiLoading } = useAI();
+  const { data: libraryUseCases = [] } = useUseCases();
+  const { data: libraryRequirements = [] } = useRequirements();
 
   const phases = [
     { id: 1, title: "Organization Profile", icon: Building2, color: "from-blue-500 to-cyan-600" },
     { id: 2, title: "Network & Vendors", icon: Network, color: "from-purple-500 to-pink-600" },
     { id: 3, title: "Use Cases & Requirements", icon: Target, color: "from-green-500 to-emerald-600" },
-    { id: 4, title: "Integration & Compliance", icon: Shield, color: "from-orange-500 to-red-600" },
-    { id: 5, title: "AI Analysis & Templates", icon: Brain, color: "from-indigo-500 to-purple-600" }
+    { id: 4, title: "Resource Library", icon: FileText, color: "from-teal-500 to-green-600" },
+    { id: 5, title: "Integration & Compliance", icon: Shield, color: "from-orange-500 to-red-600" },
+    { id: 6, title: "AI Analysis & Templates", icon: Brain, color: "from-indigo-500 to-purple-600" }
   ];
 
   const { data: industryOptionsData = [] } = useIndustryOptions();
@@ -387,6 +399,24 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
           ? prev.use_cases_requirements.primary_use_cases.filter(uc => uc.id !== useCase.id)
           : [...(prev.use_cases_requirements.primary_use_cases || []), useCase]
       }
+    }));
+  }, []);
+
+  const handleLibraryUseCaseSelect = useCallback((useCase: UseCase) => {
+    setResourceIntegrationData(prev => ({
+      ...prev,
+      selectedUseCases: prev.selectedUseCases.some(uc => uc.id === useCase.id)
+        ? prev.selectedUseCases.filter(uc => uc.id !== useCase.id)
+        : [...prev.selectedUseCases, useCase]
+    }));
+  }, []);
+
+  const handleLibraryRequirementSelect = useCallback((requirement: Requirement) => {
+    setResourceIntegrationData(prev => ({
+      ...prev,
+      selectedRequirements: prev.selectedRequirements.some(req => req.id === requirement.id)
+        ? prev.selectedRequirements.filter(req => req.id !== requirement.id)
+        : [...prev.selectedRequirements, requirement]
     }));
   }, []);
 

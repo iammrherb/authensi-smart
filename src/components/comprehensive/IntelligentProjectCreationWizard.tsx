@@ -9,10 +9,17 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Brain, Building2, MapPin, Clock, Target, Zap, CheckCircle, AlertCircle, Calendar, Users, Settings, Rocket } from "lucide-react";
+import { Brain, Building2, MapPin, Clock, Target, Zap, CheckCircle, AlertCircle, Calendar, Users, Settings, Rocket, FileText } from "lucide-react";
 import { useAI } from "@/hooks/useAI";
 import { toast } from "sonner";
 import DecisionTreeEngine from "@/components/scoping/DecisionTreeEngine";
+import ResourceLibraryIntegration from "@/components/resources/ResourceLibraryIntegration";
+import { useUseCases, useProjectUseCases, useAddUseCaseToProject } from "@/hooks/useUseCases";
+import { useRequirements, useProjectRequirements, useAddRequirementToProject } from "@/hooks/useRequirements";
+import { useProjectTemplates, useIncrementTemplateUsage } from "@/hooks/useProjectTemplates";
+import type { UseCase } from "@/hooks/useUseCases";
+import type { Requirement } from "@/hooks/useRequirements";
+import type { ProjectTemplate } from "@/hooks/useProjectTemplates";
 
 interface ProjectData {
   name: string;
@@ -85,11 +92,20 @@ const IntelligentProjectCreationWizard = () => {
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
+  const [selectedUseCases, setSelectedUseCases] = useState<UseCase[]>([]);
+  const [selectedRequirements, setSelectedRequirements] = useState<Requirement[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<ProjectTemplate | null>(null);
+  const [projectId, setProjectId] = useState<string | null>(null);
   
   const { generateProjectSummary, generateRecommendations, isLoading } = useAI();
+  const { data: projectTemplates = [] } = useProjectTemplates();
+  const addUseCaseToProject = useAddUseCaseToProject();
+  const addRequirementToProject = useAddRequirementToProject();
+  const incrementTemplateUsage = useIncrementTemplateUsage();
 
   const steps = [
     { id: 'basics', title: 'Project Basics', icon: Building2 },
+    { id: 'templates', title: 'Templates & Resources', icon: FileText },
     { id: 'requirements', title: 'Requirements & Goals', icon: Target },
     { id: 'analysis', title: 'AI Analysis', icon: Brain },
     { id: 'sites', title: 'Sites Generation', icon: MapPin },
@@ -351,6 +367,38 @@ const IntelligentProjectCreationWizard = () => {
     }));
   };
 
+  const handleUseCaseSelect = (useCase: UseCase) => {
+    setSelectedUseCases(prev => {
+      const exists = prev.find(uc => uc.id === useCase.id);
+      if (exists) {
+        return prev.filter(uc => uc.id !== useCase.id);
+      }
+      return [...prev, useCase];
+    });
+  };
+
+  const handleRequirementSelect = (requirement: Requirement) => {
+    setSelectedRequirements(prev => {
+      const exists = prev.find(req => req.id === requirement.id);
+      if (exists) {
+        return prev.filter(req => req.id !== requirement.id);
+      }
+      return [...prev, requirement];
+    });
+  };
+
+  const handleTemplateSelect = (template: ProjectTemplate) => {
+    setSelectedTemplate(template);
+    // Apply template data to project
+    setProjectData(prev => ({
+      ...prev,
+      industry: template.industry,
+      description: template.description,
+      // Apply other template configurations
+    }));
+    incrementTemplateUsage.mutate(template.id);
+  };
+
   const renderStepContent = () => {
     switch (steps[currentStep].id) {
       case 'basics':
@@ -407,6 +455,89 @@ const IntelligentProjectCreationWizard = () => {
                   </Select>
                 </div>
               </div>
+            </div>
+          </div>
+        );
+
+      case 'templates':
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <FileText className="h-12 w-12 mx-auto mb-4 text-primary" />
+              <h3 className="text-xl font-semibold mb-2">Project Templates & Resources</h3>
+              <p className="text-muted-foreground">
+                Select project templates, use cases, and requirements from the resource library
+              </p>
+            </div>
+
+            <ResourceLibraryIntegration
+              onUseCaseSelect={handleUseCaseSelect}
+              onRequirementSelect={handleRequirementSelect}
+              onTemplateSelect={handleTemplateSelect}
+              selectedItems={{
+                useCases: selectedUseCases.map(uc => uc.id),
+                requirements: selectedRequirements.map(req => req.id),
+                templates: selectedTemplate ? [selectedTemplate.id] : []
+              }}
+              mode="select"
+              allowCreate={false}
+              allowEdit={false}
+            />
+
+            {selectedTemplate && (
+              <Card className="bg-primary/5 border-primary">
+                <CardHeader>
+                  <CardTitle>Selected Template</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="font-medium">{selectedTemplate.name}</p>
+                  <p className="text-sm text-muted-foreground">{selectedTemplate.description}</p>
+                  <div className="flex gap-2 mt-2">
+                    <Badge>{selectedTemplate.industry}</Badge>
+                    <Badge variant="secondary">{selectedTemplate.complexity}</Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Selected Use Cases</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {selectedUseCases.length > 0 ? (
+                    <div className="space-y-2">
+                      {selectedUseCases.map(uc => (
+                        <Badge key={uc.id} variant="outline" className="mr-2">
+                          {uc.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground">No use cases selected</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Selected Requirements</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {selectedRequirements.length > 0 ? (
+                    <div className="space-y-2">
+                      {selectedRequirements.map(req => (
+                        <Badge key={req.id} variant="outline" className="mr-2">
+                          {req.title}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground">No requirements selected</p>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           </div>
         );
