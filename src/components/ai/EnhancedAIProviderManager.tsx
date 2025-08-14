@@ -73,7 +73,7 @@ interface TaskConfiguration {
   description: string;
   primaryProvider: AIProviderType;
   primaryModel: string;
-  fallbackProvider?: AIProviderType;
+  fallbackProvider?: AIProviderType | 'none';
   fallbackModel?: string;
   temperature: number;
   maxTokens: number;
@@ -894,17 +894,17 @@ const EnhancedAIProviderManager = () => {
                       <div className="space-y-2">
                         <Label>Fallback Provider</Label>
                         <Select 
-                          value={config.fallbackProvider || ''} 
+                          value={config.fallbackProvider || 'none'} 
                           onValueChange={(value) => updateTaskConfiguration(config.taskType, { 
-                            fallbackProvider: value as AIProviderType,
-                            fallbackModel: providers.find(p => p.type === value)?.models.find(m => m.isDefault)?.id || ''
+                            fallbackProvider: value === 'none' ? undefined : value as AIProviderType,
+                            fallbackModel: value === 'none' ? undefined : providers.find(p => p.type === value)?.models.find(m => m.isDefault)?.id || ''
                           })}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="None" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">None</SelectItem>
+                            <SelectItem value="none">None</SelectItem>
                             {activeProviders
                               .filter(p => p.type !== config.primaryProvider)
                               .map((provider) => (
@@ -922,14 +922,15 @@ const EnhancedAIProviderManager = () => {
                       <div className="space-y-2">
                         <Label>Fallback Model</Label>
                         <Select 
-                          value={config.fallbackModel || ''} 
-                          onValueChange={(value) => updateTaskConfiguration(config.taskType, { fallbackModel: value })}
-                          disabled={!config.fallbackProvider}
+                          value={config.fallbackModel || 'auto'} 
+                          onValueChange={(value) => updateTaskConfiguration(config.taskType, { fallbackModel: value === 'auto' ? undefined : value })}
+                          disabled={!config.fallbackProvider || config.fallbackProvider === 'none' || config.fallbackProvider === undefined}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Auto-select" />
                           </SelectTrigger>
                           <SelectContent>
+                            <SelectItem value="auto">Auto-select</SelectItem>
                             {fallbackProvider?.models.map((model) => (
                               <SelectItem key={model.id} value={model.id}>
                                 <div>
