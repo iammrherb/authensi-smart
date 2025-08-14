@@ -238,21 +238,7 @@ export class IntelligentStepTemplates {
       type: template.type,
       description: template.description,
       ai_powered: true,
-      decision_driven: true,
-      resource_integration: {
-        enabled: true,
-        resource_types: template.resource_types,
-        filtering_strategy: 'hybrid',
-        auto_selection_threshold: 0.8,
-        context_mapping: this.generateContextMappingForTemplate(template, context)
-      },
-      ai_context: {
-        system_prompt: this.interpolatePromptTemplate(template.ai_prompt_template, context),
-        context_variables: template.required_context,
-        decision_factors: template.decision_factors,
-        learning_objectives: template.outcomes,
-        output_format: 'structured'
-      }
+      decision_driven: true
     };
   }
 

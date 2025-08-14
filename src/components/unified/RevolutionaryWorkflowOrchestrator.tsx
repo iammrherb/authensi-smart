@@ -160,21 +160,22 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
     const step = steps[currentStep];
 
     switch (step.type) {
-      case 'data_collection':
+      case 'ai_data_collection':
         return renderDataCollectionStep(step);
-      case 'ai_recommendation':
+      case 'intelligent_discovery':
         return renderAIRecommendationStep(step);
-      case 'ai_processing':
+      case 'ai_analysis':
         return renderAIProcessingStep(step);
       case 'solution_generation':
-      case 'design':
         return renderDesignStep(step);
       case 'implementation_planning':
-      case 'planning':
         return renderPlanningStep(step);
       case 'validation_engine':
-      case 'validation':
         return renderValidationStep(step);
+      case 'decision_matrix':
+      case 'resource_selection':
+      case 'smart_configuration':
+      case 'predictive_assessment':
       default:
         return renderGenericStep(step);
     }

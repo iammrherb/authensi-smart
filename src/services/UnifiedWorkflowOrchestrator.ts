@@ -364,15 +364,11 @@ export class UnifiedWorkflowOrchestrator {
     
     // Update intelligent steps with new context
     this.context.intelligent_steps.forEach(step => {
-      if (step.ai_context) {
-        step.ai_context.context_variables.forEach(variable => {
-          if (inputs[variable]) {
-            step.ai_context!.system_prompt = step.ai_context!.system_prompt.replace(
-              `{${variable}}`, 
-              String(inputs[variable])
-            );
-          }
-        });
+      if (step.dynamic_content) {
+        step.dynamic_content.ai_generated_guidance = 
+          step.dynamic_content.ai_generated_guidance.replace(/\{(\w+)\}/g, (match, key) => 
+            inputs[key] ? String(inputs[key]) : match
+          );
       }
     });
   }
