@@ -12,6 +12,9 @@ interface AIRequest {
   provider?: 'openai' | 'claude' | 'gemini';
   temperature?: number;
   maxTokens?: number;
+  reasoningEffort?: 'minimal' | 'low' | 'medium' | 'high';
+  verbosity?: 'low' | 'medium' | 'high';
+  model?: string;
 }
 
 async function callOpenAI(request: AIRequest) {
@@ -20,14 +23,77 @@ async function callOpenAI(request: AIRequest) {
     throw new Error('OpenAI API key not configured');
   }
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${openAIApiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o',
+  // Determine if we're using GPT-5 models or legacy models
+  const model = request.model || 'gpt-5-2025-08-07';
+  const isGPT5Model = model.startsWith('gpt-5') || model.startsWith('o3') || model.startsWith('o4');
+  
+  // For GPT-5 models, use the Responses API for better performance
+  if (isGPT5Model) {
+    const requestBody: any = {
+      model: model,
+      input: `You are an expert network security engineer specializing in 802.1X, NAC, and enterprise network security. You have deep knowledge of Portnox NAC solutions and network infrastructure. Your expertise includes:
+
+- Enterprise 802.1X authentication and authorization
+- Network Access Control (NAC) implementations  
+- RADIUS server configuration and integration
+- Dynamic VLAN assignment and network segmentation
+- Security policy enforcement and compliance
+- Multi-vendor network equipment configuration
+- Troubleshooting network authentication issues
+- Industry best practices and security standards
+
+Always provide comprehensive, production-ready configurations that include:
+- Complete configuration commands
+- Security hardening measures
+- Best practices implementation
+- Detailed documentation and comments
+- Troubleshooting guides
+- Implementation procedures
+- Validation steps
+
+${request.context ? ` Context: ${request.context}` : ''}
+
+User Query: ${request.prompt}`,
+    };
+
+    // Add GPT-5 specific parameters
+    if (request.maxTokens) {
+      requestBody.max_completion_tokens = request.maxTokens;
+    }
+    
+    if (request.reasoningEffort) {
+      requestBody.reasoning = { effort: request.reasoningEffort };
+    }
+    
+    if (request.verbosity) {
+      requestBody.text = { verbosity: request.verbosity };
+    }
+
+    const response = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('OpenAI API error:', error);
+      throw new Error(`OpenAI API error: ${error.error?.message || 'Unknown error'}`);
+    }
+
+    const data = await response.json();
+    return {
+      content: data.choices?.[0]?.message?.content || data.output || '',
+      provider: 'openai' as const,
+      usage: data.usage
+    };
+  } else {
+    // Use Chat Completions API for legacy models
+    const requestBody: any = {
+      model: model,
       messages: [
         {
           role: 'system',
@@ -58,22 +124,37 @@ ${request.context ? ` Context: ${request.context}` : ''}`
           content: request.prompt
         }
       ],
-      temperature: request.temperature || 0.1,
-      max_tokens: request.maxTokens || 4000,
-    }),
-  });
+    };
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(`OpenAI API error: ${error.error?.message || 'Unknown error'}`);
+    // Legacy models support temperature and max_tokens
+    if (request.temperature !== undefined) {
+      requestBody.temperature = request.temperature;
+    }
+    if (request.maxTokens) {
+      requestBody.max_tokens = request.maxTokens;
+    }
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`OpenAI API error: ${error.error?.message || 'Unknown error'}`);
+    }
+
+    const data = await response.json();
+    return {
+      content: data.choices[0].message.content,
+      provider: 'openai' as const,
+      usage: data.usage
+    };
   }
-
-  const data = await response.json();
-  return {
-    content: data.choices[0].message.content,
-    provider: 'openai' as const,
-    usage: data.usage
-  };
 }
 
 async function callClaude(request: AIRequest) {

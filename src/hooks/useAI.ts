@@ -9,6 +9,9 @@ export interface AIRequest {
   provider?: AIProvider;
   temperature?: number;
   maxTokens?: number;
+  reasoningEffort?: 'minimal' | 'low' | 'medium' | 'high';
+  verbosity?: 'low' | 'medium' | 'high';
+  model?: string;
 }
 
 export interface AIResponse {
@@ -73,7 +76,9 @@ export const useAI = () => {
       prompt,
       context: 'project_summary',
       provider: 'openai',
-      temperature: 0.7
+      model: 'gpt-5-2025-08-07',
+      reasoningEffort: 'medium',
+      verbosity: 'medium'
     });
 
     return response?.content || null;
@@ -97,8 +102,10 @@ export const useAI = () => {
     const response = await generateCompletion({
       prompt,
       context: 'note_enhancement',
-      provider: 'claude',
-      temperature: 0.5
+      provider: 'openai',
+      model: 'gpt-5-mini-2025-08-07',
+      reasoningEffort: 'low',
+      verbosity: 'medium'
     });
 
     return response?.content || null;
@@ -128,8 +135,10 @@ export const useAI = () => {
     const response = await generateCompletion({
       prompt,
       context: 'project_recommendations',
-      provider: 'gemini',
-      temperature: 0.6
+      provider: 'openai',
+      model: 'gpt-5-2025-08-07',
+      reasoningEffort: 'high',
+      verbosity: 'high'
     });
 
     return response?.content || null;
@@ -159,7 +168,9 @@ export const useAI = () => {
       prompt,
       context: 'troubleshooting',
       provider: 'openai',
-      temperature: 0.3
+      model: 'gpt-5-2025-08-07',
+      reasoningEffort: 'high',
+      verbosity: 'medium'
     });
 
     return response?.content || null;

@@ -64,20 +64,18 @@ serve(async (req) => {
         throw new Error('Invalid documentation type');
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
-        messages: [
-          { role: 'system', content: systemContext },
-          { role: 'user', content: aiPrompt }
-        ],
-        temperature: 0.3,
-        max_tokens: 4000
+        model: 'gpt-5-2025-08-07',
+        input: `${systemContext}\n\nUser Query: ${aiPrompt}`,
+        max_completion_tokens: 4000,
+        reasoning: { effort: 'medium' },
+        text: { verbosity: 'high' }
       }),
     });
 
@@ -86,7 +84,7 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
+    const aiResponse = data.choices?.[0]?.message?.content || data.output || '';
 
     // Parse the AI response based on documentation type
     let result;
