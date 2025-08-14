@@ -8,7 +8,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
-import ConditionalLayout from "./components/layout/ConditionalLayout";
+import UnifiedLayout from "./components/layout/UnifiedLayout";
+import UnifiedCommandCenter from "./pages/UnifiedCommandCenter";
 
 // Page imports
 import Index from "./pages/Index";
@@ -56,17 +57,17 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <ConditionalLayout>
+          <UnifiedLayout>
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route path="/" element={
                 <ProtectedRoute>
-                  <CommandCenter />
+                  <UnifiedCommandCenter />
                 </ProtectedRoute>
               } />
               <Route path="/dashboard" element={
                 <ProtectedRoute>
-                  <CommandCenter />
+                  <UnifiedCommandCenter />
                 </ProtectedRoute>
               } />
               
@@ -248,7 +249,7 @@ const App = () => (
               
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </ConditionalLayout>
+          </UnifiedLayout>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
