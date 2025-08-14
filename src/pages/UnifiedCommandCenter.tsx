@@ -10,14 +10,21 @@ import {
   Users, Network, Settings, FileText
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import IntelligentProjectWizard from "@/components/comprehensive/IntelligentProjectWizard";
+import IntelligentProjectReports from "@/components/reports/IntelligentProjectReports";
 import AIAssistant from '@/components/ai/AIAssistant';
 import { useSites } from '@/hooks/useSites';
 import { useProjects } from '@/hooks/useProjects';
+import { useUnifiedProjects } from '@/hooks/useUnifiedProjectManagement';
+import { Button } from '@/components/ui/button';
 
 const UnifiedCommandCenter = () => {
   const [activeInsight, setActiveInsight] = useState(0);
+  const [showIntelligentWizard, setShowIntelligentWizard] = useState(false);
+  const [showReports, setShowReports] = useState(false);
   const { data: sites = [] } = useSites();
   const { data: projects = [] } = useProjects();
+  const { data: unifiedProjects = [] } = useUnifiedProjects();
 
   // Calculate key metrics
   const totalProjects = projects.length;
@@ -102,6 +109,17 @@ const UnifiedCommandCenter = () => {
           <p className="text-lg text-muted-foreground">
             AI-powered dashboard for comprehensive project management
           </p>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <Button size="lg" onClick={() => setShowIntelligentWizard(true)}>
+            <Brain className="w-5 h-5 mr-2" />
+            AI-Powered Project Wizard
+          </Button>
+          <Button size="lg" variant="outline" onClick={() => setShowReports(true)}>
+            <BarChart3 className="w-5 h-5 mr-2" />
+            Intelligent Reports
+          </Button>
         </div>
         
         <div className="flex items-center space-x-4">
@@ -321,6 +339,31 @@ const UnifiedCommandCenter = () => {
           </div>
         </CardContent>
       </EnhancedCard>
+
+      {/* Intelligent Project Wizard */}
+      {showIntelligentWizard && (
+        <div className="fixed inset-0 bg-background z-50 overflow-auto">
+          <IntelligentProjectWizard 
+            onComplete={() => setShowIntelligentWizard(false)}
+            onCancel={() => setShowIntelligentWizard(false)}
+          />
+        </div>
+      )}
+
+      {/* Intelligent Reports */}
+      {showReports && (
+        <div className="fixed inset-0 bg-background z-50 overflow-auto">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-2xl font-bold">Project Reports & Analytics</h1>
+              <Button variant="outline" onClick={() => setShowReports(false)}>
+                Close
+              </Button>
+            </div>
+            <IntelligentProjectReports />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

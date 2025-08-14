@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.12 (cd3cf9e)"
@@ -1611,6 +1611,71 @@ export type Database = {
           },
         ]
       }
+      project_phase_tracking: {
+        Row: {
+          actual_end: string | null
+          actual_start: string | null
+          blockers: Json | null
+          created_at: string | null
+          deliverables: Json | null
+          id: string
+          phase_name: string
+          phase_order: number
+          planned_end: string | null
+          planned_start: string | null
+          progress_percentage: number | null
+          project_id: string
+          resources_assigned: Json | null
+          status: string | null
+          tasks: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          actual_end?: string | null
+          actual_start?: string | null
+          blockers?: Json | null
+          created_at?: string | null
+          deliverables?: Json | null
+          id?: string
+          phase_name: string
+          phase_order: number
+          planned_end?: string | null
+          planned_start?: string | null
+          progress_percentage?: number | null
+          project_id: string
+          resources_assigned?: Json | null
+          status?: string | null
+          tasks?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          actual_end?: string | null
+          actual_start?: string | null
+          blockers?: Json | null
+          created_at?: string | null
+          deliverables?: Json | null
+          id?: string
+          phase_name?: string
+          phase_order?: number
+          planned_end?: string | null
+          planned_start?: string | null
+          progress_percentage?: number | null
+          project_id?: string
+          resources_assigned?: Json | null
+          status?: string | null
+          tasks?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_phase_tracking_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "unified_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_phases: {
         Row: {
           created_at: string | null
@@ -1715,6 +1780,56 @@ export type Database = {
             columns: ["requirement_id"]
             isOneToOne: false
             referencedRelation: "requirements_library"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_resources: {
+        Row: {
+          assigned_to: string | null
+          created_at: string | null
+          id: string
+          implementation_notes: string | null
+          implementation_status: string | null
+          metadata: Json | null
+          priority: string | null
+          project_id: string
+          resource_id: string
+          resource_type: string
+          target_date: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string | null
+          id?: string
+          implementation_notes?: string | null
+          implementation_status?: string | null
+          metadata?: Json | null
+          priority?: string | null
+          project_id: string
+          resource_id: string
+          resource_type: string
+          target_date?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string | null
+          id?: string
+          implementation_notes?: string | null
+          implementation_status?: string | null
+          metadata?: Json | null
+          priority?: string | null
+          project_id?: string
+          resource_id?: string
+          resource_type?: string
+          target_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_resources_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "unified_projects"
             referencedColumns: ["id"]
           },
         ]
@@ -3321,6 +3436,84 @@ export type Database = {
         }
         Relationships: []
       }
+      unified_projects: {
+        Row: {
+          ai_recommendations: Json | null
+          assigned_team: Json | null
+          authentication_requirements: Json | null
+          budget: string | null
+          compliance_frameworks: Json | null
+          created_at: string | null
+          created_by: string | null
+          deployment_type: string | null
+          description: string | null
+          existing_vendors: Json | null
+          id: string
+          implementation_checklist: Json | null
+          industry: string | null
+          name: string
+          next_milestone: string | null
+          organization_size: number | null
+          pain_points: Json | null
+          progress_percentage: number | null
+          risk_level: string | null
+          security_level: string | null
+          status: string | null
+          timeline: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          ai_recommendations?: Json | null
+          assigned_team?: Json | null
+          authentication_requirements?: Json | null
+          budget?: string | null
+          compliance_frameworks?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          deployment_type?: string | null
+          description?: string | null
+          existing_vendors?: Json | null
+          id?: string
+          implementation_checklist?: Json | null
+          industry?: string | null
+          name: string
+          next_milestone?: string | null
+          organization_size?: number | null
+          pain_points?: Json | null
+          progress_percentage?: number | null
+          risk_level?: string | null
+          security_level?: string | null
+          status?: string | null
+          timeline?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          ai_recommendations?: Json | null
+          assigned_team?: Json | null
+          authentication_requirements?: Json | null
+          budget?: string | null
+          compliance_frameworks?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          deployment_type?: string | null
+          description?: string | null
+          existing_vendors?: Json | null
+          id?: string
+          implementation_checklist?: Json | null
+          industry?: string | null
+          name?: string
+          next_milestone?: string | null
+          organization_size?: number | null
+          pain_points?: Json | null
+          progress_percentage?: number | null
+          risk_level?: string | null
+          security_level?: string | null
+          status?: string | null
+          timeline?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       use_case_library: {
         Row: {
           associated_projects: Json | null
@@ -3946,7 +4139,7 @@ export type Database = {
     }
     Functions: {
       can_manage_roles: {
-        Args: { _user_id: string; _scope_type?: string; _scope_id?: string }
+        Args: { _scope_id?: string; _scope_type?: string; _user_id: string }
         Returns: boolean
       }
       create_initial_admin: {
@@ -3956,12 +4149,12 @@ export type Database = {
       create_user_safely: {
         Args: {
           p_email: string
-          p_password?: string
           p_first_name?: string
           p_last_name?: string
+          p_password?: string
           p_role?: Database["public"]["Enums"]["app_role"]
-          p_scope_type?: string
           p_scope_id?: string
+          p_scope_type?: string
           p_send_invitation?: boolean
         }
         Returns: Json
@@ -3976,14 +4169,14 @@ export type Database = {
       }
       enable_two_factor_auth: {
         Args: {
-          p_user_id: string
           p_secret: string
+          p_user_id: string
           p_verification_code: string
         }
         Returns: boolean
       }
       enforce_2fa_for_user: {
-        Args: { p_user_id: string; p_deadline?: string; p_immediate?: boolean }
+        Args: { p_deadline?: string; p_immediate?: boolean; p_user_id: string }
         Returns: boolean
       }
       get_current_user_email: {
@@ -3996,25 +4189,25 @@ export type Database = {
       }
       has_permission: {
         Args: {
-          user_id: string
-          resource: Database["public"]["Enums"]["resource_type"]
           permission: Database["public"]["Enums"]["permission_type"]
-          scope_type?: string
+          resource: Database["public"]["Enums"]["resource_type"]
           scope_id?: string
+          scope_type?: string
+          user_id: string
         }
         Returns: boolean
       }
       has_role: {
         Args: {
-          _user_id: string
           _role: Database["public"]["Enums"]["app_role"]
-          _scope_type?: string
           _scope_id?: string
+          _scope_type?: string
+          _user_id: string
         }
         Returns: boolean
       }
       log_security_event: {
-        Args: { _event_type: string; _event_details?: Json; _user_id?: string }
+        Args: { _event_details?: Json; _event_type: string; _user_id?: string }
         Returns: undefined
       }
       request_password_reset: {
@@ -4030,7 +4223,7 @@ export type Database = {
         Returns: Json
       }
       toggle_user_block: {
-        Args: { p_user_id: string; p_block?: boolean }
+        Args: { p_block?: boolean; p_user_id: string }
         Returns: Json
       }
       update_2fa_enforcement: {
@@ -4054,7 +4247,7 @@ export type Database = {
         Returns: boolean
       }
       verify_totp_code: {
-        Args: { p_user_id: string; p_code: string }
+        Args: { p_code: string; p_user_id: string }
         Returns: boolean
       }
     }

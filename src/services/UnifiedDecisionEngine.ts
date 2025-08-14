@@ -92,7 +92,7 @@ export class UnifiedDecisionEngine {
       if (industry) {
         // Recommend compliance frameworks for industry
         const industryCompliance = resourceData.complianceFrameworks.filter(cf => 
-          cf.industry_specific?.includes(context.industry)
+          cf.industry_specific && Array.isArray(cf.industry_specific) && cf.industry_specific.includes(context.industry)
         );
         
         industryCompliance.forEach(framework => {
@@ -109,7 +109,7 @@ export class UnifiedDecisionEngine {
 
         // Recommend industry-specific use cases
         const industryUseCases = resourceData.useCases.filter(uc => 
-          uc.compliance_frameworks?.some(cf => industryCompliance.map(ic => ic.name).includes(cf))
+          uc.compliance_frameworks && Array.isArray(uc.compliance_frameworks) && uc.compliance_frameworks.some(cf => industryCompliance.map(ic => ic.name).includes(cf))
         );
         
         industryUseCases.forEach(useCase => {
@@ -131,10 +131,9 @@ export class UnifiedDecisionEngine {
       if (context.organizationSize > 1000) {
         // Enterprise recommendations
         const enterpriseUseCases = resourceData.useCases.filter(uc => 
-          uc.technical_requirements?.some(req => 
-            req.toString().toLowerCase().includes('enterprise') ||
-            req.toString().toLowerCase().includes('scale')
-          )
+            uc.technical_requirements && Array.isArray(uc.technical_requirements) && uc.technical_requirements.some(req => 
+              typeof req === 'string' && (req.toLowerCase().includes('enterprise') || req.toLowerCase().includes('scale'))
+            )
         );
         
         enterpriseUseCases.forEach(useCase => {
@@ -164,8 +163,10 @@ export class UnifiedDecisionEngine {
               // Recommend compatible vendors and integration methods
               const compatibleVendors = resourceData.vendors.filter(v => 
                 v.category !== vendor.category &&
-                v.integration_methods?.some(method => 
-                  vendor.integration_methods?.includes(method)
+                v.integration_methods && Array.isArray(v.integration_methods) &&
+                vendor.integration_methods && Array.isArray(vendor.integration_methods) &&
+                v.integration_methods.some(method => 
+                  Array.isArray(vendor.integration_methods) && vendor.integration_methods.includes(method)
                 )
               );
               
@@ -183,8 +184,8 @@ export class UnifiedDecisionEngine {
 
               // Recommend use cases supported by this vendor
               const vendorUseCases = resourceData.useCases.filter(uc => 
-                uc.supported_vendors?.some(sv => 
-                  sv.toString().toLowerCase().includes(vendorName.toLowerCase())
+                uc.supported_vendors && Array.isArray(uc.supported_vendors) && uc.supported_vendors.some(sv => 
+                  typeof sv === 'string' && sv.toLowerCase().includes(vendorName.toLowerCase())
                 )
               );
               
@@ -213,9 +214,8 @@ export class UnifiedDecisionEngine {
         );
         
         if (framework) {
-          // Recommend requirements for this compliance framework
           const complianceRequirements = resourceData.requirements.filter(req => 
-            req.compliance_frameworks?.includes(frameworkName)
+            req.compliance_frameworks && Array.isArray(req.compliance_frameworks) && req.compliance_frameworks.includes(frameworkName)
           );
           
           complianceRequirements.forEach(requirement => {
@@ -224,16 +224,15 @@ export class UnifiedDecisionEngine {
               id: requirement.id,
               title: requirement.title,
               description: requirement.description || '',
-              priority: requirement.priority,
+              priority: requirement.priority as 'critical' | 'high' | 'medium' | 'low',
               reasoning: `Required for ${frameworkName} compliance`,
               metadata: requirement
             });
           });
 
-          // Recommend authentication methods for compliance
           const complianceAuthMethods = resourceData.authenticationMethods.filter(am => 
-            framework.requirements?.some(req => 
-              req.toString().toLowerCase().includes(am.method_type.toLowerCase())
+            framework.requirements && Array.isArray(framework.requirements) && framework.requirements.some(req => 
+              typeof req === 'string' && req.toLowerCase().includes(am.method_type.toLowerCase())
             )
           );
           
@@ -396,6 +395,18 @@ export class UnifiedDecisionEngine {
     }
 
     // Phase 3: Testing & Validation
+    let configTasks: any[] = [];
+    vendorRecommendations.forEach(vendor => {
+      configTasks.push({
+        id: `config-${vendor.id}`,
+        title: `Configure ${vendor.title}`,
+        description: `Set up and configure ${vendor.title} according to requirements`,
+        estimatedHours: vendor.metadata.configuration_complexity === 'high' ? 16 : 8,
+        prerequisites: ['resource-allocation'],
+        deliverables: [`${vendor.title} configuration document`]
+      });
+    });
+
     checklist.push({
       phase: 'Testing & Validation',
       tasks: [
