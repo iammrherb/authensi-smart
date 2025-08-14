@@ -286,7 +286,7 @@ export class IntelligentStepOrchestrator {
           .select('*')
           .eq('is_active', true);
           
-        if (!error && data) {
+        if (data) {
           this.resourceLibrary.set(resourceType, data);
         }
       } catch (error) {

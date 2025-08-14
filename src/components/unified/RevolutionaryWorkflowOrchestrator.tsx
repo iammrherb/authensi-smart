@@ -28,6 +28,7 @@ import {
   Settings
 } from 'lucide-react';
 import { UnifiedWorkflowOrchestrator, WorkflowContext, WorkflowStep, AIInsight, ResourceMapping } from '@/services/UnifiedWorkflowOrchestrator';
+import { IntelligentStep } from '@/services/IntelligentStepOrchestrator';
 import { useIndustryOptions, useComplianceFrameworks, useDeploymentTypes } from '@/hooks/useResourceLibrary';
 
 interface RevolutionaryWorkflowOrchestratorProps {
@@ -43,7 +44,7 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
 }) => {
   const [orchestrator, setOrchestrator] = useState<UnifiedWorkflowOrchestrator | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
-  const [steps, setSteps] = useState<WorkflowStep[]>([]);
+  const [steps, setSteps] = useState<IntelligentStep[]>([]);
   const [context, setContext] = useState<WorkflowContext | null>(null);
   const [userInputs, setUserInputs] = useState<Record<string, any>>({});
   const [aiInsights, setAiInsights] = useState<AIInsight[]>([]);
@@ -165,10 +166,13 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
         return renderAIRecommendationStep(step);
       case 'ai_processing':
         return renderAIProcessingStep(step);
+      case 'solution_generation':
       case 'design':
         return renderDesignStep(step);
+      case 'implementation_planning':
       case 'planning':
         return renderPlanningStep(step);
+      case 'validation_engine':
       case 'validation':
         return renderValidationStep(step);
       default:
@@ -176,7 +180,7 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
     }
   };
 
-  const renderDataCollectionStep = (step: WorkflowStep) => (
+  const renderDataCollectionStep = (step: IntelligentStep) => (
     <div className="space-y-6">
       <div className="text-center mb-6">
         <FileText className="h-12 w-12 mx-auto mb-4 text-primary" />
@@ -275,7 +279,7 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
     </div>
   );
 
-  const renderAIRecommendationStep = (step: WorkflowStep) => (
+  const renderAIRecommendationStep = (step: IntelligentStep) => (
     <div className="space-y-6">
       <div className="text-center mb-6">
         <Brain className="h-12 w-12 mx-auto mb-4 text-primary" />
@@ -348,7 +352,7 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
     </div>
   );
 
-  const renderAIProcessingStep = (step: WorkflowStep) => (
+  const renderAIProcessingStep = (step: IntelligentStep) => (
     <div className="space-y-6">
       <div className="text-center mb-6">
         <Brain className="h-12 w-12 mx-auto mb-4 text-primary animate-pulse" />
@@ -414,7 +418,7 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
     </div>
   );
 
-  const renderDesignStep = (step: WorkflowStep) => (
+  const renderDesignStep = (step: IntelligentStep) => (
     <div className="space-y-6">
       <div className="text-center mb-6">
         <Layers className="h-12 w-12 mx-auto mb-4 text-primary" />
@@ -432,7 +436,7 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
     </div>
   );
 
-  const renderPlanningStep = (step: WorkflowStep) => (
+  const renderPlanningStep = (step: IntelligentStep) => (
     <div className="space-y-6">
       <div className="text-center mb-6">
         <Settings className="h-12 w-12 mx-auto mb-4 text-primary" />
@@ -444,7 +448,7 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
     </div>
   );
 
-  const renderValidationStep = (step: WorkflowStep) => (
+  const renderValidationStep = (step: IntelligentStep) => (
     <div className="space-y-6">
       <div className="text-center mb-6">
         <CheckCircle className="h-12 w-12 mx-auto mb-4 text-primary" />
@@ -456,7 +460,7 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
     </div>
   );
 
-  const renderGenericStep = (step: WorkflowStep) => (
+  const renderGenericStep = (step: IntelligentStep) => (
     <div className="space-y-6">
       <div className="text-center mb-6">
         <div className="h-12 w-12 mx-auto mb-4 bg-primary/20 rounded-full flex items-center justify-center">

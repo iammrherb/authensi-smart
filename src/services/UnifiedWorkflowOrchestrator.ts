@@ -2,6 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { IntelligentStepOrchestrator, IntelligentStep, StepType, ResourceType } from './IntelligentStepOrchestrator';
 import { IntelligentStepTemplates } from './IntelligentStepTemplates';
 
+
 // Core Workflow Context Interface - Enhanced for AI and Resource Library Integration
 export interface WorkflowContext {
   project_id?: string;
@@ -307,13 +308,28 @@ export class UnifiedWorkflowOrchestrator {
     // Execute the intelligent step to get insights
     const executionResult = await this.aiOrchestrator.processStepExecution(step, userInputs);
     
-    // Convert execution insights to AI insights
+    // Convert execution insights to AI insights with proper type mapping
     if (executionResult.insights) {
-      this.context.ai_insights.push(...executionResult.insights);
+      const convertedInsights: AIInsight[] = executionResult.insights.map(insight => ({
+        id: `insight_${insight.id}`,
+        type: insight.type,
+        title: insight.title,
+        description: insight.description,
+        confidence_score: insight.confidence_score,
+        action_required: insight.action_required,
+        resource_references: insight.resource_references,
+        impact_assessment: {
+          timeline: this.mapTimelineImpact(insight.impact_assessment?.timeline),
+          cost: this.mapCostImpact(insight.impact_assessment?.cost),
+          complexity: this.mapComplexityImpact(insight.impact_assessment?.complexity),
+          risk: insight.impact_assessment?.risk || 'medium'
+        }
+      }));
+      this.context.ai_insights.push(...convertedInsights);
     }
   }
 
-  private async generateContextualInsights(): Promise<void> {
+  private generateContextualInsights(): Promise<void> {
     // Generate AI insights based on current context and intelligent steps
     const insights: AIInsight[] = [];
     
@@ -329,10 +345,10 @@ export class UnifiedWorkflowOrchestrator {
             action_required: recommendation.type === 'warning',
             resource_references: recommendation.resource_references,
             impact_assessment: {
-              timeline: recommendation.impact.timeline === 'positive' ? 'low' : 'high',
-              cost: recommendation.impact.cost === 'reduce' ? 'low' : 'high',
-              complexity: recommendation.impact.complexity === 'simplify' ? 'low' : 'high',
-              risk: recommendation.impact.risk || (recommendation.impact.security === 'improve' ? 'low' : 'high')
+              timeline: this.mapTimelineImpact(recommendation.impact?.timeline),
+              cost: this.mapCostImpact(recommendation.impact?.cost),
+              complexity: this.mapComplexityImpact(recommendation.impact?.complexity),
+              risk: recommendation.impact?.risk || 'medium'
             }
           });
         }
@@ -340,6 +356,7 @@ export class UnifiedWorkflowOrchestrator {
     }
     
     this.context.ai_insights.push(...insights);
+    return Promise.resolve();
   }
 
   private updateContextData(inputs: Record<string, any>): void {
@@ -359,7 +376,34 @@ export class UnifiedWorkflowOrchestrator {
       }
     });
   }
+  
+  // Helper methods for impact assessment mapping
+  private mapTimelineImpact(timeline?: string): 'low' | 'medium' | 'high' {
+    switch (timeline) {
+      case 'positive': return 'low';
+      case 'neutral': return 'medium';
+      case 'negative': return 'high';
+      default: return 'medium';
+    }
+  }
 
+  private mapCostImpact(cost?: string): 'low' | 'medium' | 'high' {
+    switch (cost) {
+      case 'reduce': return 'low';
+      case 'neutral': return 'medium';
+      case 'increase': return 'high';
+      default: return 'medium';
+    }
+  }
+
+  private mapComplexityImpact(complexity?: string): 'low' | 'medium' | 'high' {
+    switch (complexity) {
+      case 'simplify': return 'low';
+      case 'neutral': return 'medium';
+      case 'complicate': return 'high';
+      default: return 'medium';
+    }
+  }
   private async updateResourceMappings(): Promise<void> {
     const newMappings = await this.generateResourceRecommendations();
     this.context.resource_library_mappings = newMappings;
