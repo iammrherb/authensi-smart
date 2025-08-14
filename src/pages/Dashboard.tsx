@@ -13,6 +13,7 @@ import AIAssistant from "@/components/ai/AIAssistant";
 import SmartProjectInsights from "@/components/ai/SmartProjectInsights";
 import { useSites } from "@/hooks/useSites";
 import { useProjects } from "@/hooks/useProjects";
+import { RealtimeDashboardStats } from "@/components/dashboard/RealtimeDashboardStats";
 
 const Dashboard = () => {
   const { data: sites = [] } = useSites();
@@ -68,6 +69,8 @@ const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
+            {/* Real-time Dashboard Stats */}
+            <RealtimeDashboardStats />
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

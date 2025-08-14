@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useRealtimeUpdates } from './useRealtimeUpdates';
 
 export interface ScopingSessionRow {
   id: string;
@@ -15,6 +16,8 @@ export interface ScopingSessionRow {
 }
 
 export const useScopingSessions = () => {
+  useRealtimeUpdates(); // Enable real-time updates
+  
   return useQuery({
     queryKey: ["scoping-sessions"],
     queryFn: async () => {

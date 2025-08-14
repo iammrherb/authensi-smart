@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useRealtimeUpdates } from './useRealtimeUpdates';
 
 export interface Site {
   id: string;
@@ -48,6 +49,8 @@ export interface Site {
 }
 
 export const useSites = () => {
+  useRealtimeUpdates(); // Enable real-time updates
+  
   return useQuery({
     queryKey: ['sites'],
     queryFn: async () => {
