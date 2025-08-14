@@ -398,6 +398,7 @@ export class UnifiedWorkflowOrchestrator {
         context_data: this.context.context_data,
         ai_insights: this.context.ai_insights,
         resource_mappings: this.context.resource_library_mappings,
+        created_by: (await supabase.auth.getUser()).data.user?.id,
         updated_at: new Date().toISOString()
       });
     
