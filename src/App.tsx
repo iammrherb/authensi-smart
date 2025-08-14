@@ -45,6 +45,7 @@ import AIConfigCenter from "./pages/AIConfigCenter";
 import UltimateWizard from "./pages/UltimateWizard";
 import Portnox from "./pages/Portnox";
 import ComprehensiveImplementationHub from "./pages/ComprehensiveImplementationHub";
+import UnifiedProjectTrackingCenter from "./pages/UnifiedProjectTrackingCenter";
 
 const queryClient = new QueryClient();
 
@@ -103,7 +104,19 @@ const App = () => (
                 </ProtectedRoute>
               } />
               
-              {/* Implementation Hub */}
+              {/* Unified Project Tracking Center */}
+              <Route path="/tracking" element={
+                <ProtectedRoute>
+                  <UnifiedProjectTrackingCenter />
+                </ProtectedRoute>
+              } />
+              <Route path="/tracking/project/:projectId" element={
+                <ProtectedRoute>
+                  <UnifiedProjectTrackingCenter />
+                </ProtectedRoute>
+              } />
+              
+              {/* Legacy Implementation Hub */}
               <Route path="/implementation" element={
                 <ProtectedRoute>
                   <ComprehensiveImplementationHub />
