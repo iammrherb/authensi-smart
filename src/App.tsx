@@ -42,7 +42,7 @@ import UnifiedResourceCenter from "./pages/UnifiedResourceCenter";
 import ProjectCreation from "./pages/ProjectCreation";
 import UnifiedProjectHub from "./pages/UnifiedProjectHub";
 import OneXerWizardPage from "./pages/OneXerWizard";
-import AIConfigCenter from "./pages/AIConfigCenter";
+import SmartConfigCenter from "./pages/SmartConfigCenter";
 import UltimateWizard from "./pages/UltimateWizard";
 import Portnox from "./pages/Portnox";
 import ComprehensiveImplementationHub from "./pages/ComprehensiveImplementationHub";
@@ -157,7 +157,7 @@ const App = () => (
               {/* AI Configuration Center */}
               <Route path="/ai-config" element={
                 <ProtectedRoute>
-                  <AIConfigCenter />
+                  <SmartConfigCenter />
                 </ProtectedRoute>
               } />
               <Route path="/onexer-wizard" element={

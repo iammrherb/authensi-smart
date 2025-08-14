@@ -58,7 +58,7 @@ const UnifiedCommandCenter = () => {
       gradient: "button"
     },
     {
-      title: "AI Config Generator",
+      title: "Smart Config Generator",
       description: "OneXer intelligent 802.1X configuration",
       icon: <Settings className="h-8 w-8" />,
       href: "/ai-config",

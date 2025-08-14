@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AIScopingDialog from '@/components/scoping/AIScopingDialog';
+import SmartScopingDialog from '@/components/scoping/SmartScopingDialog';
 import EnhancedAIScopingWizard from '@/components/scoping/EnhancedAIScopingWizard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

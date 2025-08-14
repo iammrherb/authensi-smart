@@ -36,7 +36,7 @@ export function UnifiedHeader() {
     if (path.startsWith('/users')) return 'User Management';
     if (path.startsWith('/settings')) return 'Settings';
     if (path.startsWith('/wizard')) return 'Smart Wizard';
-    if (path.startsWith('/ai-config')) return 'AI Config Generator';
+    if (path.startsWith('/ai-config')) return 'Smart Config Generator';
     return 'NAC Intelligence Hub';
   };
 

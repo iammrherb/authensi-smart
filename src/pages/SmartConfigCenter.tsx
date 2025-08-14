@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Brain, Settings, FileText, Sparkles, Zap, Target } from "lucide-react";
 
-const AIConfigCenter = () => {
+const SmartConfigCenter = () => {
   const [activeTab, setActiveTab] = useState("wizard");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -40,14 +40,14 @@ const AIConfigCenter = () => {
               </div>
               
               <h1 className="text-4xl md:text-6xl font-bold mb-4">
-                AI Config
+                Smart Config
                 <span className="bg-gradient-primary bg-clip-text text-transparent block">
-                  Gen1Xer Hub
+                  Generator Hub
                 </span>
               </h1>
               
               <p className="text-lg text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-                Revolutionary AI-powered 802.1X configuration generation. Create, manage, and deploy 
+                Revolutionary Smart-powered 802.1X configuration generation. Create, manage, and deploy 
                 enterprise-grade network access control configurations with intelligent automation, 
                 best practices, and seamless integration across your entire infrastructure.
               </p>
@@ -55,8 +55,8 @@ const AIConfigCenter = () => {
               {/* Quick Stats */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 max-w-2xl mx-auto">
                 <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-primary">AI-Powered</div>
-                  <div className="text-sm text-muted-foreground">Smart Generation</div>
+                  <div className="text-2xl font-bold text-primary">Smart-Powered</div>
+                  <div className="text-sm text-muted-foreground">Intelligent Generation</div>
                 </div>
                 <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
                   <div className="text-2xl font-bold text-primary">Enterprise</div>
@@ -86,7 +86,7 @@ const AIConfigCenter = () => {
             </TabsTrigger>
             <TabsTrigger value="ai-generator" className="flex items-center gap-2">
               <Sparkles className="h-4 w-4" />
-              AI Generator
+              Smart Generator
             </TabsTrigger>
           </TabsList>
 
@@ -98,7 +98,7 @@ const AIConfigCenter = () => {
                   <CardTitle className="text-2xl">Intelligent Configuration Wizard</CardTitle>
                 </div>
                 <CardDescription className="text-base">
-                  Step-by-step guided configuration with AI-powered recommendations
+                  Step-by-step guided configuration with Smart-powered recommendations
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -132,10 +132,10 @@ const AIConfigCenter = () => {
               <CardHeader className="text-center">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <Zap className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-2xl">AI Configuration Generator</CardTitle>
+                  <CardTitle className="text-2xl">Smart Configuration Generator</CardTitle>
                 </div>
                 <CardDescription className="text-base">
-                  Advanced AI-powered configuration generation with custom requirements
+                  Advanced Smart-powered configuration generation with custom requirements
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -149,4 +149,4 @@ const AIConfigCenter = () => {
   );
 };
 
-export default AIConfigCenter;
+export default SmartConfigCenter;

@@ -6,7 +6,7 @@ import { Brain, Save, FileDown, FolderPlus, ArrowRight } from 'lucide-react';
 import UltimateAIScopingWizard from './UltimateAIScopingWizard';
 import { useToast } from '@/hooks/use-toast';
 
-interface AIScopingDialogProps {
+interface SmartScopingDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onCreateProject?: (scopingData: any) => void;
@@ -20,7 +20,7 @@ interface ScopingSession {
   completedAt?: string;
 }
 
-const AIScopingDialog: React.FC<AIScopingDialogProps> = ({
+const SmartScopingDialog: React.FC<SmartScopingDialogProps> = ({
   isOpen,
   onClose,
   onCreateProject
@@ -216,4 +216,4 @@ const AIScopingDialog: React.FC<AIScopingDialogProps> = ({
   );
 };
 
-export default AIScopingDialog;
+export default SmartScopingDialog;
