@@ -141,27 +141,14 @@ const ResourceLibraryIntegration: React.FC<ResourceLibraryIntegrationProps> = ({
           industry: formData.industry || 'General',
           deployment_type: formData.deployment_type || 'hybrid',
           security_level: formData.security_level || 'standard',
-          complexity: formData.complexity || 'medium',
-          estimated_duration: formData.estimated_duration || '8-12 weeks',
-          sites_supported: formData.sites_supported || '1-10',
-          template_data: {
-            use_cases: formData.use_cases || [],
-            requirements: formData.requirements || [],
-            vendor_configurations: formData.vendor_configurations || [],
-            timeline_template: formData.timeline_template || {},
-            deployment_phases: formData.deployment_phases || [],
-            success_criteria: formData.success_criteria || [],
-            risk_factors: formData.risk_factors || [],
-            automation_level: formData.automation_level || 'manual',
-            compliance_frameworks: formData.compliance_frameworks || []
-          },
-          metadata: {
-            usage_count: 0,
-            success_rate: 0,
-            tags: formData.tags || []
-          },
-          is_active: true,
-          is_validated: false
+          use_cases: formData.use_cases || [],
+          requirements: formData.requirements || [],
+          vendor_configurations: formData.vendor_configurations || [],
+          timeline_template: formData.timeline_template || {},
+          authentication_workflows: formData.authentication_workflows || [],
+          compliance_frameworks: formData.compliance_frameworks || [],
+          network_requirements: formData.network_requirements || {},
+          test_cases: formData.test_cases || []
         });
       }
       setIsCreateDialogOpen(false);

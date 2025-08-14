@@ -494,7 +494,7 @@ const IntelligentProjectCreationWizard = () => {
                   <p className="text-sm text-muted-foreground">{selectedTemplate.description}</p>
                   <div className="flex gap-2 mt-2">
                     <Badge>{selectedTemplate.industry}</Badge>
-                    <Badge variant="secondary">{selectedTemplate.complexity}</Badge>
+                    <Badge variant="secondary">{selectedTemplate.security_level}</Badge>
                   </div>
                 </CardContent>
               </Card>

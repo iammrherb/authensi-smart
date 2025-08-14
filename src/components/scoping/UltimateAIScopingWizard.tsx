@@ -402,7 +402,7 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
     }));
   }, []);
 
-  const handleLibraryUseCaseSelect = useCallback((useCase: UseCase) => {
+  const handleLibraryUseCaseSelect = useCallback((useCase: LibraryUseCase) => {
     setResourceIntegrationData(prev => ({
       ...prev,
       selectedUseCases: prev.selectedUseCases.some(uc => uc.id === useCase.id)

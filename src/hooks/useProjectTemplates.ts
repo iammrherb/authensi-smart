@@ -6,37 +6,17 @@ export interface ProjectTemplate {
   id: string;
   name: string;
   description?: string;
-  industry: string;
+  industry?: string;
   deployment_type: string;
   security_level: string;
-  complexity: 'low' | 'medium' | 'high';
-  estimated_duration: string;
-  sites_supported: string;
-  template_data: {
-    use_cases: string[];
-    requirements: string[];
-    vendor_configurations: string[];
-    timeline_template: Record<string, string>;
-    deployment_phases: Array<{
-      name: string;
-      duration: string;
-      deliverables: string[];
-    }>;
-    success_criteria: string[];
-    risk_factors: string[];
-    automation_level: string;
-    compliance_frameworks: string[];
-  };
-  metadata: {
-    usage_count: number;
-    success_rate: number;
-    last_used?: string;
-    created_by?: string;
-    tags: string[];
-  };
-  is_active: boolean;
-  is_validated: boolean;
-  validation_notes?: string;
+  authentication_workflows?: any;
+  compliance_frameworks?: string[];
+  network_requirements?: any;
+  requirements?: any;
+  test_cases?: any;
+  timeline_template?: any;
+  use_cases?: any;
+  vendor_configurations?: any;
   created_at: string;
   updated_at: string;
   created_by?: string;
@@ -49,7 +29,6 @@ export const useProjectTemplates = () => {
       const { data, error } = await supabase
         .from('project_templates')
         .select('*')
-        .eq('is_active', true)
         .order('name', { ascending: true });
       
       if (error) throw error;
@@ -185,8 +164,7 @@ export const useProjectTemplatesByIndustry = (industry?: string) => {
     queryFn: async () => {
       let query = supabase
         .from('project_templates')
-        .select('*')
-        .eq('is_active', true);
+        .select('*');
 
       if (industry) {
         query = query.eq('industry', industry);
@@ -206,12 +184,9 @@ export const useProjectTemplatesByComplexity = (complexity?: string) => {
     queryFn: async () => {
       let query = supabase
         .from('project_templates')
-        .select('*')
-        .eq('is_active', true);
+        .select('*');
 
-      if (complexity) {
-        query = query.eq('complexity', complexity);
-      }
+      // Note: complexity filtering removed as column doesn't exist in current schema
 
       const { data, error } = await query.order('name', { ascending: true });
       
@@ -268,26 +243,11 @@ export const useIncrementTemplateUsage = () => {
 
   return useMutation({
     mutationFn: async (templateId: string) => {
-      // Get current template to increment usage count
-      const { data: template, error: fetchError } = await supabase
-        .from('project_templates')
-        .select('metadata')
-        .eq('id', templateId)
-        .maybeSingle();
-
-      if (fetchError) throw fetchError;
-      if (!template) throw new Error('Template not found');
-
-      const currentMetadata = template.metadata || { usage_count: 0, success_rate: 0, tags: [] };
-      const updatedMetadata = {
-        ...currentMetadata,
-        usage_count: (currentMetadata.usage_count || 0) + 1,
-        last_used: new Date().toISOString(),
-      };
-
+      // Note: Usage tracking would need a separate table since metadata column doesn't exist
+      // For now, just update the updated_at timestamp to show activity
       const { data, error } = await supabase
         .from('project_templates')
-        .update({ metadata: updatedMetadata })
+        .update({ updated_at: new Date().toISOString() })
         .eq('id', templateId)
         .select()
         .maybeSingle();
