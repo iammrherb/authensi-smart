@@ -579,7 +579,8 @@ export class IntelligentTrackingEngine {
   }
 
   private async saveTrackingContext(): Promise<void> {
-    const { error } = await supabase
+    // Save tracking context to database - using any type for now until types are regenerated
+    const { error } = await (supabase as any)
       .from('tracking_sessions')
       .upsert({
         session_id: this.context.tracking_session_id,

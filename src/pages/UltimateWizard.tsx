@@ -1,18 +1,23 @@
 import React, { useEffect } from "react";
-import UltimateIntelligentWizard from "@/components/wizard/UltimateIntelligentWizard";
+import RevolutionaryWorkflowOrchestrator from "@/components/unified/RevolutionaryWorkflowOrchestrator";
 
 const UltimateWizard: React.FC = () => {
   useEffect(() => {
-    document.title = "Ultimate Intelligent Wizard | Unified Scoping & Config";
+    document.title = "Revolutionary Workflow Orchestrator | AI-Driven Project Management";
     const meta = document.querySelector('meta[name="description"]');
-    const content = "Unified wizard for project creation, sites, AI scoping, and 802.1X config generation";
+    const content = "AI-powered workflow orchestrator for intelligent project genesis, site creation, and implementation tracking";
     if (meta) meta.setAttribute('content', content);
   }, []);
 
   return (
     <main className="min-h-screen bg-background">
       <section className="container mx-auto px-6 py-8">
-        <UltimateIntelligentWizard />
+        <RevolutionaryWorkflowOrchestrator 
+          workflowType="project_genesis"
+          onComplete={(result) => {
+            console.log('Workflow completed:', result);
+          }}
+        />
       </section>
     </main>
   );

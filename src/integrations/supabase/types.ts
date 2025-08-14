@@ -3436,6 +3436,39 @@ export type Database = {
         }
         Relationships: []
       }
+      tracking_sessions: {
+        Row: {
+          context_data: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          implementation_type: string
+          project_id: string
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          context_data?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          implementation_type: string
+          project_id: string
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          context_data?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          implementation_type?: string
+          project_id?: string
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       unified_projects: {
         Row: {
           ai_recommendations: Json | null
@@ -4130,6 +4163,45 @@ export type Database = {
           updated_at?: string | null
           vendor_type?: string
           website_url?: string | null
+        }
+        Relationships: []
+      }
+      workflow_sessions: {
+        Row: {
+          ai_insights: Json
+          context_data: Json
+          created_at: string
+          created_by: string | null
+          current_step: number
+          id: string
+          resource_mappings: Json
+          session_id: string
+          updated_at: string
+          workflow_type: string
+        }
+        Insert: {
+          ai_insights?: Json
+          context_data?: Json
+          created_at?: string
+          created_by?: string | null
+          current_step?: number
+          id?: string
+          resource_mappings?: Json
+          session_id: string
+          updated_at?: string
+          workflow_type: string
+        }
+        Update: {
+          ai_insights?: Json
+          context_data?: Json
+          created_at?: string
+          created_by?: string | null
+          current_step?: number
+          id?: string
+          resource_mappings?: Json
+          session_id?: string
+          updated_at?: string
+          workflow_type?: string
         }
         Relationships: []
       }

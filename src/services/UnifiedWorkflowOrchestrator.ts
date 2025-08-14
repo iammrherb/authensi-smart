@@ -281,30 +281,30 @@ export class UnifiedWorkflowOrchestrator {
   private getWorkflowSteps(workflowType: WorkflowContext['workflow_type']): WorkflowStep[] {
     const stepTemplates = {
       project_genesis: [
-        { id: 'project_basics', title: 'Project Foundation', type: 'data_collection' },
-        { id: 'resource_discovery', title: 'Resource Library Integration', type: 'ai_recommendation' },
-        { id: 'context_analysis', title: 'AI Context Analysis', type: 'ai_processing' },
-        { id: 'solution_design', title: 'Solution Architecture', type: 'design' },
-        { id: 'implementation_planning', title: 'Implementation Strategy', type: 'planning' },
-        { id: 'validation', title: 'Validation & Approval', type: 'validation' }
+        { id: 'project_basics', title: 'Project Foundation', type: 'data_collection' as const },
+        { id: 'resource_discovery', title: 'Resource Library Integration', type: 'ai_recommendation' as const },
+        { id: 'context_analysis', title: 'AI Context Analysis', type: 'ai_processing' as const },
+        { id: 'solution_design', title: 'Solution Architecture', type: 'design' as const },
+        { id: 'implementation_planning', title: 'Implementation Strategy', type: 'planning' as const },
+        { id: 'validation', title: 'Validation & Approval', type: 'validation' as const }
       ],
       site_creation: [
-        { id: 'site_basics', title: 'Site Information', type: 'data_collection' },
-        { id: 'infrastructure_analysis', title: 'Infrastructure Assessment', type: 'analysis' },
-        { id: 'deployment_planning', title: 'Deployment Planning', type: 'planning' },
-        { id: 'checklist_generation', title: 'Implementation Checklist', type: 'generation' }
+        { id: 'site_basics', title: 'Site Information', type: 'data_collection' as const },
+        { id: 'infrastructure_analysis', title: 'Infrastructure Assessment', type: 'analysis' as const },
+        { id: 'deployment_planning', title: 'Deployment Planning', type: 'planning' as const },
+        { id: 'checklist_generation', title: 'Implementation Checklist', type: 'generation' as const }
       ],
       implementation_planning: [
-        { id: 'scope_definition', title: 'Scope Definition', type: 'scoping' },
-        { id: 'resource_allocation', title: 'Resource Allocation', type: 'planning' },
-        { id: 'timeline_creation', title: 'Timeline & Milestones', type: 'scheduling' },
-        { id: 'risk_assessment', title: 'Risk Assessment', type: 'analysis' }
+        { id: 'scope_definition', title: 'Scope Definition', type: 'scoping' as const },
+        { id: 'resource_allocation', title: 'Resource Allocation', type: 'planning' as const },
+        { id: 'timeline_creation', title: 'Timeline & Milestones', type: 'scheduling' as const },
+        { id: 'risk_assessment', title: 'Risk Assessment', type: 'analysis' as const }
       ],
       deployment_tracking: [
-        { id: 'progress_monitoring', title: 'Progress Monitoring', type: 'tracking' },
-        { id: 'milestone_tracking', title: 'Milestone Tracking', type: 'tracking' },
-        { id: 'quality_assurance', title: 'Quality Assurance', type: 'validation' },
-        { id: 'completion_verification', title: 'Completion Verification', type: 'verification' }
+        { id: 'progress_monitoring', title: 'Progress Monitoring', type: 'tracking' as const },
+        { id: 'milestone_tracking', title: 'Milestone Tracking', type: 'tracking' as const },
+        { id: 'quality_assurance', title: 'Quality Assurance', type: 'validation' as const },
+        { id: 'completion_verification', title: 'Completion Verification', type: 'verification' as const }
       ]
     };
 
@@ -388,8 +388,8 @@ export class UnifiedWorkflowOrchestrator {
   }
 
   private async saveContext(): Promise<void> {
-    // Save workflow context to database
-    const { error } = await supabase
+    // Save workflow context to database - using any type for now until types are regenerated
+    const { error } = await (supabase as any)
       .from('workflow_sessions')
       .upsert({
         session_id: this.context.session_id,
