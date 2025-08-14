@@ -44,6 +44,7 @@ import OneXerWizardPage from "./pages/OneXerWizard";
 import AIConfigCenter from "./pages/AIConfigCenter";
 import UltimateWizard from "./pages/UltimateWizard";
 import Portnox from "./pages/Portnox";
+import ComprehensiveImplementationHub from "./pages/ComprehensiveImplementationHub";
 
 const queryClient = new QueryClient();
 
@@ -99,6 +100,18 @@ const App = () => (
               <Route path="/tracker" element={
                 <ProtectedRoute>
                   <UnifiedProjectHub />
+                </ProtectedRoute>
+              } />
+              
+              {/* Implementation Hub */}
+              <Route path="/implementation" element={
+                <ProtectedRoute>
+                  <ComprehensiveImplementationHub />
+                </ProtectedRoute>
+              } />
+              <Route path="/implementation-tracker" element={
+                <ProtectedRoute>
+                  <ComprehensiveImplementationHub />
                 </ProtectedRoute>
               } />
               <Route path="/project/:projectId/tracking" element={
