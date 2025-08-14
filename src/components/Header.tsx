@@ -30,7 +30,6 @@ const Header = () => {
   const secondaryNavItems = [
     { title: "Resource Library", url: "/resource-library", icon: FolderOpen, active: ["/resource-library"], description: "Resource Library" },
     { title: "Use Cases", url: "/use-cases", icon: BookOpen, active: ["/use-cases"], description: "Knowledge Library" },
-    { title: "Sites", url: "/sites", icon: Building2, active: ["/sites"], description: "Network Sites" },
     { title: "Requirements", url: "/requirements", icon: FileText, active: ["/requirements"], description: "Project Requirements" },
     { title: "Vendors", url: "/vendors", icon: Network, active: ["/vendors"], description: "Vendor Management" },
   ];
