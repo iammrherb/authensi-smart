@@ -1,6 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
+import { IntelligentStepOrchestrator, IntelligentStep, StepType, ResourceType } from './IntelligentStepOrchestrator';
+import { IntelligentStepTemplates } from './IntelligentStepTemplates';
 
-// Core Workflow Context Interface
+// Core Workflow Context Interface - Enhanced for AI and Resource Library Integration
 export interface WorkflowContext {
   project_id?: string;
   session_id: string;
@@ -12,6 +14,8 @@ export interface WorkflowContext {
   resource_library_mappings: ResourceMapping[];
   decision_tree_state: DecisionState;
   progression_rules: ProgressionRule[];
+  intelligent_steps: IntelligentStep[]; // New: AI-powered steps
+  ai_orchestrator: IntelligentStepOrchestrator; // New: AI orchestrator
 }
 
 export interface AIInsight {
@@ -77,61 +81,81 @@ export interface CompletionCriteria {
   minimum_confidence?: number;
 }
 
-// Main Workflow Orchestrator Class
+// Main Workflow Orchestrator Class - Enhanced with Intelligent Steps
 export class UnifiedWorkflowOrchestrator {
   private context: WorkflowContext;
   private resourceLibrary: ResourceLibraryCache;
+  private aiOrchestrator: IntelligentStepOrchestrator;
   
   constructor(workflowType: WorkflowContext['workflow_type'], existingContext?: Partial<WorkflowContext>) {
+    this.aiOrchestrator = new IntelligentStepOrchestrator();
+    
     this.context = {
       session_id: existingContext?.session_id || this.generateSessionId(),
       current_step: existingContext?.current_step || 0,
-      total_steps: this.getWorkflowSteps(workflowType).length,
+      total_steps: 0, // Will be set after generating intelligent steps
       workflow_type: workflowType,
       context_data: existingContext?.context_data || {},
       ai_insights: existingContext?.ai_insights || [],
       resource_library_mappings: existingContext?.resource_library_mappings || [],
       decision_tree_state: existingContext?.decision_tree_state || this.initializeDecisionState(),
       progression_rules: this.getProgressionRules(workflowType),
+      intelligent_steps: [], // Will be populated with AI-powered steps
+      ai_orchestrator: this.aiOrchestrator,
       ...existingContext
     };
     
     this.resourceLibrary = new ResourceLibraryCache();
   }
 
-  // Initialize workflow with AI-driven step generation
-  async initializeWorkflow(): Promise<WorkflowStep[]> {
+  // Initialize workflow with AI-driven intelligent steps
+  async initializeWorkflow(): Promise<IntelligentStep[]> {
     await this.resourceLibrary.initialize();
+    await this.aiOrchestrator.initializeResourceLibrary();
     
-    const steps = this.getWorkflowSteps(this.context.workflow_type);
+    // Generate AI-powered intelligent steps from templates
+    this.context.intelligent_steps = await this.generateIntelligentSteps();
+    this.context.total_steps = this.context.intelligent_steps.length;
     
-    // AI-enhance each step based on context
-    for (const step of steps) {
-      await this.enhanceStepWithAI(step);
-    }
-    
-    // Generate initial AI insights
+    // Generate initial AI insights with full Resource Library context
     await this.generateContextualInsights();
     
-    return steps;
+    // Save initial context
+    await this.saveContext();
+    
+    return this.context.intelligent_steps;
   }
 
-  // Dynamic step progression with AI guidance
-  async advanceToStep(stepIndex: number, userInputs?: Record<string, any>): Promise<WorkflowStep> {
+  // Generate intelligent steps from templates
+  async generateIntelligentSteps(): Promise<IntelligentStep[]> {
+    const templates = IntelligentStepTemplates.getTemplatesForWorkflow(this.context.workflow_type);
+    const intelligentSteps: IntelligentStep[] = [];
+    
+    for (const template of templates) {
+      const stepConfig = IntelligentStepTemplates.createStepFromTemplate(template, this.context.context_data);
+      const intelligentStep = await this.aiOrchestrator.createIntelligentStep(stepConfig, this.context.context_data);
+      intelligentSteps.push(intelligentStep);
+    }
+    
+    return intelligentSteps;
+  }
+
+  // Dynamic step progression with AI guidance for intelligent steps
+  async advanceToStep(stepIndex: number, userInputs?: Record<string, any>): Promise<IntelligentStep> {
     if (userInputs) {
       this.updateContextData(userInputs);
     }
 
-    // Validate current step completion
-    const canAdvance = await this.validateStepCompletion(this.context.current_step);
+    // Validate current step completion using intelligent validation
+    const canAdvance = await this.validateIntelligentStepCompletion(this.context.current_step, userInputs || {});
     if (!canAdvance) {
       throw new Error('Current step requirements not met');
     }
 
     this.context.current_step = stepIndex;
     
-    // Generate AI insights for new step
-    await this.generateStepSpecificInsights(stepIndex);
+    // Generate AI insights for new step using intelligent orchestrator
+    await this.generateStepSpecificInsights(stepIndex, userInputs || {});
     
     // Update resource mappings based on new context
     await this.updateResourceMappings();
@@ -139,135 +163,93 @@ export class UnifiedWorkflowOrchestrator {
     // Save context to database
     await this.saveContext();
     
-    return this.getCurrentStep();
+    return this.getCurrentIntelligentStep();
   }
 
-  // AI-powered resource recommendation engine
+  // AI-powered resource recommendation engine - enhanced
   async generateResourceRecommendations(): Promise<ResourceMapping[]> {
-    const context = this.context.context_data;
-    const currentStep = this.getCurrentStep();
+    const currentStep = this.getCurrentIntelligentStep();
     
-    // Fetch relevant resources from library
-    const industryOptions = await this.resourceLibrary.getIndustryOptions();
-    const complianceFrameworks = await this.resourceLibrary.getComplianceFrameworks();
-    const deploymentTypes = await this.resourceLibrary.getDeploymentTypes();
-    const useCases = await this.resourceLibrary.getUseCases();
-    const requirements = await this.resourceLibrary.getRequirements();
-
-    const recommendations: ResourceMapping[] = [];
-
-    // AI-driven matching logic
-    if (context.industry) {
-      const industryMatch = industryOptions.find(opt => 
-        opt.name.toLowerCase().includes(context.industry.toLowerCase())
-      );
-      if (industryMatch) {
-        recommendations.push({
-          resource_type: 'industry_option',
-          resource_id: industryMatch.id,
-          relevance_score: 0.95,
-          auto_selected: true,
-          user_confirmed: false,
-          ai_reasoning: `Exact match for specified industry: ${context.industry}`
-        });
-      }
+    if (!currentStep || !currentStep.resource_mappings) {
+      return [];
     }
+    
+    // Use the intelligent step's pre-generated resource mappings
+    // and enhance them with additional context
+    const enhancedMappings = currentStep.resource_mappings.map(mapping => ({
+      resource_type: this.mapResourceTypeToLegacy(mapping.resource_type),
+      resource_id: mapping.resource_id,
+      relevance_score: mapping.relevance_score,
+      auto_selected: mapping.auto_selected,
+      user_confirmed: mapping.user_confirmed,
+      ai_reasoning: mapping.ai_reasoning
+    }));
 
-    // Compliance framework recommendations
-    if (context.compliance_requirements) {
-      for (const framework of complianceFrameworks) {
-        const score = this.calculateComplianceRelevance(framework, context);
-        if (score > 0.7) {
-          recommendations.push({
-            resource_type: 'compliance_framework',
-            resource_id: framework.id,
-            relevance_score: score,
-            auto_selected: score > 0.85,
-            user_confirmed: false,
-            ai_reasoning: `High relevance based on compliance requirements analysis`
-          });
-        }
-      }
-    }
-
-    // Use case recommendations based on pain points and goals
-    if (context.pain_points || context.primary_goals) {
-      for (const useCase of useCases) {
-        const score = this.calculateUseCaseRelevance(useCase, context);
-        if (score > 0.6) {
-          recommendations.push({
-            resource_type: 'use_case',
-            resource_id: useCase.id,
-            relevance_score: score,
-            auto_selected: score > 0.8,
-            user_confirmed: false,
-            ai_reasoning: `Matches identified goals and pain points`
-          });
-        }
-      }
-    }
-
-    this.context.resource_library_mappings = recommendations;
-    return recommendations;
+    this.context.resource_library_mappings = enhancedMappings;
+    return enhancedMappings;
   }
 
-  // Smart checklist generation based on context
+  // Smart checklist generation based on intelligent steps
   async generateImplementationChecklist(): Promise<ChecklistItem[]> {
-    const context = this.context.context_data;
-    const mappings = this.context.resource_library_mappings;
-    
     const checklist: ChecklistItem[] = [];
     
-    // Pre-deployment phase
-    checklist.push(...await this.generatePreDeploymentChecklist(context, mappings));
-    
-    // Deployment phase
-    checklist.push(...await this.generateDeploymentChecklist(context, mappings));
-    
-    // Post-deployment phase
-    checklist.push(...await this.generatePostDeploymentChecklist(context, mappings));
-    
-    // Implementation tracking phase
-    checklist.push(...await this.generateImplementationTrackingChecklist(context, mappings));
+    for (const step of this.context.intelligent_steps) {
+      if (step.ai_recommendations) {
+        for (const recommendation of step.ai_recommendations) {
+          for (const actionItem of recommendation.action_items || []) {
+            checklist.push({
+              id: actionItem.id,
+              title: actionItem.description,
+              description: `Generated from ${step.title}: ${recommendation.description}`,
+              phase: this.mapStepTypeToPhase(step.type),
+              priority: actionItem.priority,
+              estimated_duration: actionItem.estimated_effort,
+              dependencies: actionItem.dependencies,
+              ai_generated: true,
+              resource_references: actionItem.resource_requirements,
+              status: 'not_started'
+            });
+          }
+        }
+      }
+    }
     
     return checklist;
   }
 
-  // Predictive analytics and insights
+  // Predictive analytics and insights - enhanced with intelligent steps
   async generatePredictiveInsights(): Promise<PredictiveInsight[]> {
     const insights: PredictiveInsight[] = [];
     
-    // Timeline prediction
+    // Aggregate insights from all intelligent steps
+    for (const step of this.context.intelligent_steps) {
+      if (step.dynamic_content?.risk_assessments) {
+        for (const risk of step.dynamic_content.risk_assessments) {
+          insights.push({
+            type: 'risk_assessment',
+            title: `Risk Assessment: ${risk.description}`,
+            prediction: {
+              risk_level: risk.risk_level,
+              mitigation_strategies: risk.mitigation_strategies,
+              affected_resources: risk.affected_resources
+            },
+            confidence: 0.85,
+            factors: ['AI Analysis', 'Resource Library', 'Historical Data'],
+            recommendations: risk.mitigation_strategies
+          });
+        }
+      }
+    }
+    
+    // Add general timeline prediction
     const timelinePrediction = await this.predictProjectTimeline();
     insights.push({
       type: 'timeline_prediction',
-      title: 'Project Timeline Forecast',
+      title: 'Intelligent Timeline Forecast',
       prediction: timelinePrediction,
-      confidence: 0.85,
-      factors: ['Organization size', 'Complexity level', 'Historical data'],
-      recommendations: ['Consider phased approach', 'Allocate buffer time for integration']
-    });
-    
-    // Risk assessment
-    const riskAssessment = await this.assessProjectRisks();
-    insights.push({
-      type: 'risk_assessment',
-      title: 'Risk Analysis',
-      prediction: riskAssessment,
-      confidence: 0.78,
-      factors: ['Industry type', 'Compliance requirements', 'Technical complexity'],
-      recommendations: ['Implement risk mitigation strategies', 'Regular checkpoint reviews']
-    });
-    
-    // Resource optimization
-    const resourceOptimization = await this.optimizeResourceAllocation();
-    insights.push({
-      type: 'resource_optimization',
-      title: 'Resource Allocation Optimization',
-      prediction: resourceOptimization,
-      confidence: 0.82,
-      factors: ['Team expertise', 'Project scope', 'Timeline constraints'],
-      recommendations: ['Consider additional training', 'Optimize team allocation']
+      confidence: 0.90,
+      factors: ['AI Step Analysis', 'Resource Optimization', 'Complexity Assessment'],
+      recommendations: ['Follow AI-recommended path', 'Monitor step completion rates']
     });
     
     return insights;
@@ -276,39 +258,6 @@ export class UnifiedWorkflowOrchestrator {
   // Private helper methods
   private generateSessionId(): string {
     return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  private getWorkflowSteps(workflowType: WorkflowContext['workflow_type']): WorkflowStep[] {
-    const stepTemplates = {
-      project_genesis: [
-        { id: 'project_basics', title: 'Project Foundation', type: 'data_collection' as const },
-        { id: 'resource_discovery', title: 'Resource Library Integration', type: 'ai_recommendation' as const },
-        { id: 'context_analysis', title: 'AI Context Analysis', type: 'ai_processing' as const },
-        { id: 'solution_design', title: 'Solution Architecture', type: 'design' as const },
-        { id: 'implementation_planning', title: 'Implementation Strategy', type: 'planning' as const },
-        { id: 'validation', title: 'Validation & Approval', type: 'validation' as const }
-      ],
-      site_creation: [
-        { id: 'site_basics', title: 'Site Information', type: 'data_collection' as const },
-        { id: 'infrastructure_analysis', title: 'Infrastructure Assessment', type: 'analysis' as const },
-        { id: 'deployment_planning', title: 'Deployment Planning', type: 'planning' as const },
-        { id: 'checklist_generation', title: 'Implementation Checklist', type: 'generation' as const }
-      ],
-      implementation_planning: [
-        { id: 'scope_definition', title: 'Scope Definition', type: 'scoping' as const },
-        { id: 'resource_allocation', title: 'Resource Allocation', type: 'planning' as const },
-        { id: 'timeline_creation', title: 'Timeline & Milestones', type: 'scheduling' as const },
-        { id: 'risk_assessment', title: 'Risk Assessment', type: 'analysis' as const }
-      ],
-      deployment_tracking: [
-        { id: 'progress_monitoring', title: 'Progress Monitoring', type: 'tracking' as const },
-        { id: 'milestone_tracking', title: 'Milestone Tracking', type: 'tracking' as const },
-        { id: 'quality_assurance', title: 'Quality Assurance', type: 'validation' as const },
-        { id: 'completion_verification', title: 'Completion Verification', type: 'verification' as const }
-      ]
-    };
-
-    return stepTemplates[workflowType] || [];
   }
 
   private initializeDecisionState(): DecisionState {
@@ -321,14 +270,15 @@ export class UnifiedWorkflowOrchestrator {
   }
 
   private getProgressionRules(workflowType: WorkflowContext['workflow_type']): ProgressionRule[] {
-    // Define progression rules based on workflow type
+    // Enhanced progression rules for intelligent steps
     return [
       {
-        step_id: 'project_basics',
+        step_id: 'business_context_discovery',
         completion_criteria: [
-          { type: 'required_data', field_name: 'project_name' },
           { type: 'required_data', field_name: 'industry' },
-          { type: 'required_data', field_name: 'organization_size' }
+          { type: 'required_data', field_name: 'organization_size' },
+          { type: 'ai_validation', minimum_confidence: 0.8 },
+          { type: 'resource_selection' }
         ],
         auto_advancement: false,
         validation_required: true,
@@ -337,49 +287,77 @@ export class UnifiedWorkflowOrchestrator {
     ];
   }
 
-  private async enhanceStepWithAI(step: WorkflowStep): Promise<void> {
-    // AI enhancement logic for each step
-    step.ai_enhanced = true;
-    step.dynamic_content = await this.generateDynamicContent(step);
-    step.guidance = await this.generateStepGuidance(step);
+  private async validateIntelligentStepCompletion(stepIndex: number, userInputs: Record<string, any>): Promise<boolean> {
+    const step = this.context.intelligent_steps[stepIndex];
+    if (!step) return true;
+    
+    // Use the intelligent step orchestrator for validation
+    const executionResult = await this.aiOrchestrator.processStepExecution(step, userInputs);
+    return executionResult.success;
+  }
+
+  private getCurrentIntelligentStep(): IntelligentStep {
+    return this.context.intelligent_steps[this.context.current_step] || this.context.intelligent_steps[0];
+  }
+
+  private async generateStepSpecificInsights(stepIndex: number, userInputs: Record<string, any>): Promise<void> {
+    const step = this.context.intelligent_steps[stepIndex];
+    if (!step) return;
+    
+    // Execute the intelligent step to get insights
+    const executionResult = await this.aiOrchestrator.processStepExecution(step, userInputs);
+    
+    // Convert execution insights to AI insights
+    if (executionResult.insights) {
+      this.context.ai_insights.push(...executionResult.insights);
+    }
   }
 
   private async generateContextualInsights(): Promise<void> {
-    // Generate AI insights based on current context
-    const insights = await this.analyzeContext();
-    this.context.ai_insights.push(...insights);
-  }
-
-  private async generateStepSpecificInsights(stepIndex: number): Promise<void> {
-    // Generate insights specific to the current step
-    const step = this.getWorkflowSteps(this.context.workflow_type)[stepIndex];
-    const insights = await this.analyzeStepContext(step);
+    // Generate AI insights based on current context and intelligent steps
+    const insights: AIInsight[] = [];
+    
+    for (const step of this.context.intelligent_steps) {
+      if (step.ai_recommendations) {
+        for (const recommendation of step.ai_recommendations) {
+          insights.push({
+            id: `insight_${recommendation.id}`,
+            type: recommendation.type as any,
+            title: recommendation.title,
+            description: recommendation.description,
+            confidence_score: recommendation.confidence,
+            action_required: recommendation.type === 'warning',
+            resource_references: recommendation.resource_references,
+            impact_assessment: {
+              timeline: recommendation.impact.timeline === 'positive' ? 'low' : 'high',
+              cost: recommendation.impact.cost === 'reduce' ? 'low' : 'high',
+              complexity: recommendation.impact.complexity === 'simplify' ? 'low' : 'high',
+              risk: recommendation.impact.risk || (recommendation.impact.security === 'improve' ? 'low' : 'high')
+            }
+          });
+        }
+      }
+    }
+    
     this.context.ai_insights.push(...insights);
   }
 
   private updateContextData(inputs: Record<string, any>): void {
     this.context.context_data = { ...this.context.context_data, ...inputs };
-  }
-
-  private async validateStepCompletion(stepIndex: number): Promise<boolean> {
-    const rules = this.context.progression_rules.find(rule => 
-      rule.step_id === this.getWorkflowSteps(this.context.workflow_type)[stepIndex]?.id
-    );
     
-    if (!rules) return true;
-    
-    for (const criteria of rules.completion_criteria) {
-      if (!await this.validateCriteria(criteria)) {
-        return false;
+    // Update intelligent steps with new context
+    this.context.intelligent_steps.forEach(step => {
+      if (step.ai_context) {
+        step.ai_context.context_variables.forEach(variable => {
+          if (inputs[variable]) {
+            step.ai_context!.system_prompt = step.ai_context!.system_prompt.replace(
+              `{${variable}}`, 
+              String(inputs[variable])
+            );
+          }
+        });
       }
-    }
-    
-    return true;
-  }
-
-  private getCurrentStep(): WorkflowStep {
-    const steps = this.getWorkflowSteps(this.context.workflow_type);
-    return steps[this.context.current_step] || steps[0];
+    });
   }
 
   private async updateResourceMappings(): Promise<void> {
@@ -388,7 +366,7 @@ export class UnifiedWorkflowOrchestrator {
   }
 
   private async saveContext(): Promise<void> {
-    // Save workflow context to database - using any type for now until types are regenerated
+    // Save workflow context to database
     const { error } = await (supabase as any)
       .from('workflow_sessions')
       .upsert({
@@ -405,133 +383,46 @@ export class UnifiedWorkflowOrchestrator {
     if (error) throw error;
   }
 
-  private calculateComplianceRelevance(framework: any, context: any): number {
-    // AI logic to calculate compliance framework relevance
-    let score = 0;
+  private mapResourceTypeToLegacy(resourceType: ResourceType): 'industry_option' | 'compliance_framework' | 'deployment_type' | 'use_case' | 'requirement' {
+    const mapping: Record<ResourceType, 'industry_option' | 'compliance_framework' | 'deployment_type' | 'use_case' | 'requirement'> = {
+      'industry_options': 'industry_option',
+      'compliance_frameworks': 'compliance_framework',
+      'deployment_types': 'deployment_type',
+      'business_domains': 'use_case',
+      'network_segments': 'requirement',
+      'authentication_methods': 'requirement',
+      'device_types': 'requirement',
+      'pain_points_library': 'requirement',
+      'use_cases': 'use_case',
+      'requirements': 'requirement'
+    };
     
-    if (framework.industry_specific?.includes(context.industry)) {
-      score += 0.3;
-    }
-    
-    if (context.compliance_requirements) {
-      const matches = framework.requirements?.filter((req: string) =>
-        context.compliance_requirements.some((ctxReq: string) =>
-          req.toLowerCase().includes(ctxReq.toLowerCase())
-        )
-      ).length || 0;
-      score += Math.min(matches * 0.2, 0.6);
-    }
-    
-    return Math.min(score, 1.0);
+    return mapping[resourceType] || 'requirement';
   }
 
-  private calculateUseCaseRelevance(useCase: any, context: any): number {
-    // AI logic to calculate use case relevance
-    let score = 0;
+  private mapStepTypeToPhase(stepType: StepType): 'pre_deployment' | 'deployment' | 'post_deployment' | 'implementation_tracking' {
+    const mapping: Record<StepType, 'pre_deployment' | 'deployment' | 'post_deployment' | 'implementation_tracking'> = {
+      'ai_data_collection': 'pre_deployment',
+      'intelligent_discovery': 'pre_deployment',
+      'decision_matrix': 'pre_deployment',
+      'resource_selection': 'pre_deployment',
+      'ai_analysis': 'deployment',
+      'solution_generation': 'deployment',
+      'validation_engine': 'post_deployment',
+      'implementation_planning': 'deployment',
+      'smart_configuration': 'deployment',
+      'predictive_assessment': 'implementation_tracking'
+    };
     
-    if (context.primary_goals) {
-      const goalMatches = useCase.business_value?.filter((value: string) =>
-        context.primary_goals.some((goal: string) =>
-          value.toLowerCase().includes(goal.toLowerCase())
-        )
-      ).length || 0;
-      score += Math.min(goalMatches * 0.25, 0.7);
-    }
-    
-    if (context.pain_points) {
-      const painMatches = useCase.addresses_pain_points?.filter((pain: string) =>
-        context.pain_points.some((ctxPain: string) =>
-          pain.toLowerCase().includes(ctxPain.toLowerCase())
-        )
-      ).length || 0;
-      score += Math.min(painMatches * 0.2, 0.5);
-    }
-    
-    return Math.min(score, 1.0);
+    return mapping[stepType] || 'deployment';
   }
 
-  // Additional helper methods for checklist generation
-  private async generatePreDeploymentChecklist(context: any, mappings: ResourceMapping[]): Promise<ChecklistItem[]> {
-    return [
-      {
-        id: 'network_assessment',
-        title: 'Network Infrastructure Assessment',
-        description: 'Complete comprehensive network infrastructure assessment',
-        phase: 'pre_deployment',
-        priority: 'high',
-        estimated_duration: '2-3 days',
-        dependencies: [],
-        ai_generated: true,
-        resource_references: mappings.filter(m => m.resource_type === 'requirement').map(m => m.resource_id)
-      },
-      {
-        id: 'security_baseline',
-        title: 'Establish Security Baseline',
-        description: 'Document current security posture and establish baseline metrics',
-        phase: 'pre_deployment',
-        priority: 'high',
-        estimated_duration: '1-2 days',
-        dependencies: ['network_assessment'],
-        ai_generated: true,
-        resource_references: []
-      }
-    ];
-  }
-
-  private async generateDeploymentChecklist(context: any, mappings: ResourceMapping[]): Promise<ChecklistItem[]> {
-    return [
-      {
-        id: 'pilot_deployment',
-        title: 'Pilot Environment Deployment',
-        description: 'Deploy NAC solution in controlled pilot environment',
-        phase: 'deployment',
-        priority: 'high',
-        estimated_duration: '3-5 days',
-        dependencies: ['network_assessment', 'security_baseline'],
-        ai_generated: true,
-        resource_references: []
-      }
-    ];
-  }
-
-  private async generatePostDeploymentChecklist(context: any, mappings: ResourceMapping[]): Promise<ChecklistItem[]> {
-    return [
-      {
-        id: 'validation_testing',
-        title: 'Comprehensive Validation Testing',
-        description: 'Execute complete validation test suite',
-        phase: 'post_deployment',
-        priority: 'high',
-        estimated_duration: '2-4 days',
-        dependencies: ['pilot_deployment'],
-        ai_generated: true,
-        resource_references: []
-      }
-    ];
-  }
-
-  private async generateImplementationTrackingChecklist(context: any, mappings: ResourceMapping[]): Promise<ChecklistItem[]> {
-    return [
-      {
-        id: 'progress_monitoring',
-        title: 'Implementation Progress Monitoring',
-        description: 'Establish ongoing progress monitoring and reporting',
-        phase: 'implementation_tracking',
-        priority: 'medium',
-        estimated_duration: 'ongoing',
-        dependencies: ['validation_testing'],
-        ai_generated: true,
-        resource_references: []
-      }
-    ];
-  }
-
-  // Predictive methods
   private async predictProjectTimeline(): Promise<any> {
     const context = this.context.context_data;
+    const intelligentStepsCount = this.context.intelligent_steps.length;
     
-    // AI-based timeline prediction logic
-    let baselineWeeks = 12; // Default timeline
+    // AI-based timeline prediction using intelligent steps
+    let baselineWeeks = intelligentStepsCount * 2; // 2 weeks per intelligent step baseline
     
     if (context.organization_size?.includes('Enterprise')) {
       baselineWeeks += 8;
@@ -546,99 +437,17 @@ export class UnifiedWorkflowOrchestrator {
     return {
       estimated_weeks: baselineWeeks,
       confidence_range: [baselineWeeks * 0.8, baselineWeeks * 1.3],
-      critical_path_items: ['Network Assessment', 'Pilot Deployment', 'Full Rollout']
+      critical_path_items: this.context.intelligent_steps.map(step => step.title),
+      ai_optimization_factor: 0.15 // 15% improvement from AI assistance
     };
-  }
-
-  private async assessProjectRisks(): Promise<any> {
-    const context = this.context.context_data;
-    const risks = [];
-    
-    if (context.industry === 'Healthcare') {
-      risks.push({
-        category: 'Compliance',
-        description: 'HIPAA compliance requirements may extend timeline',
-        probability: 'medium',
-        impact: 'high'
-      });
-    }
-    
-    if (context.organization_size?.includes('Enterprise')) {
-      risks.push({
-        category: 'Complexity',
-        description: 'Large-scale deployment complexity',
-        probability: 'high',
-        impact: 'medium'
-      });
-    }
-    
-    return {
-      overall_risk_level: 'medium',
-      identified_risks: risks,
-      mitigation_strategies: ['Phased rollout', 'Dedicated compliance review', 'Regular stakeholder communication']
-    };
-  }
-
-  private async optimizeResourceAllocation(): Promise<any> {
-    return {
-      recommended_team_size: 5,
-      key_roles: ['Network Architect', 'Security Specialist', 'Implementation Engineer', 'Project Manager'],
-      allocation_strategy: 'Front-loaded planning with scaled implementation team',
-      efficiency_score: 0.85
-    };
-  }
-
-  // Validation and analysis methods
-  private async validateCriteria(criteria: CompletionCriteria): Promise<boolean> {
-    switch (criteria.type) {
-      case 'required_data':
-        return !!this.context.context_data[criteria.field_name!];
-      case 'user_confirmation':
-        return true; // Assume user has confirmed
-      case 'ai_validation':
-        return await this.performAIValidation(criteria);
-      case 'resource_selection':
-        return this.context.resource_library_mappings.some(m => m.user_confirmed);
-      default:
-        return true;
-    }
-  }
-
-  private async performAIValidation(criteria: CompletionCriteria): Promise<boolean> {
-    // AI validation logic
-    return true;
-  }
-
-  private async generateDynamicContent(step: WorkflowStep): Promise<any> {
-    // Generate dynamic content for the step
-    return {
-      recommendations: [],
-      guidance: '',
-      examples: []
-    };
-  }
-
-  private async generateStepGuidance(step: WorkflowStep): Promise<string> {
-    // Generate AI-powered guidance for the step
-    return `AI-generated guidance for ${step.title}`;
-  }
-
-  private async analyzeContext(): Promise<AIInsight[]> {
-    // Analyze current context and generate insights
-    return [];
-  }
-
-  private async analyzeStepContext(step: WorkflowStep): Promise<AIInsight[]> {
-    // Analyze step-specific context
-    return [];
   }
 }
 
-// Supporting interfaces and classes
+// Legacy WorkflowStep interface for backward compatibility
 export interface WorkflowStep {
   id: string;
   title: string;
-  type: 'data_collection' | 'ai_recommendation' | 'ai_processing' | 'design' | 'planning' | 'validation' | 'analysis' | 'generation' | 'scoping' | 'scheduling' | 'tracking' | 'verification';
+  type: 'data_collection' | 'ai_recommendation' | 'ai_processing' | 'design' | 'planning' | 'validation';
   description?: string;
   ai_enhanced?: boolean;
   dynamic_content?: any;
@@ -648,6 +457,7 @@ export interface WorkflowStep {
   dependencies?: string[];
 }
 
+// Supporting interfaces
 export interface ChecklistItem {
   id: string;
   title: string;
