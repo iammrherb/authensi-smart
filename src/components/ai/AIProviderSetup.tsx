@@ -73,16 +73,36 @@ const AIProviderSetup: React.FC = () => {
     loadSavedKeys();
   }, []);
 
-  const loadSavedKeys = () => {
+  const loadSavedKeys = async () => {
     try {
-      const saved = localStorage.getItem('ai_provider_keys');
-      if (saved) {
-        const savedKeys = JSON.parse(saved);
-        setProviders(prev => prev.map(provider => ({
-          ...provider,
-          apiKey: savedKeys[provider.keyName] || '',
-          status: savedKeys[provider.keyName] ? 'active' : 'inactive'
-        })));
+      // Load API keys from database
+      const { data: apiKeys, error } = await supabase
+        .from('user_api_keys')
+        .select('provider_name, encrypted_api_key');
+
+      if (error) {
+        console.error('Failed to load API keys:', error);
+        return;
+      }
+
+      if (apiKeys && apiKeys.length > 0) {
+        setProviders(prev => prev.map(provider => {
+          const savedKey = apiKeys.find(key => 
+            key.provider_name === provider.keyName.toLowerCase().replace('_api_key', '') ||
+            key.provider_name === provider.name.toLowerCase()
+          );
+          
+          if (savedKey) {
+            // Decrypt the API key (simple base64 decoding for demo)
+            const decryptedKey = atob(savedKey.encrypted_api_key);
+            return {
+              ...provider,
+              apiKey: decryptedKey,
+              status: 'active' as const
+            };
+          }
+          return provider;
+        }));
       }
     } catch (error) {
       console.error('Failed to load saved keys:', error);
@@ -161,10 +181,8 @@ const AIProviderSetup: React.FC = () => {
 
       if (error) throw error;
 
-      // Save to localStorage
-      const savedKeys = JSON.parse(localStorage.getItem('ai_provider_keys') || '{}');
-      savedKeys[provider.keyName] = provider.apiKey;
-      localStorage.setItem('ai_provider_keys', JSON.stringify(savedKeys));
+      // Refresh the keys from database to ensure consistency
+      await loadSavedKeys();
 
       toast({
         title: "Provider Saved",

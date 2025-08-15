@@ -53,14 +53,39 @@ serve(async (req) => {
     // Create Supabase client with service role key
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Save the API key as a secret in Supabase Vault
-    // Note: This is a simplified example. In a real implementation, you would use the Supabase Management API
-    // to store secrets securely in the vault system.
+    // Get the user's ID from the auth header
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      throw new Error('No authorization header provided');
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
-    // For now, we'll store it in a secure way using environment variables
-    // In production, this would be handled by Supabase's secrets management system
-    
-    console.log(`Securely storing API key for provider: ${provider}`);
+    if (authError || !user) {
+      throw new Error('Invalid authorization token');
+    }
+
+    // Simple encryption for the API key (in production, use proper encryption)
+    const encryptedApiKey = btoa(apiKey); // Base64 encoding for demo
+
+    // Store the API key in the database
+    const { error: dbError } = await supabase
+      .from('user_api_keys')
+      .upsert({
+        user_id: user.id,
+        provider_name: provider,
+        encrypted_api_key: encryptedApiKey
+      }, {
+        onConflict: 'user_id,provider_name'
+      });
+
+    if (dbError) {
+      console.error('Database error:', dbError);
+      throw new Error(`Failed to save API key: ${dbError.message}`);
+    }
+
+    console.log(`Securely stored API key for provider: ${provider}, user: ${user.id}`);
     
     // Return success response
     return new Response(

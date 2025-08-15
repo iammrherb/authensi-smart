@@ -3784,6 +3784,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_api_keys: {
+        Row: {
+          created_at: string | null
+          encrypted_api_key: string
+          id: string
+          provider_name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          encrypted_api_key: string
+          id?: string
+          provider_name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          encrypted_api_key?: string
+          id?: string
+          provider_name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_invitations: {
         Row: {
           approved_at: string | null
