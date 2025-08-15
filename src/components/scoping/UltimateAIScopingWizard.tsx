@@ -54,10 +54,12 @@ import { useAI } from "@/hooks/useAI";
 import ResourceLibraryIntegration from "@/components/resources/ResourceLibraryIntegration";
 import { useUseCases } from "@/hooks/useUseCases";
 import { useRequirements } from "@/hooks/useRequirements";
+import { usePainPoints } from "@/hooks/usePainPoints";
 import type { UseCase as LibraryUseCase } from "@/hooks/useUseCases";
 import type { Requirement } from "@/hooks/useRequirements";
 import EnhancedVendorSelector from "./EnhancedVendorSelector";
-import DecisionTreeEngine from "./DecisionTreeEngine";
+import SmartRecommendationPanel from "./SmartRecommendationPanel";
+import EnhancedLibrarySelector from "../library/EnhancedLibrarySelector";
 import ScopingFlowManager from "./ScopingFlowManager";
 import InlineSelectCreate from "@/components/common/InlineSelectCreate";
 import type { CatalogItem } from "@/hooks/useCatalog";
@@ -250,6 +252,7 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
   const { generateRecommendations, isLoading: aiLoading } = useAI();
   const { data: libraryUseCases = [] } = useUseCases();
   const { data: libraryRequirements = [] } = useRequirements();
+  const { data: libraryPainPoints = [] } = usePainPoints();
 
   const phases = [
     { id: 1, title: "Organization Profile", icon: Building2, color: "from-blue-500 to-cyan-600" },
@@ -497,9 +500,35 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
               <p className="text-muted-foreground">Tell us about your organization and current challenges</p>
             </div>
 
-            <DecisionTreeEngine 
+            <SmartRecommendationPanel
               scopingData={scopingData}
-              onSuggestion={handleSuggestionApply}
+              selectedPainPoints={scopingData.organization?.pain_points?.map(pp => pp.id) || []}
+              selectedUseCases={scopingData.use_cases_requirements?.primary_use_cases?.map(uc => uc.id) || []}
+              selectedRequirements={resourceIntegrationData.selectedRequirements.map(req => req.id)}
+              onPainPointsChange={(painPointIds) => {
+                const painPoints = libraryPainPoints.filter(pp => painPointIds.includes(pp.id)).map(pp => ({
+                  ...pp,
+                  description: pp.description || ''
+                }));
+                setScopingData(prev => ({
+                  ...prev,
+                  organization: { ...prev.organization, pain_points: painPoints }
+                }));
+              }}
+              onUseCasesChange={(useCaseIds) => {
+                const useCases = libraryUseCases.filter(uc => useCaseIds.includes(uc.id));
+                setScopingData(prev => ({
+                  ...prev,
+                  use_cases_requirements: { 
+                    ...prev.use_cases_requirements, 
+                    primary_use_cases: useCases 
+                  }
+                }));
+              }}
+              onRequirementsChange={(requirementIds) => {
+                const requirements = libraryRequirements.filter(req => requirementIds.includes(req.id));
+                setResourceIntegrationData(prev => ({ ...prev, selectedRequirements: requirements }));
+              }}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -652,9 +681,35 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
               <p className="text-muted-foreground">Select your current and planned vendor infrastructure</p>
             </div>
 
-            <DecisionTreeEngine 
+            <SmartRecommendationPanel
               scopingData={scopingData}
-              onSuggestion={handleSuggestionApply}
+              selectedPainPoints={scopingData.organization?.pain_points?.map(pp => pp.id) || []}
+              selectedUseCases={scopingData.use_cases_requirements?.primary_use_cases?.map(uc => uc.id) || []}
+              selectedRequirements={resourceIntegrationData.selectedRequirements.map(req => req.id)}
+              onPainPointsChange={(painPointIds) => {
+                const painPoints = libraryPainPoints.filter(pp => painPointIds.includes(pp.id)).map(pp => ({
+                  ...pp,
+                  description: pp.description || ''
+                }));
+                setScopingData(prev => ({
+                  ...prev,
+                  organization: { ...prev.organization, pain_points: painPoints }
+                }));
+              }}
+              onUseCasesChange={(useCaseIds) => {
+                const useCases = libraryUseCases.filter(uc => useCaseIds.includes(uc.id));
+                setScopingData(prev => ({
+                  ...prev,
+                  use_cases_requirements: { 
+                    ...prev.use_cases_requirements, 
+                    primary_use_cases: useCases 
+                  }
+                }));
+              }}
+              onRequirementsChange={(requirementIds) => {
+                const requirements = libraryRequirements.filter(req => requirementIds.includes(req.id));
+                setResourceIntegrationData(prev => ({ ...prev, selectedRequirements: requirements }));
+              }}
             />
 
             {/* Unified Vendor Ecosystem Selection */}
@@ -813,6 +868,37 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
               <p className="text-muted-foreground">Define your NAC objectives and success criteria</p>
             </div>
 
+            <SmartRecommendationPanel
+              scopingData={scopingData}
+              selectedPainPoints={scopingData.organization?.pain_points?.map(pp => pp.id) || []}
+              selectedUseCases={scopingData.use_cases_requirements?.primary_use_cases?.map(uc => uc.id) || []}
+              selectedRequirements={resourceIntegrationData.selectedRequirements.map(req => req.id)}
+              onPainPointsChange={(painPointIds) => {
+                const painPoints = libraryPainPoints.filter(pp => painPointIds.includes(pp.id)).map(pp => ({
+                  ...pp,
+                  description: pp.description || ''
+                }));
+                setScopingData(prev => ({
+                  ...prev,
+                  organization: { ...prev.organization, pain_points: painPoints }
+                }));
+              }}
+              onUseCasesChange={(useCaseIds) => {
+                const useCases = libraryUseCases.filter(uc => useCaseIds.includes(uc.id));
+                setScopingData(prev => ({
+                  ...prev,
+                  use_cases_requirements: { 
+                    ...prev.use_cases_requirements, 
+                    primary_use_cases: useCases 
+                  }
+                }));
+              }}
+              onRequirementsChange={(requirementIds) => {
+                const requirements = libraryRequirements.filter(req => requirementIds.includes(req.id));
+                setResourceIntegrationData(prev => ({ ...prev, selectedRequirements: requirements }));
+              }}
+            />
+
             <div className="space-y-4">
               <Label>Primary Use Cases</Label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -860,6 +946,78 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
                 rows={3}
               />
             </div>
+          </div>
+        );
+
+      case 'library':
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <FileText className="h-12 w-12 mx-auto mb-4 text-primary" />
+              <h3 className="text-2xl font-bold mb-2">Enterprise Resource Library</h3>
+              <p className="text-muted-foreground">Browse and select from our comprehensive library of pain points, requirements, and use cases</p>
+            </div>
+
+            <SmartRecommendationPanel
+              scopingData={scopingData}
+              selectedPainPoints={scopingData.organization?.pain_points?.map(pp => pp.id) || []}
+              selectedUseCases={scopingData.use_cases_requirements?.primary_use_cases?.map(uc => uc.id) || []}
+              selectedRequirements={resourceIntegrationData.selectedRequirements.map(req => req.id)}
+              onPainPointsChange={(painPointIds) => {
+                const painPoints = libraryPainPoints.filter(pp => painPointIds.includes(pp.id)).map(pp => ({
+                  ...pp,
+                  description: pp.description || ''
+                }));
+                setScopingData(prev => ({
+                  ...prev,
+                  organization: { ...prev.organization, pain_points: painPoints }
+                }));
+              }}
+              onUseCasesChange={(useCaseIds) => {
+                const useCases = libraryUseCases.filter(uc => useCaseIds.includes(uc.id));
+                setScopingData(prev => ({
+                  ...prev,
+                  use_cases_requirements: { 
+                    ...prev.use_cases_requirements, 
+                    primary_use_cases: useCases 
+                  }
+                }));
+              }}
+              onRequirementsChange={(requirementIds) => {
+                const requirements = libraryRequirements.filter(req => requirementIds.includes(req.id));
+                setResourceIntegrationData(prev => ({ ...prev, selectedRequirements: requirements }));
+              }}
+            />
+
+            <EnhancedLibrarySelector
+              selectedPainPoints={scopingData.organization?.pain_points?.map(pp => pp.id) || []}
+              selectedRequirements={resourceIntegrationData.selectedRequirements.map(req => req.id)}
+              selectedUseCases={scopingData.use_cases_requirements?.primary_use_cases?.map(uc => uc.id) || []}
+              onPainPointsChange={(painPointIds) => {
+                const painPoints = libraryPainPoints.filter(pp => painPointIds.includes(pp.id)).map(pp => ({
+                  ...pp,
+                  description: pp.description || ''
+                }));
+                setScopingData(prev => ({
+                  ...prev,
+                  organization: { ...prev.organization, pain_points: painPoints }
+                }));
+              }}
+              onRequirementsChange={(requirementIds) => {
+                const requirements = libraryRequirements.filter(req => requirementIds.includes(req.id));
+                setResourceIntegrationData(prev => ({ ...prev, selectedRequirements: requirements }));
+              }}
+              onUseCasesChange={(useCaseIds) => {
+                const useCases = libraryUseCases.filter(uc => useCaseIds.includes(uc.id));
+                setScopingData(prev => ({
+                  ...prev,
+                  use_cases_requirements: { 
+                    ...prev.use_cases_requirements, 
+                    primary_use_cases: useCases 
+                  }
+                }));
+              }}
+            />
           </div>
         );
 
