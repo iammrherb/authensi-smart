@@ -29,6 +29,7 @@ import { useCreateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
 import { PortnoxDocumentationService, type PortnoxDocumentationResult } from '@/services/PortnoxDocumentationService';
 import UltimateAIScopingWizard from './UltimateAIScopingWizard';
+import SmartRecommendationPanel from './SmartRecommendationPanel';
 import { useCreateScopingSession, useUpdateScopingSession } from '@/hooks/useScopingSessionsDb';
 
 interface EnhancedScopingSession {
