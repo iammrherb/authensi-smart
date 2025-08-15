@@ -39,7 +39,7 @@ import IntelligenceTrackerHub from "./pages/IntelligenceTrackerHub";
 
 import UnifiedResourceCenter from "./pages/UnifiedResourceCenter";
 import ProjectCreation from "./pages/ProjectCreation";
-import UnifiedProjectCenter from "./pages/UnifiedProjectCenter";
+import ProjectManager from "./pages/ProjectManager";
 import OneXerWizardPage from "./pages/OneXerWizard";
 import SmartConfigCenter from "./pages/SmartConfigCenter";
 import UltimateWizard from "./pages/UltimateWizard";
@@ -91,35 +91,25 @@ const App = () => (
                 </ProtectedRoute>
               } />
               
-              {/* Unified Project Center - All project management in one place */}
+              {/* Project Manager - Simple, unified project management */}
               <Route path="/projects" element={
                 <ProtectedRoute>
-                  <UnifiedProjectCenter />
-                </ProtectedRoute>
-              } />
-              <Route path="/projects/:projectId" element={
-                <ProtectedRoute>
-                  <UnifiedProjectCenter />
+                  <ProjectManager />
                 </ProtectedRoute>
               } />
               <Route path="/tracker" element={
                 <ProtectedRoute>
-                  <UnifiedProjectCenter />
+                  <ProjectManager />
                 </ProtectedRoute>
               } />
               <Route path="/tracking" element={
                 <ProtectedRoute>
-                  <UnifiedProjectCenter />
-                </ProtectedRoute>
-              } />
-              <Route path="/tracking/project/:projectId" element={
-                <ProtectedRoute>
-                  <UnifiedProjectCenter />
+                  <ProjectManager />
                 </ProtectedRoute>
               } />
               <Route path="/implementation" element={
                 <ProtectedRoute>
-                  <UnifiedProjectCenter />
+                  <ProjectManager />
                 </ProtectedRoute>
               } />
               

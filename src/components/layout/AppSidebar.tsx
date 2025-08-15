@@ -31,11 +31,11 @@ const primaryNavItems = [
     tooltip: "Central hub for all project activities with AI insights"
   },
   { 
-    title: "Project Center", 
+    title: "Project Manager", 
     url: "/projects", 
     icon: Target,
-    description: "Unified Project Management & Tracking",
-    tooltip: "Complete project lifecycle from creation to deployment"
+    description: "Simple Project Creation & Management",
+    tooltip: "Create, scope, and manage your NAC projects"
   },
   { 
     title: "Analytics", 
