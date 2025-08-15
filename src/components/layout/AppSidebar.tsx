@@ -65,8 +65,7 @@ const lifecycleItems = [
   {
     title: "Implementation & Tracking",
     items: [
-      { title: "Project Tracking", url: "/tracking", icon: BarChart3, tooltip: "Real-time project progress tracking with site management" },
-      { title: "Site Deployment", url: "/tracking?tab=sites", icon: Building2, tooltip: "Multi-site deployment and management" },
+      { title: "Project Tracking", url: "/tracking", icon: BarChart3, tooltip: "Real-time project progress tracking" },
       { title: "Deployment", url: "/deployment", icon: Rocket, tooltip: "Automated deployment orchestration" },
       { title: "Testing", url: "/testing", icon: TestTube, tooltip: "Comprehensive testing and validation" }
     ]

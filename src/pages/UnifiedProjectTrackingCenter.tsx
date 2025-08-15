@@ -40,6 +40,9 @@ const UnifiedProjectTrackingCenter = () => {
   const { data: projects = [], isLoading: projectsLoading } = useProjects();
   const { data: sites = [], isLoading: sitesLoading } = useSites();
   const { sites: trackerSites, stats, milestones, loading: trackerLoading } = useTrackerData();
+  
+  // Get selected project data
+  const selectedProject = projectId ? projects.find(p => p.id === projectId) : null;
 
   // Filter data
   const filteredSites = sites.filter(site => {
@@ -51,7 +54,6 @@ const UnifiedProjectTrackingCenter = () => {
     return matchesSearch && matchesStatus && matchesProject;
   });
 
-  const selectedProject = projectId ? projects.find(p => p.id === projectId) : null;
 
   // Calculate overview stats
   const overviewStats = {
@@ -142,7 +144,7 @@ const UnifiedProjectTrackingCenter = () => {
       {/* Main Content */}
       <div className="container mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className={`grid w-full ${projectId ? 'grid-cols-6' : 'grid-cols-5'}`}>
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Overview
@@ -151,10 +153,12 @@ const UnifiedProjectTrackingCenter = () => {
               <Activity className="h-4 w-4" />
               Implementation
             </TabsTrigger>
-            <TabsTrigger value="sites" className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              Site Deployment
-            </TabsTrigger>
+            {projectId && (
+              <TabsTrigger value="sites" className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                Site Deployment
+              </TabsTrigger>
+            )}
             <TabsTrigger value="reports" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               Reports
@@ -182,67 +186,88 @@ const UnifiedProjectTrackingCenter = () => {
             <ComprehensiveImplementationTracker />
           </TabsContent>
 
-          {/* Sites Tab */}
-          <TabsContent value="sites" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                  <CardTitle>Sites Management ({filteredSites.length})</CardTitle>
-                  <div className="flex gap-2">
-                    <Button onClick={() => setIsFormOpen(true)}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Site
-                    </Button>
+          {/* Sites Tab - Only visible when a project is selected */}
+          {projectId && (
+            <TabsContent value="sites" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div>
+                      <CardTitle>Project Site Deployment ({filteredSites.length})</CardTitle>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Manage sites specific to project: <span className="font-medium">{selectedProject?.name}</span>
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button onClick={() => setIsFormOpen(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Site to Project
+                      </Button>
+                    </div>
                   </div>
-                </div>
 
-                {/* Filters */}
-                <div className="flex flex-col lg:flex-row gap-4 pt-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search sites by name or location..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
+                  {/* Filters */}
+                  <div className="flex flex-col lg:flex-row gap-4 pt-4">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search project sites by name or location..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                    
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="w-40">
+                        <Filter className="h-4 w-4 mr-2" />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {statusOptions.map(option => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                  
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-40">
-                      <Filter className="h-4 w-4 mr-2" />
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {statusOptions.map(option => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <SitesTable
-                  sites={filteredSites}
-                  onEdit={(site) => {
-                    setSelectedSite(site);
-                    setIsFormOpen(true);
-                  }}
-                  onDelete={(id) => {
-                    if (confirm("Are you sure you want to delete this site?")) {
-                      // Handle delete
-                    }
-                  }}
-                  onViewDetails={(site) => {
-                    setSelectedSite(site);
-                    setIsDetailsOpen(true);
-                  }}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
+                </CardHeader>
+                <CardContent>
+                  {filteredSites.length > 0 ? (
+                    <SitesTable
+                      sites={filteredSites}
+                      onEdit={(site) => {
+                        setSelectedSite(site);
+                        setIsFormOpen(true);
+                      }}
+                      onDelete={(id) => {
+                        if (confirm("Are you sure you want to remove this site from the project?")) {
+                          // Handle delete
+                        }
+                      }}
+                      onViewDetails={(site) => {
+                        setSelectedSite(site);
+                        setIsDetailsOpen(true);
+                      }}
+                    />
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="text-6xl mb-4">🏢</div>
+                      <h3 className="text-lg font-semibold mb-2">No sites in this project</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Add sites to start managing deployment locations for this project.
+                      </p>
+                      <Button onClick={() => setIsFormOpen(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add First Site
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
 
           {/* Reports Tab */}
           <TabsContent value="reports">
