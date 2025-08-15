@@ -610,6 +610,8 @@ const AdvancedAIManager = () => {
 
   // Save API Key
   const saveApiKey = async (provider: AIProvider, apiKey: string) => {
+    console.log('saveApiKey called with:', { provider: provider.type, apiKeyLength: apiKey.length });
+    
     if (!apiKey.trim()) {
       toast({
         title: "Invalid API Key",
@@ -622,14 +624,23 @@ const AdvancedAIManager = () => {
     setSavingApiKey(provider.type);
     
     try {
-      const { error } = await supabase.functions.invoke('save-ai-provider', {
+      console.log('Calling supabase function save-ai-provider...');
+      
+      const { data, error } = await supabase.functions.invoke('save-ai-provider', {
         body: {
           provider: provider.type,
           apiKey: apiKey.trim()
         }
       });
 
-      if (error) throw error;
+      console.log('Function response:', { data, error });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
+
+      console.log('API key saved successfully');
 
       setProviders(prev => prev.map(p => 
         p.id === provider.id ? { ...p, apiKeySet: true, status: 'active' as const } : p
@@ -643,6 +654,7 @@ const AdvancedAIManager = () => {
         description: `${provider.name} API key has been saved successfully.`
       });
     } catch (error: any) {
+      console.error('Save API key error:', error);
       toast({
         title: "Save Failed",
         description: error.message || `Failed to save ${provider.name} API key.`,
