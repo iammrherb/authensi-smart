@@ -16,7 +16,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Designer from "./pages/Designer";
 import UnifiedTrackingCenter from "./pages/UnifiedTrackingCenter";
-import Deployment from "./pages/Deployment";
+import UnifiedImplementationHub from "./pages/UnifiedImplementationHub";
 import Dashboard from "./pages/Dashboard";
 import CommandCenter from "./pages/CommandCenter";
 import AdminDashboard from "./components/admin/AdminDashboard";
@@ -116,7 +116,7 @@ const App = () => (
               {/* Legacy routes for backward compatibility */}
               <Route path="/deployment" element={
                 <ProtectedRoute>
-                  <Deployment />
+                  <UnifiedImplementationHub />
                 </ProtectedRoute>
               } />
               <Route path="/reports" element={
