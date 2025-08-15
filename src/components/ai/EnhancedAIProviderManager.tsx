@@ -704,7 +704,7 @@ const EnhancedAIProviderManager = () => {
               const isSaving = savingProviders.has(provider.id);
               
               return (
-                <EnhancedCard key={provider.id} glass>
+                <Card key={provider.id}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
@@ -816,7 +816,7 @@ const EnhancedAIProviderManager = () => {
                       </div>
                     </div>
                   </CardContent>
-                </EnhancedCard>
+                </Card>
               );
             })}
           </div>
