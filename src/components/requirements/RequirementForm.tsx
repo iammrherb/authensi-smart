@@ -170,7 +170,7 @@ const RequirementForm: React.FC<RequirementFormProps> = ({ onSubmit, onCancel, i
           Cancel
         </Button>
         <Button type="submit">
-          Create Requirement
+          {initialData ? 'Update Requirement' : 'Create Requirement'}
         </Button>
       </div>
     </form>

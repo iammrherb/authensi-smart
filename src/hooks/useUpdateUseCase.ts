@@ -1,6 +1,40 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { UseCase } from './useUseCases';
+
+export const useUpdateUseCase = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<UseCase> & { id: string }) => {
+      const { data, error } = await supabase
+        .from('use_case_library')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['use-cases'] });
+      toast({
+        title: "Success",
+        description: "Use case updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error", 
+        description: "Failed to update use case: " + error.message,
+        variant: "destructive",
+      });
+    },
+  });
+};
 
 export const useDeleteUseCase = () => {
   const queryClient = useQueryClient();

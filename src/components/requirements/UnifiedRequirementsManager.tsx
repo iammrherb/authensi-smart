@@ -11,11 +11,18 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { 
   Search, Plus, Filter, CheckCircle, AlertTriangle, Clock, 
-  Shield, Database, Network, FileText, Tag, Star
+  Shield, Database, Network, FileText, Tag, Star, Edit, 
+  MoreHorizontal, ExternalLink, Trash2
 } from "lucide-react";
-import { useRequirements, useCreateRequirement, type Requirement } from "@/hooks/useRequirements";
+import { useRequirements, useCreateRequirement, useAddRequirementToProject, 
+         useAddRequirementToSite, type Requirement } from "@/hooks/useRequirements";
+import { useUpdateRequirement, useDeleteRequirement } from "@/hooks/useUpdateRequirement";
 import { usePainPoints } from "@/hooks/usePainPoints";
 import { useUseCases } from "@/hooks/useUseCases";
+import { useProjects } from "@/hooks/useProjects";
+import { useSites } from "@/hooks/useSites";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, 
+         DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import RequirementForm from "./RequirementForm";
 
 interface UnifiedRequirementsManagerProps {
@@ -49,11 +56,21 @@ const UnifiedRequirementsManager: React.FC<UnifiedRequirementsManagerProps> = ({
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [editingRequirement, setEditingRequirement] = useState<Requirement | null>(null);
+  const [addToProjectDialog, setAddToProjectDialog] = useState<{ requirement: Requirement; open: boolean }>({ requirement: null as any, open: false });
+  const [addToSiteDialog, setAddToSiteDialog] = useState<{ requirement: Requirement; open: boolean }>({ requirement: null as any, open: false });
 
   const { data: requirements = [], isLoading } = useRequirements();
   const { data: painPoints = [] } = usePainPoints();
   const { data: useCases = [] } = useUseCases();
+  const { data: projects = [] } = useProjects();
+  const { data: sites = [] } = useSites();
+  
   const createRequirement = useCreateRequirement();
+  const updateRequirement = useUpdateRequirement();
+  const deleteRequirement = useDeleteRequirement();
+  const addToProject = useAddRequirementToProject();
+  const addToSite = useAddRequirementToSite();
 
   // Filter requirements based on search and filters
   const filteredRequirements = useMemo(() => {
@@ -92,6 +109,52 @@ const UnifiedRequirementsManager: React.FC<UnifiedRequirementsManagerProps> = ({
       setIsCreateDialogOpen(false);
     } catch (error) {
       console.error('Failed to create requirement:', error);
+    }
+  };
+
+  const handleUpdateRequirement = async (data: any) => {
+    if (!editingRequirement) return;
+    try {
+      await updateRequirement.mutateAsync({ id: editingRequirement.id, ...data });
+      setEditingRequirement(null);
+    } catch (error) {
+      console.error('Failed to update requirement:', error);
+    }
+  };
+
+  const handleDeleteRequirement = async (requirementId: string) => {
+    if (confirm('Are you sure you want to delete this requirement?')) {
+      try {
+        await deleteRequirement.mutateAsync(requirementId);
+      } catch (error) {
+        console.error('Failed to delete requirement:', error);
+      }
+    }
+  };
+
+  const handleAddToProject = async (projectId: string) => {
+    if (!addToProjectDialog.requirement) return;
+    try {
+      await addToProject.mutateAsync({
+        projectId,
+        requirementId: addToProjectDialog.requirement.id
+      });
+      setAddToProjectDialog({ requirement: null as any, open: false });
+    } catch (error) {
+      console.error('Failed to add requirement to project:', error);
+    }
+  };
+
+  const handleAddToSite = async (siteId: string) => {
+    if (!addToSiteDialog.requirement) return;
+    try {
+      await addToSite.mutateAsync({
+        siteId,
+        requirementId: addToSiteDialog.requirement.id
+      });
+      setAddToSiteDialog({ requirement: null as any, open: false });
+    } catch (error) {
+      console.error('Failed to add requirement to site:', error);
     }
   };
 
@@ -166,6 +229,38 @@ const UnifiedRequirementsManager: React.FC<UnifiedRequirementsManagerProps> = ({
                   <Badge variant={getPriorityColor(requirement.priority)} className="text-xs">
                     {requirement.priority}
                   </Badge>
+                  
+                  {mode === 'standalone' && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                          <MoreHorizontal className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => setEditingRequirement(requirement)}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setAddToProjectDialog({ requirement, open: true })}>
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Add to Project
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setAddToSiteDialog({ requirement, open: true })}>
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Add to Site
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          onClick={() => handleDeleteRequirement(requirement.id)}
+                          className="text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </div>
               </div>
 
@@ -377,6 +472,80 @@ const UnifiedRequirementsManager: React.FC<UnifiedRequirementsManagerProps> = ({
           </CardContent>
         </Card>
       )}
+
+      {/* Edit Requirement Dialog */}
+      <Dialog open={!!editingRequirement} onOpenChange={() => setEditingRequirement(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Requirement</DialogTitle>
+          </DialogHeader>
+          {editingRequirement && (
+            <RequirementForm 
+              initialData={editingRequirement}
+              onSubmit={handleUpdateRequirement} 
+              onCancel={() => setEditingRequirement(null)} 
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Add to Project Dialog */}
+      <Dialog open={addToProjectDialog.open} onOpenChange={(open) => setAddToProjectDialog(prev => ({ ...prev, open }))}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add to Project</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Select a project to add "{addToProjectDialog.requirement?.title}" to:
+            </p>
+            <div className="grid gap-2 max-h-64 overflow-y-auto">
+              {projects.map(project => (
+                <Button
+                  key={project.id}
+                  variant="outline"
+                  className="justify-start"
+                  onClick={() => handleAddToProject(project.id)}
+                >
+                  <div className="text-left">
+                    <div className="font-medium">{project.name}</div>
+                    <div className="text-xs text-muted-foreground">{project.description}</div>
+                  </div>
+                </Button>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add to Site Dialog */}
+      <Dialog open={addToSiteDialog.open} onOpenChange={(open) => setAddToSiteDialog(prev => ({ ...prev, open }))}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add to Site</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Select a site to add "{addToSiteDialog.requirement?.title}" to:
+            </p>
+            <div className="grid gap-2 max-h-64 overflow-y-auto">
+              {sites.map(site => (
+                <Button
+                  key={site.id}
+                  variant="outline"
+                  className="justify-start"
+                  onClick={() => handleAddToSite(site.id)}
+                >
+                  <div className="text-left">
+                    <div className="font-medium">{site.name}</div>
+                    <div className="text-xs text-muted-foreground">{site.location}</div>
+                  </div>
+                </Button>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
