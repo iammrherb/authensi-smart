@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import UltimateIntelligentWizard from "@/components/wizard/UltimateIntelligentWizard";
+import UnifiedIntelligentConfigWizard from "@/components/config/UnifiedIntelligentConfigWizard";
 
 const UltimateWizard: React.FC = () => {
   useEffect(() => {
@@ -11,7 +11,7 @@ const UltimateWizard: React.FC = () => {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <UltimateIntelligentWizard />
+      <UnifiedIntelligentConfigWizard />
     </main>
   );
 };

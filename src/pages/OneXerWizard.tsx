@@ -1,5 +1,5 @@
 import React from 'react';
-import OneXerConfigWizard from "@/components/config/OneXerConfigWizard";
+import UnifiedIntelligentConfigWizard from "@/components/config/UnifiedIntelligentConfigWizard";
 import { Badge } from "@/components/ui/badge";
 
 interface OneXerWizardPageProps {
@@ -34,7 +34,7 @@ const OneXerWizardPage: React.FC<OneXerWizardPageProps> = ({ projectId, siteId }
             </p>
           </div>
           
-          <OneXerConfigWizard 
+          <UnifiedIntelligentConfigWizard 
             projectId={projectId}
             siteId={siteId}
             onSave={handleSave}

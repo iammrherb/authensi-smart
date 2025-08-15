@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
-import OneXerConfigWizard from "@/components/config/OneXerConfigWizard";
-import EnhancedConfigTemplateManager from "@/components/config/EnhancedConfigTemplateManager";
-import ConfigGeneratorManager from "@/components/config/ConfigGeneratorManager";
+import UnifiedIntelligentConfigWizard from "@/components/config/UnifiedIntelligentConfigWizard";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, Settings, FileText, Sparkles, Zap, Target } from "lucide-react";
+import { Brain } from "lucide-react";
 
 const SmartConfigCenter = () => {
-  const [activeTab, setActiveTab] = useState("wizard");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [projectId] = useState<string | undefined>(undefined);
+  const [siteId] = useState<string | undefined>(undefined);
 
   const handleConfigSave = (config: any) => {
     console.log('Configuration saved:', config);
@@ -74,76 +70,15 @@ const SmartConfigCenter = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-6 py-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-card/50 backdrop-blur-sm border border-border/50">
-            <TabsTrigger value="wizard" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Config Wizard
-            </TabsTrigger>
-            <TabsTrigger value="templates" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Templates
-            </TabsTrigger>
-            <TabsTrigger value="ai-generator" className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
-              Smart Generator
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="wizard" className="space-y-6">
-            <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
-              <CardHeader className="text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Target className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-2xl">Intelligent Configuration Wizard</CardTitle>
-                </div>
-                <CardDescription className="text-base">
-                  Step-by-step guided configuration with Smart-powered recommendations
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <OneXerConfigWizard 
-                  onSave={handleConfigSave}
-                  onCancel={handleConfigCancel}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="templates" className="space-y-6">
-            <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
-              <CardHeader className="text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <FileText className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-2xl">Configuration Templates</CardTitle>
-                </div>
-                <CardDescription className="text-base">
-                  Manage and customize pre-built configuration templates for various scenarios
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <EnhancedConfigTemplateManager />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="ai-generator" className="space-y-6">
-            <Card className="bg-card/50 backdrop-blur-sm border border-border/50">
-              <CardHeader className="text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Zap className="h-5 w-5 text-primary" />
-                  <CardTitle className="text-2xl">Smart Configuration Generator</CardTitle>
-                </div>
-                <CardDescription className="text-base">
-                  Advanced Smart-powered configuration generation with custom requirements
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ConfigGeneratorManager searchTerm={searchTerm} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        {/* Unified Configuration Interface */}
+        <div className="w-full">
+          <UnifiedIntelligentConfigWizard
+            projectId={projectId}
+            siteId={siteId}
+            onSave={handleConfigSave}
+            onCancel={handleConfigCancel}
+          />
+        </div>
       </div>
     </div>
   );
