@@ -15,7 +15,7 @@ import UnifiedCommandCenter from "./pages/UnifiedCommandCenter";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Designer from "./pages/Designer";
-import Tracker from "./pages/Tracker";
+import UnifiedTrackingCenter from "./pages/UnifiedTrackingCenter";
 import Deployment from "./pages/Deployment";
 import Dashboard from "./pages/Dashboard";
 import CommandCenter from "./pages/CommandCenter";
