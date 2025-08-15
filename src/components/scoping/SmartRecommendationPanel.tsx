@@ -8,7 +8,8 @@ import {
   Brain, Plus, Search, AlertTriangle, CheckSquare, FileText, 
   X, Lightbulb, TrendingUp, Shield, Network
 } from "lucide-react";
-import EnhancedLibrarySelector from "@/components/library/EnhancedLibrarySelector";
+import EnhancedLibrarySelector from "../library/EnhancedLibrarySelector";
+import UnifiedRequirementsManager from "../requirements/UnifiedRequirementsManager";
 import { usePainPoints } from "@/hooks/usePainPoints";
 import { useRequirements } from "@/hooks/useRequirements";
 import { useUseCases } from "@/hooks/useUseCases";
@@ -326,27 +327,29 @@ const SmartRecommendationPanel: React.FC<SmartRecommendationPanelProps> = ({
           <p className="text-sm text-muted-foreground">
             AI-powered suggestions based on your project scoping data
           </p>
-          <Dialog open={showLibraryDialog} onOpenChange={setShowLibraryDialog}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Search className="h-4 w-4 mr-2" />
-                Browse Library
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Enterprise Resource Library</DialogTitle>
-              </DialogHeader>
-              <EnhancedLibrarySelector
-                selectedPainPoints={selectedPainPoints}
-                selectedRequirements={selectedRequirements}
-                selectedUseCases={selectedUseCases}
-                onPainPointsChange={onPainPointsChange}
-                onRequirementsChange={onRequirementsChange}
-                onUseCasesChange={onUseCasesChange}
-              />
-            </DialogContent>
-          </Dialog>
+              <Dialog open={showLibraryDialog} onOpenChange={setShowLibraryDialog}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Search className="h-4 w-4 mr-2" />
+                    Browse Library
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Enterprise Resource Library</DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-4">
+                    <EnhancedLibrarySelector
+                      selectedPainPoints={selectedPainPoints}
+                      selectedRequirements={selectedRequirements}
+                      selectedUseCases={selectedUseCases}
+                      onPainPointsChange={onPainPointsChange}
+                      onRequirementsChange={onRequirementsChange}
+                      onUseCasesChange={onUseCasesChange}
+                    />
+                  </div>
+                </DialogContent>
+              </Dialog>
         </div>
 
         <div className="space-y-3">

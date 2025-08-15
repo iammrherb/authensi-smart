@@ -13,6 +13,7 @@ import { Search, Filter, Plus, AlertTriangle, CheckSquare, FileText } from "luci
 import { usePainPoints } from "@/hooks/usePainPoints";
 import { useRequirements } from "@/hooks/useRequirements";
 import { useUseCases } from "@/hooks/useUseCases";
+import UnifiedRequirementsManager from "../requirements/UnifiedRequirementsManager";
 
 interface EnhancedLibrarySelectorProps {
   selectedPainPoints: string[];
@@ -348,7 +349,13 @@ const EnhancedLibrarySelector: React.FC<EnhancedLibrarySelectorProps> = ({
           </TabsContent>
 
           <TabsContent value="requirements">
-            {renderFilters('requirements')}
+            <UnifiedRequirementsManager
+              selectedRequirements={selectedRequirements}
+              onRequirementsChange={onRequirementsChange}
+              mode="selector"
+              showCreate={false}
+              maxHeight="h-96"
+            />
           </TabsContent>
 
           <TabsContent value="useCases">

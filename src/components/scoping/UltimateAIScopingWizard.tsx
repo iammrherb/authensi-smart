@@ -44,7 +44,8 @@ import {
   Plus,
   X,
   FileText,
-  Download
+  Download,
+  CheckSquare
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useEnhancedVendors } from "@/hooks/useEnhancedVendors";
@@ -60,6 +61,7 @@ import type { Requirement } from "@/hooks/useRequirements";
 import EnhancedVendorSelector from "./EnhancedVendorSelector";
 import SmartRecommendationPanel from "./SmartRecommendationPanel";
 import EnhancedLibrarySelector from "../library/EnhancedLibrarySelector";
+import UnifiedRequirementsManager from "../requirements/UnifiedRequirementsManager";
 import ScopingFlowManager from "./ScopingFlowManager";
 import InlineSelectCreate from "@/components/common/InlineSelectCreate";
 import type { CatalogItem } from "@/hooks/useCatalog";
@@ -1018,6 +1020,106 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
                 }));
               }}
             />
+          </div>
+        );
+
+      case 'requirements':
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <CheckSquare className="h-12 w-12 mx-auto mb-4 text-primary" />
+              <h3 className="text-2xl font-bold mb-2">Project Requirements</h3>
+              <p className="text-muted-foreground">Select and manage requirements from the unified library</p>
+            </div>
+
+            <SmartRecommendationPanel
+              scopingData={scopingData}
+              selectedPainPoints={scopingData.organization?.pain_points?.map(pp => pp.id) || []}
+              selectedUseCases={scopingData.use_cases_requirements?.primary_use_cases?.map(uc => uc.id) || []}
+              selectedRequirements={resourceIntegrationData.selectedRequirements.map(req => req.id)}
+              onPainPointsChange={(painPointIds) => {
+                const painPoints = libraryPainPoints.filter(pp => painPointIds.includes(pp.id)).map(pp => ({
+                  ...pp,
+                  description: pp.description || ''
+                }));
+                setScopingData(prev => ({
+                  ...prev,
+                  organization: { ...prev.organization, pain_points: painPoints }
+                }));
+              }}
+              onUseCasesChange={(useCaseIds) => {
+                const useCases = libraryUseCases.filter(uc => useCaseIds.includes(uc.id));
+                setScopingData(prev => ({
+                  ...prev,
+                  use_cases_requirements: { 
+                    ...prev.use_cases_requirements, 
+                    primary_use_cases: useCases 
+                  }
+                }));
+              }}
+              onRequirementsChange={(requirementIds) => {
+                const requirements = libraryRequirements.filter(req => requirementIds.includes(req.id));
+                setResourceIntegrationData(prev => ({ ...prev, selectedRequirements: requirements }));
+              }}
+            />
+
+            <UnifiedRequirementsManager
+              selectedRequirements={resourceIntegrationData.selectedRequirements.map(req => req.id)}
+              onRequirementsChange={(requirementIds) => {
+                const requirements = libraryRequirements.filter(req => requirementIds.includes(req.id));
+                setResourceIntegrationData(prev => ({ ...prev, selectedRequirements: requirements }));
+              }}
+              mode="scoping"
+              showCreate={true}
+              maxHeight="h-96"
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm">Selected Requirements Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Total Requirements:</span>
+                      <Badge variant="outline">{resourceIntegrationData.selectedRequirements.length}</Badge>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Critical Priority:</span>
+                      <Badge variant="destructive">
+                        {resourceIntegrationData.selectedRequirements.filter(r => r.priority === 'critical').length}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>High Priority:</span>
+                      <Badge variant="default">
+                        {resourceIntegrationData.selectedRequirements.filter(r => r.priority === 'high').length}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm">Requirements by Category</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {['Security', 'Technical', 'Compliance', 'Business'].map(category => {
+                      const count = resourceIntegrationData.selectedRequirements.filter(r => r.category === category).length;
+                      return count > 0 ? (
+                        <div key={category} className="flex justify-between text-sm">
+                          <span>{category}:</span>
+                          <Badge variant="secondary">{count}</Badge>
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         );
 

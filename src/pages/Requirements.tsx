@@ -1,4 +1,4 @@
-import RequirementsManagement from "@/components/requirements/RequirementsManagement";
+import UnifiedRequirementsManager from "@/components/requirements/UnifiedRequirementsManager";
 import { Badge } from "@/components/ui/badge";
 
 const Requirements = () => {
@@ -19,7 +19,7 @@ const Requirements = () => {
             </p>
           </div>
           
-          <RequirementsManagement />
+          <UnifiedRequirementsManager mode="standalone" />
         </div>
       </div>
     </div>
