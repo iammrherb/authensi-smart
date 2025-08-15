@@ -709,7 +709,7 @@ const EnhancedAIProviderManager = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <div className={`w-12 h-12 ${provider.color} rounded-xl flex items-center justify-center text-white shadow-lg`}>
-                          {React.createElement(provider.icon, { className: "h-6 w-6" })}
+                          <provider.icon className="h-6 w-6" />
                         </div>
                         <div>
                           <CardTitle className="text-lg">{provider.name}</CardTitle>
@@ -872,7 +872,7 @@ const EnhancedAIProviderManager = () => {
                             {activeProviders.map((provider) => (
                               <SelectItem key={provider.type} value={provider.type}>
                                 <div className="flex items-center space-x-2">
-                                  {React.createElement(provider.icon, { className: "h-4 w-4" })}
+                                   <provider.icon className="h-4 w-4" />
                                   <span>{provider.name}</span>
                                 </div>
                               </SelectItem>
@@ -922,7 +922,7 @@ const EnhancedAIProviderManager = () => {
                               .map((provider) => (
                                 <SelectItem key={provider.type} value={provider.type}>
                                    <div className="flex items-center space-x-2">
-                                     {React.createElement(provider.icon, { className: "h-4 w-4" })}
+                                     <provider.icon className="h-4 w-4" />
                                      <span>{provider.name}</span>
                                    </div>
                                 </SelectItem>
