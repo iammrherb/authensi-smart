@@ -216,6 +216,8 @@ export const AISettings = () => {
           setting_key: 'ai_configuration',
           setting_value: aiConfig as any,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'setting_key'
         });
 
       if (error) throw error;
