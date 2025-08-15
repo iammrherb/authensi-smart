@@ -28,7 +28,9 @@ serve(async (req) => {
     const secretNames: { [key: string]: string } = {
       'openai': 'OPENAI_API_KEY',
       'anthropic': 'CLAUDE_API_KEY',
+      'claude': 'CLAUDE_API_KEY',
       'google': 'GEMINI_API_KEY',
+      'gemini': 'GEMINI_API_KEY',
       'perplexity': 'PERPLEXITY_API_KEY',
       'grok': 'GROK_API_KEY',
       'cohere': 'COHERE_API_KEY',
