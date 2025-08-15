@@ -87,13 +87,20 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
 
   // Handle step advancement
   const handleAdvanceStep = async () => {
-    if (!orchestrator) return;
+    if (!orchestrator) {
+      console.error('No orchestrator available');
+      return;
+    }
 
+    console.log('Advancing step from', currentStep, 'with inputs:', userInputs);
     setIsLoading(true);
     try {
       const nextStepIndex = currentStep + 1;
+      console.log('Calling orchestrator.advanceToStep with index:', nextStepIndex);
+      
       await orchestrator.advanceToStep(nextStepIndex, userInputs);
       
+      console.log('Step advancement successful, updating UI');
       setCurrentStep(nextStepIndex);
       setUserInputs({});
       
@@ -104,7 +111,7 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
       toast.success("Step completed successfully!");
     } catch (error) {
       console.error('Failed to advance step:', error);
-      toast.error("Failed to advance to next step");
+      toast.error(`Failed to advance to next step: ${error.message || 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
