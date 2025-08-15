@@ -33,7 +33,7 @@ const ProjectDashboard = () => {
         change: activeProjects > 5 ? "+2" : "0", 
         trend: activeProjects > 5 ? "up" : "neutral",
         icon: Target,
-        color: "text-blue-600"
+        color: "text-neon-cyan"
       },
       { 
         label: "Total Sites", 
@@ -41,7 +41,7 @@ const ProjectDashboard = () => {
         change: totalSites > 3 ? "+1" : "0", 
         trend: totalSites > 3 ? "up" : "neutral",
         icon: Building,
-        color: "text-green-600"
+        color: "text-neon-green"
       },
       { 
         label: "Questionnaire Completion", 
@@ -49,7 +49,7 @@ const ProjectDashboard = () => {
         change: completionRate > 80 ? "+5%" : "0%", 
         trend: completionRate > 80 ? "up" : "neutral",
         icon: FileText,
-        color: "text-purple-600"
+        color: "text-neon-purple"
       },
       { 
         label: "Deployed Projects", 
@@ -57,7 +57,7 @@ const ProjectDashboard = () => {
         change: completedProjects > 0 ? "+1" : "0", 
         trend: completedProjects > 0 ? "up" : "neutral",
         icon: Users,
-        color: "text-orange-600"
+        color: "text-neon-orange"
       },
     ];
   }, [projects, sites, questionnaires]);

@@ -8,36 +8,36 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 218 35% 3%;
-    --foreground: 210 40% 98%;
+    --background: 218 35% 2%;
+    --foreground: 180 100% 90%;
 
-    --card: 218 35% 6%;
-    --card-foreground: 210 40% 98%;
+    --card: 218 35% 5%;
+    --card-foreground: 180 100% 95%;
 
-    --popover: 218 35% 8%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 218 35% 4%;
+    --popover-foreground: 180 100% 95%;
 
-    --primary: 195 100% 55%;
-    --primary-foreground: 218 35% 3%;
-    --primary-glow: 195 100% 75%;
-    --primary-bold: 195 100% 45%;
+    --primary: 180 100% 60%;
+    --primary-foreground: 218 35% 2%;
+    --primary-glow: 180 100% 80%;
+    --primary-bold: 180 100% 50%;
 
-    --secondary: 240 100% 25%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 240 100% 15%;
+    --secondary-foreground: 180 100% 90%;
 
-    --muted: 218 35% 12%;
-    --muted-foreground: 215 20.2% 75%;
+    --muted: 218 35% 8%;
+    --muted-foreground: 180 60% 80%;
 
-    --accent: 195 100% 20%;
-    --accent-foreground: 195 100% 85%;
-    --accent-bold: 280 100% 35%;
+    --accent: 283 100% 65%;
+    --accent-foreground: 218 35% 2%;
+    --accent-bold: 283 100% 55%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 85% 65%;
+    --destructive-foreground: 180 100% 95%;
 
-    --border: 218 35% 18%;
-    --input: 218 35% 15%;
-    --ring: 195 100% 55%;
+    --border: 180 30% 20%;
+    --input: 218 35% 8%;
+    --ring: 180 100% 60%;
     
     /* Enhanced Cyberpunk Color Palette */
     --neon-green: 120 100% 50%;
@@ -156,33 +156,33 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 218 35% 1%;
+    --foreground: 180 100% 92%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 218 35% 3%;
+    --card-foreground: 180 100% 96%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 218 35% 2%;
+    --popover-foreground: 180 100% 96%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 180 100% 65%;
+    --primary-foreground: 218 35% 1%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 240 100% 12%;
+    --secondary-foreground: 180 100% 88%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 218 35% 5%;
+    --muted-foreground: 180 60% 82%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 283 100% 70%;
+    --accent-foreground: 218 35% 1%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 85% 68%;
+    --destructive-foreground: 180 100% 96%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 180 30% 15%;
+    --input: 218 35% 5%;
+    --ring: 180 100% 65%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

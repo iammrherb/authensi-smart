@@ -81,10 +81,10 @@ export function UnifiedHeader() {
         {/* Right side */}
         <div className="flex items-center space-x-4">
           {/* AI Status Indicator */}
-          <div className="hidden lg:flex items-center space-x-3 px-3 py-1.5 bg-muted/50 rounded-lg">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+          <div className="hidden lg:flex items-center space-x-3 px-3 py-1.5 bg-card/50 border border-border rounded-lg">
+            <div className="w-2 h-2 bg-neon-green rounded-full animate-pulse"></div>
             <span className="text-sm font-medium text-foreground">AI Active</span>
-            <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-600">
+            <Badge variant="glow" className="text-xs">
               v2.0
             </Badge>
           </div>
