@@ -622,11 +622,11 @@ const EnhancedAIProviderManager = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
-        return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
+        return React.createElement(CheckCircle2, { className: "h-4 w-4 text-emerald-500" });
       case 'error':
-        return <XCircle className="h-4 w-4 text-red-500" />;
+        return React.createElement(XCircle, { className: "h-4 w-4 text-red-500" });
       default:
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+        return React.createElement(AlertTriangle, { className: "h-4 w-4 text-yellow-500" });
     }
   };
 
