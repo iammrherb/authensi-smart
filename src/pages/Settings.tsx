@@ -13,7 +13,7 @@ import InvitationManagement from "@/components/admin/InvitationManagement";
 import CustomRoleManager from "@/components/admin/CustomRoleManager";
 import AISettings from "@/components/ai/AISettings";
 import AIProviderSetup from "@/components/ai/AIProviderSetup";
-import AdvancedAIManager from "@/components/ai/AdvancedAIManager";
+import SimpleAIKeyManager from "@/components/ai/SimpleAIKeyManager";
 import { Settings as SettingsIcon, User, Bell, Shield, Database, Globe, Users, Brain } from "lucide-react";
 import TaxonomySeederPanel from "@/components/admin/TaxonomySeederPanel";
 const Settings = () => {
@@ -241,7 +241,7 @@ const Settings = () => {
             </TabsContent>
 
         <TabsContent value="ai" className="space-y-6">
-          <AdvancedAIManager />
+          <SimpleAIKeyManager />
         </TabsContent>
 
             {(isAdmin || canManageUsers) && (
