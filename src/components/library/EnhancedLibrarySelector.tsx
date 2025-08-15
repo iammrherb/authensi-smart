@@ -242,14 +242,14 @@ const EnhancedLibrarySelector: React.FC<EnhancedLibrarySelectorProps> = ({
             value={filters[type].category}
             onValueChange={(value) => setFilters(prev => ({
               ...prev,
-              [type]: { ...prev[type], category: value }
+              [type]: { ...prev[type], category: value === "all" ? "" : value }
             }))}
           >
             <SelectTrigger>
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {config.categories.map(category => (
                 <SelectItem key={category} value={category}>
                   {category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
@@ -264,7 +264,7 @@ const EnhancedLibrarySelector: React.FC<EnhancedLibrarySelectorProps> = ({
               ...prev,
               [type]: { 
                 ...prev[type], 
-                [type === 'painPoints' ? 'severity' : type === 'requirements' ? 'priority' : 'complexity']: value 
+                [type === 'painPoints' ? 'severity' : type === 'requirements' ? 'priority' : 'complexity']: value === "all" ? "" : value 
               }
             }))}
           >
@@ -272,7 +272,7 @@ const EnhancedLibrarySelector: React.FC<EnhancedLibrarySelectorProps> = ({
               <SelectValue placeholder={type === 'painPoints' ? 'Severity' : type === 'requirements' ? 'Priority' : 'Complexity'} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Levels</SelectItem>
+              <SelectItem value="all">All Levels</SelectItem>
               {config.severities.map(level => (
                 <SelectItem key={level} value={level}>
                   {level.charAt(0).toUpperCase() + level.slice(1)}
@@ -285,14 +285,14 @@ const EnhancedLibrarySelector: React.FC<EnhancedLibrarySelectorProps> = ({
             value={filters[type].industry}
             onValueChange={(value) => setFilters(prev => ({
               ...prev,
-              [type]: { ...prev[type], industry: value }
+              [type]: { ...prev[type], industry: value === "all" ? "" : value }
             }))}
           >
             <SelectTrigger>
               <SelectValue placeholder="Industry" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Industries</SelectItem>
+              <SelectItem value="all">All Industries</SelectItem>
               {industries.map(industry => (
                 <SelectItem key={industry} value={industry}>
                   {industry.charAt(0).toUpperCase() + industry.slice(1)}
