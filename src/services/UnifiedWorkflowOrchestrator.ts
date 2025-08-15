@@ -258,7 +258,11 @@ export class UnifiedWorkflowOrchestrator {
 
   // Private helper methods
   private generateSessionId(): string {
-    return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // Generate a unique session ID with timestamp and random parts
+    const timestamp = Date.now();
+    const randomPart = Math.random().toString(36).substr(2, 12);
+    const additionalRandom = Math.random().toString(36).substr(2, 8);
+    return `wf_session_${timestamp}_${randomPart}_${additionalRandom}`;
   }
 
   private initializeDecisionState(): DecisionState {
@@ -406,21 +410,56 @@ export class UnifiedWorkflowOrchestrator {
   }
 
   private async saveContext(): Promise<void> {
-    // Save workflow context to database
-    const { error } = await (supabase as any)
-      .from('workflow_sessions')
-      .upsert({
-        session_id: this.context.session_id,
-        workflow_type: this.context.workflow_type,
-        current_step: this.context.current_step,
-        context_data: this.context.context_data,
-        ai_insights: this.context.ai_insights,
-        resource_mappings: this.context.resource_library_mappings,
-        created_by: (await supabase.auth.getUser()).data.user?.id,
-        updated_at: new Date().toISOString()
-      });
-    
-    if (error) throw error;
+    try {
+      // First try to update existing session
+      const { data: existingSession } = await (supabase as any)
+        .from('workflow_sessions')
+        .select('session_id')
+        .eq('session_id', this.context.session_id)
+        .single();
+
+      if (existingSession) {
+        // Update existing session
+        const { error } = await (supabase as any)
+          .from('workflow_sessions')
+          .update({
+            workflow_type: this.context.workflow_type,
+            current_step: this.context.current_step,
+            context_data: this.context.context_data,
+            ai_insights: this.context.ai_insights,
+            resource_library_mappings: this.context.resource_library_mappings,
+            updated_at: new Date().toISOString()
+          })
+          .eq('session_id', this.context.session_id);
+
+        if (error) {
+          console.error('Error updating workflow session:', error);
+          throw error;
+        }
+      } else {
+        // Insert new session
+        const { error } = await (supabase as any)
+          .from('workflow_sessions')
+          .insert({
+            session_id: this.context.session_id,
+            workflow_type: this.context.workflow_type,
+            current_step: this.context.current_step,
+            context_data: this.context.context_data,
+            ai_insights: this.context.ai_insights,
+            resource_library_mappings: this.context.resource_library_mappings,
+            created_by: (await supabase.auth.getUser()).data.user?.id,
+            updated_at: new Date().toISOString()
+          });
+
+        if (error) {
+          console.error('Error inserting workflow session:', error);
+          throw error;
+        }
+      }
+    } catch (error) {
+      console.error('Error saving workflow context:', error);
+      throw error;
+    }
   }
 
   private mapResourceTypeToLegacy(resourceType: ResourceType): 'industry_option' | 'compliance_framework' | 'deployment_type' | 'use_case' | 'requirement' {
