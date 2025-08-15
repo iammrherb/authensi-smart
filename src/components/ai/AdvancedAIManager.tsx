@@ -12,14 +12,15 @@ import { Input } from '@/components/ui/input';
 import { EnhancedCard } from '@/components/ui/enhanced-card';
 import { EnhancedButton } from '@/components/ui/enhanced-button';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Brain, Sparkles, Diamond, Globe, Zap, Settings2, 
   TestTube, CheckCircle2, XCircle, Loader2, AlertTriangle,
   Network, RefreshCw, BarChart3, Save, ArrowRight, ArrowDown,
-  Shield, Cpu, Cloud, Target, Layers, Router, Eye, EyeOff
+  Shield, Cpu, Cloud, Target, Layers, Router, Eye, EyeOff, Key
 } from 'lucide-react';
 
-export type AIProviderType = 'openai' | 'anthropic' | 'google' | 'perplexity' | 'grok';
+export type AIProviderType = 'openai' | 'anthropic' | 'google' | 'perplexity' | 'grok' | 'cohere' | 'mistral';
 export type TaskScenario = 
   | 'project_analysis' | 'troubleshooting' | 'config_generation' | 'documentation'
   | 'recommendations' | 'scoping' | 'training' | 'reporting' | 'chat' | 'search'
@@ -49,6 +50,7 @@ interface AIProvider {
   models: AIModel[];
   features: string[];
   apiKeySet: boolean;
+  apiKey?: string;
 }
 
 interface ScenarioConfiguration {
@@ -91,6 +93,33 @@ const AI_PROVIDERS: AIProvider[] = [
         isDefault: true
       },
       {
+        id: 'gpt-5-mini-2025-08-07',
+        name: 'GPT-5 Mini',
+        description: 'Faster, cost-efficient version of GPT-5',
+        contextWindow: 128000,
+        outputTokens: 16384,
+        costPerToken: 0.00001,
+        capabilities: ['reasoning', 'analysis', 'code']
+      },
+      {
+        id: 'gpt-5-nano-2025-08-07',
+        name: 'GPT-5 Nano',
+        description: 'Fastest, cheapest version for simple tasks',
+        contextWindow: 128000,
+        outputTokens: 8192,
+        costPerToken: 0.000005,
+        capabilities: ['chat', 'summarization', 'classification']
+      },
+      {
+        id: 'gpt-4.1-2025-04-14',
+        name: 'GPT-4.1',
+        description: 'Flagship GPT-4 model for reliable results',
+        contextWindow: 128000,
+        outputTokens: 4096,
+        costPerToken: 0.00003,
+        capabilities: ['reasoning', 'analysis', 'code', 'vision']
+      },
+      {
         id: 'o3-2025-04-16',
         name: 'O3',
         description: 'Powerful reasoning for complex problems',
@@ -98,6 +127,42 @@ const AI_PROVIDERS: AIProvider[] = [
         outputTokens: 8192,
         costPerToken: 0.00005,
         capabilities: ['reasoning', 'analysis', 'math']
+      },
+      {
+        id: 'o4-mini-2025-04-16',
+        name: 'O4 Mini',
+        description: 'Fast reasoning for coding and visual tasks',
+        contextWindow: 128000,
+        outputTokens: 8192,
+        costPerToken: 0.00003,
+        capabilities: ['reasoning', 'code', 'vision']
+      },
+      {
+        id: 'gpt-4.1-mini-2025-04-14',
+        name: 'GPT-4.1 Mini',
+        description: 'Older model with vision capabilities',
+        contextWindow: 128000,
+        outputTokens: 4096,
+        costPerToken: 0.00015,
+        capabilities: ['analysis', 'vision']
+      },
+      {
+        id: 'gpt-4o-mini',
+        name: 'GPT-4o Mini',
+        description: 'Fast and cheap model with vision (legacy)',
+        contextWindow: 128000,
+        outputTokens: 16384,
+        costPerToken: 0.00015,
+        capabilities: ['chat', 'vision']
+      },
+      {
+        id: 'gpt-4o',
+        name: 'GPT-4o',
+        description: 'Older powerful model with vision (legacy)',
+        contextWindow: 128000,
+        outputTokens: 16384,
+        costPerToken: 0.005,
+        capabilities: ['reasoning', 'vision', 'analysis']
       }
     ]
   },
@@ -132,6 +197,42 @@ const AI_PROVIDERS: AIProvider[] = [
         outputTokens: 8192,
         costPerToken: 0.0003,
         capabilities: ['reasoning', 'analysis', 'code']
+      },
+      {
+        id: 'claude-3-5-haiku-20241022',
+        name: 'Claude 3.5 Haiku',
+        description: 'Fastest model for quick responses',
+        contextWindow: 200000,
+        outputTokens: 8192,
+        costPerToken: 0.00025,
+        capabilities: ['chat', 'analysis', 'fast-response']
+      },
+      {
+        id: 'claude-3-7-sonnet-20250219',
+        name: 'Claude 3.7 Sonnet',
+        description: 'Extended thinking capabilities',
+        contextWindow: 200000,
+        outputTokens: 8192,
+        costPerToken: 0.0003,
+        capabilities: ['reasoning', 'analysis', 'deep-thinking']
+      },
+      {
+        id: 'claude-3-5-sonnet-20241022',
+        name: 'Claude 3.5 Sonnet',
+        description: 'Previous intelligent model',
+        contextWindow: 200000,
+        outputTokens: 8192,
+        costPerToken: 0.0003,
+        capabilities: ['reasoning', 'analysis', 'code']
+      },
+      {
+        id: 'claude-3-opus-20240229',
+        name: 'Claude 3 Opus',
+        description: 'Powerful but older model',
+        contextWindow: 200000,
+        outputTokens: 4096,
+        costPerToken: 0.00075,
+        capabilities: ['reasoning', 'analysis', 'writing']
       }
     ]
   },
@@ -157,6 +258,24 @@ const AI_PROVIDERS: AIProvider[] = [
         costPerToken: 0.000075,
         capabilities: ['multimodal', 'reasoning', 'code'],
         isDefault: true
+      },
+      {
+        id: 'gemini-1.5-pro',
+        name: 'Gemini 1.5 Pro',
+        description: 'Advanced reasoning with large context',
+        contextWindow: 2000000,
+        outputTokens: 8192,
+        costPerToken: 0.00125,
+        capabilities: ['reasoning', 'multimodal', 'large-context']
+      },
+      {
+        id: 'gemini-1.5-flash',
+        name: 'Gemini 1.5 Flash',
+        description: 'Fast multimodal model',
+        contextWindow: 1000000,
+        outputTokens: 8192,
+        costPerToken: 0.000075,
+        capabilities: ['multimodal', 'fast-response']
       }
     ]
   },
@@ -182,6 +301,24 @@ const AI_PROVIDERS: AIProvider[] = [
         costPerToken: 0.001,
         capabilities: ['search', 'analysis'],
         isDefault: true
+      },
+      {
+        id: 'llama-3.1-sonar-small-128k-online',
+        name: 'Sonar Small',
+        description: 'Smaller, faster model with web search',
+        contextWindow: 127072,
+        outputTokens: 4096,
+        costPerToken: 0.0002,
+        capabilities: ['search', 'fast-response']
+      },
+      {
+        id: 'llama-3.1-sonar-huge-128k-online',
+        name: 'Sonar Huge',
+        description: 'Largest model with comprehensive search',
+        contextWindow: 127072,
+        outputTokens: 4096,
+        costPerToken: 0.005,
+        capabilities: ['search', 'deep-analysis', 'comprehensive']
       }
     ]
   },
@@ -207,6 +344,92 @@ const AI_PROVIDERS: AIProvider[] = [
         costPerToken: 0.002,
         capabilities: ['chat', 'analysis', 'search'],
         isDefault: true
+      },
+      {
+        id: 'grok-beta',
+        name: 'Grok Beta',
+        description: 'Latest beta features',
+        contextWindow: 128000,
+        outputTokens: 8192,
+        costPerToken: 0.002,
+        capabilities: ['chat', 'experimental', 'real-time']
+      }
+    ]
+  },
+  {
+    id: '6',
+    type: 'cohere',
+    name: 'Cohere',
+    description: 'Enterprise-focused language models',
+    icon: Layers,
+    color: 'bg-indigo-500',
+    status: 'inactive',
+    isPrimary: false,
+    isSecondary: false,
+    apiKeySet: false,
+    features: ['Enterprise', 'RAG', 'Classification', 'Generation'],
+    models: [
+      {
+        id: 'command-r-plus',
+        name: 'Command R+',
+        description: 'Advanced reasoning and RAG capabilities',
+        contextWindow: 128000,
+        outputTokens: 4096,
+        costPerToken: 0.003,
+        capabilities: ['reasoning', 'rag', 'enterprise'],
+        isDefault: true
+      },
+      {
+        id: 'command-r',
+        name: 'Command R',
+        description: 'Balanced performance for enterprise use',
+        contextWindow: 128000,
+        outputTokens: 4096,
+        costPerToken: 0.0005,
+        capabilities: ['chat', 'rag', 'classification']
+      }
+    ]
+  },
+  {
+    id: '7',
+    type: 'mistral',
+    name: 'Mistral',
+    description: 'Open-source focused high-performance models',
+    icon: Cloud,
+    color: 'bg-red-500',
+    status: 'inactive',
+    isPrimary: false,
+    isSecondary: false,
+    apiKeySet: false,
+    features: ['Open Source', 'Code', 'Multilingual', 'Function Calling'],
+    models: [
+      {
+        id: 'mistral-large-latest',
+        name: 'Mistral Large',
+        description: 'Most capable Mistral model',
+        contextWindow: 32000,
+        outputTokens: 8192,
+        costPerToken: 0.004,
+        capabilities: ['reasoning', 'code', 'multilingual'],
+        isDefault: true
+      },
+      {
+        id: 'mistral-medium-latest',
+        name: 'Mistral Medium',
+        description: 'Balanced performance and cost',
+        contextWindow: 32000,
+        outputTokens: 8192,
+        costPerToken: 0.0027,
+        capabilities: ['chat', 'code', 'analysis']
+      },
+      {
+        id: 'mistral-small-latest',
+        name: 'Mistral Small',
+        description: 'Fast and efficient for simple tasks',
+        contextWindow: 32000,
+        outputTokens: 8192,
+        costPerToken: 0.002,
+        capabilities: ['chat', 'fast-response']
       }
     ]
   }
@@ -306,6 +529,9 @@ const AdvancedAIManager = () => {
   const [testingProviders, setTestingProviders] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState('providers');
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showApiKey, setShowApiKey] = useState<{[key: string]: boolean}>({});
+  const [apiKeys, setApiKeys] = useState<{[key: string]: string}>({});
+  const [savingApiKey, setSavingApiKey] = useState<string | null>(null);
 
   const [globalSettings, setGlobalSettings] = useState({
     enableIntelligentRouting: true,
@@ -344,8 +570,62 @@ const AdvancedAIManager = () => {
     ));
   };
 
+  // Save API Key
+  const saveApiKey = async (provider: AIProvider, apiKey: string) => {
+    if (!apiKey.trim()) {
+      toast({
+        title: "Invalid API Key",
+        description: "Please enter a valid API key.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setSavingApiKey(provider.type);
+    
+    try {
+      const { error } = await supabase.functions.invoke('save-ai-provider', {
+        body: {
+          provider: provider.type,
+          apiKey: apiKey.trim()
+        }
+      });
+
+      if (error) throw error;
+
+      setProviders(prev => prev.map(p => 
+        p.id === provider.id ? { ...p, apiKeySet: true, status: 'active' as const } : p
+      ));
+
+      setApiKeys(prev => ({ ...prev, [provider.type]: '' }));
+      setShowApiKey(prev => ({ ...prev, [provider.type]: false }));
+      
+      toast({
+        title: "API Key Saved",
+        description: `${provider.name} API key has been saved successfully.`
+      });
+    } catch (error: any) {
+      toast({
+        title: "Save Failed",
+        description: error.message || `Failed to save ${provider.name} API key.`,
+        variant: "destructive"
+      });
+    } finally {
+      setSavingApiKey(null);
+    }
+  };
+
   // Test provider connection
   const testProvider = async (provider: AIProvider) => {
+    if (!provider.apiKeySet) {
+      toast({
+        title: "API Key Required",
+        description: `Please configure your ${provider.name} API key first.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
     setTestingProviders(prev => new Set([...prev, provider.id]));
     
     try {
@@ -413,7 +693,11 @@ const AdvancedAIManager = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="api-keys" className="flex items-center gap-2">
+            <Key className="h-4 w-4" />
+            API Keys
+          </TabsTrigger>
           <TabsTrigger value="providers" className="flex items-center gap-2">
             <Network className="h-4 w-4" />
             Providers
@@ -431,6 +715,99 @@ const AdvancedAIManager = () => {
             Global Settings
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="api-keys" className="space-y-6">
+          <EnhancedCard glass>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Key className="h-5 w-5" />
+                <span>API Key Management</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {providers.map((provider) => {
+                const IconComponent = provider.icon;
+                const isVisible = showApiKey[provider.type] || false;
+                const currentApiKey = apiKeys[provider.type] || '';
+                const isSaving = savingApiKey === provider.type;
+                
+                return (
+                  <div key={provider.id} className="border rounded-lg p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className={`w-12 h-12 ${provider.color} rounded-lg flex items-center justify-center text-white`}>
+                          <IconComponent className="h-6 w-6" />
+                        </div>
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <Label className="text-lg font-semibold">{provider.name}</Label>
+                            {provider.apiKeySet && <Badge variant="default">Configured</Badge>}
+                            {!provider.apiKeySet && <Badge variant="outline">Not Configured</Badge>}
+                          </div>
+                          <p className="text-sm text-muted-foreground">{provider.description}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowApiKey(prev => ({ ...prev, [provider.type]: !isVisible }))}
+                        >
+                          {isVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          {isVisible ? 'Hide' : 'Configure'}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {isVisible && (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`api-key-${provider.type}`}>API Key</Label>
+                          <Input
+                            id={`api-key-${provider.type}`}
+                            type="password"
+                            placeholder={`Enter your ${provider.name} API key`}
+                            value={currentApiKey}
+                            onChange={(e) => setApiKeys(prev => ({ ...prev, [provider.type]: e.target.value }))}
+                            className="font-mono"
+                          />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <EnhancedButton
+                            onClick={() => saveApiKey(provider, currentApiKey)}
+                            disabled={!currentApiKey.trim() || isSaving}
+                            className="flex items-center space-x-2"
+                          >
+                            {isSaving ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Save className="h-4 w-4" />
+                            )}
+                            <span>{isSaving ? 'Saving...' : 'Save API Key'}</span>
+                          </EnhancedButton>
+                          {provider.apiKeySet && (
+                            <Button
+                              variant="outline"
+                              onClick={() => testProvider(provider)}
+                              disabled={testingProviders.has(provider.id)}
+                            >
+                              {testingProviders.has(provider.id) ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <TestTube className="h-4 w-4" />
+                              )}
+                              Test Connection
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </CardContent>
+          </EnhancedCard>
+        </TabsContent>
 
         <TabsContent value="providers" className="space-y-6">
           <EnhancedCard glass>
