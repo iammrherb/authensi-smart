@@ -55,6 +55,59 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// Enhanced Cyberpunk Color Palette
+				'neon-green': {
+					DEFAULT: 'hsl(var(--neon-green))',
+					foreground: 'hsl(var(--neon-green-foreground))',
+					glow: 'hsl(var(--neon-green-glow))'
+				},
+				'neon-purple': {
+					DEFAULT: 'hsl(var(--neon-purple))',
+					foreground: 'hsl(var(--neon-purple-foreground))',
+					glow: 'hsl(var(--neon-purple-glow))'
+				},
+				'neon-orange': {
+					DEFAULT: 'hsl(var(--neon-orange))',
+					foreground: 'hsl(var(--neon-orange-foreground))',
+					glow: 'hsl(var(--neon-orange-glow))'
+				},
+				'neon-red': {
+					DEFAULT: 'hsl(var(--neon-red))',
+					foreground: 'hsl(var(--neon-red-foreground))',
+					glow: 'hsl(var(--neon-red-glow))'
+				},
+				'neon-yellow': {
+					DEFAULT: 'hsl(var(--neon-yellow))',
+					foreground: 'hsl(var(--neon-yellow-foreground))',
+					glow: 'hsl(var(--neon-yellow-glow))'
+				},
+				'electric-blue': {
+					DEFAULT: 'hsl(var(--electric-blue))',
+					foreground: 'hsl(var(--electric-blue-foreground))',
+					glow: 'hsl(var(--electric-blue-glow))'
+				},
+				'cyber-pink': {
+					DEFAULT: 'hsl(var(--cyber-pink))',
+					foreground: 'hsl(var(--cyber-pink-foreground))',
+					glow: 'hsl(var(--cyber-pink-glow))'
+				},
+				// Status and Phase Colors
+				status: {
+					planned: 'hsl(var(--status-planned))',
+					'in-progress': 'hsl(var(--status-in-progress))',
+					complete: 'hsl(var(--status-complete))',
+					delayed: 'hsl(var(--status-delayed))',
+					blocked: 'hsl(var(--status-blocked))',
+					review: 'hsl(var(--status-review))'
+				},
+				phase: {
+					discovery: 'hsl(var(--phase-discovery))',
+					planning: 'hsl(var(--phase-planning))',
+					implementation: 'hsl(var(--phase-implementation))',
+					testing: 'hsl(var(--phase-testing))',
+					deployment: 'hsl(var(--phase-deployment))',
+					maintenance: 'hsl(var(--phase-maintenance))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -160,7 +213,21 @@ export default {
 				'gradient-hero': 'var(--gradient-hero)',
 				'gradient-card': 'var(--gradient-card)',
 				'gradient-button': 'var(--gradient-button)',
-				'gradient-accent': 'var(--gradient-accent)'
+				'gradient-accent': 'var(--gradient-accent)',
+				// Enhanced Cyberpunk Gradients
+				'gradient-neon-green': 'var(--gradient-neon-green)',
+				'gradient-neon-purple': 'var(--gradient-neon-purple)',
+				'gradient-neon-orange': 'var(--gradient-neon-orange)',
+				'gradient-electric-cyber': 'var(--gradient-electric-cyber)',
+				'gradient-matrix': 'var(--gradient-matrix)',
+				'gradient-cyber-wave': 'var(--gradient-cyber-wave)',
+				'gradient-neon-dreams': 'var(--gradient-neon-dreams)',
+				'gradient-digital-rain': 'var(--gradient-digital-rain)',
+				'gradient-progress': 'var(--gradient-progress)',
+				'gradient-chart': 'var(--gradient-chart)',
+				'gradient-chart-alt': 'var(--gradient-chart-alt)',
+				'gradient-status': 'var(--gradient-status)',
+				'gradient-metric': 'var(--gradient-metric)'
 			},
 			boxShadow: {
 				'glow': 'var(--shadow-glow)',

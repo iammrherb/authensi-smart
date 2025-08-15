@@ -20,6 +20,14 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         hero: "bg-gradient-primary text-primary-foreground hover:shadow-glow hover:scale-105 transition-all duration-300",
         glow: "bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 hover:shadow-glow backdrop-blur-sm",
+        // Enhanced Cyberpunk Variants
+        neon: "bg-gradient-neon-green text-neon-green-foreground hover:shadow-glow hover:scale-105 transition-all duration-300",
+        electric: "bg-gradient-electric-cyber text-electric-blue-foreground hover:shadow-glow hover:scale-105 transition-all duration-300",
+        matrix: "bg-gradient-matrix text-neon-green-foreground hover:shadow-glow hover:scale-105 transition-all duration-300",
+        cyber: "bg-gradient-cyber-wave text-cyber-pink-foreground hover:shadow-glow hover:scale-105 transition-all duration-300",
+        neon_purple: "bg-neon-purple text-neon-purple-foreground hover:bg-neon-purple/90 hover:shadow-glow",
+        neon_orange: "bg-neon-orange text-neon-orange-foreground hover:bg-neon-orange/90 hover:shadow-glow",
+        neon_yellow: "bg-neon-yellow text-neon-yellow-foreground hover:bg-neon-yellow/90 hover:shadow-glow",
       },
       size: {
         default: "h-10 px-4 py-2",
