@@ -697,7 +697,7 @@ const EnhancedAIProviderManager = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <div className={`w-12 h-12 ${provider.color} rounded-xl flex items-center justify-center text-white shadow-lg`}>
-                          <provider.icon className="h-6 w-6" />
+                          {React.createElement(provider.icon, { className: "h-6 w-6" })}
                         </div>
                         <div>
                           <CardTitle className="text-lg">{provider.name}</CardTitle>
@@ -860,7 +860,7 @@ const EnhancedAIProviderManager = () => {
                             {activeProviders.map((provider) => (
                               <SelectItem key={provider.type} value={provider.type}>
                                 <div className="flex items-center space-x-2">
-                                  <provider.icon className="h-4 w-4" />
+                                  {React.createElement(provider.icon, { className: "h-4 w-4" })}
                                   <span>{provider.name}</span>
                                 </div>
                               </SelectItem>
@@ -909,10 +909,10 @@ const EnhancedAIProviderManager = () => {
                               .filter(p => p.type !== config.primaryProvider)
                               .map((provider) => (
                                 <SelectItem key={provider.type} value={provider.type}>
-                                  <div className="flex items-center space-x-2">
-                                    <provider.icon className="h-4 w-4" />
-                                    <span>{provider.name}</span>
-                                  </div>
+                                   <div className="flex items-center space-x-2">
+                                     {React.createElement(provider.icon, { className: "h-4 w-4" })}
+                                     <span>{provider.name}</span>
+                                   </div>
                                 </SelectItem>
                               ))}
                           </SelectContent>
