@@ -96,13 +96,13 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-dark">
       <div className="pt-0">
         <div className="container mx-auto px-6 py-8">
           <div className="space-y-6">
             {/* Hero Section - Clean Header */}
             <div className="text-center mb-8">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-primary bg-clip-text text-transparent">
                 Portnox NAC Designer & Deployment Tracker
               </h1>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
@@ -113,19 +113,19 @@ const Index = () => {
               
               {/* Quick Action Buttons */}
               <div className="flex flex-wrap justify-center gap-3 mb-8">
-                <Button asChild size="lg" className="bg-gradient-primary hover:opacity-90 shadow-lg">
+                <Button asChild size="lg" className="bg-gradient-primary hover:opacity-90 shadow-neon hover-glow">
                   <Link to="/scoping">
                     <Plus className="h-4 w-4 mr-2" />
-                    AI-Powered Scoping
+                    Smart Scoping Assistant
                   </Link>
                 </Button>
-                <Button variant="outline" size="lg" asChild>
+                <Button variant="neon" size="lg" asChild>
                   <Link to="/use-cases">
                     <BookOpen className="h-4 w-4 mr-2" />
                     Use Case Library
                   </Link>
                 </Button>
-                <Button variant="outline" size="lg" asChild>
+                <Button variant="cyber" size="lg" asChild>
                   <Link to="/sites">
                     <Building2 className="h-4 w-4 mr-2" />
                     Manage Sites
@@ -136,10 +136,10 @@ const Index = () => {
 
             {/* Stats Grid - Matching Image Design */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <Card className="border-l-4 border-l-cyan-500 hover:shadow-lg transition-all duration-300">
+              <Card className="border-l-4 border-l-neon-cyan bg-gradient-to-r from-neon-cyan/5 to-transparent hover:shadow-neon transition-all duration-300 glass">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">Total Sites</CardTitle>
-                  <Building2 className="h-4 w-4 text-cyan-500" />
+                  <Building2 className="h-4 w-4 text-neon-cyan" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-foreground">{stats.totalSites}</div>
@@ -147,10 +147,10 @@ const Index = () => {
                 </CardContent>
               </Card>
 
-              <Card className="border-l-4 border-l-blue-500 hover:shadow-lg transition-all duration-300">
+              <Card className="border-l-4 border-l-electric-blue bg-gradient-to-r from-electric-blue/5 to-transparent hover:shadow-neon transition-all duration-300 glass">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">Active Projects</CardTitle>
-                  <Zap className="h-4 w-4 text-blue-500" />
+                  <Zap className="h-4 w-4 text-electric-blue" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-foreground">{stats.totalProjects}</div>
@@ -158,10 +158,10 @@ const Index = () => {
                 </CardContent>
               </Card>
 
-              <Card className="border-l-4 border-l-purple-500 hover:shadow-lg transition-all duration-300">
+              <Card className="border-l-4 border-l-neon-purple bg-gradient-to-r from-neon-purple/5 to-transparent hover:shadow-neon transition-all duration-300 glass">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">Questionnaires</CardTitle>
-                  <FileText className="h-4 w-4 text-purple-500" />
+                  <FileText className="h-4 w-4 text-neon-purple" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-foreground">{stats.activeQuestionnaires}</div>
@@ -169,10 +169,10 @@ const Index = () => {
                 </CardContent>
               </Card>
 
-              <Card className="border-l-4 border-l-green-500 hover:shadow-lg transition-all duration-300">
+              <Card className="border-l-4 border-l-neon-green bg-gradient-to-r from-neon-green/5 to-transparent hover:shadow-neon transition-all duration-300 glass">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">Completed</CardTitle>
-                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <CheckCircle className="h-4 w-4 text-neon-green" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-foreground">{stats.completedDeployments}</div>
@@ -196,13 +196,13 @@ const Index = () => {
                   <h2 className="text-xl font-semibold">Active Projects Overview</h2>
                   <div className="flex gap-2">
                     <Link to="/scoping">
-                      <Button className="bg-gradient-primary hover:opacity-90">
+                      <Button className="bg-gradient-primary hover:opacity-90 hover-glow">
                         <Plus className="h-4 w-4 mr-2" />
-                        AI Scoping Wizard
+                        Smart Scoping Wizard
                       </Button>
                     </Link>
                     <Link to="/tracker">
-                      <Button variant="outline">
+                      <Button variant="electric">
                         <TrendingUp className="h-4 w-4 mr-2" />
                         Project Tracker
                       </Button>
@@ -212,7 +212,7 @@ const Index = () => {
                 
                 <div className="grid gap-6">
                   {recentProjects.map((project) => (
-                    <Card key={project.id} className="hover:shadow-md transition-shadow">
+                    <Card key={project.id} className="hover:shadow-neon transition-all duration-300 glass hover-lift">
                       <CardHeader>
                         <div className="flex justify-between items-start">
                           <div>
@@ -272,7 +272,7 @@ const Index = () => {
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-semibold">Sites Overview</h2>
                   <Link to="/sites">
-                    <Button className="bg-gradient-primary hover:opacity-90">
+                    <Button className="bg-gradient-primary hover:opacity-90 hover-glow">
                       <Building2 className="h-4 w-4 mr-2" />
                       Manage Sites
                     </Button>
@@ -354,7 +354,7 @@ const Index = () => {
                       <CardTitle className="text-sm">Success Rate</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold text-green-600">94.2%</div>
+                      <div className="text-2xl font-bold text-neon-green">94.2%</div>
                       <p className="text-xs text-muted-foreground">On-time delivery rate</p>
                     </CardContent>
                   </Card>
@@ -374,7 +374,7 @@ const Index = () => {
                       <CardTitle className="text-sm">Cost Efficiency</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold text-green-600">12%</div>
+                      <div className="text-2xl font-bold text-neon-green">12%</div>
                       <p className="text-xs text-muted-foreground">Under budget average</p>
                     </CardContent>
                   </Card>
