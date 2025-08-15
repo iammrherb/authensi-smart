@@ -20,7 +20,6 @@ import Deployment from "./pages/Deployment";
 import Dashboard from "./pages/Dashboard";
 import CommandCenter from "./pages/CommandCenter";
 import AdminDashboard from "./components/admin/AdminDashboard";
-import Sites from "./pages/Sites";
 import Requirements from "./pages/Requirements";
 import Vendors from "./pages/Vendors";
 import Users from "./pages/Users";
@@ -190,11 +189,6 @@ const App = () => (
               <Route path="/use-cases" element={
                 <ProtectedRoute>
                   <UseCaseLibrary />
-                </ProtectedRoute>
-              } />
-              <Route path="/sites" element={
-                <ProtectedRoute>
-                  <Sites />
                 </ProtectedRoute>
               } />
               <Route path="/questionnaires" element={

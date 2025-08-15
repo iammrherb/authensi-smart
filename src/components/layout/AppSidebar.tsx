@@ -59,14 +59,14 @@ const lifecycleItems = [
     title: "Configuration & Setup",
     items: [
       { title: "AI Config Gen", url: "/ai-config", icon: Settings, badge: "1X", tooltip: "Automated configuration generation for 802.1X" },
-      { title: "Site Management", url: "/sites", icon: Building2, tooltip: "Multi-site deployment and management" },
       { title: "Vendor Configs", url: "/vendors", icon: Network, tooltip: "Vendor-specific configuration templates" }
     ]
   },
   {
     title: "Implementation & Tracking",
     items: [
-      { title: "Project Tracking", url: "/tracking", icon: BarChart3, tooltip: "Real-time project progress tracking" },
+      { title: "Project Tracking", url: "/tracking", icon: BarChart3, tooltip: "Real-time project progress tracking with site management" },
+      { title: "Site Deployment", url: "/tracking?tab=sites", icon: Building2, tooltip: "Multi-site deployment and management" },
       { title: "Deployment", url: "/deployment", icon: Rocket, tooltip: "Automated deployment orchestration" },
       { title: "Testing", url: "/testing", icon: TestTube, tooltip: "Comprehensive testing and validation" }
     ]
