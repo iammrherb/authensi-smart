@@ -64,3 +64,46 @@ export const useCreatePainPoint = () => {
     }
   });
 };
+
+export const useBulkImportPainPoints = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (painPoints: Omit<PainPoint, 'id' | 'created_at' | 'updated_at' | 'created_by'>[]) => {
+      const user = await supabase.auth.getUser();
+      const userId = user.data.user?.id;
+      
+      if (!userId) {
+        throw new Error('User must be authenticated to import pain points');
+      }
+
+      const painPointsWithUser = painPoints.map(painPoint => ({
+        ...painPoint,
+        created_by: userId
+      }));
+
+      const { data, error } = await supabase
+        .from('pain_points_library')
+        .insert(painPointsWithUser)
+        .select();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['pain-points'] });
+      toast({
+        title: "Pain Points Imported",
+        description: `Successfully imported ${data.length} pain points to the library.`
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to Import Pain Points",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
+};
