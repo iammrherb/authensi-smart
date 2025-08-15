@@ -194,94 +194,199 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
         <FileText className="h-12 w-12 mx-auto mb-4 text-primary" />
         <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
         <p className="text-muted-foreground">
-          Provide the foundational information for AI-driven recommendations
+          Tell us about your project requirements and goals
         </p>
       </div>
 
       {workflowType === 'project_genesis' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="project_name">Project Name</Label>
-              <Input
-                id="project_name"
-                value={userInputs.project_name || ''}
-                onChange={(e) => handleInputChange('project_name', e.target.value)}
-                placeholder="Enter project name"
-              />
-            </div>
+        <div className="space-y-8">
+          {/* Basic Project Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Basic Project Information</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="project_name">Project Name *</Label>
+                  <Input
+                    id="project_name"
+                    value={userInputs.project_name || ''}
+                    onChange={(e) => handleInputChange('project_name', e.target.value)}
+                    placeholder="Enter project name"
+                  />
+                </div>
 
-            <div>
-              <Label htmlFor="industry">Industry</Label>
-              <Select 
-                value={userInputs.industry} 
-                onValueChange={(value) => handleInputChange('industry', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select industry" />
-                </SelectTrigger>
-                <SelectContent>
-                  {industryOptions.map(option => (
-                    <SelectItem key={option.id} value={option.name}>{option.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                <div>
+                  <Label htmlFor="industry">Industry *</Label>
+                  <Select 
+                    value={userInputs.industry} 
+                    onValueChange={(value) => handleInputChange('industry', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select industry" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {industryOptions.map(option => (
+                        <SelectItem key={option.id} value={option.name}>{option.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <div>
-              <Label htmlFor="organization_size">Organization Size</Label>
-              <Select 
-                value={userInputs.organization_size} 
-                onValueChange={(value) => handleInputChange('organization_size', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select organization size" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="small">Small (1-100 users)</SelectItem>
-                  <SelectItem value="medium">Medium (101-1000 users)</SelectItem>
-                  <SelectItem value="large">Large (1001-5000 users)</SelectItem>
-                  <SelectItem value="enterprise">Enterprise (5000+ users)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+                <div>
+                  <Label htmlFor="organization_size">Organization Size *</Label>
+                  <Select 
+                    value={userInputs.organization_size} 
+                    onValueChange={(value) => handleInputChange('organization_size', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select organization size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="small">Small (1-100 users)</SelectItem>
+                      <SelectItem value="medium">Medium (101-1000 users)</SelectItem>
+                      <SelectItem value="large">Large (1001-5000 users)</SelectItem>
+                      <SelectItem value="enterprise">Enterprise (5000+ users)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="project_description">Project Description</Label>
-              <Textarea
-                id="project_description"
-                value={userInputs.project_description || ''}
-                onChange={(e) => handleInputChange('project_description', e.target.value)}
-                placeholder="Describe the project goals and scope"
-                rows={4}
-              />
-            </div>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="project_description">Project Description</Label>
+                  <Textarea
+                    id="project_description"
+                    value={userInputs.project_description || ''}
+                    onChange={(e) => handleInputChange('project_description', e.target.value)}
+                    placeholder="Describe the project goals and scope"
+                    rows={4}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-            <div>
-              <Label>Primary Goals</Label>
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                {['Zero Trust', 'Compliance', 'Visibility', 'Access Control'].map(goal => (
-                  <div key={goal} className="flex items-center space-x-2">
+          {/* Pain Points & Requirements */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Pain Points & Requirements</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                What challenges are you trying to solve? Select all that apply.
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  'Network Security',
+                  'Compliance Requirements', 
+                  'User Access Control',
+                  'Device Authentication',
+                  'Wireless Security',
+                  'Guest Network Management',
+                  'IoT Device Control',
+                  'Remote Access',
+                  'Visibility & Monitoring',
+                  'Policy Enforcement',
+                  'Incident Response',
+                  'Audit & Reporting'
+                ].map(painPoint => (
+                  <div key={painPoint} className="flex items-center space-x-2">
                     <Checkbox
-                      id={goal}
-                      checked={userInputs.primary_goals?.includes(goal) || false}
+                      id={painPoint}
+                      checked={userInputs.pain_points?.includes(painPoint) || false}
                       onCheckedChange={(checked) => {
-                        const goals = userInputs.primary_goals || [];
+                        const painPoints = userInputs.pain_points || [];
                         if (checked) {
-                          handleInputChange('primary_goals', [...goals, goal]);
+                          handleInputChange('pain_points', [...painPoints, painPoint]);
                         } else {
-                          handleInputChange('primary_goals', goals.filter((g: string) => g !== goal));
+                          handleInputChange('pain_points', painPoints.filter((p: string) => p !== painPoint));
                         }
                       }}
                     />
-                    <Label htmlFor={goal} className="text-sm">{goal}</Label>
+                    <Label htmlFor={painPoint} className="text-sm font-normal">{painPoint}</Label>
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
+
+          {/* Compliance & Regulatory */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Compliance & Regulatory Requirements</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Select any compliance frameworks you need to meet.
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {complianceFrameworks.map(framework => (
+                  <div key={framework.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={framework.name}
+                      checked={userInputs.compliance_requirements?.includes(framework.name) || false}
+                      onCheckedChange={(checked) => {
+                        const requirements = userInputs.compliance_requirements || [];
+                        if (checked) {
+                          handleInputChange('compliance_requirements', [...requirements, framework.name]);
+                        } else {
+                          handleInputChange('compliance_requirements', requirements.filter((r: string) => r !== framework.name));
+                        }
+                      }}
+                    />
+                    <Label htmlFor={framework.name} className="text-sm font-normal">{framework.name}</Label>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Deployment Preferences */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Deployment Preferences</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label htmlFor="deployment_type">Deployment Type</Label>
+                  <Select 
+                    value={userInputs.deployment_type} 
+                    onValueChange={(value) => handleInputChange('deployment_type', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select deployment type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {deploymentTypes.map(type => (
+                        <SelectItem key={type.id} value={type.name}>{type.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="timeline">Expected Timeline</Label>
+                  <Select 
+                    value={userInputs.timeline} 
+                    onValueChange={(value) => handleInputChange('timeline', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select timeline" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="immediate">Immediate (&lt; 1 month)</SelectItem>
+                      <SelectItem value="short">Short Term (1-3 months)</SelectItem>
+                      <SelectItem value="medium">Medium Term (3-6 months)</SelectItem>
+                      <SelectItem value="long">Long Term (6+ months)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>
@@ -308,20 +413,29 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {resourceMappings.filter(rm => rm.auto_selected).map(mapping => (
-                <div key={mapping.resource_id} className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <div>
-                      <div className="font-medium">{mapping.resource_type}</div>
-                      <div className="text-sm text-muted-foreground">{mapping.ai_reasoning}</div>
+              {resourceMappings.filter(rm => rm.auto_selected).length > 0 ? (
+                resourceMappings.filter(rm => rm.auto_selected).map(mapping => (
+                  <div key={mapping.resource_id} className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                    <div className="flex items-center gap-3">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <div>
+                        <div className="font-medium">{mapping.resource_type}</div>
+                        <div className="text-sm text-muted-foreground">{mapping.ai_reasoning}</div>
+                      </div>
                     </div>
+                    <Badge variant="default" className="bg-green-100 text-green-800">
+                      {Math.round(mapping.relevance_score * 100)}% match
+                    </Badge>
                   </div>
-                  <Badge variant="default" className="bg-green-100 text-green-800">
-                    {Math.round(mapping.relevance_score * 100)}% match
-                  </Badge>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <AlertTriangle className="h-8 w-8 mx-auto mb-3 text-orange-500" />
+                  <p className="text-muted-foreground">
+                    No auto-selected resources yet. Complete the requirements step to see AI recommendations.
+                  </p>
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
@@ -336,23 +450,32 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {resourceMappings.filter(rm => !rm.auto_selected).map(mapping => (
-                <div key={mapping.resource_id} className="flex items-center justify-between p-3 bg-accent/50 rounded-lg border">
-                  <div className="flex items-center gap-3">
-                    <Checkbox
-                      checked={mapping.user_confirmed}
-                      onCheckedChange={() => handleResourceToggle(mapping)}
-                    />
-                    <div>
-                      <div className="font-medium">{mapping.resource_type}</div>
-                      <div className="text-sm text-muted-foreground">{mapping.ai_reasoning}</div>
+              {resourceMappings.filter(rm => !rm.auto_selected).length > 0 ? (
+                resourceMappings.filter(rm => !rm.auto_selected).map(mapping => (
+                  <div key={mapping.resource_id} className="flex items-center justify-between p-3 bg-accent/50 rounded-lg border">
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        checked={mapping.user_confirmed}
+                        onCheckedChange={() => handleResourceToggle(mapping)}
+                      />
+                      <div>
+                        <div className="font-medium">{mapping.resource_type}</div>
+                        <div className="text-sm text-muted-foreground">{mapping.ai_reasoning}</div>
+                      </div>
                     </div>
+                    <Badge variant="outline">
+                      {Math.round(mapping.relevance_score * 100)}% match
+                    </Badge>
                   </div>
-                  <Badge variant="outline">
-                    {Math.round(mapping.relevance_score * 100)}% match
-                  </Badge>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <Lightbulb className="h-8 w-8 mx-auto mb-3 text-blue-500" />
+                  <p className="text-muted-foreground">
+                    Based on your requirements, we'll suggest relevant resources here.
+                  </p>
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
