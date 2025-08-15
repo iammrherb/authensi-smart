@@ -58,7 +58,7 @@ User Query: ${request.prompt}`,
 
     // Add GPT-5 specific parameters
     if (request.maxTokens) {
-      requestBody.max_completion_tokens = request.maxTokens;
+      requestBody.max_output_tokens = request.maxTokens;
     }
     
     if (request.reasoningEffort) {
