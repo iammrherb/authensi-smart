@@ -532,6 +532,7 @@ const AdvancedAIManager = () => {
   const [showApiKey, setShowApiKey] = useState<{[key: string]: boolean}>({});
   const [apiKeys, setApiKeys] = useState<{[key: string]: string}>({});
   const [savingApiKey, setSavingApiKey] = useState<string | null>(null);
+  const [loadingKeys, setLoadingKeys] = useState(true);
 
   const [globalSettings, setGlobalSettings] = useState({
     enableIntelligentRouting: true,
@@ -544,6 +545,43 @@ const AdvancedAIManager = () => {
     performanceMode: 'balanced' as 'speed' | 'balanced' | 'quality',
     enableUsageTracking: true
   });
+
+  // Load existing API keys on component mount
+  useEffect(() => {
+    loadSavedKeys();
+  }, []);
+
+  const loadSavedKeys = async () => {
+    try {
+      setLoadingKeys(true);
+      const { data: apiKeys, error } = await supabase
+        .from('user_api_keys')
+        .select('provider_name, encrypted_api_key');
+
+      if (error) {
+        console.error('Failed to load API keys:', error);
+        return;
+      }
+
+      if (apiKeys && apiKeys.length > 0) {
+        setProviders(prev => prev.map(provider => {
+          const hasKey = apiKeys.find(key => key.provider_name === provider.type);
+          return hasKey 
+            ? { ...provider, apiKeySet: true, status: 'active' as const }
+            : provider;
+        }));
+
+        toast({
+          title: "API Keys Loaded",
+          description: `Found ${apiKeys.length} configured AI provider(s).`
+        });
+      }
+    } catch (error) {
+      console.error('Error loading API keys:', error);
+    } finally {
+      setLoadingKeys(false);
+    }
+  };
 
   // Set primary provider
   const setPrimaryProvider = (providerId: string) => {
@@ -725,7 +763,13 @@ const AdvancedAIManager = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {providers.map((provider) => {
+              {loadingKeys ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                  <span>Loading saved API keys...</span>
+                </div>
+              ) : (
+                providers.map((provider) => {
                 const IconComponent = provider.icon;
                 const isVisible = showApiKey[provider.type] || false;
                 const currentApiKey = apiKeys[provider.type] || '';
@@ -804,7 +848,8 @@ const AdvancedAIManager = () => {
                     )}
                   </div>
                 );
-              })}
+                })
+              )}
             </CardContent>
           </EnhancedCard>
         </TabsContent>
