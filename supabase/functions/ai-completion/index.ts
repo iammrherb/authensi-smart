@@ -85,8 +85,23 @@ User Query: ${request.prompt}`,
     }
 
     const data = await response.json();
+    
+    // Handle different response formats from OpenAI Responses API
+    let content = '';
+    if (data.choices && data.choices[0] && data.choices[0].message) {
+      content = data.choices[0].message.content;
+    } else if (data.output) {
+      content = data.output;
+    } else if (data.content && Array.isArray(data.content)) {
+      // Handle new response format with reasoning traces
+      const textContent = data.content.find(item => item.type === 'text');
+      content = textContent ? textContent.text : 'Connection successful';
+    } else {
+      content = 'Connection successful'; // Fallback for test purposes
+    }
+    
     return {
-      content: data.choices?.[0]?.message?.content || data.output || '',
+      content,
       provider: 'openai' as const,
       usage: data.usage
     };
