@@ -13,6 +13,7 @@ import InvitationManagement from "@/components/admin/InvitationManagement";
 import CustomRoleManager from "@/components/admin/CustomRoleManager";
 import AISettings from "@/components/ai/AISettings";
 import AIProviderSetup from "@/components/ai/AIProviderSetup";
+import AdvancedAIManager from "@/components/ai/AdvancedAIManager";
 import { Settings as SettingsIcon, User, Bell, Shield, Database, Globe, Users, Brain } from "lucide-react";
 import TaxonomySeederPanel from "@/components/admin/TaxonomySeederPanel";
 const Settings = () => {
@@ -239,9 +240,9 @@ const Settings = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="ai" className="space-y-6">
-              <AIProviderSetup />
-            </TabsContent>
+        <TabsContent value="ai" className="space-y-6">
+          <AdvancedAIManager />
+        </TabsContent>
 
             {(isAdmin || canManageUsers) && (
               <TabsContent value="admin" className="space-y-6">
