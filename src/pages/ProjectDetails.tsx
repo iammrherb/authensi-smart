@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import EnhancedProjectTracker from '@/components/projects/EnhancedProjectTracker';
+import ProjectEditDialog from '@/components/projects/ProjectEditDialog';
+import PhaseManagementPanel from '@/components/projects/PhaseManagementPanel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProject } from '@/hooks/useProjects';
-import { ArrowLeft, Edit, Settings, Users, FileText } from 'lucide-react';
+import { ArrowLeft, Edit, Settings, Users, FileText, BarChart3, Folder } from 'lucide-react';
 
 const ProjectDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: project, isLoading } = useProject(id || '');
+  const { data: project, isLoading, refetch } = useProject(id || '');
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   if (isLoading) {
     return (
@@ -76,9 +80,73 @@ const ProjectDetails = () => {
     endpoints_count: 150, // Mock endpoints count - would come from project configuration
   };
 
+  // Sample phases data for the project
+  const projectPhases = [
+    {
+      id: "discovery",
+      name: "Discovery & Planning",
+      status: "completed" as const,
+      progress: 100,
+      start_date: "2025-01-01",
+      end_date: "2025-01-14",
+      estimated_duration: 14,
+      dependencies: [],
+      deliverables: ["Network Assessment", "Requirements Document", "Project Plan"],
+      assigned_team: ["Lead Architect", "Network Engineer"]
+    },
+    {
+      id: "design",
+      name: "Design & Architecture",
+      status: "in-progress" as const,
+      progress: 75,
+      start_date: "2025-01-15",
+      estimated_duration: 21,
+      dependencies: ["discovery"],
+      deliverables: ["Technical Design", "Security Policies", "Integration Plan"],
+      assigned_team: ["Lead Architect", "Security Specialist"]
+    },
+    {
+      id: "implementation",
+      name: "Implementation & Testing",
+      status: "not-started" as const,
+      progress: 0,
+      estimated_duration: 42,
+      dependencies: ["design"],
+      deliverables: ["System Implementation", "Testing Reports", "Documentation"],
+      assigned_team: ["Implementation Team", "QA Team"]
+    }
+  ];
+
+  // Sample milestones data for the project
+  const projectMilestones = [
+    {
+      id: "requirements-signed",
+      name: "Requirements Sign-off",
+      date: "2025-01-14",
+      status: "completed" as const,
+      description: "All project requirements have been documented and approved",
+      phase_id: "discovery"
+    },
+    {
+      id: "design-review",
+      name: "Design Review Complete",
+      date: "2025-02-05",
+      status: "pending" as const,
+      description: "Technical design review and stakeholder approval",
+      phase_id: "design"
+    },
+    {
+      id: "pilot-deployment",
+      name: "Pilot Deployment",
+      date: "2025-03-15",
+      status: "pending" as const,
+      description: "Pilot site deployment and initial testing",
+      phase_id: "implementation"
+    }
+  ];
+
   const handleEdit = () => {
-    // Navigate to project edit page or open edit modal
-    console.log('Edit project:', project.id);
+    setShowEditDialog(true);
   };
 
   const handleViewSites = () => {
@@ -111,12 +179,116 @@ const ProjectDetails = () => {
               <span className="text-foreground font-medium">{project.name}</span>
             </div>
 
-            {/* Enhanced Project Tracker */}
-            <EnhancedProjectTracker
-              project={projectDetails}
-              onEdit={handleEdit}
-              onViewSites={handleViewSites}
-              onViewTimeline={handleViewTimeline}
+            {/* Project Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Folder className="h-8 w-8 text-primary" />
+                <div>
+                  <h1 className="text-3xl font-bold">{project.name}</h1>
+                  <p className="text-muted-foreground">
+                    {project.client_name} • {project.current_phase} phase
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={handleEdit}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Project
+                </Button>
+                <Button variant="outline" onClick={handleViewSites}>
+                  <Settings className="h-4 w-4 mr-2" />
+                  Sites
+                </Button>
+                <Button variant="outline" onClick={() => navigate(`/reports?project=${project.id}`)}>
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Reports
+                </Button>
+              </div>
+            </div>
+
+            {/* Project Management Tabs */}
+            <Tabs defaultValue="overview" className="space-y-6">
+              <TabsList>
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="phases">Phases & Milestones</TabsTrigger>
+                <TabsTrigger value="sites">Sites</TabsTrigger>
+                <TabsTrigger value="settings">Settings</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="overview">
+                <EnhancedProjectTracker
+                  project={projectDetails}
+                  onEdit={handleEdit}
+                  onViewSites={handleViewSites}
+                  onViewTimeline={handleViewTimeline}
+                />
+              </TabsContent>
+
+              <TabsContent value="phases">
+                <PhaseManagementPanel
+                  projectId={project.id}
+                  phases={projectPhases}
+                  milestones={projectMilestones}
+                  onUpdatePhase={(phase) => console.log('Update phase:', phase)}
+                  onUpdateMilestone={(milestone) => console.log('Update milestone:', milestone)}
+                />
+              </TabsContent>
+
+              <TabsContent value="sites">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Project Sites</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground mb-4">
+                      Manage and track implementation across all project sites.
+                    </p>
+                    <Button onClick={handleViewSites}>
+                      <Settings className="h-4 w-4 mr-2" />
+                      View All Sites
+                    </Button>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="settings">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Project Settings</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium">Status</label>
+                          <Badge variant="outline" className="ml-2">{project.status}</Badge>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium">Current Phase</label>
+                          <p className="text-sm text-muted-foreground capitalize">{project.current_phase}</p>
+                        </div>
+                      </div>
+                      {project.description && (
+                        <div>
+                          <label className="text-sm font-medium">Description</label>
+                          <p className="text-sm text-muted-foreground">{project.description}</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+
+            {/* Project Edit Dialog */}
+            <ProjectEditDialog
+              project={project}
+              isOpen={showEditDialog}
+              onClose={() => setShowEditDialog(false)}
+              onUpdate={() => {
+                refetch();
+                setShowEditDialog(false);
+              }}
             />
           </div>
         </div>

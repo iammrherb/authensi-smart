@@ -37,6 +37,7 @@ import ProjectScoping from "./pages/ProjectScoping";
 import UseCaseLibrary from "./pages/UseCaseLibrary";
 import ProjectDetails from "./pages/ProjectDetails";
 import Sites from "./pages/Sites";
+import SiteDetails from "./pages/SiteDetails";
 import IntelligenceTrackerHub from "./pages/IntelligenceTrackerHub";
 
 
@@ -110,6 +111,11 @@ const App = () => (
               <Route path="/sites" element={
                 <ProtectedRoute>
                   <Sites />
+                </ProtectedRoute>
+              } />
+              <Route path="/sites/:id" element={
+                <ProtectedRoute>
+                  <SiteDetails />
                 </ProtectedRoute>
               } />
               
