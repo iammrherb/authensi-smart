@@ -270,11 +270,12 @@ export class UnifiedWorkflowOrchestrator {
 
   // Private helper methods
   private generateSessionId(): string {
-    // Generate a unique session ID with timestamp and random parts
+    // Generate a highly unique session ID using crypto if available
     const timestamp = Date.now();
-    const randomPart = Math.random().toString(36).substr(2, 12);
-    const additionalRandom = Math.random().toString(36).substr(2, 8);
-    return `wf_session_${timestamp}_${randomPart}_${additionalRandom}`;
+    const randomPart1 = Math.random().toString(36).substr(2, 16);
+    const randomPart2 = Math.random().toString(36).substr(2, 16);
+    const microseconds = performance.now().toString().replace('.', '');
+    return `wf_${timestamp}_${microseconds}_${randomPart1}_${randomPart2}`;
   }
 
   private initializeDecisionState(): DecisionState {
@@ -441,23 +442,31 @@ export class UnifiedWorkflowOrchestrator {
 
   private async saveContext(): Promise<void> {
     try {
+      console.log('Saving context for session:', this.context.session_id);
+      
       // First try to update existing session
-      const { data: existingSession } = await (supabase as any)
+      const { data: existingSession, error: selectError } = await supabase
         .from('workflow_sessions')
         .select('session_id')
         .eq('session_id', this.context.session_id)
         .maybeSingle();
 
+      if (selectError) {
+        console.error('Error checking existing session:', selectError);
+        throw selectError;
+      }
+
       if (existingSession) {
+        console.log('Updating existing session');
         // Update existing session
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from('workflow_sessions')
           .update({
             workflow_type: this.context.workflow_type,
             current_step: this.context.current_step,
             context_data: this.context.context_data,
-            ai_insights: this.context.ai_insights,
-            resource_library_mappings: this.context.resource_library_mappings,
+            ai_insights: JSON.parse(JSON.stringify(this.context.ai_insights)),
+            resource_mappings: JSON.parse(JSON.stringify(this.context.resource_library_mappings)),
             updated_at: new Date().toISOString()
           })
           .eq('session_id', this.context.session_id);
@@ -466,24 +475,44 @@ export class UnifiedWorkflowOrchestrator {
           console.error('Error updating workflow session:', error);
           throw error;
         }
+        console.log('Session updated successfully');
       } else {
-        // Insert new session
-        const { error } = await (supabase as any)
-          .from('workflow_sessions')
-          .insert({
-            session_id: this.context.session_id,
-            workflow_type: this.context.workflow_type,
-            current_step: this.context.current_step,
-            context_data: this.context.context_data,
-            ai_insights: this.context.ai_insights,
-            resource_library_mappings: this.context.resource_library_mappings,
-            created_by: (await supabase.auth.getUser()).data.user?.id,
-            updated_at: new Date().toISOString()
-          });
+        console.log('Creating new session');
+        // Try to insert new session, but if it fails due to conflict, try with a new ID
+        let insertAttempts = 0;
+        let currentSessionId = this.context.session_id;
+        
+        while (insertAttempts < 3) {
+          const { error } = await supabase
+            .from('workflow_sessions')
+            .insert({
+              session_id: currentSessionId,
+              workflow_type: this.context.workflow_type,
+              current_step: this.context.current_step,
+              context_data: this.context.context_data,
+              ai_insights: JSON.parse(JSON.stringify(this.context.ai_insights)),
+              resource_mappings: JSON.parse(JSON.stringify(this.context.resource_library_mappings)),
+              created_by: (await supabase.auth.getUser()).data.user?.id,
+              updated_at: new Date().toISOString()
+            });
 
-        if (error) {
-          console.error('Error inserting workflow session:', error);
-          throw error;
+          if (!error) {
+            console.log('Session created successfully with ID:', currentSessionId);
+            this.context.session_id = currentSessionId;
+            break;
+          } else if (error.code === '23505') {
+            // Duplicate key, generate new ID and try again
+            insertAttempts++;
+            currentSessionId = this.generateSessionId();
+            console.log(`Duplicate session ID, trying again with new ID (attempt ${insertAttempts}):`, currentSessionId);
+          } else {
+            console.error('Error inserting workflow session:', error);
+            throw error;
+          }
+        }
+        
+        if (insertAttempts >= 3) {
+          throw new Error('Failed to create session after multiple attempts due to ID conflicts');
         }
       }
     } catch (error) {
