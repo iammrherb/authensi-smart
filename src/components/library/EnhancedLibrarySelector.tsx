@@ -70,7 +70,7 @@ const EnhancedLibrarySelector: React.FC<EnhancedLibrarySelectorProps> = ({
       const matchesCategory = !filters.requirements.category || item.category === filters.requirements.category;
       const matchesPriority = !filters.requirements.priority || item.priority === filters.requirements.priority;
       const matchesIndustry = !filters.requirements.industry || 
-                             (item.tags && item.tags.some(tag => tag.toLowerCase().includes(filters.requirements.industry.toLowerCase())));
+                             (item.tags && item.tags.some((tag: string) => tag.toLowerCase().includes(filters.requirements.industry.toLowerCase())));
       
       return matchesSearch && matchesCategory && matchesPriority && matchesIndustry;
     });
@@ -83,7 +83,7 @@ const EnhancedLibrarySelector: React.FC<EnhancedLibrarySelectorProps> = ({
       const matchesCategory = !filters.useCases.category || item.category === filters.useCases.category;
       const matchesComplexity = !filters.useCases.complexity || item.complexity === filters.useCases.complexity;
       const matchesIndustry = !filters.useCases.industry || 
-                             (item.tags && item.tags.some(tag => tag.toLowerCase().includes(filters.useCases.industry.toLowerCase())));
+                             (item.tags && item.tags.some((tag: string) => tag.toLowerCase().includes(filters.useCases.industry.toLowerCase())));
       
       return matchesSearch && matchesCategory && matchesComplexity && matchesIndustry;
     });
