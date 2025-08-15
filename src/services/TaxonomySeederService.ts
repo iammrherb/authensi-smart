@@ -9,8 +9,10 @@ export type SeedableDataset =
   | "network_segments"
   | "compliance_frameworks"
   | "vendor_library"
+  | "vendor_models"
   | "use_case_library"
-  | "config_templates";
+  | "config_templates"
+  | "expanded_vendor_library";
 
 export class TaxonomySeederService {
   static async seed(datasets?: SeedableDataset[]) {

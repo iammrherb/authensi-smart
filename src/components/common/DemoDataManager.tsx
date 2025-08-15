@@ -22,6 +22,7 @@ import { useSeedDemoData, useClearDemoData } from "@/hooks/useDemoData";
 import { TaxonomySeederService } from "@/services/TaxonomySeederService";
 import { UnifiedTemplateSeederService } from "@/services/UnifiedTemplateSeederService";
 import SimpleLibrarySeeder from "@/components/library/SimpleLibrarySeeder";
+import ExpandedVendorSeeder from "@/components/library/ExpandedVendorSeeder";
 
 const DemoDataManager: React.FC = () => {
   const [isSeeding, setIsSeeding] = useState(false);
@@ -185,8 +186,9 @@ const DemoDataManager: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="library">
+        <TabsContent value="library" className="space-y-6">
           <SimpleLibrarySeeder />
+          <ExpandedVendorSeeder />
         </TabsContent>
 
         <TabsContent value="taxonomy">
