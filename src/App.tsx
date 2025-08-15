@@ -49,6 +49,7 @@ import SmartConfigCenter from "./pages/SmartConfigCenter";
 import UltimateWizard from "./pages/UltimateWizard";
 import Portnox from "./pages/Portnox";
 import ComprehensiveImplementationHub from "./pages/ComprehensiveImplementationHub";
+import AIIntegrationTest from "./pages/AIIntegrationTest";
 
 const queryClient = new QueryClient();
 
@@ -193,6 +194,11 @@ const App = () => (
               <Route path="/portnox" element={
                 <ProtectedRoute>
                   <Portnox />
+                </ProtectedRoute>
+              } />
+              <Route path="/ai-test" element={
+                <ProtectedRoute>
+                  <AIIntegrationTest />
                 </ProtectedRoute>
               } />
               
