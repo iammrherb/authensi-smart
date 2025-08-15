@@ -36,6 +36,7 @@ import ProjectScoping from "./pages/ProjectScoping";
 
 import UseCaseLibrary from "./pages/UseCaseLibrary";
 import ProjectDetails from "./pages/ProjectDetails";
+import Sites from "./pages/Sites";
 import IntelligenceTrackerHub from "./pages/IntelligenceTrackerHub";
 
 
@@ -104,6 +105,14 @@ const App = () => (
                   <ProjectDetails />
                 </ProtectedRoute>
               } />
+              
+              {/* Sites Management */}
+              <Route path="/sites" element={
+                <ProtectedRoute>
+                  <Sites />
+                </ProtectedRoute>
+              } />
+              
               <Route path="/tracker" element={
                 <ProtectedRoute>
                   <ProjectManager />
