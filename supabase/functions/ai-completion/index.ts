@@ -9,7 +9,7 @@ const corsHeaders = {
 interface AIRequest {
   prompt: string;
   context?: string;
-  provider?: 'openai' | 'claude' | 'gemini';
+  provider?: 'openai' | 'claude' | 'gemini' | 'anthropic';
   temperature?: number;
   maxTokens?: number;
   reasoningEffort?: 'minimal' | 'low' | 'medium' | 'high';
@@ -171,7 +171,7 @@ async function callClaude(request: AIRequest) {
       'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify({
-      model: 'claude-3-5-sonnet-20241022',
+      model: request.model || 'claude-sonnet-4-20250514',
       max_tokens: request.maxTokens || 2000,
       temperature: request.temperature || 0.7,
       system: `You are a Portnox NAC (Network Access Control) expert assistant. You help with deployment planning, troubleshooting, best practices, and recommendations. Always provide accurate, actionable advice based on enterprise network security best practices.${request.context ? ` Context: ${request.context}` : ''}`,
@@ -262,6 +262,7 @@ serve(async (req) => {
         result = await callOpenAI(request);
         break;
       case 'claude':
+      case 'anthropic':
         result = await callClaude(request);
         break;
       case 'gemini':
