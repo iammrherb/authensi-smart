@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
+import AIEnhancedLibraryManager from '@/components/library/AIEnhancedLibraryManager';
+import LibrarySeeder from '@/components/library/LibrarySeeder';
 import { 
   Brain, 
   Zap, 
@@ -308,6 +310,47 @@ const RevolutionaryWorkflowOrchestrator: React.FC<RevolutionaryWorkflowOrchestra
                     <Label htmlFor={painPoint} className="text-sm font-normal">{painPoint}</Label>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Library Management */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Enhance Your Library</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Seed your library with comprehensive resources or add custom items.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <LibrarySeeder />
+                <div className="space-y-3">
+                  <AIEnhancedLibraryManager
+                    type="pain_point"
+                    onItemCreated={(item) => {
+                      toast(`Pain point "${item.title}" added to library`, {
+                        description: "Available for future projects"
+                      });
+                    }}
+                  />
+                  <AIEnhancedLibraryManager
+                    type="requirement"
+                    onItemCreated={(item) => {
+                      toast(`Requirement "${item.title}" added to library`, {
+                        description: "Available for future projects"
+                      });
+                    }}
+                  />
+                  <AIEnhancedLibraryManager
+                    type="use_case"
+                    onItemCreated={(item) => {
+                      toast(`Use case "${item.name}" added to library`, {
+                        description: "Available for future projects"
+                      });
+                    }}
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
