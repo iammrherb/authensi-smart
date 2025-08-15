@@ -31,7 +31,7 @@ import NotFound from "./pages/NotFound";
 // New enhanced pages
 import IntelligentScoping from "./pages/IntelligentScoping";
 import ProjectScoping from "./pages/ProjectScoping";
-import ProjectTracking from "./pages/ProjectTracking";
+
 import UseCaseLibrary from "./pages/UseCaseLibrary";
 import ProjectDetails from "./pages/ProjectDetails";
 import IntelligenceTrackerHub from "./pages/IntelligenceTrackerHub";
@@ -39,13 +39,12 @@ import IntelligenceTrackerHub from "./pages/IntelligenceTrackerHub";
 
 import UnifiedResourceCenter from "./pages/UnifiedResourceCenter";
 import ProjectCreation from "./pages/ProjectCreation";
-import UnifiedProjectHub from "./pages/UnifiedProjectHub";
+import UnifiedProjectCenter from "./pages/UnifiedProjectCenter";
 import OneXerWizardPage from "./pages/OneXerWizard";
 import SmartConfigCenter from "./pages/SmartConfigCenter";
 import UltimateWizard from "./pages/UltimateWizard";
 import Portnox from "./pages/Portnox";
 import ComprehensiveImplementationHub from "./pages/ComprehensiveImplementationHub";
-import UnifiedProjectTrackingCenter from "./pages/UnifiedProjectTrackingCenter";
 
 const queryClient = new QueryClient();
 
@@ -92,46 +91,39 @@ const App = () => (
                 </ProtectedRoute>
               } />
               
-              {/* Unified Project Management */}
+              {/* Unified Project Center - All project management in one place */}
               <Route path="/projects" element={
                 <ProtectedRoute>
-                  <UnifiedProjectHub />
+                  <UnifiedProjectCenter />
+                </ProtectedRoute>
+              } />
+              <Route path="/projects/:projectId" element={
+                <ProtectedRoute>
+                  <UnifiedProjectCenter />
                 </ProtectedRoute>
               } />
               <Route path="/tracker" element={
                 <ProtectedRoute>
-                  <UnifiedProjectHub />
+                  <UnifiedProjectCenter />
                 </ProtectedRoute>
               } />
-              
-              {/* Unified Project Tracking Center */}
               <Route path="/tracking" element={
                 <ProtectedRoute>
-                  <UnifiedProjectTrackingCenter />
+                  <UnifiedProjectCenter />
                 </ProtectedRoute>
               } />
               <Route path="/tracking/project/:projectId" element={
                 <ProtectedRoute>
-                  <UnifiedProjectTrackingCenter />
+                  <UnifiedProjectCenter />
+                </ProtectedRoute>
+              } />
+              <Route path="/implementation" element={
+                <ProtectedRoute>
+                  <UnifiedProjectCenter />
                 </ProtectedRoute>
               } />
               
-              {/* Legacy Implementation Hub */}
-              <Route path="/implementation" element={
-                <ProtectedRoute>
-                  <ComprehensiveImplementationHub />
-                </ProtectedRoute>
-              } />
-              <Route path="/implementation-tracker" element={
-                <ProtectedRoute>
-                  <ComprehensiveImplementationHub />
-                </ProtectedRoute>
-              } />
-              <Route path="/project/:projectId/tracking" element={
-                <ProtectedRoute>
-                  <ProjectTracking />
-                </ProtectedRoute>
-              } />
+              {/* Legacy routes for backward compatibility */}
               <Route path="/deployment" element={
                 <ProtectedRoute>
                   <Deployment />
@@ -140,16 +132,6 @@ const App = () => (
               <Route path="/reports" element={
                 <ProtectedRoute>
                   <Reports />
-                </ProtectedRoute>
-              } />
-              <Route path="/projects/:id" element={
-                <ProtectedRoute>
-                  <ProjectDetails />
-                </ProtectedRoute>
-              } />
-              <Route path="/projects/:id/edit" element={
-                <ProtectedRoute>
-                  <ProjectDetails />
                 </ProtectedRoute>
               } />
               

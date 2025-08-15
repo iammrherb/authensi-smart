@@ -31,11 +31,11 @@ const primaryNavItems = [
     tooltip: "Central hub for all project activities with AI insights"
   },
   { 
-    title: "Project Hub", 
+    title: "Project Center", 
     url: "/projects", 
     icon: Target,
-    description: "Complete Project Lifecycle Management",
-    tooltip: "Manage projects from planning to deployment"
+    description: "Unified Project Management & Tracking",
+    tooltip: "Complete project lifecycle from creation to deployment"
   },
   { 
     title: "Analytics", 
@@ -63,9 +63,8 @@ const lifecycleItems = [
     ]
   },
   {
-    title: "Implementation & Tracking",
+    title: "Deployment & Testing",
     items: [
-      { title: "Project Tracking", url: "/tracking", icon: BarChart3, tooltip: "Real-time project progress tracking" },
       { title: "Deployment", url: "/deployment", icon: Rocket, tooltip: "Automated deployment orchestration" },
       { title: "Testing", url: "/testing", icon: TestTube, tooltip: "Comprehensive testing and validation" }
     ]
