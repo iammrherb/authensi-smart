@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 interface SaveProviderRequest {
-  provider: 'openai' | 'anthropic' | 'google' | 'perplexity' | 'grok' | 'cohere' | 'mistral';
+  provider: 'openai' | 'anthropic' | 'google' | 'perplexity' | 'grok' | 'cohere' | 'mistral' | 'claude' | 'gemini';
   apiKey: string;
 }
 
@@ -53,23 +53,21 @@ serve(async (req) => {
     // Create Supabase client with service role key
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get the user's ID from the auth header
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
-      throw new Error('No authorization header provided');
+    // Get user from the JWT token
+    const authToken = req.headers.get('Authorization')?.replace('Bearer ', '');
+    if (!authToken) {
+      throw new Error('No authorization token provided');
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
-    if (authError || !user) {
-      throw new Error('Invalid authorization token');
+    const { data: { user }, error: userError } = await supabase.auth.getUser(authToken);
+    if (userError || !user) {
+      throw new Error('Invalid or expired token');
     }
 
-    // Simple encryption for the API key (in production, use proper encryption)
-    const encryptedApiKey = btoa(apiKey); // Base64 encoding for demo
+    // Simple encryption (base64 encoding for demo - use proper encryption in production)
+    const encryptedApiKey = btoa(apiKey);
 
-    // Store the API key in the database
+    // Save the API key securely in the database
     const { error: dbError } = await supabase
       .from('user_api_keys')
       .upsert({
@@ -82,10 +80,10 @@ serve(async (req) => {
 
     if (dbError) {
       console.error('Database error:', dbError);
-      throw new Error(`Failed to save API key: ${dbError.message}`);
+      throw new Error('Failed to save API key to database');
     }
 
-    console.log(`Securely stored API key for provider: ${provider}, user: ${user.id}`);
+    console.log(`Securely stored API key for provider: ${provider}`);
     
     // Return success response
     return new Response(
