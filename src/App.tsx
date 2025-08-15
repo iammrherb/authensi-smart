@@ -99,6 +99,11 @@ const App = () => (
                   <ProjectManager />
                 </ProtectedRoute>
               } />
+              <Route path="/projects/:id" element={
+                <ProtectedRoute>
+                  <ProjectDetails />
+                </ProtectedRoute>
+              } />
               <Route path="/tracker" element={
                 <ProtectedRoute>
                   <ProjectManager />
