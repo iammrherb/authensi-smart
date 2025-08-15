@@ -454,6 +454,16 @@ export const useSeedDemoData = () => {
 
   return useMutation({
     mutationFn: async () => {
+      // Get the current user for created_by field
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('User must be authenticated to seed demo data');
+      }
+
+      // Clear any existing demo data first
+      await supabase.from('projects').delete().eq('created_by', user.id);
+      await supabase.from('sites').delete().eq('created_by', user.id);
+
       // Insert demo sites
       const { error: sitesError } = await supabase
         .from('sites')
@@ -469,7 +479,7 @@ export const useSeedDemoData = () => {
           device_count: site.device_count,
           status: site.status,
           priority: site.priority,
-          created_by: site.created_by
+          created_by: user.id
         })));
 
       if (sitesError) throw sitesError;
@@ -486,11 +496,10 @@ export const useSeedDemoData = () => {
           target_completion: project.target_completion,
           actual_completion: project.actual_completion,
           budget: project.budget,
-          created_by: project.created_by
+          created_by: user.id
         })));
 
       if (projectsError) throw projectsError;
-
 
       return { success: true };
     },
@@ -520,9 +529,15 @@ export const useClearDemoData = () => {
 
   return useMutation({
     mutationFn: async () => {
+      // Get the current user for filtering
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('User must be authenticated to clear demo data');
+      }
+
       // Delete in correct order due to foreign key constraints
-      await supabase.from('projects').delete().eq('created_by', 'demo-user');
-      await supabase.from('sites').delete().eq('created_by', 'demo-user');
+      await supabase.from('projects').delete().eq('created_by', user.id);
+      await supabase.from('sites').delete().eq('created_by', user.id);
       
       return { success: true };
     },
