@@ -18,7 +18,9 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Received request to save AI provider');
     const { provider, apiKey }: SaveProviderRequest = await req.json();
+    console.log(`Request details: provider=${provider}, apiKeyLength=${apiKey?.length || 0}`);
 
     if (!provider || !apiKey) {
       throw new Error('Provider and API key are required');
@@ -61,8 +63,10 @@ serve(async (req) => {
 
     const { data: { user }, error: userError } = await supabase.auth.getUser(authToken);
     if (userError || !user) {
+      console.error('Authentication error:', userError);
       throw new Error('Invalid or expired token');
     }
+    console.log(`Authenticated user: ${user.id}`);
 
     // Simple encryption (base64 encoding for demo - use proper encryption in production)
     const encryptedApiKey = btoa(apiKey);
@@ -80,10 +84,10 @@ serve(async (req) => {
 
     if (dbError) {
       console.error('Database error:', dbError);
-      throw new Error('Failed to save API key to database');
+      throw new Error(`Failed to save API key to database: ${dbError.message}`);
     }
 
-    console.log(`Securely stored API key for provider: ${provider}`);
+    console.log(`Successfully stored API key for provider: ${provider} for user: ${user.id}`);
     
     // Return success response
     return new Response(
