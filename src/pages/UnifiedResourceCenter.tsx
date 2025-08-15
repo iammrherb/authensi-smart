@@ -167,17 +167,17 @@ const UnifiedResourceCenter = () => {
 
   const getColorClasses = (category: string) => {
     const colorMap: { [key: string]: string } = {
-      vendors: 'border-l-primary',
-      'config-templates': 'border-l-green-500',
-      'project-templates': 'border-l-purple-500',
-      'use-cases': 'border-l-orange-500',
-      requirements: 'border-l-red-500',
-      compliance: 'border-l-indigo-500',
-      authentication: 'border-l-pink-500',
-      'network-segments': 'border-l-teal-500',
-      industries: 'border-l-gray-500'
+      vendors: 'border-l-neon-green bg-gradient-to-r from-neon-green/5 to-transparent',
+      'config-templates': 'border-l-neon-purple bg-gradient-to-r from-neon-purple/5 to-transparent',
+      'project-templates': 'border-l-neon-orange bg-gradient-to-r from-neon-orange/5 to-transparent',
+      'use-cases': 'border-l-electric-blue bg-gradient-to-r from-electric-blue/5 to-transparent',
+      requirements: 'border-l-cyber-red bg-gradient-to-r from-cyber-red/5 to-transparent',
+      compliance: 'border-l-neon-yellow bg-gradient-to-r from-neon-yellow/5 to-transparent',
+      authentication: 'border-l-cyber-pink bg-gradient-to-r from-cyber-pink/5 to-transparent',
+      'network-segments': 'border-l-matrix-green bg-gradient-to-r from-matrix-green/5 to-transparent',
+      industries: 'border-l-cyberpunk-blue bg-gradient-to-r from-cyberpunk-blue/5 to-transparent'
     };
-    return colorMap[category] || 'border-l-primary';
+    return colorMap[category] || 'border-l-neon-cyan bg-gradient-to-r from-neon-cyan/5 to-transparent';
   };
 
   const renderOverview = () => (
@@ -189,7 +189,7 @@ const UnifiedResourceCenter = () => {
           return (
             <Card 
               key={category.id} 
-              className={`border-l-4 ${getColorClasses(category.id)} cursor-pointer hover:shadow-lg transition-all duration-300`}
+              className={`border-l-4 ${getColorClasses(category.id)} cursor-pointer hover:shadow-neon transition-all duration-300 glass hover-lift hover-glow`}
               onClick={() => setActiveCategory(category.id)}
             >
               <CardHeader className="pb-2">
@@ -230,8 +230,8 @@ const UnifiedResourceCenter = () => {
               return (
                 <Button
                   key={index}
-                  variant="outline"
-                  className="h-20 flex flex-col gap-2 hover:bg-muted/50"
+                  variant="cyber"
+                  className="h-20 flex flex-col gap-2 hover-glow"
                   onClick={action.action}
                 >
                   <IconComponent className="h-6 w-6" />
@@ -371,19 +371,27 @@ const UnifiedResourceCenter = () => {
         {/* Category Tabs */}
         <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
           <div className="overflow-x-auto">
-            <TabsList className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground w-max">
+            <TabsList className="inline-flex h-12 items-center justify-center rounded-lg bg-gradient-dark border border-border/50 p-1.5 text-muted-foreground w-max backdrop-blur-sm shadow-glow">
               {resourceCategories.map((category) => {
                 const IconComponent = category.icon;
+                const isActive = activeCategory === category.id;
                 return (
                   <TabsTrigger
                     key={category.id}
                     value={category.id}
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                    className={`inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+                      isActive 
+                        ? 'bg-gradient-primary text-primary-foreground shadow-neon border border-primary/30' 
+                        : 'hover:bg-gradient-accent/10 hover:text-accent-foreground'
+                    }`}
                   >
-                    <IconComponent className="h-4 w-4 mr-2" />
+                    <IconComponent className={`h-4 w-4 mr-2 ${isActive ? 'text-primary-foreground' : ''}`} />
                     <span>{category.name}</span>
                     {category.count !== '--' && (
-                      <Badge variant="secondary" className="ml-2 text-xs">
+                      <Badge 
+                        variant={isActive ? "outline" : "secondary"} 
+                        className={`ml-2 text-xs ${isActive ? 'border-primary-foreground/30 text-primary-foreground' : ''}`}
+                      >
                         {category.count}
                       </Badge>
                     )}

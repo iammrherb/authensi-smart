@@ -182,11 +182,6 @@ const App = () => (
                   <UnifiedResourceCenter />
                 </ProtectedRoute>
               } />
-              <Route path="/resource-center" element={
-                <ProtectedRoute>
-                  <UnifiedResourceCenter />
-                </ProtectedRoute>
-              } />
               <Route path="/project-creation" element={
                 <ProtectedRoute>
                   <ProjectCreation />
