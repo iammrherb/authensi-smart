@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { 
   Brain, Target, Rocket, BarChart3, Settings, BookOpen, 
   Building2, Users, Network, FolderOpen, Bot, Sparkles,
-  Command, PieChart, TestTube, ChevronRight, Home
+  Command, PieChart, TestTube, ChevronRight, Home, Database
 } from 'lucide-react';
 import {
   Sidebar,
@@ -75,6 +75,7 @@ const managementItems = [
   { title: "User Management", url: "/users", icon: Users, tooltip: "Manage users, roles, and permissions" },
   { title: "Resource Library", url: "/resource-library", icon: FolderOpen, tooltip: "Centralized templates, use cases, and vendor resources" },
   { title: "AI Providers", url: "/settings?tab=ai", icon: Bot, tooltip: "Configure AI models and providers" },
+  { title: "Demo Data", url: "/demo-data", icon: Database, tooltip: "Generate comprehensive demo data for testing" },
   { title: "Settings", url: "/settings", icon: Settings, tooltip: "System configuration and preferences" }
 ];
 
