@@ -148,29 +148,29 @@ const DecisionTreeEngine: React.FC<DecisionTreeEngineProps> = ({
   }
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+    <div className="bg-accent/50 border border-border rounded-lg p-4 mb-6">
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
-          <span className="text-white text-xs font-bold">AI</span>
+        <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+          <span className="text-primary-foreground text-xs font-bold">AI</span>
         </div>
-        <h4 className="font-semibold text-blue-900">Smart Recommendations</h4>
+        <h4 className="font-semibold text-foreground">Smart Recommendations</h4>
       </div>
       
       <div className="space-y-2">
         {activeSuggestions.slice(0, 3).map((suggestion, index) => (
-          <div key={suggestion.ruleId} className="flex items-center justify-between p-2 bg-white rounded border">
+          <div key={suggestion.ruleId} className="flex items-center justify-between p-3 bg-card border border-border rounded-md shadow-sm">
             <div className="flex-1">
-              <div className="font-medium text-sm">
+              <div className="font-medium text-sm text-foreground">
                 {suggestion.type === 'suggest_pain_point' && `Pain Point: ${suggestion.data.title}`}
                 {suggestion.type === 'suggest_use_case' && `Use Case: ${suggestion.data.name}`}
                 {suggestion.type === 'suggest_vendor' && `Vendor: ${suggestion.data.vendor}`}
                 {suggestion.type === 'suggest_requirement' && `Requirement: ${suggestion.data.name}`}
               </div>
-              <div className="text-xs text-muted-foreground">{suggestion.reason}</div>
+              <div className="text-xs text-muted-foreground mt-1">{suggestion.reason}</div>
             </div>
             <button
               onClick={() => applySuggestion(suggestion)}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium ml-4"
+              className="text-primary hover:text-primary/80 text-sm font-medium ml-4 px-3 py-1 rounded-md hover:bg-accent transition-colors"
             >
               Apply
             </button>
