@@ -491,11 +491,11 @@ export const useSeedDemoData = () => {
           name: project.name,
           description: project.description,
           status: project.status,
-          priority: project.priority,
           start_date: project.start_date,
           target_completion: project.target_completion,
           actual_completion: project.actual_completion,
           budget: project.budget,
+          deployment_type: project.deployment_type,
           created_by: user.id
         })));
 

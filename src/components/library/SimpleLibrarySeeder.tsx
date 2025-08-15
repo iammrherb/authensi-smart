@@ -47,11 +47,7 @@ const SimpleLibrarySeeder: React.FC = () => {
         category: pp.category,
         severity: pp.severity,
         recommended_solutions: pp.recommended_solutions,
-        industry_specific: pp.industry_specific,
-        financial_impact: "Cost varies based on implementation scope and organization size",
-        business_impact: "Operational efficiency improvements and risk mitigation",
-        risk_level: `${pp.severity} risk to business operations and security posture`,
-        typical_causes: ["Legacy infrastructure", "Resource constraints", "Compliance requirements", "Rapid growth"]
+        industry_specific: pp.industry_specific
       }));
 
       // Import pain points
@@ -67,27 +63,20 @@ const SimpleLibrarySeeder: React.FC = () => {
         category: req.category,
         priority: req.priority,
         requirement_type: req.requirement_type || 'security',
-        technical_details: req.acceptance_criteria || [],
-        validation_criteria: req.verification_methods || [],
-        verification_methods: req.verification_methods || ['Security testing', 'Compliance audit'],
-        industry_specific: req.tags?.filter(tag => 
-          ['healthcare', 'finance', 'government', 'education', 'manufacturing', 'retail', 'energy', 'defense', 'legal', 'aerospace', 'utilities'].includes(tag)
-        ) || ['general'],
-        prerequisites: req.dependencies || [],
-        implementation_guidance: req.rationale || "Follow industry best practices for implementation",
-        compliance_frameworks: req.compliance_frameworks || [],
-        estimated_effort: "2-4 weeks",
-        dependencies: req.dependencies || [],
-        status: 'approved' as const,
-        test_cases: req.test_cases || [],
-        portnox_features: req.portnox_features || [],
+        rationale: req.rationale || "Follow industry best practices for implementation",
         acceptance_criteria: req.acceptance_criteria || [],
+        verification_methods: req.verification_methods || ['Security testing', 'Compliance audit'],
+        test_cases: req.test_cases || [],
         related_use_cases: req.related_use_cases || [],
+        dependencies: req.dependencies || [],
         assumptions: req.assumptions || [],
         constraints: req.constraints || [],
+        compliance_frameworks: req.compliance_frameworks || [],
         vendor_requirements: req.vendor_requirements || {},
+        portnox_features: req.portnox_features || [],
         documentation_references: req.documentation_references || [],
-        tags: req.tags || []
+        tags: req.tags || [],
+        status: 'approved' as const
       }));
 
       // Import requirements
@@ -112,7 +101,6 @@ const SimpleLibrarySeeder: React.FC = () => {
         portnox_features: uc.portnox_features || [],
         test_scenarios: uc.test_scenarios || [],
         supported_vendors: uc.supported_vendors || [],
-        implementation_notes: "Follow standard implementation procedures",
         tags: uc.tags || [uc.category]
       }));
 
