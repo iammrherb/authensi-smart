@@ -443,7 +443,19 @@ const EnhancedAIProviderManager = () => {
       const savedGlobalSettings = localStorage.getItem('ai_global_settings');
 
       if (savedProviders) {
-        setProviders(JSON.parse(savedProviders));
+        const parsedProviders = JSON.parse(savedProviders);
+        // Merge saved providers with defaults to ensure we have all current providers
+        const mergedProviders = DEFAULT_PROVIDERS.map(defaultProvider => {
+          const savedProvider = parsedProviders.find((p: AIProvider) => p.type === defaultProvider.type);
+          return savedProvider ? {
+            ...defaultProvider,
+            ...savedProvider,
+            // Preserve critical API key data
+            apiKey: savedProvider.apiKey || '',
+            status: savedProvider.apiKey ? savedProvider.status : 'inactive'
+          } : defaultProvider;
+        });
+        setProviders(mergedProviders);
       }
       if (savedTasks) {
         setTaskConfigurations(JSON.parse(savedTasks));
