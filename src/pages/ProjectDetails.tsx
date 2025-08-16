@@ -284,10 +284,10 @@ const ProjectDetails = () => {
                     project={{
                       id: project.id,
                       name: project.name,
-                      customer_portal_id: (project as any).customer_portal_id,
-                      customer_portal_enabled: (project as any).customer_portal_enabled || false,
-                      customer_access_expires_at: (project as any).customer_access_expires_at,
-                      customer_organization: project.client_name || (project as any).customer_organization
+                      customer_portal_id: project.customer_portal_id,
+                      customer_portal_enabled: project.customer_portal_enabled || false,
+                      customer_access_expires_at: project.customer_access_expires_at,
+                      customer_organization: project.customer_organization || project.client_name
                     }}
                     onUpdate={() => refetch()}
                   />
