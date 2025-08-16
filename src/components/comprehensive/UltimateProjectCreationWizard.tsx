@@ -1936,14 +1936,13 @@ const UltimateProjectCreationWizard: React.FC<Props> = ({
         </CardHeader>
         <CardContent>
           <ResourceLibraryIntegration
-            onItemSelect={(item, type) => {
-              if (type === 'pain_point') {
-                addItem('pain_points', item.title);
-              }
+            onRequirementSelect={(requirement) => {
+              addItem('pain_points', requirement.title);
             }}
             selectedItems={{
               requirements: formData.pain_points
             }}
+            mode="select"
           />
           
           <div className="mt-6">
@@ -2047,15 +2046,13 @@ const UltimateProjectCreationWizard: React.FC<Props> = ({
         </CardHeader>
         <CardContent>
           <ResourceLibraryIntegration
-            onItemSelect={(item, type) => {
-              if (type === 'use_case') {
-                addItem('use_cases', item.title);
-              }
+            onUseCaseSelect={(useCase) => {
+              addItem('use_cases', useCase.name || useCase.description || 'Use Case');
             }}
             selectedItems={{
               useCases: formData.use_cases
             }}
-            showOnlyTypes={['use_cases']}
+            mode="select"
           />
           
           <div className="mt-6">
@@ -2109,15 +2106,13 @@ const UltimateProjectCreationWizard: React.FC<Props> = ({
         </CardHeader>
         <CardContent>
           <ResourceLibraryIntegration
-            onItemSelect={(item, type) => {
-              if (type === 'requirement') {
-                addItem('integration_requirements', item.title);
-              }
+            onRequirementSelect={(requirement) => {
+              addItem('integration_requirements', requirement.title);
             }}
             selectedItems={{
               requirements: formData.integration_requirements
             }}
-            showOnlyTypes={['requirements']}
+            mode="select"
           />
           
           <div className="mt-6">
@@ -3003,19 +2998,28 @@ const UltimateProjectCreationWizard: React.FC<Props> = ({
                 <DialogTitle>Bulk Site Creation</DialogTitle>
               </DialogHeader>
               <BulkSiteCreator
-                onSitesCreated={(sites: any[]) => {
+                isOpen={showBulkSiteCreator}
+                onClose={() => setShowBulkSiteCreator(false)}
+                onSubmit={(sites) => {
                   setFormData(prev => ({ 
                     ...prev, 
                     sites: [...prev.sites, ...sites.map(site => ({
-                      ...site,
                       id: `bulk-${Date.now()}-${Math.random()}`,
+                      name: site.name,
+                      location: site.location,
+                      address: site.address || '',
+                      type: (site.site_type === 'headquarters' || site.site_type === 'branch' || site.site_type === 'datacenter' || site.site_type === 'remote' || site.site_type === 'clinic' || site.site_type === 'factory' || site.site_type === 'warehouse' || site.site_type === 'office') ? site.site_type : 'office',
+                      estimatedUsers: site.estimated_users || 100,
+                      complexity: site.priority === 'high' ? 'complex' : 'simple',
+                      networkDevices: site.device_count || 0,
+                      timeline: { start: new Date(), end: new Date() },
                       status: 'planning' as const,
-                      riskLevel: 'low' as const
-                    }))] 
+                      riskLevel: 'low' as const,
+                      priority: site.priority || 'medium' as const
+                    }))]
                   }));
                   setShowBulkSiteCreator(false);
                 }}
-                onCancel={() => setShowBulkSiteCreator(false)}
               />
             </DialogContent>
           </Dialog>
@@ -3028,12 +3032,17 @@ const UltimateProjectCreationWizard: React.FC<Props> = ({
                 <DialogTitle>Bulk User Creation</DialogTitle>
               </DialogHeader>
               <BulkUserCreator
-                onUsersCreated={(users: any[]) => {
+                isOpen={showBulkUserCreator}
+                onClose={() => setShowBulkUserCreator(false)}
+                onSubmit={(users) => {
                   setFormData(prev => ({ 
                     ...prev, 
                     additional_stakeholders: [...prev.additional_stakeholders, ...users.map(user => ({
                       email: user.email,
-                      role: user.role || 'contact',
+                      role: user.role === 'project_viewer' ? 'project_viewer' : 
+                           user.role === 'project_editor' ? 'project_viewer' : 
+                           user.role === 'project_manager' ? 'project_creator' : 
+                           user.role === 'site_manager' ? 'viewer' : 'contact' as const,
                       name: user.name,
                       createUser: true,
                       sendInvitation: user.sendInvitation || false,
@@ -3042,7 +3051,6 @@ const UltimateProjectCreationWizard: React.FC<Props> = ({
                   }));
                   setShowBulkUserCreator(false);
                 }}
-                onCancel={() => setShowBulkUserCreator(false)}
               />
             </DialogContent>
           </Dialog>
