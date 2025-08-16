@@ -3008,14 +3008,30 @@ const UltimateProjectCreationWizard: React.FC<Props> = ({
                       name: site.name,
                       location: site.location,
                       address: site.address || '',
-                      type: (site.site_type === 'headquarters' || site.site_type === 'branch' || site.site_type === 'datacenter' || site.site_type === 'remote' || site.site_type === 'clinic' || site.site_type === 'factory' || site.site_type === 'warehouse' || site.site_type === 'office') ? site.site_type : 'office',
+                      type: (['headquarters', 'branch', 'datacenter', 'remote', 'clinic', 'factory', 'warehouse', 'office'].includes(site.site_type)) 
+                        ? site.site_type as 'headquarters' | 'office' | 'branch' | 'warehouse' | 'clinic' | 'factory' | 'remote' | 'datacenter'
+                        : 'office' as const,
                       estimatedUsers: site.estimated_users || 100,
-                      complexity: site.priority === 'high' ? 'complex' : 'simple',
-                      networkDevices: site.device_count || 0,
-                      timeline: { start: new Date(), end: new Date() },
+                      complexity: (['simple', 'moderate', 'complex', 'enterprise'].includes(site.priority === 'high' ? 'complex' : 'simple')) 
+                        ? (site.priority === 'high' ? 'complex' : 'simple') as 'simple' | 'moderate' | 'complex' | 'enterprise'
+                        : 'simple' as const,
+                      networkDevices: {
+                        switches: site.device_count || 0,
+                        accessPoints: 0,
+                        routers: 0,
+                        firewalls: 0,
+                        other: {}
+                      },
+                      timeline: {
+                        estimatedStart: new Date().toISOString().split('T')[0],
+                        estimatedEnd: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        duration: 90
+                      },
                       status: 'planning' as const,
                       riskLevel: 'low' as const,
-                      priority: site.priority || 'medium' as const
+                      priority: (['critical', 'high', 'medium', 'low'].includes(site.priority)) 
+                        ? site.priority as 'critical' | 'high' | 'medium' | 'low'
+                        : 'medium' as const
                     }))]
                   }));
                   setShowBulkSiteCreator(false);
@@ -3039,15 +3055,18 @@ const UltimateProjectCreationWizard: React.FC<Props> = ({
                     ...prev, 
                     additional_stakeholders: [...prev.additional_stakeholders, ...users.map(user => ({
                       email: user.email,
-                      role: user.role === 'project_viewer' ? 'project_viewer' : 
-                           user.role === 'project_editor' ? 'project_viewer' : 
-                           user.role === 'project_manager' ? 'project_creator' : 
-                           user.role === 'site_manager' ? 'viewer' : 'contact' as const,
+                      role: (user.role === 'project_manager') 
+                        ? 'project_creator' as const
+                        : (user.role === 'project_editor') 
+                        ? 'project_viewer' as const
+                        : (user.role === 'site_manager') 
+                        ? 'viewer' as const
+                        : 'contact' as const,
                       name: user.name,
                       createUser: true,
                       sendInvitation: user.sendInvitation || false,
                       responsibilities: []
-                    }))] 
+                    }))]
                   }));
                   setShowBulkUserCreator(false);
                 }}
