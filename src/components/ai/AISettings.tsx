@@ -482,16 +482,16 @@ export const AISettings = () => {
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                           <SelectContent>
                             {(() => {
                               const selectedProvider = aiConfig.featureSettings[feature.key]?.provider || 'openai';
                               const provider = PROVIDERS.find(p => p.type === selectedProvider);
-                              return provider?.models.map(model => (
-                                <SelectItem key={model} value={model}>
-                                  {model}
-                                </SelectItem>
-                              )) || [];
-                            })()}
+                              return provider?.models || [];
+                            })().map(model => (
+                              <SelectItem key={model} value={model}>
+                                {model}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </div>
