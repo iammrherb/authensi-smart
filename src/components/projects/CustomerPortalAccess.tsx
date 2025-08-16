@@ -76,22 +76,26 @@ const CustomerPortalAccess: React.FC<CustomerPortalAccessProps> = ({ project, on
       const expiresAt = new Date();
       expiresAt.setMonth(expiresAt.getMonth() + 6); // 6 months from now
       
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('projects')
         .update({
           customer_portal_id: newPortalId,
           customer_access_expires_at: expiresAt.toISOString(),
           customer_portal_enabled: true
         })
-        .eq('id', project.id);
+        .eq('id', project.id)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
       
       toast.success('New portal access ID generated');
       onUpdate?.();
     } catch (error) {
       console.error('Error generating portal ID:', error);
-      toast.error('Failed to generate new portal ID');
+      toast.error(`Failed to generate new portal ID: ${error.message}`);
     } finally {
       setIsGenerating(false);
     }
@@ -113,12 +117,16 @@ const CustomerPortalAccess: React.FC<CustomerPortalAccessProps> = ({ project, on
         updateData.customer_access_expires_at = expiresAt.toISOString();
       }
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('projects')
         .update(updateData)
-        .eq('id', project.id);
+        .eq('id', project.id)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
       
       toast.success(newEnabled ? 'Portal access enabled' : 'Portal access disabled');
       onUpdate?.();
@@ -128,7 +136,7 @@ const CustomerPortalAccess: React.FC<CustomerPortalAccessProps> = ({ project, on
       }
     } catch (error) {
       console.error('Error updating portal access:', error);
-      toast.error('Failed to update portal access');
+      toast.error(`Failed to update portal access: ${error.message}`);
     } finally {
       setIsToggling(false);
     }
