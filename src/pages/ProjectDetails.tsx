@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import EnhancedProjectTracker from '@/components/projects/EnhancedProjectTracker';
 import ProjectEditDialog from '@/components/projects/ProjectEditDialog';
 import PhaseManagementPanel from '@/components/projects/PhaseManagementPanel';
+import CustomerPortalAccess from '@/components/projects/CustomerPortalAccess';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -252,31 +253,45 @@ const ProjectDetails = () => {
               </TabsContent>
 
               <TabsContent value="settings">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Project Settings</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-sm font-medium">Status</label>
-                          <Badge variant="outline" className="ml-2">{project.status}</Badge>
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Project Settings</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium">Status</label>
+                            <Badge variant="outline" className="ml-2">{project.status}</Badge>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Current Phase</label>
+                            <p className="text-sm text-muted-foreground capitalize">{project.current_phase}</p>
+                          </div>
                         </div>
-                        <div>
-                          <label className="text-sm font-medium">Current Phase</label>
-                          <p className="text-sm text-muted-foreground capitalize">{project.current_phase}</p>
-                        </div>
+                        {project.description && (
+                          <div>
+                            <label className="text-sm font-medium">Description</label>
+                            <p className="text-sm text-muted-foreground">{project.description}</p>
+                          </div>
+                        )}
                       </div>
-                      {project.description && (
-                        <div>
-                          <label className="text-sm font-medium">Description</label>
-                          <p className="text-sm text-muted-foreground">{project.description}</p>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+
+                  <CustomerPortalAccess 
+                    project={{
+                      id: project.id,
+                      name: project.name,
+                      customer_portal_id: (project as any).customer_portal_id,
+                      customer_portal_enabled: (project as any).customer_portal_enabled || false,
+                      customer_access_expires_at: (project as any).customer_access_expires_at,
+                      customer_organization: project.client_name || (project as any).customer_organization
+                    }}
+                    onUpdate={() => refetch()}
+                  />
+                </div>
               </TabsContent>
             </Tabs>
 
