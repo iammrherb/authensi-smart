@@ -864,6 +864,126 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_analytics: {
+        Row: {
+          created_at: string
+          customer_user_id: string | null
+          event_data: Json | null
+          event_type: string
+          id: string
+          ip_address: unknown | null
+          project_id: string
+          session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_user_id?: string | null
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: unknown | null
+          project_id: string
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_user_id?: string | null
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: unknown | null
+          project_id?: string
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_analytics_customer_user_id_fkey"
+            columns: ["customer_user_id"]
+            isOneToOne: false
+            referencedRelation: "customer_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_analytics_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_analytics_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "customer_portal_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_implementation_tracking: {
+        Row: {
+          assigned_to: string | null
+          completion_date: string | null
+          created_at: string
+          deliverables: Json | null
+          dependencies: Json | null
+          description: string | null
+          id: string
+          milestone_name: string
+          phase: string
+          progress_percentage: number | null
+          project_id: string
+          status: string
+          success_criteria: Json | null
+          target_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          completion_date?: string | null
+          created_at?: string
+          deliverables?: Json | null
+          dependencies?: Json | null
+          description?: string | null
+          id?: string
+          milestone_name: string
+          phase: string
+          progress_percentage?: number | null
+          project_id: string
+          status?: string
+          success_criteria?: Json | null
+          target_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          completion_date?: string | null
+          created_at?: string
+          deliverables?: Json | null
+          dependencies?: Json | null
+          description?: string | null
+          id?: string
+          milestone_name?: string
+          phase?: string
+          progress_percentage?: number | null
+          project_id?: string
+          status?: string
+          success_criteria?: Json | null
+          target_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_implementation_tracking_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_portal_activity: {
         Row: {
           activity_data: Json | null
@@ -898,6 +1018,186 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "customer_portal_activity_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_portal_sessions: {
+        Row: {
+          created_at: string
+          customer_user_id: string
+          expires_at: string
+          id: string
+          ip_address: unknown | null
+          is_active: boolean | null
+          last_activity: string | null
+          project_id: string
+          session_token: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_user_id: string
+          expires_at: string
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean | null
+          last_activity?: string | null
+          project_id: string
+          session_token: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_user_id?: string
+          expires_at?: string
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean | null
+          last_activity?: string | null
+          project_id?: string
+          session_token?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_portal_sessions_customer_user_id_fkey"
+            columns: ["customer_user_id"]
+            isOneToOne: false
+            referencedRelation: "customer_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_portal_sessions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_team_members: {
+        Row: {
+          can_receive_notifications: boolean | null
+          created_at: string
+          created_by: string | null
+          department: string | null
+          email: string
+          id: string
+          is_primary_contact: boolean | null
+          name: string
+          phone: string | null
+          project_id: string
+          responsibilities: Json | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          can_receive_notifications?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          department?: string | null
+          email: string
+          id?: string
+          is_primary_contact?: boolean | null
+          name: string
+          phone?: string | null
+          project_id: string
+          responsibilities?: Json | null
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          can_receive_notifications?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          department?: string | null
+          email?: string
+          id?: string
+          is_primary_contact?: boolean | null
+          name?: string
+          phone?: string | null
+          project_id?: string
+          responsibilities?: Json | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_team_members_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "customer_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_team_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_users: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_organization: string | null
+          email: string
+          first_name: string | null
+          id: string
+          is_active: boolean | null
+          last_login: string | null
+          last_name: string | null
+          password_hash: string
+          project_id: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_organization?: string | null
+          email: string
+          first_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_login?: string | null
+          last_name?: string | null
+          password_hash: string
+          project_id: string
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_organization?: string | null
+          email?: string
+          first_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_login?: string | null
+          last_name?: string | null
+          password_hash?: string
+          project_id?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_users_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_users_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
@@ -4287,6 +4587,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      authenticate_customer_user: {
+        Args: { p_email: string; p_password: string }
+        Returns: {
+          customer_organization: string
+          project_id: string
+          project_name: string
+          role: string
+          user_id: string
+        }[]
+      }
       can_manage_roles: {
         Args: { _scope_id?: string; _scope_type?: string; _user_id: string }
         Returns: boolean

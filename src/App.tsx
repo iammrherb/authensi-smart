@@ -51,6 +51,8 @@ import Portnox from "./pages/Portnox";
 import ComprehensiveImplementationHub from "./pages/ComprehensiveImplementationHub";
 import AIIntegrationTest from "./pages/AIIntegrationTest";
 import CustomerPortal from "./pages/CustomerPortal";
+import CustomerAuth from "./pages/CustomerAuth";
+import CustomerDashboard from "./pages/CustomerDashboard";
 
 const queryClient = new QueryClient();
 
@@ -243,7 +245,10 @@ const App = () => (
               } />
               
               {/* Customer Portal - Public access */}
-              <Route path="/customer-portal/:portalId" element={<CustomerPortal />} />
+          <Route path="/customer-portal/:portalId" element={<CustomerPortal />} />
+          <Route path="/customer-auth/:portalId" element={<CustomerAuth />} />
+          <Route path="/customer-auth" element={<CustomerAuth />} />
+          <Route path="/customer-dashboard/:projectId" element={<CustomerDashboard />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
