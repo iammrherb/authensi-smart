@@ -2478,6 +2478,7 @@ export type Database = {
           created_by: string | null
           current_phase: string | null
           customer_access_expires_at: string | null
+          customer_organization: string | null
           customer_portal_enabled: boolean | null
           customer_portal_id: string | null
           deployment_type: string | null
@@ -2534,6 +2535,7 @@ export type Database = {
           created_by?: string | null
           current_phase?: string | null
           customer_access_expires_at?: string | null
+          customer_organization?: string | null
           customer_portal_enabled?: boolean | null
           customer_portal_id?: string | null
           deployment_type?: string | null
@@ -2590,6 +2592,7 @@ export type Database = {
           created_by?: string | null
           current_phase?: string | null
           customer_access_expires_at?: string | null
+          customer_organization?: string | null
           customer_portal_enabled?: boolean | null
           customer_portal_id?: string | null
           deployment_type?: string | null

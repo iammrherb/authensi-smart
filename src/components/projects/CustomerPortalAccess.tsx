@@ -138,7 +138,7 @@ const CustomerPortalAccess: React.FC<CustomerPortalAccessProps> = ({ project, on
     try {
       const { error } = await supabase
         .from('projects')
-        .update({ customer_organization: organization })
+        .update({ customer_organization: organization } as any)
         .eq('id', project.id);
 
       if (error) throw error;
