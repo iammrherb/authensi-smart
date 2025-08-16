@@ -61,7 +61,13 @@ const CustomerImplementationTracking: React.FC<CustomerImplementationTrackingPro
       if (error) throw error;
 
       if (data && data.length > 0) {
-        setMilestones(data);
+        setMilestones(data.map(milestone => ({
+          ...milestone,
+          status: milestone.status as 'pending' | 'in_progress' | 'completed' | 'delayed',
+          dependencies: Array.isArray(milestone.dependencies) ? milestone.dependencies.map(String) : [],
+          success_criteria: Array.isArray(milestone.success_criteria) ? milestone.success_criteria.map(String) : [],
+          deliverables: Array.isArray(milestone.deliverables) ? milestone.deliverables.map(String) : []
+        })));
       } else {
         // Create default milestones if none exist
         setMilestones(getDefaultMilestones());

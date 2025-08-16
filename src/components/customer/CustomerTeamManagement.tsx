@@ -77,7 +77,13 @@ const CustomerTeamManagement: React.FC<CustomerTeamManagementProps> = ({
       if (error) throw error;
       setTeamMembers((data || []).map(member => ({
         ...member,
-        responsibilities: Array.isArray(member.responsibilities) ? member.responsibilities : []
+        responsibilities: Array.isArray(member.responsibilities) 
+          ? member.responsibilities.map(String)
+          : [],
+        department: member.department || '',
+        phone: member.phone || '',
+        is_primary_contact: member.is_primary_contact || false,
+        can_receive_notifications: member.can_receive_notifications !== false
       })));
     } catch (error) {
       console.error('Error fetching team members:', error);
@@ -119,7 +125,16 @@ const CustomerTeamManagement: React.FC<CustomerTeamManagementProps> = ({
 
       if (error) throw error;
 
-      setTeamMembers(prev => [data, ...prev]);
+      setTeamMembers(prev => [{
+        ...data,
+        responsibilities: Array.isArray(data.responsibilities) 
+          ? data.responsibilities.map(String)
+          : [],
+        department: data.department || '',
+        phone: data.phone || '',
+        is_primary_contact: data.is_primary_contact || false,
+        can_receive_notifications: data.can_receive_notifications !== false
+      }, ...prev]);
       setNewMember({
         name: '',
         email: '',

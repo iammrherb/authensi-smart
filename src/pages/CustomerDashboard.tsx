@@ -103,9 +103,9 @@ const CustomerDashboard: React.FC = () => {
         current_phase: data.current_phase,
         progress_percentage: data.progress_percentage,
         start_date: data.start_date,
-        end_date: data.target_completion || data.end_date,
-        estimated_budget: data.budget || data.estimated_budget || 0,
-        customer_organization: data.customer_organization || ''
+        end_date: data.target_completion || data.actual_completion || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        estimated_budget: data.budget || 0,
+        customer_organization: customerSession?.customer_organization || ''
       });
     } catch (error) {
       console.error('Error fetching project data:', error);
