@@ -50,6 +50,7 @@ import UltimateWizard from "./pages/UltimateWizard";
 import Portnox from "./pages/Portnox";
 import ComprehensiveImplementationHub from "./pages/ComprehensiveImplementationHub";
 import AIIntegrationTest from "./pages/AIIntegrationTest";
+import CustomerPortal from "./pages/CustomerPortal";
 
 const queryClient = new QueryClient();
 
@@ -240,6 +241,9 @@ const App = () => (
                   <Requirements />
                 </ProtectedRoute>
               } />
+              
+              {/* Customer Portal - Public access */}
+              <Route path="/customer-portal/:portalId" element={<CustomerPortal />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>

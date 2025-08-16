@@ -864,6 +864,47 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_portal_activity: {
+        Row: {
+          activity_data: Json | null
+          activity_type: string
+          created_at: string
+          customer_portal_id: string
+          id: string
+          ip_address: unknown | null
+          project_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          activity_data?: Json | null
+          activity_type: string
+          created_at?: string
+          customer_portal_id: string
+          id?: string
+          ip_address?: unknown | null
+          project_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          activity_data?: Json | null
+          activity_type?: string
+          created_at?: string
+          customer_portal_id?: string
+          id?: string
+          ip_address?: unknown | null
+          project_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_portal_activity_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deployment_types: {
         Row: {
           complexity_level: string | null
@@ -2136,6 +2177,9 @@ export type Database = {
           created_at: string
           created_by: string | null
           current_phase: string | null
+          customer_access_expires_at: string | null
+          customer_portal_enabled: boolean | null
+          customer_portal_id: string | null
           deployment_type: string | null
           description: string | null
           enable_auto_vendors: boolean | null
@@ -2189,6 +2233,9 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           current_phase?: string | null
+          customer_access_expires_at?: string | null
+          customer_portal_enabled?: boolean | null
+          customer_portal_id?: string | null
           deployment_type?: string | null
           description?: string | null
           enable_auto_vendors?: boolean | null
@@ -2242,6 +2289,9 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           current_phase?: string | null
+          customer_access_expires_at?: string | null
+          customer_portal_enabled?: boolean | null
+          customer_portal_id?: string | null
           deployment_type?: string | null
           description?: string | null
           enable_auto_vendors?: boolean | null
@@ -4281,6 +4331,23 @@ export type Database = {
       get_current_user_email: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_project_by_customer_portal_id: {
+        Args: { portal_id: string }
+        Returns: {
+          created_at: string
+          current_phase: string
+          customer_organization: string
+          customer_portal_enabled: boolean
+          description: string
+          end_date: string
+          estimated_budget: number
+          id: string
+          name: string
+          progress_percentage: number
+          start_date: string
+          status: string
+        }[]
       }
       get_super_admin_emails: {
         Args: Record<PropertyKey, never>
