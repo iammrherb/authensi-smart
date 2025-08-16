@@ -63,196 +63,201 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <UnifiedLayout>
-            <Routes>
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <UnifiedCommandCenter />
-                </ProtectedRoute>
-              } />
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <UnifiedCommandCenter />
-                </ProtectedRoute>
-              } />
-              
-              {/* Intelligence Tracker Hub */}
-              <Route path="/intelligence" element={
-                <ProtectedRoute>
-                  <IntelligenceTrackerHub />
-                </ProtectedRoute>
-              } />
-              <Route path="/scoping" element={
-                <ProtectedRoute>
-                  <IntelligentScoping />
-                </ProtectedRoute>
-              } />
-              <Route path="/scoping/:projectId" element={
-                <ProtectedRoute>
-                  <ProjectScoping />
-                </ProtectedRoute>
-              } />
-              <Route path="/recommendations" element={
-                <ProtectedRoute>
-                  <IntelligenceTrackerHub />
-                </ProtectedRoute>
-              } />
-              
-              {/* Project Manager - Simple, unified project management */}
-              <Route path="/projects" element={
-                <ProtectedRoute>
-                  <ProjectManager />
-                </ProtectedRoute>
-              } />
-              <Route path="/projects/:id" element={
-                <ProtectedRoute>
-                  <ProjectDetails />
-                </ProtectedRoute>
-              } />
-              
-              {/* Sites Management */}
-              <Route path="/sites" element={
-                <ProtectedRoute>
-                  <Sites />
-                </ProtectedRoute>
-              } />
-              <Route path="/sites/:id" element={
-                <ProtectedRoute>
-                  <SiteDetails />
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/tracker" element={
-                <ProtectedRoute>
-                  <ProjectManager />
-                </ProtectedRoute>
-              } />
-              <Route path="/tracking" element={
-                <ProtectedRoute>
-                  <ProjectManager />
-                </ProtectedRoute>
-              } />
-              <Route path="/implementation" element={
-                <ProtectedRoute>
-                  <ProjectManager />
-                </ProtectedRoute>
-              } />
-              
-              {/* Legacy routes for backward compatibility */}
-              <Route path="/deployment" element={
-                <ProtectedRoute>
-                  <UnifiedImplementationHub />
-                </ProtectedRoute>
-              } />
-              <Route path="/reports" element={
-                <ProtectedRoute>
-                  <Reports />
-                </ProtectedRoute>
-              } />
-              
-              {/* AI Configuration Center */}
-              <Route path="/ai-config" element={
-                <ProtectedRoute>
-                  <SmartConfigCenter />
-                </ProtectedRoute>
-              } />
-              <Route path="/onexer-wizard" element={
-                <ProtectedRoute>
-                  <OneXerWizardPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/wizard" element={
-                <ProtectedRoute>
-                  <UltimateWizard />
-                </ProtectedRoute>
-              } />
-              
-              {/* Knowledge & Resources */}
-              <Route path="/resource-library" element={
-                <ProtectedRoute>
-                  <UnifiedResourceCenter />
-                </ProtectedRoute>
-              } />
-              <Route path="/resources" element={
-                <ProtectedRoute>
-                  <UnifiedResourceCenter />
-                </ProtectedRoute>
-              } />
-              <Route path="/project-creation" element={
-                <ProtectedRoute>
-                  <ProjectCreation />
-                </ProtectedRoute>
-              } />
-              <Route path="/use-cases" element={
-                <ProtectedRoute>
-                  <UseCaseLibrary />
-                </ProtectedRoute>
-              } />
-              <Route path="/questionnaires" element={
-                <ProtectedRoute>
-                  <Questionnaires />
-                </ProtectedRoute>
-              } />
-              <Route path="/portnox" element={
-                <ProtectedRoute>
-                  <Portnox />
-                </ProtectedRoute>
-              } />
-              <Route path="/ai-test" element={
-                <ProtectedRoute>
-                  <AIIntegrationTest />
-                </ProtectedRoute>
-              } />
-              
-              {/* Administration */}
-              <Route path="/users" element={
-                <ProtectedRoute>
-                  <Users />
-                </ProtectedRoute>
-              } />
-              <Route path="/vendors" element={
-                <ProtectedRoute>
-                  <Vendors />
-                </ProtectedRoute>
-              } />
-              <Route path="/settings" element={
-                <ProtectedRoute>
-                  <Settings />
-                </ProtectedRoute>
-              } />
-              <Route path="/demo-data" element={
-                <ProtectedRoute>
-                  <DemoDataManager />
-                </ProtectedRoute>
-              } />
-              
-              {/* Legacy/Deprecated Routes */}
-              <Route path="/admin" element={
-                <ProtectedRoute>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/designer" element={
-                <ProtectedRoute>
-                  <Designer />
-                </ProtectedRoute>
-              } />
-              <Route path="/requirements" element={
-                <ProtectedRoute>
-                  <Requirements />
-                </ProtectedRoute>
-              } />
-              
-              {/* Customer Portal - Public access */}
-          <Route path="/customer-portal/:portalId" element={<CustomerPortal />} />
-          <Route path="/customer-auth/:portalId" element={<CustomerAuth />} />
-          <Route path="/customer-auth" element={<CustomerAuth />} />
-          <Route path="/customer-dashboard/:projectId" element={<CustomerDashboard />} />
-              
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </UnifiedLayout>
+          <Routes>
+            {/* Customer Portal Routes - Separate from main app */}
+            <Route path="/customer-portal/:portalId" element={<CustomerPortal />} />
+            <Route path="/customer-auth/:portalId" element={<CustomerAuth />} />
+            <Route path="/customer-auth" element={<CustomerAuth />} />
+            <Route path="/customer-dashboard/:projectId" element={<CustomerDashboard />} />
+            
+            {/* Main Application Routes */}
+            <Route path="/*" element={
+              <UnifiedLayout>
+                <Routes>
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/" element={
+                    <ProtectedRoute>
+                      <UnifiedCommandCenter />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/dashboard" element={
+                    <ProtectedRoute>
+                      <UnifiedCommandCenter />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* Intelligence Tracker Hub */}
+                  <Route path="/intelligence" element={
+                    <ProtectedRoute>
+                      <IntelligenceTrackerHub />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/scoping" element={
+                    <ProtectedRoute>
+                      <IntelligentScoping />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/scoping/:projectId" element={
+                    <ProtectedRoute>
+                      <ProjectScoping />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/recommendations" element={
+                    <ProtectedRoute>
+                      <IntelligenceTrackerHub />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* Project Manager - Simple, unified project management */}
+                  <Route path="/projects" element={
+                    <ProtectedRoute>
+                      <ProjectManager />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/projects/:id" element={
+                    <ProtectedRoute>
+                      <ProjectDetails />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* Sites Management */}
+                  <Route path="/sites" element={
+                    <ProtectedRoute>
+                      <Sites />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/sites/:id" element={
+                    <ProtectedRoute>
+                      <SiteDetails />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="/tracker" element={
+                    <ProtectedRoute>
+                      <ProjectManager />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/tracking" element={
+                    <ProtectedRoute>
+                      <ProjectManager />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/implementation" element={
+                    <ProtectedRoute>
+                      <ProjectManager />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* Legacy routes for backward compatibility */}
+                  <Route path="/deployment" element={
+                    <ProtectedRoute>
+                      <UnifiedImplementationHub />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/reports" element={
+                    <ProtectedRoute>
+                      <Reports />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* AI Configuration Center */}
+                  <Route path="/ai-config" element={
+                    <ProtectedRoute>
+                      <SmartConfigCenter />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/onexer-wizard" element={
+                    <ProtectedRoute>
+                      <OneXerWizardPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/wizard" element={
+                    <ProtectedRoute>
+                      <UltimateWizard />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* Knowledge & Resources */}
+                  <Route path="/resource-library" element={
+                    <ProtectedRoute>
+                      <UnifiedResourceCenter />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/resources" element={
+                    <ProtectedRoute>
+                      <UnifiedResourceCenter />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/project-creation" element={
+                    <ProtectedRoute>
+                      <ProjectCreation />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/use-cases" element={
+                    <ProtectedRoute>
+                      <UseCaseLibrary />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/questionnaires" element={
+                    <ProtectedRoute>
+                      <Questionnaires />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/portnox" element={
+                    <ProtectedRoute>
+                      <Portnox />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/ai-test" element={
+                    <ProtectedRoute>
+                      <AIIntegrationTest />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* Administration */}
+                  <Route path="/users" element={
+                    <ProtectedRoute>
+                      <Users />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/vendors" element={
+                    <ProtectedRoute>
+                      <Vendors />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/settings" element={
+                    <ProtectedRoute>
+                      <Settings />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/demo-data" element={
+                    <ProtectedRoute>
+                      <DemoDataManager />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* Legacy/Deprecated Routes */}
+                  <Route path="/admin" element={
+                    <ProtectedRoute>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/designer" element={
+                    <ProtectedRoute>
+                      <Designer />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/requirements" element={
+                    <ProtectedRoute>
+                      <Requirements />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </UnifiedLayout>
+             } />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
