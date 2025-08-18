@@ -116,17 +116,15 @@ export function AppSidebar() {
           {/* Persistent Portnox Branding - Always Visible */}
           <div className={`${collapsed ? "p-2" : "p-4"} border-b border-sidebar-border bg-gradient-to-br from-primary/5 to-primary/10`}>
             <NavLink to="/" className="flex items-center space-x-3 group">
-              <div className="relative flex-shrink-0 group">
-                <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 p-2 transition-all duration-500 hover:from-primary/20 hover:to-primary/10 hover:scale-105 hover:shadow-glow">
+              <div className="relative flex-shrink-0">
+                <div className="relative rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 p-2 transition-all duration-300 hover:from-primary/20 hover:to-primary/10 hover:scale-105 hover:shadow-lg">
                   <img 
                     src={portnoxLogo} 
                     alt="Portnox" 
-                    className={`${collapsed ? "h-14 w-14" : "h-16 w-16"} object-contain transition-all duration-500 group-hover:scale-110 animate-pulse`} 
+                    className={`${collapsed ? "h-12 w-12" : "h-14 w-14"} object-contain transition-all duration-300 hover:scale-110`} 
                   />
-                  <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-xl"></div>
                 </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-primary rounded-full animate-pulse shadow-glow group-hover:scale-125 transition-transform duration-300"></div>
-                <div className="absolute inset-0 rounded-xl animate-pulse bg-primary/5 opacity-50"></div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-primary rounded-full animate-pulse shadow-glow"></div>
               </div>
               {!collapsed && <div className="min-w-0 flex-1">
                   
