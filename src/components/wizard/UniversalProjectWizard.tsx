@@ -532,7 +532,7 @@ Provide detailed analysis with professional markdown formatting and actionable i
 
       const foundationResult = await generateCompletion({
         prompt: foundationPrompt,
-        taskType: 'project_analysis',
+        taskType: 'project_insights',
         context: 'comprehensive_foundation'
       });
 
@@ -1528,11 +1528,16 @@ Provide detailed testing procedures with automation recommendations and quality 
                             ? 'border-green-500 bg-green-500 text-white'
                             : 'border-muted-foreground'
                         }`}>
-                        {index < currentStep ? (
-                          <Check className="h-4 w-4" />
-                        ) : (
-                          React.createElement(step.icon, { className: "h-4 w-4" })
-                        )}
+                         {index < currentStep ? (
+                           <Check className="h-4 w-4" />
+                         ) : (
+                           <div className="h-4 w-4">
+                             {(() => {
+                               const IconComponent = step.icon;
+                               return <IconComponent />;
+                             })()}
+                           </div>
+                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium truncate">{step.title}</div>
@@ -1562,7 +1567,12 @@ Provide detailed testing procedures with automation recommendations and quality 
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="flex items-center gap-2">
-                      {React.createElement(wizardSteps[currentStep].icon, { className: "h-5 w-5" })}
+                      <div className="h-5 w-5">
+                        {(() => {
+                          const IconComponent = wizardSteps[currentStep].icon;
+                          return <IconComponent />;
+                        })()}
+                      </div>
                       {wizardSteps[currentStep].title}
                     </CardTitle>
                     <CardDescription>
