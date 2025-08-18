@@ -1,131 +1,132 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { 
-  Brain, Target, Rocket, BarChart3, Settings, BookOpen, 
-  Building2, Users, Network, FolderOpen, Bot, Sparkles,
-  Command, PieChart, TestTube, ChevronRight, Home, Database
-} from 'lucide-react';
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarTrigger,
-  useSidebar,
-} from '@/components/ui/sidebar';
+import { Brain, Target, Rocket, BarChart3, Settings, BookOpen, Building2, Users, Network, FolderOpen, Bot, Sparkles, Command, PieChart, TestTube, ChevronRight, Home, Database } from 'lucide-react';
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import portnoxLogo from '@/assets/portnox-logo.png';
-
-const primaryNavItems = [
-  { 
-    title: "Command Center", 
-    url: "/", 
-    icon: Command,
-    description: "AI-Powered Project Management Dashboard",
+const primaryNavItems = [{
+  title: "Command Center",
+  url: "/",
+  icon: Command,
+  description: "AI-Powered Project Management Dashboard",
+  badge: "AI",
+  tooltip: "Central hub for all project activities with AI insights"
+}, {
+  title: "Project Manager",
+  url: "/projects",
+  icon: Target,
+  description: "Simple Project Creation & Management",
+  tooltip: "Create, scope, and manage your NAC projects"
+}, {
+  title: "Analytics",
+  url: "/reports",
+  icon: PieChart,
+  description: "Advanced Performance Insights & Reports",
+  tooltip: "Comprehensive analytics and reporting dashboard"
+}];
+const lifecycleItems = [{
+  title: "Planning & Scoping",
+  items: [{
+    title: "Smart Wizard",
+    url: "/wizard",
+    icon: Sparkles,
     badge: "AI",
-    tooltip: "Central hub for all project activities with AI insights"
-  },
-  { 
-    title: "Project Manager", 
-    url: "/projects", 
-    icon: Target,
-    description: "Simple Project Creation & Management",
-    tooltip: "Create, scope, and manage your NAC projects"
-  },
-  { 
-    title: "Analytics", 
-    url: "/reports", 
-    icon: PieChart,
-    description: "Advanced Performance Insights & Reports",
-    tooltip: "Comprehensive analytics and reporting dashboard"
-  }
-];
-
-const lifecycleItems = [
-  {
-    title: "Planning & Scoping",
-    items: [
-      { title: "Smart Wizard", url: "/wizard", icon: Sparkles, badge: "AI", tooltip: "AI-powered project creation wizard" },
-      { title: "AI Scoping", url: "/scoping", icon: Brain, tooltip: "Intelligent project scoping with AI recommendations" },
-      { title: "Requirements", url: "/requirements", icon: BookOpen, tooltip: "Comprehensive requirements management" }
-    ]
-  },
-  {
-    title: "Configuration & Setup",
-    items: [
-      { title: "AI Config Gen", url: "/ai-config", icon: Settings, badge: "1X", tooltip: "Automated configuration generation for 802.1X" },
-      { title: "Vendor Configs", url: "/vendors", icon: Network, tooltip: "Vendor-specific configuration templates" }
-    ]
-  },
-  {
-    title: "Deployment & Testing",
-    items: [
-      { title: "Deployment", url: "/deployment", icon: Rocket, tooltip: "Automated deployment orchestration" },
-      { title: "Testing", url: "/testing", icon: TestTube, tooltip: "Comprehensive testing and validation" }
-    ]
-  }
-];
-
-const managementItems = [
-  { title: "User Management", url: "/users", icon: Users, tooltip: "Manage users, roles, and permissions" },
-  { title: "Resource Library", url: "/resource-library", icon: FolderOpen, tooltip: "Centralized templates, use cases, and vendor resources" },
-  { title: "AI Providers", url: "/settings?tab=ai", icon: Bot, tooltip: "Configure AI models and providers" },
-  { title: "Demo Data", url: "/demo-data", icon: Database, tooltip: "Generate comprehensive demo data for testing" },
-  { title: "Settings", url: "/settings", icon: Settings, tooltip: "System configuration and preferences" }
-];
-
+    tooltip: "AI-powered project creation wizard"
+  }, {
+    title: "AI Scoping",
+    url: "/scoping",
+    icon: Brain,
+    tooltip: "Intelligent project scoping with AI recommendations"
+  }, {
+    title: "Requirements",
+    url: "/requirements",
+    icon: BookOpen,
+    tooltip: "Comprehensive requirements management"
+  }]
+}, {
+  title: "Configuration & Setup",
+  items: [{
+    title: "AI Config Gen",
+    url: "/ai-config",
+    icon: Settings,
+    badge: "1X",
+    tooltip: "Automated configuration generation for 802.1X"
+  }, {
+    title: "Vendor Configs",
+    url: "/vendors",
+    icon: Network,
+    tooltip: "Vendor-specific configuration templates"
+  }]
+}, {
+  title: "Deployment & Testing",
+  items: [{
+    title: "Deployment",
+    url: "/deployment",
+    icon: Rocket,
+    tooltip: "Automated deployment orchestration"
+  }, {
+    title: "Testing",
+    url: "/testing",
+    icon: TestTube,
+    tooltip: "Comprehensive testing and validation"
+  }]
+}];
+const managementItems = [{
+  title: "User Management",
+  url: "/users",
+  icon: Users,
+  tooltip: "Manage users, roles, and permissions"
+}, {
+  title: "Resource Library",
+  url: "/resource-library",
+  icon: FolderOpen,
+  tooltip: "Centralized templates, use cases, and vendor resources"
+}, {
+  title: "AI Providers",
+  url: "/settings?tab=ai",
+  icon: Bot,
+  tooltip: "Configure AI models and providers"
+}, {
+  title: "Demo Data",
+  url: "/demo-data",
+  icon: Database,
+  tooltip: "Generate comprehensive demo data for testing"
+}, {
+  title: "Settings",
+  url: "/settings",
+  icon: Settings,
+  tooltip: "System configuration and preferences"
+}];
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const {
+    state
+  } = useSidebar();
   const collapsed = state === 'collapsed';
   const location = useLocation();
   const currentPath = location.pathname;
-
   const isActive = (path: string) => {
     if (path === "/") return currentPath === "/";
     return currentPath.startsWith(path);
   };
-
-  const getNavCls = (isActive: boolean) =>
-    isActive 
-      ? "bg-gradient-primary text-primary-foreground shadow-glow" 
-      : "hover:bg-sidebar-accent text-sidebar-foreground/80";
-
-  return (
-    <TooltipProvider delayDuration={300}>
-      <Sidebar
-        className={`${collapsed ? "w-18" : "w-72"} border-r border-sidebar-border bg-sidebar-background transition-all duration-300`}
-        collapsible="icon"
-      >
+  const getNavCls = (isActive: boolean) => isActive ? "bg-gradient-primary text-primary-foreground shadow-glow" : "hover:bg-sidebar-accent text-sidebar-foreground/80";
+  return <TooltipProvider delayDuration={300}>
+      <Sidebar className={`${collapsed ? "w-18" : "w-72"} border-r border-sidebar-border bg-sidebar-background transition-all duration-300`} collapsible="icon">
         <SidebarContent className="overflow-y-auto">
           {/* Persistent Portnox Branding - Always Visible */}
           <div className={`${collapsed ? "p-2" : "p-4"} border-b border-sidebar-border bg-gradient-to-br from-primary/5 to-primary/10`}>
             <NavLink to="/" className="flex items-center space-x-3 group">
               <div className="relative flex-shrink-0">
-                <img 
-                  src={portnoxLogo} 
-                  alt="Portnox" 
-                  className={`${collapsed ? "h-10 w-10" : "h-12 w-12"} object-contain transition-all duration-300`} 
-                />
+                <img src={portnoxLogo} alt="Portnox" className={`${collapsed ? "h-10 w-10" : "h-12 w-12"} object-contain transition-all duration-300`} />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-primary rounded-full animate-pulse shadow-glow"></div>
               </div>
-              {!collapsed && (
-                <div className="min-w-0 flex-1">
-                  <h1 className="text-xl font-black text-primary bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                    PORTNOX
-                  </h1>
+              {!collapsed && <div className="min-w-0 flex-1">
+                  
                   <h2 className="text-lg font-bold text-sidebar-foreground leading-tight">
                     Intelligence Hub
                   </h2>
-                  <p className="text-xs text-sidebar-foreground/70 font-medium">
-                    AI-Powered NAC Platform
-                  </p>
-                </div>
-              )}
+                  <p className="text-xs text-sidebar-foreground/70 font-medium">AI-Powered NAC Track Master</p>
+                </div>}
             </NavLink>
             
             {/* Persistent AI Status Indicator */}
@@ -140,39 +141,26 @@ export function AppSidebar() {
           {!collapsed && <SidebarGroupLabel className="text-primary font-semibold">Main Dashboard</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
-              {primaryNavItems.map((item) => {
-                const menuItem = (
-                  <SidebarMenuItem key={item.title}>
+              {primaryNavItems.map(item => {
+                const menuItem = <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <NavLink 
-                        to={item.url} 
-                        className={`${getNavCls(isActive(item.url))} group relative flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover-scale`}
-                      >
+                      <NavLink to={item.url} className={`${getNavCls(isActive(item.url))} group relative flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover-scale`}>
                         <item.icon className="h-5 w-5 flex-shrink-0" />
-                        {!collapsed && (
-                          <div className="flex-1 min-w-0">
+                        {!collapsed && <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-2">
                               <span className="font-medium truncate">{item.title}</span>
-                              {item.badge && (
-                                <Badge variant="secondary" className="text-xs bg-primary/20 text-primary">
+                              {item.badge && <Badge variant="secondary" className="text-xs bg-primary/20 text-primary">
                                   {item.badge}
-                                </Badge>
-                              )}
+                                </Badge>}
                             </div>
-                            {item.description && (
-                              <p className="text-xs text-sidebar-foreground/50 truncate">
+                            {item.description && <p className="text-xs text-sidebar-foreground/50 truncate">
                                 {item.description}
-                              </p>
-                            )}
-                          </div>
-                        )}
+                              </p>}
+                          </div>}
                       </NavLink>
                     </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-
-                return collapsed ? (
-                  <Tooltip key={item.title}>
+                  </SidebarMenuItem>;
+                return collapsed ? <Tooltip key={item.title}>
                     <TooltipTrigger asChild>
                       {menuItem}
                     </TooltipTrigger>
@@ -180,54 +168,39 @@ export function AppSidebar() {
                       <div className="space-y-1">
                         <div className="flex items-center space-x-2">
                           <span className="font-semibold">{item.title}</span>
-                          {item.badge && (
-                            <Badge variant="secondary" className="text-xs">
+                          {item.badge && <Badge variant="secondary" className="text-xs">
                               {item.badge}
-                            </Badge>
-                          )}
+                            </Badge>}
                         </div>
                         <p className="text-xs text-muted-foreground">{item.tooltip}</p>
                       </div>
                     </TooltipContent>
-                  </Tooltip>
-                ) : menuItem;
+                  </Tooltip> : menuItem;
               })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
         {/* Project Lifecycle */}
-        {lifecycleItems.map((section) => (
-          <SidebarGroup key={section.title}>
+        {lifecycleItems.map(section => <SidebarGroup key={section.title}>
             {!collapsed && <SidebarGroupLabel className="text-primary font-semibold">{section.title}</SidebarGroupLabel>}
             <SidebarGroupContent>
               <SidebarMenu>
-                {section.items.map((item) => {
-                  const menuItem = (
-                    <SidebarMenuItem key={item.title}>
+                {section.items.map(item => {
+                const menuItem = <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild>
-                        <NavLink 
-                          to={item.url} 
-                          className={`${getNavCls(isActive(item.url))} group relative flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 hover-scale`}
-                        >
+                        <NavLink to={item.url} className={`${getNavCls(isActive(item.url))} group relative flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 hover-scale`}>
                           <item.icon className="h-4 w-4 flex-shrink-0" />
-                          {!collapsed && (
-                            <div className="flex items-center space-x-2 min-w-0">
+                          {!collapsed && <div className="flex items-center space-x-2 min-w-0">
                               <span className="text-sm truncate">{item.title}</span>
-                              {item.badge && (
-                                <Badge variant="outline" className="text-xs bg-accent/20 text-accent-foreground">
+                              {item.badge && <Badge variant="outline" className="text-xs bg-accent/20 text-accent-foreground">
                                   {item.badge}
-                                </Badge>
-                              )}
-                            </div>
-                          )}
+                                </Badge>}
+                            </div>}
                         </NavLink>
                       </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-
-                  return collapsed && item.tooltip ? (
-                    <Tooltip key={item.title}>
+                    </SidebarMenuItem>;
+                return collapsed && item.tooltip ? <Tooltip key={item.title}>
                       <TooltipTrigger asChild>
                         {menuItem}
                       </TooltipTrigger>
@@ -235,47 +208,34 @@ export function AppSidebar() {
                         <div className="space-y-1">
                           <div className="flex items-center space-x-2">
                             <span className="font-semibold">{item.title}</span>
-                            {item.badge && (
-                              <Badge variant="outline" className="text-xs">
+                            {item.badge && <Badge variant="outline" className="text-xs">
                                 {item.badge}
-                              </Badge>
-                            )}
+                              </Badge>}
                           </div>
                           <p className="text-xs text-muted-foreground">{item.tooltip}</p>
                         </div>
                       </TooltipContent>
-                    </Tooltip>
-                  ) : menuItem;
-                })}
+                    </Tooltip> : menuItem;
+              })}
               </SidebarMenu>
             </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+          </SidebarGroup>)}
 
         {/* Enterprise Management */}
         <SidebarGroup>
           {!collapsed && <SidebarGroupLabel className="text-primary font-semibold">Enterprise Management</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
-              {managementItems.map((item) => {
-                const menuItem = (
-                  <SidebarMenuItem key={item.title}>
+              {managementItems.map(item => {
+                const menuItem = <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <NavLink 
-                        to={item.url} 
-                        className={`${getNavCls(isActive(item.url))} group relative flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 hover-scale`}
-                      >
+                      <NavLink to={item.url} className={`${getNavCls(isActive(item.url))} group relative flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 hover-scale`}>
                         <item.icon className="h-4 w-4 flex-shrink-0" />
-                        {!collapsed && (
-                          <span className="text-sm truncate">{item.title}</span>
-                        )}
+                        {!collapsed && <span className="text-sm truncate">{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-
-                return collapsed && item.tooltip ? (
-                  <Tooltip key={item.title}>
+                  </SidebarMenuItem>;
+                return collapsed && item.tooltip ? <Tooltip key={item.title}>
                     <TooltipTrigger asChild>
                       {menuItem}
                     </TooltipTrigger>
@@ -285,8 +245,7 @@ export function AppSidebar() {
                         <p className="text-xs text-muted-foreground">{item.tooltip}</p>
                       </div>
                     </TooltipContent>
-                  </Tooltip>
-                ) : menuItem;
+                  </Tooltip> : menuItem;
               })}
             </SidebarMenu>
           </SidebarGroupContent>
@@ -305,6 +264,5 @@ export function AppSidebar() {
         </div>
       </SidebarContent>
     </Sidebar>
-  </TooltipProvider>
-  );
+  </TooltipProvider>;
 }
