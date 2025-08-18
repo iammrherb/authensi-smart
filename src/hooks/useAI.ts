@@ -69,22 +69,66 @@ export const useAI = () => {
 
   const generateProjectSummary = useCallback(async (projectData: any): Promise<string | null> => {
     const prompt = `
-    Based on the following project information, generate a comprehensive business summary:
-    
-    Project Name: ${projectData.name}
-    Client: ${projectData.client_name}
-    Industry: ${projectData.industry}
-    Deployment Type: ${projectData.deployment_type}
-    Security Level: ${projectData.security_level}
-    Total Sites: ${projectData.total_sites}
-    Total Endpoints: ${projectData.total_endpoints}
-    
-    Please provide:
-    1. Executive summary
-    2. Key objectives and success criteria
-    3. Technical requirements overview
-    4. Implementation timeline recommendations
-    5. Risk assessment and mitigation strategies
+# PROJECT SUMMARY GENERATION REQUEST
+
+## PROJECT DETAILS
+- **Project Name:** ${projectData.name}
+- **Client:** ${projectData.client_name}
+- **Industry:** ${projectData.industry}
+- **Deployment Type:** ${projectData.deployment_type}
+- **Security Level:** ${projectData.security_level}
+- **Total Sites:** ${projectData.total_sites}
+- **Total Endpoints:** ${projectData.total_endpoints}
+
+## REQUIRED OUTPUT FORMAT
+
+Please provide a comprehensive business summary using the following structured format with proper markdown:
+
+### Executive Summary
+Provide a high-level overview of the project scope, objectives, and strategic importance.
+
+### Key Objectives & Success Criteria
+\`\`\`
+Primary Objectives:
+- Objective 1
+- Objective 2
+- Objective 3
+
+Success Metrics:
+- Metric 1: Target value
+- Metric 2: Target value
+- Metric 3: Target value
+\`\`\`
+
+### Technical Requirements Overview
+**Core Requirements:**
+- Network Access Control implementation
+- Authentication mechanisms
+- Security policies and compliance
+
+**Infrastructure Scope:**
+- Sites: ${projectData.total_sites}
+- Endpoints: ${projectData.total_endpoints}
+- Security Level: ${projectData.security_level}
+
+### Implementation Timeline Recommendations
+\`\`\`
+Phase 1: Planning & Design (Weeks 1-2)
+Phase 2: Infrastructure Preparation (Weeks 3-4)
+Phase 3: Deployment & Testing (Weeks 5-8)
+Phase 4: Go-Live & Optimization (Weeks 9-10)
+\`\`\`
+
+### Risk Assessment & Mitigation Strategies
+**High Priority Risks:**
+- Risk 1: Description and mitigation
+- Risk 2: Description and mitigation
+
+**Medium Priority Risks:**
+- Risk 3: Description and mitigation
+- Risk 4: Description and mitigation
+
+Use professional formatting with headers, bullet points, and code blocks where appropriate.
     `;
 
     const response = await generateCompletion({
@@ -101,17 +145,52 @@ export const useAI = () => {
 
   const enhanceNotes = useCallback(async (notes: string, context: string): Promise<string | null> => {
     const prompt = `
-    Please enhance and organize the following notes for better clarity and structure:
-    
-    Context: ${context}
-    Notes: ${notes}
-    
-    Please:
-    1. Organize the content into clear sections
-    2. Improve grammar and clarity
-    3. Add relevant technical details where appropriate
-    4. Ensure professional tone
-    5. Highlight key action items and recommendations
+# NOTE ENHANCEMENT REQUEST
+
+## CONTEXT
+${context}
+
+## ORIGINAL NOTES
+\`\`\`
+${notes}
+\`\`\`
+
+## ENHANCEMENT REQUIREMENTS
+
+Please enhance and organize these notes using professional formatting with the following structure:
+
+### Summary
+Brief overview of the key points covered in the notes.
+
+### Key Findings
+\`\`\`
+- Finding 1: Details and implications
+- Finding 2: Details and implications
+- Finding 3: Details and implications
+\`\`\`
+
+### Technical Details
+Organize technical information into clear sections with:
+- **Configuration Details**
+- **Network Requirements**
+- **Security Considerations**
+
+### Action Items
+**High Priority:**
+- [ ] Action item 1 with deadline
+- [ ] Action item 2 with deadline
+
+**Medium Priority:**
+- [ ] Action item 3 with deadline
+- [ ] Action item 4 with deadline
+
+### Recommendations
+Professional recommendations with technical reasoning and business impact.
+
+### Next Steps
+Clear next steps with timelines and responsible parties.
+
+Ensure professional tone, proper grammar, and technical accuracy throughout.
     `;
 
     const response = await generateCompletion({

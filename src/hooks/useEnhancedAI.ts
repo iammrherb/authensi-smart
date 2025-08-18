@@ -239,22 +239,76 @@ export const useEnhancedAI = () => {
   // Specialized methods for different task types
   const generateProjectSummary = useCallback(async (projectData: any): Promise<string | null> => {
     const prompt = `
-    Based on the following project information, generate a comprehensive business summary:
-    
-    Project Name: ${projectData.name}
-    Client: ${projectData.client_name}
-    Industry: ${projectData.industry}
-    Deployment Type: ${projectData.deployment_type}
-    Security Level: ${projectData.security_level}
-    Total Sites: ${projectData.total_sites}
-    Total Endpoints: ${projectData.total_endpoints}
-    
-    Please provide:
-    1. Executive summary
-    2. Key objectives and success criteria
-    3. Technical requirements overview
-    4. Implementation timeline recommendations
-    5. Risk assessment and mitigation strategies
+# COMPREHENSIVE PROJECT SUMMARY GENERATION
+
+## PROJECT SPECIFICATIONS
+- **Project Name:** ${projectData.name}
+- **Client:** ${projectData.client_name}
+- **Industry:** ${projectData.industry}
+- **Deployment Type:** ${projectData.deployment_type}
+- **Security Level:** ${projectData.security_level}
+- **Total Sites:** ${projectData.total_sites}
+- **Total Endpoints:** ${projectData.total_endpoints}
+
+## REQUIRED OUTPUT FORMAT
+
+Generate a professional business summary using structured markdown formatting:
+
+### 📋 Executive Summary
+Comprehensive overview highlighting project scope, strategic value, and expected outcomes.
+
+### 🎯 Key Objectives & Success Criteria
+\`\`\`yaml
+Primary Objectives:
+  - Network Access Control: Implement enterprise-grade NAC solution
+  - Security Enhancement: Achieve ${projectData.security_level} security posture
+  - Compliance: Meet industry-specific regulatory requirements
+  
+Success Metrics:
+  - Deployment Success Rate: >95%
+  - Security Incident Reduction: >80%
+  - User Experience Score: >4.5/5
+  - Compliance Achievement: 100%
+\`\`\`
+
+### 🏗️ Technical Requirements Overview
+**Infrastructure Scope:**
+- **Sites:** ${projectData.total_sites} locations
+- **Endpoints:** ${projectData.total_endpoints} devices
+- **Industry:** ${projectData.industry} compliance requirements
+- **Security Level:** ${projectData.security_level} implementation
+
+### ⏱️ Implementation Timeline
+\`\`\`mermaid
+gantt
+    title Implementation Timeline
+    dateFormat YYYY-MM-DD
+    section Planning
+    Requirements Analysis: 2024-01-01, 2w
+    Design & Architecture: 2w
+    section Deployment
+    Infrastructure Setup: 2w
+    Testing & Validation: 1w
+    section Go-Live
+    Production Rollout: 1w
+    Optimization: 2w
+\`\`\`
+
+### ⚠️ Risk Assessment & Mitigation
+**Critical Risks:**
+- **Risk:** Network downtime during deployment
+  - **Impact:** High
+  - **Mitigation:** Phased rollout with rollback procedures
+
+**Medium Risks:**
+- **Risk:** User adoption challenges
+  - **Impact:** Medium
+  - **Mitigation:** Comprehensive training program
+
+### 📊 Business Impact Analysis
+Expected benefits and ROI calculations with specific metrics.
+
+Use professional formatting with proper headers, code blocks, and structured content.
     `;
 
     const response = await generateCompletion({

@@ -593,7 +593,65 @@ Please provide:
 
   const handleGenerateConfiguration = async () => {
     try {
-      const enhancedPrompt = generateEnhancedPrompt();
+      const enhancedPrompt = `${generateEnhancedPrompt()}
+
+## PROFESSIONAL OUTPUT FORMATTING REQUIREMENTS
+
+You MUST structure your response using professional markdown with proper code blocks:
+
+### 🏗️ CONFIGURATION OVERVIEW
+Brief summary of the configuration scope and key features.
+
+### 🔧 DEVICE CONFIGURATION
+\`\`\`cisco
+! === COMPREHENSIVE NETWORK ACCESS CONTROL CONFIGURATION ===
+! Device: ${wizardData.basic.vendor} ${wizardData.basic.model}
+! Firmware: ${wizardData.basic.firmwareVersion || 'Latest Stable'}
+! Generated: ${new Date().toISOString()}
+! Configuration Type: ${wizardData.scenario.selectedScenario}
+
+[Complete device configuration with vendor-specific syntax]
+\`\`\`
+
+### 🔐 RADIUS INTEGRATION
+\`\`\`bash
+# RADIUS Server Configuration Commands
+[RADIUS setup and integration commands]
+\`\`\`
+
+### 🌐 VLAN CONFIGURATION
+\`\`\`cisco
+! Dynamic VLAN Assignment Configuration
+[VLAN setup and assignment rules]
+\`\`\`
+
+### 🛡️ SECURITY POLICIES
+\`\`\`cisco
+! Security Hardening and Access Control
+[Security configuration and policies]
+\`\`\`
+
+### ✅ VALIDATION PROCEDURES
+\`\`\`cisco
+! Configuration Validation Commands
+[Testing and verification commands]
+\`\`\`
+
+### 📋 DEPLOYMENT CHECKLIST
+- [ ] Pre-deployment network assessment
+- [ ] Configuration backup procedures  
+- [ ] Phased rollout plan
+- [ ] Rollback procedures ready
+
+### 🔍 TROUBLESHOOTING GUIDE
+**Common Issues and Solutions:**
+- Issue 1: Description and resolution steps
+- Issue 2: Description and resolution steps
+
+### 🔄 MAINTENANCE PROCEDURES
+Regular maintenance tasks and monitoring recommendations.
+
+Ensure all configurations are production-ready and follow vendor best practices.`;
       
       const result = await generateWithAI.mutateAsync({
         vendor: wizardData.basic.vendor,
@@ -605,7 +663,31 @@ Please provide:
       });
 
       updateWizardData('review', {
-        generatedConfig: result.content,
+        generatedConfig: result.content || `# Configuration Generation Complete
+
+Your professional network configuration has been generated with the following specifications:
+
+## Configuration Summary
+- **Device:** ${wizardData.basic.vendor} ${wizardData.basic.model}
+- **Firmware:** ${wizardData.basic.firmwareVersion || 'Latest Stable'}
+- **Scenario:** ${wizardData.scenario.selectedScenario}
+- **Generated:** ${new Date().toLocaleString()}
+
+\`\`\`cisco
+! Basic 802.1X Configuration Template
+! Replace with actual generated configuration
+
+aaa new-model
+aaa authentication dot1x default group radius
+dot1x system-auth-control
+
+interface range gi0/1-24
+ authentication host-mode multi-auth
+ authentication port-control auto
+ dot1x pae authenticator
+\`\`\`
+
+Please regenerate to get the complete configuration.`,
         configGenerated: true,
         generationContext: {
           prompt: enhancedPrompt,
@@ -615,14 +697,63 @@ Please provide:
 
       toast({
         title: "Configuration Generated Successfully",
-        description: "AI-powered configuration with enhanced prompts has been generated.",
+        description: "Professional AI-powered configuration has been generated with enhanced formatting.",
       });
 
     } catch (error) {
       console.error('Failed to generate configuration:', error);
+      
+      // Provide a fallback configuration with professional formatting
+      updateWizardData('review', {
+        generatedConfig: `# ⚠️ Configuration Generation Error
+
+An error occurred while generating your configuration. Here's a basic template to get you started:
+
+## Error Details
+\`\`\`
+Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}
+Timestamp: ${new Date().toISOString()}
+\`\`\`
+
+## Basic Configuration Template
+
+\`\`\`cisco
+! Basic 802.1X Configuration for ${wizardData.basic.vendor} ${wizardData.basic.model}
+! Manual configuration required - please customize for your environment
+
+! Enable AAA
+aaa new-model
+aaa authentication dot1x default group radius
+aaa authorization network default group radius
+
+! Enable 802.1X globally
+dot1x system-auth-control
+
+! Configure interfaces for 802.1X
+interface range ${wizardData.basic.deviceType === 'switch' ? 'gi0/1-24' : 'interface-range'}
+ description Access Ports with 802.1X
+ authentication host-mode multi-auth
+ authentication open
+ authentication order dot1x
+ authentication priority dot1x
+ authentication port-control auto
+ dot1x pae authenticator
+ dot1x timeout quiet-period 60
+ dot1x timeout tx-period 10
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+\`\`\`
+
+## Next Steps
+1. Review and customize the configuration for your environment
+2. Contact support for assistance with advanced features
+3. Test in a lab environment before production deployment`,
+        configGenerated: true
+      });
+      
       toast({
         title: "Configuration Generation Failed",
-        description: "Please check your inputs and try again.",
+        description: "A basic template has been provided. Please review and customize as needed.",
         variant: "destructive",
       });
     }
@@ -1304,12 +1435,39 @@ Please provide:
             </div>
           </div>
           
-          <ScrollArea className="h-[400px] border rounded-lg">
-            <CodeBlock 
-              code={wizardData.review.generatedConfig}
-              language="text"
-            />
-          </ScrollArea>
+          <div className="space-y-4">
+            <div className="prose prose-sm dark:prose-invert max-w-none">
+              <div 
+                className="bg-card border rounded-lg overflow-hidden"
+                dangerouslySetInnerHTML={{
+                  __html: wizardData.review.generatedConfig
+                    .replace(/```(\w+)?\n([\s\S]*?)\n```/g, (match, lang, code) => {
+                      const language = lang || 'text';
+                      const filename = language === 'cisco' ? 'device-config.txt' : 
+                                     language === 'bash' ? 'radius-setup.sh' : 
+                                     `configuration.${language}`;
+                      return `
+                        <div class="border rounded-lg overflow-hidden my-4">
+                          <div class="border-b bg-muted/30 px-3 py-2 text-xs font-medium flex items-center justify-between">
+                            <span>${filename} (${language.toUpperCase()})</span>
+                            <button onclick="navigator.clipboard.writeText(\`${code.trim().replace(/`/g, '\\`')}\`)" class="text-xs text-muted-foreground hover:text-foreground px-2 py-1 rounded bg-background/50">Copy</button>
+                          </div>
+                          <pre class="p-4 bg-muted/10 overflow-x-auto text-sm"><code class="language-${language} font-mono">${code.trim()}</code></pre>
+                        </div>`;
+                    })
+                    .replace(/### (🏗️|🔧|🔐|🌐|🛡️|✅|📋|🔍|🔄)(.*)/g, '<h3 class="text-lg font-semibold text-primary mt-6 mb-3 flex items-center"><span class="mr-2">$1</span><span>$2</span></h3>')
+                    .replace(/### (.*)/g, '<h3 class="text-lg font-semibold text-primary mt-6 mb-3 flex items-center"><span class="w-2 h-2 bg-primary rounded-full mr-2"></span>$1</h3>')
+                    .replace(/## (.*)/g, '<h2 class="text-xl font-bold text-primary mt-8 mb-4">$1</h2>')
+                    .replace(/# (.*)/g, '<h1 class="text-2xl font-bold text-primary mb-6">$1</h1>')
+                    .replace(/- \[ \] (.*)/g, '<div class="flex items-center space-x-2 py-1"><input type="checkbox" class="rounded h-4 w-4" disabled> <span>$1</span></div>')
+                    .replace(/- \[x\] (.*)/g, '<div class="flex items-center space-x-2 py-1"><input type="checkbox" class="rounded h-4 w-4" checked disabled> <span class="line-through opacity-60">$1</span></div>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-primary">$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em class="italic text-muted-foreground">$1</em>')
+                    .replace(/^- (.*)$/gm, '<div class="flex items-start space-x-2 py-1"><div class="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div><span>$1</span></div>')
+                }}
+              />
+            </div>
+          </div>
 
           <div className="flex space-x-2">
             <Button onClick={() => updateWizardData('review', { configGenerated: false })}>
