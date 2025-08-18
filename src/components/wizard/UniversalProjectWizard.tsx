@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ProfessionalMarkdown from "@/components/ui/professional-markdown";
@@ -230,7 +232,7 @@ const UniversalProjectWizard: React.FC<UniversalProjectWizardProps> = ({
   const [generatedPlan, setGeneratedPlan] = useState<any>(null);
   
   const { generateCompletion, isLoading } = useEnhancedAI();
-  const { createProject } = useProjects();
+  const { data: projects } = useProjects();
   const { toast } = useToast();
 
   // Comprehensive wizard steps
@@ -610,7 +612,7 @@ Provide comprehensive risk analysis with quantified impact assessments and detai
 
       const riskResult = await generateCompletion({
         prompt: riskPrompt,
-        taskType: 'risk_analysis',
+        taskType: 'project_insights',
         context: 'comprehensive_risk_assessment'
       });
 
@@ -730,7 +732,7 @@ Provide comprehensive implementation guidance with detailed timelines and resour
 
       const implementationResult = await generateCompletion({
         prompt: implementationPrompt,
-        taskType: 'implementation_planning',
+        taskType: 'project_insights',
         context: 'strategic_roadmap'
       });
 
@@ -838,7 +840,7 @@ Provide detailed testing procedures with automation recommendations and quality 
 
       const qualityResult = await generateCompletion({
         prompt: qualityPrompt,
-        taskType: 'quality_assurance',
+        taskType: 'project_insights',
         context: 'comprehensive_testing'
       });
 
@@ -1508,28 +1510,28 @@ Provide detailed testing procedures with automation recommendations and quality 
               <CardContent>
                 <div className="space-y-2">
                   {wizardSteps.map((step, index) => (
-                    <div
-                      key={step.id}
-                      className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${
-                        index === currentStep
-                          ? 'bg-primary text-primary-foreground'
-                          : index < currentStep
-                          ? 'bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300'
-                          : 'hover:bg-muted'
-                      }`}
-                      onClick={() => jumpToStep(index)}
-                    >
-                      <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 ${
-                        index === currentStep
-                          ? 'border-primary-foreground bg-primary-foreground text-primary'
-                          : index < currentStep
-                          ? 'border-green-500 bg-green-500 text-white'
-                          : 'border-muted-foreground'
-                      }`}>
+                      <div
+                        key={step.id}
+                        className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${
+                          index === currentStep
+                            ? 'bg-primary text-primary-foreground'
+                            : index < currentStep
+                            ? 'bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300'
+                            : 'hover:bg-muted'
+                        }`}
+                        onClick={() => jumpToStep(index)}
+                      >
+                        <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 ${
+                          index === currentStep
+                            ? 'border-primary-foreground bg-primary-foreground text-primary'
+                            : index < currentStep
+                            ? 'border-green-500 bg-green-500 text-white'
+                            : 'border-muted-foreground'
+                        }`}>
                         {index < currentStep ? (
                           <Check className="h-4 w-4" />
                         ) : (
-                          <step.icon className="h-4 w-4" />
+                          React.createElement(step.icon, { className: "h-4 w-4" })
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -1560,7 +1562,7 @@ Provide detailed testing procedures with automation recommendations and quality 
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="flex items-center gap-2">
-                      <wizardSteps[currentStep].icon className="h-5 w-5" />
+                      {React.createElement(wizardSteps[currentStep].icon, { className: "h-5 w-5" })}
                       {wizardSteps[currentStep].title}
                     </CardTitle>
                     <CardDescription>
