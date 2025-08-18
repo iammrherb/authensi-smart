@@ -429,6 +429,83 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
     }
   });
 
+  // Demo users creation mutation
+  const createDemoUsersMutation = useMutation({
+    mutationFn: async () => {
+      const demoUsers = [
+        {
+          email: 'admin@portnox.demo',
+          first_name: 'Super',
+          last_name: 'Admin',
+          role: 'super_admin' as AppRole
+        },
+        {
+          email: 'manager@portnox.demo',
+          first_name: 'Project',
+          last_name: 'Manager',
+          role: 'product_manager' as AppRole
+        },
+        {
+          email: 'engineer@portnox.demo',
+          first_name: 'Lead',
+          last_name: 'Engineer',
+          role: 'lead_engineer' as AppRole
+        },
+        {
+          email: 'sales@portnox.demo',
+          first_name: 'Sales',
+          last_name: 'Engineer',
+          role: 'sales_engineer' as AppRole
+        }
+      ];
+
+      const results = [];
+      for (const userData of demoUsers) {
+        try {
+          const { data, error } = await supabase.functions.invoke('user-management', {
+            body: {
+              action: 'create-user',
+              ...userData,
+              scope_type: 'global',
+              send_welcome_email: false
+            }
+          });
+
+          if (error) {
+            console.error(`Failed to create demo user ${userData.email}:`, error);
+            results.push({ ...userData, success: false, error: error.message });
+          } else {
+            results.push({ ...userData, success: true, data });
+          }
+        } catch (err) {
+          console.error(`Exception creating demo user ${userData.email}:`, err);
+          results.push({ ...userData, success: false, error: err instanceof Error ? err.message : 'Unknown error' });
+        }
+      }
+      
+      return results;
+    },
+    onSuccess: (results: any[]) => {
+      const successful = results.filter(r => r.success).length;
+      const failed = results.filter(r => !r.success).length;
+      
+      toast({
+        title: "Demo Users Created",
+        description: `Successfully created ${successful} demo users${failed > 0 ? `, ${failed} failed` : ''}`,
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ['all-users'] });
+      queryClient.invalidateQueries({ queryKey: ['user-roles'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Demo Creation Error",
+        description: error.message || "Failed to create demo users",
+        variant: "destructive"
+      });
+    }
+  });
+
   const resetCreateForm = () => {
     setNewUserEmail('');
     setNewUserFirstName('');
@@ -524,6 +601,16 @@ const ComprehensiveUserManagement: React.FC<ComprehensiveUserManagementProps> = 
 
         {canManage && (
           <div className="flex space-x-2">
+            <Button
+              variant="outline"
+              onClick={() => createDemoUsersMutation.mutate()}
+              disabled={createDemoUsersMutation.isPending}
+              className="bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200"
+            >
+              <Users className="h-4 w-4 mr-2" />
+              {createDemoUsersMutation.isPending ? 'Creating...' : 'Create Demo Users'}
+            </Button>
+            
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-primary hover:opacity-90">

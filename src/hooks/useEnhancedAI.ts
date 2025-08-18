@@ -197,7 +197,12 @@ export const useEnhancedAI = () => {
       });
 
       if (supabaseError) {
-        throw new Error(supabaseError.message);
+        console.error('Enhanced AI function error:', supabaseError);
+        throw new Error(supabaseError.message || 'Enhanced AI service unavailable');
+      }
+
+      if (!data) {
+        throw new Error('No response from enhanced AI service');
       }
 
       const responseTime = Date.now() - startTime;
@@ -211,7 +216,21 @@ export const useEnhancedAI = () => {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);
       console.error('Enhanced AI completion error:', err);
-      return null;
+      
+      // Return a fallback response to prevent crashes
+      return {
+        content: 'Enhanced AI service is temporarily unavailable. Please try again later.',
+        provider: request.provider || 'openai',
+        model: request.model || 'gpt-5-2025-08-07',
+        usage: {
+          prompt_tokens: 0,
+          completion_tokens: 0,
+          total_tokens: 0,
+          cost_estimate: 0
+        },
+        responseTime: Date.now() - startTime,
+        fallbackUsed: false
+      };
     } finally {
       setIsLoading(false);
     }

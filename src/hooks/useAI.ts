@@ -38,7 +38,12 @@ export const useAI = () => {
       });
 
       if (supabaseError) {
-        throw new Error(supabaseError.message);
+        console.error('Supabase function error:', supabaseError);
+        throw new Error(supabaseError.message || 'AI service unavailable');
+      }
+
+      if (!data) {
+        throw new Error('No response from AI service');
       }
 
       return data as AIResponse;
@@ -46,7 +51,17 @@ export const useAI = () => {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);
       console.error('AI completion error:', err);
-      return null;
+      
+      // Return a fallback response to prevent crashes
+      return {
+        content: 'AI service is temporarily unavailable. Please try again later.',
+        provider: request.provider || 'openai',
+        usage: {
+          prompt_tokens: 0,
+          completion_tokens: 0,
+          total_tokens: 0
+        }
+      };
     } finally {
       setIsLoading(false);
     }
