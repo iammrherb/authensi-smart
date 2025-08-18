@@ -4604,6 +4604,10 @@ export type Database = {
         Args: { _scope_id?: string; _scope_type?: string; _user_id: string }
         Returns: boolean
       }
+      cleanup_expired_sessions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       create_initial_admin: {
         Args: { _user_id: string }
         Returns: undefined
@@ -4724,6 +4728,14 @@ export type Database = {
       user_requires_2fa: {
         Args: { p_user_id?: string }
         Returns: boolean
+      }
+      validate_session_token: {
+        Args: { p_token: string }
+        Returns: {
+          is_valid: boolean
+          session_id: string
+          user_id: string
+        }[]
       }
       verify_totp_code: {
         Args: { p_code: string; p_user_id: string }
