@@ -709,7 +709,7 @@ ${generatedPlan.optimization}
                       </CardHeader>
                       <CardContent>
                         <div className="text-2xl font-bold">
-                          {Object.values(generatedPlan.resourceRequirements).reduce((a: any, b: any) => a + b, 0)}
+                          {String(Object.values(generatedPlan.resourceRequirements).reduce((a: number, b: unknown) => a + (typeof b === 'number' ? b : 0), 0))}
                         </div>
                         <div className="text-sm text-muted-foreground">Resources</div>
                       </CardContent>
