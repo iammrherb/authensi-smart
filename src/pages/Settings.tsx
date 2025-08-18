@@ -167,37 +167,190 @@ const Settings = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>External Integrations</CardTitle>
+                  <CardDescription>
+                    Connect your NAC platform with external tools and services for enhanced workflow automation
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {/* Jira Integration */}
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
                         <span className="text-white font-bold">J</span>
                       </div>
                       <div>
-                        <Label>Jira Integration</Label>
-                        <p className="text-sm text-muted-foreground">Sync project tasks with Jira</p>
+                        <Label className="font-medium">Jira Integration</Label>
+                        <p className="text-sm text-muted-foreground">Sync project tasks and issues with Jira</p>
                       </div>
                     </div>
                     <Button variant="outline">Configure</Button>
                   </div>
                   
+                  {/* Slack Integration */}
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
                         <span className="text-white font-bold">S</span>
                       </div>
                       <div>
-                        <Label>Slack Integration</Label>
-                        <p className="text-sm text-muted-foreground">Send notifications to Slack channels</p>
+                        <Label className="font-medium">Slack Integration</Label>
+                        <p className="text-sm text-muted-foreground">Send notifications and updates to Slack channels</p>
                       </div>
                     </div>
                     <Button variant="outline">Configure</Button>
                   </div>
 
+                  {/* MS Teams Integration */}
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold">T</span>
+                      </div>
+                      <div>
+                        <Label className="font-medium">Microsoft Teams</Label>
+                        <p className="text-sm text-muted-foreground">Collaborate and receive notifications in Teams channels</p>
+                      </div>
+                    </div>
+                    <Button variant="outline">Configure</Button>
+                  </div>
+
+                  {/* Confluence Integration */}
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold">C</span>
+                      </div>
+                      <div>
+                        <Label className="font-medium">Confluence</Label>
+                        <p className="text-sm text-muted-foreground">Auto-generate and sync project documentation</p>
+                      </div>
+                    </div>
+                    <Button variant="outline">Configure</Button>
+                  </div>
+
+                  {/* Portnox API Integration */}
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold">P</span>
+                      </div>
+                      <div>
+                        <Label className="font-medium">Portnox API</Label>
+                        <p className="text-sm text-muted-foreground">Direct integration with Portnox NAC platform</p>
+                      </div>
+                    </div>
+                    <Button variant="outline">Configure</Button>
+                  </div>
+
+                  {/* Salesforce Integration */}
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-cyan-500 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold">SF</span>
+                      </div>
+                      <div>
+                        <Label className="font-medium">Salesforce</Label>
+                        <p className="text-sm text-muted-foreground">Sync customer data and project opportunities</p>
+                      </div>
+                    </div>
+                    <Button variant="outline">Configure</Button>
+                  </div>
                 </CardContent>
               </Card>
 
+              <Card>
+                <CardHeader>
+                  <CardTitle>Integration Status</CardTitle>
+                  <CardDescription>
+                    Monitor the health and status of your external integrations
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Jira</span>
+                        <Badge variant="secondary">Not Connected</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Last sync: Never</p>
+                    </div>
+                    
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Slack</span>
+                        <Badge variant="secondary">Not Connected</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Last sync: Never</p>
+                    </div>
+
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">MS Teams</span>
+                        <Badge variant="secondary">Not Connected</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Last sync: Never</p>
+                    </div>
+
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Confluence</span>
+                        <Badge variant="secondary">Not Connected</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Last sync: Never</p>
+                    </div>
+
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Portnox API</span>
+                        <Badge variant="secondary">Not Connected</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Last sync: Never</p>
+                    </div>
+
+                    <div className="p-3 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Salesforce</span>
+                        <Badge variant="secondary">Not Connected</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Last sync: Never</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Webhook Settings</CardTitle>
+                  <CardDescription>
+                    Configure webhooks for real-time data synchronization
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Enable Webhooks</Label>
+                      <p className="text-sm text-muted-foreground">Allow external services to receive real-time updates</p>
+                    </div>
+                    <Switch />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="webhookUrl">Webhook URL</Label>
+                    <Input id="webhookUrl" placeholder="https://your-service.com/webhook" />
+                    <p className="text-xs text-muted-foreground">
+                      This URL will receive POST requests when project events occur
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Webhook Authentication</Label>
+                      <p className="text-sm text-muted-foreground">Secure webhooks with authentication tokens</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="data" className="space-y-6">
