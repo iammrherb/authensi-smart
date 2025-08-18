@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,12 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHasRole } from "@/hooks/useUserRoles";
-import EnhancedUserManagement from "@/components/admin/EnhancedUserManagement";
-import InvitationManagement from "@/components/admin/InvitationManagement";
-import CustomRoleManager from "@/components/admin/CustomRoleManager";
+import ComprehensiveUserManagement from "@/components/admin/ComprehensiveUserManagement";
 import AISettings from "@/components/ai/AISettings";
 import { Settings as SettingsIcon, User, Bell, Shield, Database, Globe, Users, Brain } from "lucide-react";
-import TaxonomySeederPanel from "@/components/admin/TaxonomySeederPanel";
 const Settings = () => {
   const { data: isAdmin } = useHasRole('super_admin', 'global');
   const { data: canManageUsers } = useHasRole('product_manager', 'global');
@@ -252,43 +249,17 @@ const Settings = () => {
 
             {(isAdmin || canManageUsers) && (
               <TabsContent value="admin" className="space-y-6">
-                <div className="grid gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>User Management</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <EnhancedUserManagement />
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>User Invitations</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <InvitationManagement />
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Custom Roles</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <CustomRoleManager />
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Taxonomy Seeder</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <TaxonomySeederPanel />
-                    </CardContent>
-                  </Card>
-                </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Administration</CardTitle>
+                    <CardDescription>
+                      Manage users, roles, invitations, and system settings
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ComprehensiveUserManagement />
+                  </CardContent>
+                </Card>
               </TabsContent>
             )}
           </Tabs>
