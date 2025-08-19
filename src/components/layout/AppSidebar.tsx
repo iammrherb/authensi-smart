@@ -6,12 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import portnoxLogo from '@/assets/portnox-logo.png';
 const primaryNavItems = [{
-  title: "Enterprise Command Center",
-  url: "/command-center",
+  title: "Command Center",
+  url: "/",
   icon: Command,
-  description: "AI-Powered Enterprise Control Hub",
-  badge: "Enterprise",
-  tooltip: "Unified enterprise management with AI insights, executive reports, and intelligent automation"
+  description: "AI-Powered Project Management Dashboard",
+  badge: "AI",
+  tooltip: "Central hub for all project activities with AI insights"
 }, {
   title: "Project Manager",
   url: "/projects",

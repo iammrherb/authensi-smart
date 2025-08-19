@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { EnhancedButton } from '@/components/ui/enhanced-button';
-import { ProfessionalReport } from '@/components/ui/professional-report';
 import { useProjects } from '@/hooks/useProjects';
 import { useSites } from '@/hooks/useSites';
 import { useUseCases } from '@/hooks/useUseCases';
@@ -121,251 +120,6 @@ const ComprehensiveReports = () => {
     }
   ];
 
-  const generateFallbackReport = (type: string, projects: any[], analytics: any): string => {
-    const timestamp = new Date().toLocaleDateString();
-    const reportTypeName = reportTypes.find(t => t.id === type)?.name || 'NAC Deployment Report';
-    
-    return `# ${reportTypeName}
-**Enterprise Network Access Control Analysis**
-
----
-
-## 📋 Executive Summary
-
-This comprehensive enterprise report provides detailed analysis of your Network Access Control (NAC) deployment across **${projects.length} project(s)** and **${analytics.totalSites} site(s)**.
-
-### 🎯 Key Performance Indicators
-
-\`\`\`yaml
-Report Metrics:
-  Total Projects: ${analytics.totalProjects}
-  Active Sites: ${analytics.totalSites}
-  Overall Progress: ${analytics.avgProgress}%
-  Completion Rate: ${Math.round((analytics.completedProjects / Math.max(analytics.totalProjects, 1)) * 100)}%
-  On-Time Delivery: ${Math.round((analytics.onTimeProjects / Math.max(analytics.totalProjects, 1)) * 100)}%
-  Risk Projects: ${analytics.riskProjects}
-\`\`\`
-
-## 🏗️ Project Portfolio Analysis
-
-### Project Status Distribution
-
-${projects.map(p => `
-#### **${p.name}**
-\`\`\`json
-{
-  "client": "${p.client_name || 'Not specified'}",
-  "industry": "${p.industry || 'Not specified'}",
-  "status": "${p.status}",
-  "progress": "${p.progress_percentage || 0}%",
-  "risk_level": "${(p.progress_percentage || 0) <= 25 ? 'HIGH' : (p.progress_percentage || 0) <= 75 ? 'MEDIUM' : 'LOW'}"
-}
-\`\`\``).join('\n')}
-
-## 🔍 Risk Assessment Matrix
-
-### Risk Distribution Analysis
-
-\`\`\`bash
-# Risk Level Distribution
-echo "Low Risk Projects: ${projects.filter(p => (p.progress_percentage || 0) > 75).length}"
-echo "Medium Risk Projects: ${projects.filter(p => (p.progress_percentage || 0) > 25 && (p.progress_percentage || 0) <= 75).length}"
-echo "High Risk Projects: ${projects.filter(p => (p.progress_percentage || 0) <= 25).length}"
-
-# Risk Mitigation Commands
-if [ "${analytics.riskProjects}" -gt 0 ]; then
-  echo "WARNING: ${analytics.riskProjects} projects require immediate attention"
-  echo "ACTION: Schedule emergency review meetings"
-fi
-\`\`\`
-
-### Critical Success Factors
-
-| Factor | Status | Action Required |
-|--------|--------|----------------|
-| Resource Allocation | ${analytics.avgProgress > 70 ? '✅ Optimal' : '⚠️ Needs Review'} | ${analytics.avgProgress > 70 ? 'Maintain current levels' : 'Increase resource allocation'} |
-| Timeline Adherence | ${analytics.onTimeProjects > analytics.totalProjects * 0.8 ? '✅ On Track' : '⚠️ Behind Schedule'} | ${analytics.onTimeProjects > analytics.totalProjects * 0.8 ? 'Continue monitoring' : 'Implement recovery plans'} |
-| Quality Standards | ✅ Meeting Standards | Regular quality audits |
-
-## 🛡️ Security & Compliance Framework
-
-### NAC Implementation Standards
-
-\`\`\`cisco
-! Cisco NAC Configuration Template
-! Generated for Enterprise Deployment
-
-configure terminal
-radius-server host 192.168.1.100 auth-port 1812 acct-port 1813
-radius-server key "your-radius-key"
-dot1x system-auth-control
-interface range gi1/0/1-48
-  switchport mode access
-  switchport access vlan 100
-  dot1x port-control auto
-  authentication periodic
-  authentication timer restart 3600
-exit
-\`\`\`
-
-### Portnox Integration Guidelines
-
-\`\`\`yaml
-# Portnox Cloud Configuration
-portnox:
-  deployment_type: "cloud"
-  integration_mode: "hybrid"
-  authentication:
-    - method: "802.1X"
-    - method: "MAC Authentication Bypass"
-    - method: "Guest Portal"
-  policy_enforcement:
-    - dynamic_vlan_assignment: true
-    - device_profiling: true
-    - threat_protection: true
-\`\`\`
-
-## 📊 Strategic Recommendations
-
-### Immediate Actions (0-30 days)
-
-1. **🚨 High Priority**: Address ${analytics.riskProjects} high-risk projects
-2. **🔧 Resource Optimization**: Reallocate resources to critical milestones
-3. **📋 Quality Assurance**: Implement weekly progress reviews
-4. **🔐 Security Hardening**: Complete security policy validations
-
-### Medium-term Initiatives (30-90 days)
-
-1. **📈 Performance Optimization**: Implement advanced monitoring
-2. **🤝 Stakeholder Engagement**: Establish customer communication protocols
-3. **🎯 Milestone Tracking**: Deploy automated progress reporting
-4. **🛠️ Process Improvement**: Standardize deployment procedures
-
-### Long-term Strategy (90+ days)
-
-1. **🚀 Scalability Planning**: Prepare for enterprise-wide rollout
-2. **📚 Knowledge Management**: Build comprehensive documentation
-3. **🔄 Continuous Improvement**: Implement DevOps practices
-4. **🌐 Global Expansion**: Plan multi-site deployments
-
-## 📋 Implementation Checklist
-
-### Pre-Deployment Validation
-
-\`\`\`bash
-#!/bin/bash
-# Pre-deployment validation script
-
-echo "=== NAC Deployment Readiness Check ==="
-check_network_infrastructure() {
-  ping -c 3 radius-server.company.com
-  nslookup portnox-cloud.portnox.com
-}
-
-validate_switch_configs() {
-  ssh admin@switch-ip "show dot1x all"
-  ssh admin@switch-ip "show vlan brief"
-}
-
-test_authentication() {
-  eapol_test -c test-user.conf -a radius-server-ip
-}
-
-check_network_infrastructure
-validate_switch_configs
-test_authentication
-echo "Validation complete. Review results before proceeding."
-\`\`\`
-
-### Post-Deployment Monitoring
-
-\`\`\`python
-# Python monitoring script for NAC deployment
-import requests
-import json
-from datetime import datetime
-
-def monitor_nac_health():
-    """Monitor NAC deployment health metrics"""
-    
-    metrics = {
-        'timestamp': datetime.now().isoformat(),
-        'authentication_rate': check_auth_success_rate(),
-        'device_compliance': check_device_compliance(),
-        'network_performance': measure_network_latency(),
-        'security_events': count_security_incidents()
-    }
-    
-    # Generate alert if thresholds exceeded
-    if metrics['authentication_rate'] < 95:
-        send_alert("Authentication rate below threshold")
-    
-    return metrics
-
-def generate_compliance_report():
-    """Generate regulatory compliance report"""
-    return {
-        'sox_compliance': True,
-        'pci_dss_status': 'Compliant',
-        'iso27001_certification': True,
-        'audit_trail_complete': True
-    }
-\`\`\`
-
-## 🎯 Success Metrics & KPIs
-
-### Deployment Success Criteria
-
-| Metric | Target | Current | Status |
-|--------|--------|---------|--------|
-| Authentication Success Rate | >95% | ${Math.min(95 + Math.random() * 5, 100).toFixed(1)}% | ${Math.random() > 0.3 ? '✅' : '⚠️'} |
-| Policy Compliance | 100% | ${Math.min(90 + Math.random() * 10, 100).toFixed(1)}% | ${Math.random() > 0.2 ? '✅' : '⚠️'} |
-| Incident Response Time | <15min | ${Math.floor(10 + Math.random() * 10)}min | ${Math.random() > 0.4 ? '✅' : '⚠️'} |
-| User Satisfaction | >90% | ${Math.min(85 + Math.random() * 15, 100).toFixed(1)}% | ${Math.random() > 0.3 ? '✅' : '⚠️'} |
-
-### ROI Analysis
-
-\`\`\`json
-{
-  "investment": {
-    "initial_cost": "$${(analytics.totalProjects * 50000).toLocaleString()}",
-    "annual_maintenance": "$${(analytics.totalProjects * 10000).toLocaleString()}",
-    "training_costs": "$${(analytics.totalProjects * 5000).toLocaleString()}"
-  },
-  "benefits": {
-    "security_incident_reduction": "75%",
-    "compliance_cost_savings": "$${(analytics.totalProjects * 25000).toLocaleString()}",
-    "operational_efficiency": "40% improvement",
-    "payback_period": "18 months"
-  }
-}
-\`\`\`
-
----
-
-## 📞 Next Steps & Contact Information
-
-### Immediate Actions Required
-
-1. **📋 Review this report** with stakeholders within 48 hours
-2. **🔄 Schedule follow-up** meetings for high-risk projects
-3. **📊 Implement monitoring** dashboards for real-time visibility
-4. **📝 Update project plans** based on recommendations
-
-### Support Contacts
-
-- **Technical Support**: nac-support@company.com
-- **Project Management**: pmo@company.com  
-- **Security Team**: security@company.com
-- **Vendor Relations**: vendor-mgmt@company.com
-
----
-
-**Report Generated**: ${timestamp} | **Version**: 2.0 | **Classification**: Internal Use Only
-
-*This enterprise report contains proprietary information. Distribution limited to authorized personnel.*`;
-  };
-
   const buildPortnoxDocText = (doc: PortnoxDocumentationResult): string => {
     let out = 'Portnox Onboarding & Deployment Guide\n\n';
     if (doc.deploymentGuide?.length) {
@@ -462,12 +216,10 @@ def generate_compliance_report():
         prompt,
         context: `${type}_report`,
         provider: 'openai',
-        model: 'gpt-4o-mini',
         temperature: 0.3,
         maxTokens: 4000
       });
 
-      // Fallback to mock data if AI response is empty
       if (response?.content) {
         setReportData({
           type,
@@ -479,21 +231,6 @@ def generate_compliance_report():
         toast({
           title: 'Report Generated',
           description: 'AI-powered report has been generated successfully',
-        });
-      } else {
-        // Generate fallback report if AI fails
-        const fallbackContent = generateFallbackReport(type, projectsData, analytics);
-        setReportData({
-          type,
-          content: fallbackContent,
-          generatedAt: new Date().toISOString(),
-          analytics
-        });
-        setActiveTab('generated');
-        toast({
-          title: 'Report Generated',
-          description: 'Report generated with fallback content (AI service unavailable)',
-          variant: 'default'
         });
       }
     } catch (error) {
@@ -812,14 +549,48 @@ const exportDocx = async () => {
         {/* Generated Report */}
         <TabsContent value="generated" className="space-y-6">
           {reportData ? (
-            <ProfessionalReport
-              content={reportData.content}
-              title={reportTypes.find(t => t.id === reportData.type)?.name || 'Report'}
-              subtitle="Enterprise Network Access Control Analysis"
-              generatedAt={reportData.generatedAt}
-              analytics={reportData.analytics}
-              enableExport={true}
-            />
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Brain className="h-5 w-5 text-primary" />
+                      <span>AI-Generated {reportTypes.find(t => t.id === reportData.type)?.name}</span>
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Generated on {new Date(reportData.generatedAt).toLocaleString()}
+                    </p>
+                  </div>
+                    <div className="flex space-x-2">
+                      <Button onClick={() => exportReport('pdf')} variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-2" />
+                        Export PDF
+                      </Button>
+                      <Button onClick={() => exportReport('docx')} variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-2" />
+                        Export DOCX
+                      </Button>
+                      <Button onClick={shareReport} variant="outline" size="sm">
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share
+                      </Button>
+                      <Button onClick={() => window.print()} variant="outline" size="sm">
+                        <Printer className="h-4 w-4 mr-2" />
+                        Print
+                      </Button>
+                    </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[600px]">
+                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed p-6 bg-card/50 rounded-lg">
+                      {reportData.content}
+                    </div>
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
           ) : (
             <Card>
               <CardContent className="text-center py-12">
