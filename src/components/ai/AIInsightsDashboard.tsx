@@ -17,6 +17,8 @@ import {
   Monitor, Gauge, Award, Trophy, Medal, Crown, Flame
 } from "lucide-react";
 import { useEnhancedAI } from "@/hooks/useEnhancedAI";
+import { useAIInsights } from "@/hooks/useAIInsights";
+import { optimizationEngine } from "@/services/AIOptimizationEngine";
 
 interface DeploymentMetrics {
   successRate: number;
@@ -81,266 +83,85 @@ interface EpicMetrics {
 }
 
 export const AIInsightsDashboard: React.FC = () => {
-  const [deploymentMetrics, setDeploymentMetrics] = useState<DeploymentMetrics>({
-    successRate: 94.2,
-    avgDeploymentTime: 12.5,
-    rollbackRate: 2.1,
-    resourceUtilization: 78.3,
-    costEfficiency: 87.1,
-    performanceScore: 91.4,
-    securityScore: 96.2,
-    automationLevel: 89.7
-  });
-
-  const [resourceAllocation, setResourceAllocation] = useState<ResourceAllocation>({
-    cpu: { allocated: 1000, used: 782, efficiency: 78.2 },
-    memory: { allocated: 2048, used: 1543, efficiency: 75.4 },
-    storage: { allocated: 5000, used: 3876, efficiency: 77.5 },
-    network: { allocated: 1000, used: 456, efficiency: 45.6 },
-    cost: { budgeted: 15000, actual: 12847, variance: -14.4 }
-  });
-
-  const [milestones, setMilestones] = useState<MilestoneAchievement[]>([
-    {
-      id: "1",
-      name: "Zero-Downtime Deployment Pipeline",
-      category: "deployment",
-      status: "completed",
-      progress: 100,
-      targetDate: "2024-01-15",
-      actualDate: "2024-01-12",
-      impact: "high",
-      dependencies: ["CI/CD Pipeline", "Load Balancer"],
-      blockers: [],
-      recommendations: ["Implement canary deployments", "Add automated rollback triggers"]
-    },
-    {
-      id: "2", 
-      name: "Security Compliance Certification",
-      category: "security",
-      status: "in_progress",
-      progress: 73,
-      targetDate: "2024-02-28",
-      impact: "high",
-      dependencies: ["Security Audit", "Vulnerability Assessment"],
-      blockers: ["Pending third-party vendor approval"],
-      recommendations: ["Accelerate security documentation", "Schedule additional penetration testing"]
-    },
-    {
-      id: "3",
-      name: "Performance Optimization Phase 2",
-      category: "performance", 
-      status: "at_risk",
-      progress: 45,
-      targetDate: "2024-03-15",
-      impact: "medium",
-      dependencies: ["Database Optimization", "Cache Implementation"],
-      blockers: ["Resource allocation conflicts", "Database migration complexity"],
-      recommendations: ["Reallocate senior developer resources", "Consider phased migration approach"]
-    }
-  ]);
-
-  const [recommendations, setRecommendations] = useState<AIRecommendation[]>([
-    {
-      id: "rec_001",
-      type: "optimization",
-      priority: "high",
-      title: "Implement Intelligent Auto-Scaling",
-      description: "Deploy machine learning-based auto-scaling to optimize resource allocation based on traffic patterns and application behavior.",
-      impact: "Reduce infrastructure costs by 30-40% while improving performance during peak loads.",
-      effort: "medium",
-      expectedBenefit: "$4,500/month cost savings + 25% performance improvement",
-      implementationSteps: [
-        "Analyze historical traffic and resource usage patterns",
-        "Deploy predictive scaling algorithms",
-        "Configure monitoring and alerting thresholds",
-        "Implement gradual rollout with A/B testing",
-        "Fine-tune scaling parameters based on performance data"
-      ],
-      estimatedTime: "3-4 weeks",
-      riskLevel: "medium",
-      confidence: 87,
-      tags: ["auto-scaling", "cost-optimization", "performance", "ml"],
-      createdAt: "2024-01-20T10:30:00Z",
-      status: "new"
-    },
-    {
-      id: "rec_002",
-      type: "security",
-      priority: "critical",
-      title: "Enhanced Zero-Trust Security Architecture",
-      description: "Implement comprehensive zero-trust security model with AI-powered threat detection and automated response capabilities.",
-      impact: "Eliminate 95% of security vulnerabilities and reduce incident response time by 80%.",
-      effort: "high",
-      expectedBenefit: "Prevent potential $2M+ security breach costs",
-      implementationSteps: [
-        "Deploy micro-segmentation across all network zones",
-        "Implement continuous authentication and authorization",
-        "Set up AI-powered behavioral analysis",
-        "Configure automated threat response workflows",
-        "Establish security posture monitoring dashboard"
-      ],
-      estimatedTime: "6-8 weeks",
-      riskLevel: "low",
-      confidence: 94,
-      tags: ["zero-trust", "security", "ai-detection", "automation"],
-      createdAt: "2024-01-20T11:15:00Z",
-      status: "approved"
-    },
-    {
-      id: "rec_003",
-      type: "deployment",
-      priority: "medium", 
-      title: "GitOps-Based Deployment Automation",
-      description: "Migrate to GitOps methodology with automated deployment pipelines, configuration drift detection, and self-healing infrastructure.",
-      impact: "Reduce deployment errors by 90% and increase deployment frequency by 300%.",
-      effort: "medium",
-      expectedBenefit: "50% faster time-to-market + 95% deployment reliability",
-      implementationSteps: [
-        "Set up GitOps operators and controllers",
-        "Migrate existing configurations to git repositories",
-        "Implement automated testing and validation pipelines",
-        "Configure drift detection and reconciliation",
-        "Train team on GitOps best practices"
-      ],
-      estimatedTime: "4-5 weeks",
-      riskLevel: "medium",
-      confidence: 82,
-      tags: ["gitops", "deployment", "automation", "reliability"],
-      createdAt: "2024-01-20T14:22:00Z",
-      status: "reviewed"
-    }
-  ]);
-
-  const [epicMetrics, setEpicMetrics] = useState<EpicMetrics>({
-    overallHealth: 87.3,
-    velocityTrend: 23.1,
-    qualityScore: 92.4,
-    deliveryPredictability: 79.6,
-    teamEfficiency: 84.2,
-    customerSatisfaction: 91.8,
-    technicalDebt: 34.7,
-    innovationIndex: 76.9
-  });
-
-  const [loading, setLoading] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState(new Date());
+  const { 
+    deploymentMetrics, 
+    resourceAllocation, 
+    milestones, 
+    recommendations, 
+    epicMetrics, 
+    optimizationOpportunities,
+    loading, 
+    lastUpdated, 
+    refreshInsights, 
+    generateAIRecommendations, 
+    updateRecommendationStatus 
+  } = useAIInsights();
+  
   const { generateCompletion, isLoading: aiLoading } = useEnhancedAI();
   const { toast } = useToast();
+  const [autonomousMode, setAutonomousMode] = useState(true);
+  const [optimizationResults, setOptimizationResults] = useState<any[]>([]);
 
   useEffect(() => {
-    loadInsightsData();
-    // Set up real-time updates every 30 seconds
-    const interval = setInterval(generateAutonomousRecommendations, 30000);
-    return () => clearInterval(interval);
-  }, []);
+    loadOptimizationResults();
+    // Set up autonomous optimization every 5 minutes
+    if (autonomousMode) {
+      const interval = setInterval(runAutonomousOptimization, 300000);
+      return () => clearInterval(interval);
+    }
+  }, [autonomousMode]);
 
-  const loadInsightsData = async () => {
-    setLoading(true);
+  const loadOptimizationResults = async () => {
     try {
-      // Load real data from Supabase analytics
-      const { data: analyticsData } = await supabase
-        .from('ai_usage_analytics')
-        .select('*')
-        .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
-
-      if (analyticsData) {
-        // Calculate real metrics based on actual data
-        updateMetricsFromAnalytics(analyticsData);
-      }
+      const results = await optimizationEngine.analyzeSystemPerformance();
+      setOptimizationResults(results);
     } catch (error) {
-      console.error('Error loading insights data:', error);
-    } finally {
-      setLoading(false);
-      setLastUpdated(new Date());
+      console.error('Error loading optimization results:', error);
     }
   };
 
-  const updateMetricsFromAnalytics = (analyticsData: any[]) => {
-    if (analyticsData.length === 0) return;
-
-    const successRate = (analyticsData.filter(d => d.success).length / analyticsData.length) * 100;
-    const avgResponseTime = analyticsData.reduce((sum, d) => sum + (d.response_time_ms || 0), 0) / analyticsData.length;
-    const totalCost = analyticsData.reduce((sum, d) => sum + (d.cost_cents || 0), 0) / 100;
-
-    setDeploymentMetrics(prev => ({
-      ...prev,
-      successRate: Math.round(successRate * 10) / 10,
-      avgDeploymentTime: Math.round(avgResponseTime / 1000 * 10) / 10,
-      performanceScore: Math.min(100, Math.max(0, 100 - (avgResponseTime / 100)))
-    }));
-
-    // Update epic metrics based on real data
-    setEpicMetrics(prev => ({
-      ...prev,
-      overallHealth: (successRate + prev.qualityScore + prev.deliveryPredictability) / 3,
-      velocityTrend: analyticsData.length > 10 ? 15.2 : -5.3
-    }));
-  };
-
-  const generateAutonomousRecommendations = async () => {
-    if (aiLoading) return;
-
+  const runAutonomousOptimization = async () => {
     try {
-      const context = `
-        Current System Metrics:
-        - Success Rate: ${deploymentMetrics.successRate}%
-        - Resource Utilization: ${deploymentMetrics.resourceUtilization}%
-        - Cost Efficiency: ${deploymentMetrics.costEfficiency}%
-        - Security Score: ${deploymentMetrics.securityScore}%
-        - Overall Health: ${epicMetrics.overallHealth}%
-        - Technical Debt: ${epicMetrics.technicalDebt}%
-        
-        Resource Allocation:
-        - CPU Efficiency: ${resourceAllocation.cpu.efficiency}%
-        - Memory Efficiency: ${resourceAllocation.memory.efficiency}%
-        - Cost Variance: ${resourceAllocation.cost.variance}%
-        
-        Active Milestones: ${milestones.filter(m => m.status !== 'completed').length}
-        At-Risk Milestones: ${milestones.filter(m => m.status === 'at_risk').length}
-      `;
-
-      const response = await generateCompletion({
-        prompt: "Analyze the system metrics and generate intelligent recommendations for optimization, security, cost reduction, and performance improvement. Focus on actionable items with measurable impact.",
-        context,
-        taskType: "analysis",
-        maxTokens: 1000
-      });
-
-      if (response.content) {
-        // Parse AI response and create new recommendations
-        console.log("AI Recommendation Generated:", response.content);
-        
-        // Create a new recommendation based on AI analysis
-        const newRecommendation: AIRecommendation = {
-          id: `ai_rec_${Date.now()}`,
-          type: "optimization",
-          priority: "medium",
-          title: "AI-Generated Optimization Opportunity",
-          description: response.content.substring(0, 200) + "...",
-          impact: "Autonomous AI analysis suggests significant improvement potential",
-          effort: "medium",
-          expectedBenefit: "AI-calculated optimization benefits",
-          implementationSteps: ["Detailed analysis pending", "Implementation plan to be generated"],
-          estimatedTime: "2-3 weeks",
-          riskLevel: "low",
-          confidence: 85,
-          tags: ["ai-generated", "autonomous", "optimization"],
-          createdAt: new Date().toISOString(),
-          status: "new"
-        };
-
-        setRecommendations(prev => [newRecommendation, ...prev.slice(0, 9)]);
+      const optimizations = await optimizationEngine.generateAutonomousRecommendations();
+      if (optimizations.length > 0) {
+        toast({
+          title: "Autonomous Optimization",
+          description: `${optimizations.length} new optimization opportunities identified`,
+        });
       }
     } catch (error) {
-      console.error('Error generating autonomous recommendations:', error);
+      console.error('Error running autonomous optimization:', error);
+    }
+  };
+
+  const handleOptimizeDeployment = async () => {
+    try {
+      const optimizations = await optimizationEngine.optimizeDeploymentStrategy();
+      toast({
+        title: "Deployment Optimization",
+        description: `Generated ${optimizations.length} deployment strategy recommendations`,
+      });
+    } catch (error) {
+      console.error('Error optimizing deployment:', error);
+    }
+  };
+
+  const handleOptimizeResources = async () => {
+    try {
+      const optimization = await optimizationEngine.optimizeResourceAllocation();
+      const totalSavings = optimization.cpu.costSavings + optimization.memory.costSavings + 
+                          optimization.storage.costSavings + optimization.network.costSavings;
+      toast({
+        title: "Resource Optimization",
+        description: `Potential cost savings: $${totalSavings.toFixed(0)}/month`,
+      });
+    } catch (error) {
+      console.error('Error optimizing resources:', error);
     }
   };
 
   const handleRecommendationAction = (id: string, action: 'approve' | 'reject' | 'implement') => {
-    setRecommendations(prev => prev.map(rec => 
-      rec.id === id ? { ...rec, status: action === 'approve' ? 'approved' : action === 'reject' ? 'rejected' : 'implemented' } : rec
-    ));
+    updateRecommendationStatus(id, action === 'approve' ? 'approved' : action === 'reject' ? 'rejected' : 'implemented');
 
     toast({
       title: "Recommendation Updated",
@@ -400,19 +221,29 @@ export const AIInsightsDashboard: React.FC = () => {
             <Activity className="h-3 w-3" />
             <span>Last updated: {lastUpdated.toLocaleTimeString()}</span>
           </Badge>
-          <Button 
-            onClick={loadInsightsData} 
-            disabled={loading}
-            variant="outline"
-            size="sm"
-          >
-            {loading ? (
-              <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <RefreshCw className="h-4 w-4 mr-2" />
-            )}
-            Refresh
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Button 
+              onClick={refreshInsights} 
+              disabled={loading}
+              variant="outline"
+              size="sm"
+            >
+              {loading ? (
+                <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <RefreshCw className="h-4 w-4 mr-2" />
+              )}
+              Refresh
+            </Button>
+            <Button 
+              onClick={handleOptimizeDeployment}
+              variant="outline"
+              size="sm"
+            >
+              <Rocket className="h-4 w-4 mr-2" />
+              Optimize
+            </Button>
+          </div>
         </div>
       </div>
 
