@@ -149,6 +149,119 @@ export type Database = {
           },
         ]
       }
+      ai_providers: {
+        Row: {
+          api_endpoint: string
+          authentication_method: string
+          capabilities: Json | null
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          pricing_info: Json | null
+          provider_name: string
+          rate_limits: Json | null
+          supported_models: Json
+          updated_at: string
+        }
+        Insert: {
+          api_endpoint: string
+          authentication_method?: string
+          capabilities?: Json | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          pricing_info?: Json | null
+          provider_name: string
+          rate_limits?: Json | null
+          supported_models?: Json
+          updated_at?: string
+        }
+        Update: {
+          api_endpoint?: string
+          authentication_method?: string
+          capabilities?: Json | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          pricing_info?: Json | null
+          provider_name?: string
+          rate_limits?: Json | null
+          supported_models?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_providers_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_usage_analytics: {
+        Row: {
+          cost_cents: number | null
+          created_at: string
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          model_used: string
+          provider_id: string
+          request_type: string
+          response_time_ms: number | null
+          success: boolean | null
+          tokens_used: number | null
+          user_id: string
+        }
+        Insert: {
+          cost_cents?: number | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          model_used: string
+          provider_id: string
+          request_type: string
+          response_time_ms?: number | null
+          success?: boolean | null
+          tokens_used?: number | null
+          user_id: string
+        }
+        Update: {
+          cost_cents?: number | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          model_used?: string
+          provider_id?: string
+          request_type?: string
+          response_time_ms?: number | null
+          success?: boolean | null
+          tokens_used?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_usage_analytics_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "ai_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_usage_analytics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       authentication_methods: {
         Row: {
           configuration_complexity: string | null
@@ -1802,6 +1915,60 @@ export type Database = {
         }
         Relationships: []
       }
+      portnox_site_configurations: {
+        Row: {
+          configuration_data: Json | null
+          created_at: string
+          created_by: string
+          deployment_status: string | null
+          id: string
+          last_sync: string | null
+          portnox_site_id: string | null
+          site_id: string
+          sync_errors: Json | null
+          updated_at: string
+        }
+        Insert: {
+          configuration_data?: Json | null
+          created_at?: string
+          created_by: string
+          deployment_status?: string | null
+          id?: string
+          last_sync?: string | null
+          portnox_site_id?: string | null
+          site_id: string
+          sync_errors?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          configuration_data?: Json | null
+          created_at?: string
+          created_by?: string
+          deployment_status?: string | null
+          id?: string
+          last_sync?: string | null
+          portnox_site_id?: string | null
+          site_id?: string
+          sync_errors?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portnox_site_configurations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portnox_site_configurations_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1876,6 +2043,81 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      project_files: {
+        Row: {
+          access_level: string | null
+          ai_analysis_status: string | null
+          ai_extracted_content: Json | null
+          ai_summary: string | null
+          ai_tags: Json | null
+          file_name: string
+          file_size: number | null
+          file_type: string
+          id: string
+          is_deleted: boolean | null
+          metadata: Json | null
+          mime_type: string | null
+          project_id: string
+          storage_path: string
+          upload_date: string
+          uploaded_by: string
+          version_number: number | null
+        }
+        Insert: {
+          access_level?: string | null
+          ai_analysis_status?: string | null
+          ai_extracted_content?: Json | null
+          ai_summary?: string | null
+          ai_tags?: Json | null
+          file_name: string
+          file_size?: number | null
+          file_type: string
+          id?: string
+          is_deleted?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          project_id: string
+          storage_path: string
+          upload_date?: string
+          uploaded_by: string
+          version_number?: number | null
+        }
+        Update: {
+          access_level?: string | null
+          ai_analysis_status?: string | null
+          ai_extracted_content?: Json | null
+          ai_summary?: string | null
+          ai_tags?: Json | null
+          file_name?: string
+          file_size?: number | null
+          file_type?: string
+          id?: string
+          is_deleted?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          project_id?: string
+          storage_path?: string
+          upload_date?: string
+          uploaded_by?: string
+          version_number?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_files_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_files_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       project_handoffs: {
         Row: {
@@ -3536,6 +3778,83 @@ export type Database = {
         }
         Relationships: []
       }
+      security_compliance_assessments: {
+        Row: {
+          assessed_by: string
+          assessment_data: Json
+          compliance_score: number | null
+          created_at: string
+          findings: Json | null
+          framework_type: string
+          id: string
+          project_id: string | null
+          recommendations: Json | null
+          reviewed_by: string | null
+          site_id: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          assessed_by: string
+          assessment_data?: Json
+          compliance_score?: number | null
+          created_at?: string
+          findings?: Json | null
+          framework_type: string
+          id?: string
+          project_id?: string | null
+          recommendations?: Json | null
+          reviewed_by?: string | null
+          site_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assessed_by?: string
+          assessment_data?: Json
+          compliance_score?: number | null
+          created_at?: string
+          findings?: Json | null
+          framework_type?: string
+          id?: string
+          project_id?: string | null
+          recommendations?: Json | null
+          reviewed_by?: string | null
+          site_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "security_compliance_assessments_assessed_by_fkey"
+            columns: ["assessed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "security_compliance_assessments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "security_compliance_assessments_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "security_compliance_assessments_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       security_levels: {
         Row: {
           compliance_mappings: Json | null
@@ -3571,6 +3890,81 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      site_files: {
+        Row: {
+          access_level: string | null
+          ai_analysis_status: string | null
+          ai_extracted_content: Json | null
+          ai_summary: string | null
+          ai_tags: Json | null
+          file_name: string
+          file_size: number | null
+          file_type: string
+          id: string
+          is_deleted: boolean | null
+          metadata: Json | null
+          mime_type: string | null
+          site_id: string
+          storage_path: string
+          upload_date: string
+          uploaded_by: string
+          version_number: number | null
+        }
+        Insert: {
+          access_level?: string | null
+          ai_analysis_status?: string | null
+          ai_extracted_content?: Json | null
+          ai_summary?: string | null
+          ai_tags?: Json | null
+          file_name: string
+          file_size?: number | null
+          file_type: string
+          id?: string
+          is_deleted?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          site_id: string
+          storage_path: string
+          upload_date?: string
+          uploaded_by: string
+          version_number?: number | null
+        }
+        Update: {
+          access_level?: string | null
+          ai_analysis_status?: string | null
+          ai_extracted_content?: Json | null
+          ai_summary?: string | null
+          ai_tags?: Json | null
+          file_name?: string
+          file_size?: number | null
+          file_type?: string
+          id?: string
+          is_deleted?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          site_id?: string
+          storage_path?: string
+          upload_date?: string
+          uploaded_by?: string
+          version_number?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_files_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_files_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       site_requirements: {
         Row: {
@@ -4540,6 +4934,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_ai_provider_configs: {
+        Row: {
+          api_key_encrypted: string | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          is_primary: boolean | null
+          model_preferences: Json | null
+          provider_id: string
+          updated_at: string
+          usage_limits: Json | null
+          user_id: string
+        }
+        Insert: {
+          api_key_encrypted?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          is_primary?: boolean | null
+          model_preferences?: Json | null
+          provider_id: string
+          updated_at?: string
+          usage_limits?: Json | null
+          user_id: string
+        }
+        Update: {
+          api_key_encrypted?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          is_primary?: boolean | null
+          model_preferences?: Json | null
+          provider_id?: string
+          updated_at?: string
+          usage_limits?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_ai_provider_configs_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "ai_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_ai_provider_configs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_api_keys: {
         Row: {
           created_at: string | null
@@ -4715,6 +5163,72 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      vendor_api_integrations: {
+        Row: {
+          api_endpoint: string | null
+          authentication_method: string | null
+          created_at: string
+          created_by: string
+          credentials_encrypted: string | null
+          id: string
+          integration_type: string
+          last_tested: string | null
+          rate_limits: Json | null
+          status: string | null
+          supported_operations: Json | null
+          test_results: Json | null
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          api_endpoint?: string | null
+          authentication_method?: string | null
+          created_at?: string
+          created_by: string
+          credentials_encrypted?: string | null
+          id?: string
+          integration_type: string
+          last_tested?: string | null
+          rate_limits?: Json | null
+          status?: string | null
+          supported_operations?: Json | null
+          test_results?: Json | null
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          api_endpoint?: string | null
+          authentication_method?: string | null
+          created_at?: string
+          created_by?: string
+          credentials_encrypted?: string | null
+          id?: string
+          integration_type?: string
+          last_tested?: string | null
+          rate_limits?: Json | null
+          status?: string | null
+          supported_operations?: Json | null
+          test_results?: Json | null
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_api_integrations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_api_integrations_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vendor_library: {
         Row: {
@@ -4949,6 +5463,80 @@ export type Database = {
         }
         Relationships: []
       }
+      workflow_instances: {
+        Row: {
+          completed_at: string | null
+          current_step: number | null
+          execution_log: Json | null
+          id: string
+          metadata: Json | null
+          project_id: string | null
+          site_id: string | null
+          started_at: string
+          started_by: string
+          status: string | null
+          step_data: Json | null
+          template_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          current_step?: number | null
+          execution_log?: Json | null
+          id?: string
+          metadata?: Json | null
+          project_id?: string | null
+          site_id?: string | null
+          started_at?: string
+          started_by: string
+          status?: string | null
+          step_data?: Json | null
+          template_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          current_step?: number | null
+          execution_log?: Json | null
+          id?: string
+          metadata?: Json | null
+          project_id?: string | null
+          site_id?: string | null
+          started_at?: string
+          started_by?: string
+          status?: string | null
+          step_data?: Json | null
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_instances_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_instances_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_instances_started_by_fkey"
+            columns: ["started_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_instances_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workflow_sessions: {
         Row: {
           ai_insights: Json
@@ -4987,6 +5575,62 @@ export type Database = {
           workflow_type?: string
         }
         Relationships: []
+      }
+      workflow_templates: {
+        Row: {
+          automation_rules: Json | null
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          is_public: boolean | null
+          name: string
+          trigger_conditions: Json | null
+          updated_at: string
+          usage_count: number | null
+          workflow_steps: Json
+        }
+        Insert: {
+          automation_rules?: Json | null
+          category: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_public?: boolean | null
+          name: string
+          trigger_conditions?: Json | null
+          updated_at?: string
+          usage_count?: number | null
+          workflow_steps?: Json
+        }
+        Update: {
+          automation_rules?: Json | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_public?: boolean | null
+          name?: string
+          trigger_conditions?: Json | null
+          updated_at?: string
+          usage_count?: number | null
+          workflow_steps?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
