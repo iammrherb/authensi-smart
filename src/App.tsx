@@ -86,11 +86,6 @@ const App = () => (
                       <UnifiedCommandCenter />
                     </ProtectedRoute>
                   } />
-                  <Route path="/command-center" element={
-                    <ProtectedRoute>
-                      <CommandCenter />
-                    </ProtectedRoute>
-                  } />
                   
                   {/* Intelligence Tracker Hub */}
                   <Route path="/intelligence" element={

@@ -10,7 +10,7 @@ import {
   Lock, Router, Monitor, Code, Folder, Plus, Edit, Search, Filter,
   Command, Eye, Settings2, Activity, Clock, DollarSign, Award,
   AlertTriangle, Calendar, MapPin, GitBranch, Layers, Crown,
-  Sparkles, Rocket, Star, Trophy, Medal, Flame, Gauge, Wand2
+  Sparkles, Rocket, Star, Trophy, Medal, Flame, Gauge
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AIInsightsDashboard } from '@/components/ai/AIInsightsDashboard';
@@ -20,10 +20,6 @@ import UnifiedResourceCenter from '@/pages/UnifiedResourceCenter';
 import PortnoxApiExplorer from '@/components/portnox/PortnoxApiExplorer';
 import ComprehensiveTaxonomyManager from '@/components/taxonomy/ComprehensiveTaxonomyManager';
 import UnifiedCreationWizard from '@/components/unified/UnifiedCreationWizard';
-import ConfigGeneratorManager from '@/components/config/ConfigGeneratorManager';
-import EnhancedConfigTemplateManager from '@/components/config/EnhancedConfigTemplateManager';
-import UnifiedIntelligentConfigWizard from '@/components/config/UnifiedIntelligentConfigWizard';
-import AdvancedConfigAnalyzer from '@/components/config/AdvancedConfigAnalyzer';
 
 interface ActionItem {
   id: string;
@@ -123,42 +119,6 @@ const EnterpriseCommandCenter = () => {
 
     // Resource Management
     {
-      id: 'config-generator',
-      title: 'Config Generator Studio',
-      description: 'AI-powered configuration generation with templates and automation',
-      icon: Code,
-      category: 'management',
-      priority: 'critical',
-      action: () => setActiveView('config-generator'),
-      badge: 'AI Powered',
-      stats: '50+ Templates',
-      color: 'from-indigo-500 to-purple-600'
-    },
-    {
-      id: 'config-templates',
-      title: 'Configuration Templates',
-      description: 'Manage vendor-specific configuration templates and libraries',
-      icon: FileText,
-      category: 'management',
-      priority: 'high',
-      action: () => setActiveView('config-templates'),
-      badge: 'Template Library',
-      stats: '25+ Templates',
-      color: 'from-cyan-500 to-blue-600'
-    },
-    {
-      id: 'config-wizard',
-      title: 'Smart Config Wizard',
-      description: 'Intelligent configuration wizard with AI assistance',
-      icon: Wand2,
-      category: 'management',
-      priority: 'high',
-      action: () => setActiveView('config-wizard'),
-      badge: 'AI Assistant',
-      stats: 'Smart Guide',
-      color: 'from-violet-500 to-purple-600'
-    },
-    {
       id: 'resource-center',
       title: 'Unified Resource Center',
       description: 'Comprehensive resource management: vendors, templates, libraries',
@@ -243,18 +203,6 @@ const EnterpriseCommandCenter = () => {
       badge: 'AI Enhanced',
       stats: 'Smart Seeding',
       color: 'from-slate-500 to-gray-600'
-    },
-    {
-      id: 'advanced-analyzer',
-      title: 'Advanced Config Analyzer',
-      description: 'AI-powered configuration analysis for security, performance, and compliance',
-      icon: Shield,
-      category: 'insights',
-      priority: 'high',
-      action: () => setActiveView('advanced-analyzer'),
-      badge: 'AI Analysis',
-      stats: 'Deep Scan',
-      color: 'from-emerald-500 to-cyan-600'
     }
   ];
 
@@ -381,62 +329,6 @@ const EnterpriseCommandCenter = () => {
           onComplete={(projectId) => navigate(`/projects/${projectId}`)}
           onCancel={() => setActiveView(null)}
         />
-      </div>
-    );
-  }
-
-  if (activeView === 'config-generator') {
-    return (
-      <div className="p-6">
-        <div className="flex items-center gap-4 mb-6">
-          <Button variant="outline" onClick={() => setActiveView(null)}>
-            ← Back to Command Center
-          </Button>
-          <h1 className="text-2xl font-bold">Configuration Generator Studio</h1>
-        </div>
-        <ConfigGeneratorManager searchTerm={searchTerm} />
-      </div>
-    );
-  }
-
-  if (activeView === 'config-templates') {
-    return (
-      <div className="p-6">
-        <div className="flex items-center gap-4 mb-6">
-          <Button variant="outline" onClick={() => setActiveView(null)}>
-            ← Back to Command Center
-          </Button>
-          <h1 className="text-2xl font-bold">Configuration Templates</h1>
-        </div>
-        <EnhancedConfigTemplateManager searchTerm={searchTerm} />
-      </div>
-    );
-  }
-
-  if (activeView === 'config-wizard') {
-    return (
-      <div className="p-6">
-        <div className="flex items-center gap-4 mb-6">
-          <Button variant="outline" onClick={() => setActiveView(null)}>
-            ← Back to Command Center
-          </Button>
-          <h1 className="text-2xl font-bold">Smart Configuration Wizard</h1>
-        </div>
-        <UnifiedIntelligentConfigWizard onCancel={() => setActiveView(null)} />
-      </div>
-    );
-  }
-
-  if (activeView === 'advanced-analyzer') {
-    return (
-      <div className="p-6">
-        <div className="flex items-center gap-4 mb-6">
-          <Button variant="outline" onClick={() => setActiveView(null)}>
-            ← Back to Command Center
-          </Button>
-          <h1 className="text-2xl font-bold">Advanced Configuration Analyzer</h1>
-        </div>
-        <AdvancedConfigAnalyzer />
       </div>
     );
   }
