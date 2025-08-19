@@ -66,7 +66,14 @@ const SiteKnowledgeManager: React.FC<SiteKnowledgeManagerProps> = ({
         title: newEntry.title,
         content: newEntry.content,
         tags: newEntry.tags,
-        category: newEntry.category
+        category: newEntry.category,
+        content_type: 'text/plain',
+        file_attachments: [],
+        external_links: [],
+        ai_analysis_results: {},
+        priority_level: 'medium',
+        is_ai_enhanced: false,
+        metadata: {}
       });
       
       toast.success('Site knowledge entry created');
@@ -90,7 +97,14 @@ const SiteKnowledgeManager: React.FC<SiteKnowledgeManagerProps> = ({
           title: `Site Knowledge Base - ${siteId}`,
           content: 'Central knowledge repository for this site',
           tags: ['site', 'knowledge-base'],
-          category: 'site_documentation'
+          category: 'site_documentation',
+          content_type: 'text/plain',
+          file_attachments: [],
+          external_links: [],
+          ai_analysis_results: {},
+          priority_level: 'medium',
+          is_ai_enhanced: false,
+          metadata: {}
         });
         knowledgeBaseId = entry.id;
       }
@@ -105,11 +119,11 @@ const SiteKnowledgeManager: React.FC<SiteKnowledgeManagerProps> = ({
       refetchFiles();
       
       // Trigger AI analysis for uploaded files
-      for (const file of result.uploadedFiles) {
+      for (const file of result) {
         setActiveAnalysis(file.id);
         analyzeFile.mutate({
           fileId: file.id,
-          criteria: 'site_network_analysis'
+          analysisCriteria: { type: 'site_network_analysis' }
         }, {
           onSuccess: () => {
             setActiveAnalysis(null);
@@ -444,7 +458,7 @@ const SiteKnowledgeManager: React.FC<SiteKnowledgeManagerProps> = ({
                             setActiveAnalysis(file.id);
                             analyzeFile.mutate({
                               fileId: file.id,
-                              criteria: 'site_network_analysis'
+                              analysisCriteria: { type: 'site_network_analysis' }
                             });
                           }}
                           disabled={activeAnalysis === file.id}

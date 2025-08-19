@@ -11,8 +11,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
-  FileTemplate, Copy, Edit, Save, Download, Upload, Eye, Star, 
-  Settings, FileText, Code, Zap, Plus, Search, Filter,
+  FileText, Copy, Edit, Save, Download, Upload, Eye, Star, 
+  Settings, Code, Zap, Plus, Search, Filter,
   Clock, User, CheckCircle, AlertCircle, Layers, Network
 } from 'lucide-react';
 import { useConfigTemplates } from '@/hooks/useConfigTemplates';
@@ -64,7 +64,10 @@ const ProjectTemplateManager: React.FC<ProjectTemplateManagerProps> = ({
         customization_name: `${template.name} - Project Customization`,
         custom_content: template.template_content,
         custom_variables: template.template_variables || {},
-        notes: `Customized for project ${projectId}`
+        customization_type: 'project_specific',
+        tags: [],
+        version: 1,
+        is_active: true
       });
       
       toast.success('Template customized successfully');
@@ -79,7 +82,6 @@ const ProjectTemplateManager: React.FC<ProjectTemplateManagerProps> = ({
     try {
       await cloneTemplate.mutateAsync({
         templateId: template.id,
-        customizationName: newName,
         projectId
       });
       
@@ -185,7 +187,7 @@ const ProjectTemplateManager: React.FC<ProjectTemplateManagerProps> = ({
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <CardTitle className="text-base flex items-center gap-2">
-                        <FileTemplate className="w-4 h-4" />
+                        <FileText className="w-4 h-4" />
                         {template.name}
                       </CardTitle>
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
@@ -246,7 +248,7 @@ const ProjectTemplateManager: React.FC<ProjectTemplateManagerProps> = ({
           {filteredTemplates.length === 0 && (
             <Card>
               <CardContent className="p-6 text-center">
-                <Template className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="font-semibold mb-2">No Templates Found</h3>
                 <p className="text-sm text-muted-foreground">
                   Try adjusting your search criteria or filters
@@ -343,7 +345,7 @@ const ProjectTemplateManager: React.FC<ProjectTemplateManagerProps> = ({
           <DialogContent className="max-w-4xl h-[80vh]">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Template className="w-5 h-5" />
+                <FileText className="w-5 h-5" />
                 {selectedTemplate.customization_name || selectedTemplate.name}
               </DialogTitle>
             </DialogHeader>

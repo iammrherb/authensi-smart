@@ -9,14 +9,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
-  Building, Template, Copy, Edit, Save, Download, Upload, Eye, 
-  Settings, FileText, Code, Zap, Plus, Search, CheckCircle,
+  Building, FileText, Copy, Edit, Save, Download, Upload, Eye, 
+  Settings, Code, Zap, Plus, Search, CheckCircle,
   Clock, User, Network, Shield, Database, Layers
 } from 'lucide-react';
 import { useConfigTemplates } from '@/hooks/useConfigTemplates';
 import { useTemplateCustomizations, useCreateTemplateCustomization } from '@/hooks/useTemplateCustomizations';
 import { useVendors } from '@/hooks/useVendors';
-import { CodeBlock } from '@/components/ui/code-block';
+import CodeBlock from '@/components/ui/code-block';
 import { toast } from 'sonner';
 
 interface SiteTemplateManagerProps {
@@ -50,33 +50,36 @@ const SiteTemplateManager: React.FC<SiteTemplateManagerProps> = ({
 
   // Filter templates
   const filteredTemplates = allTemplates.filter(template => {
-    const name = template.customization_name || template.name;
-    const description = template.notes || template.description;
+    const name = (template as any).customization_name || (template as any).name;
+    const description = (template as any).notes || (template as any).description;
     
-    const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          description?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesVendor = !selectedVendor || template.vendor_id === selectedVendor;
-    const matchesCategory = !selectedCategory || template.category === selectedCategory;
+    const matchesVendor = !selectedVendor || (template as any).vendor_id === selectedVendor;
+    const matchesCategory = !selectedCategory || (template as any).category === selectedCategory;
     
     return matchesSearch && matchesVendor && matchesCategory;
   });
 
-  // Get unique categories
-  const categories = [...new Set(allTemplates.map(t => t.category).filter(Boolean))];
+  // Get unique categories from both sources
+  const categories = [...new Set(allTemplates.map(t => (t as any).category).filter(Boolean))];
 
   const handleCustomizeForSite = async (template: any) => {
     try {
-      const baseTemplateId = template.base_template_id || template.id;
-      const templateName = template.customization_name || template.name;
+      const baseTemplateId = (template as any).base_template_id || (template as any).id;
+      const templateName = (template as any).customization_name || (template as any).name;
       
       await createCustomization.mutateAsync({
         base_template_id: baseTemplateId,
         site_id: siteId,
         project_id: projectId,
         customization_name: `${templateName} - Site Customization`,
-        custom_content: template.custom_content || template.template_content,
-        custom_variables: template.custom_variables || template.template_variables || {},
-        notes: `Customized for site ${siteId}`
+        custom_content: (template as any).custom_content || (template as any).template_content,
+        custom_variables: (template as any).custom_variables || (template as any).template_variables || {},
+        customization_type: 'site_specific',
+        tags: [],
+        version: 1,
+        is_active: true
       });
       
       toast.success('Template customized for site');
@@ -183,22 +186,22 @@ const SiteTemplateManager: React.FC<SiteTemplateManagerProps> = ({
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <CardTitle className="text-base flex items-center gap-2">
-                        {template.source === 'project' ? (
+                        {(template as any).source === 'project' ? (
                           <Layers className="w-4 h-4 text-blue-500" />
                         ) : (
-                          <Template className="w-4 h-4" />
+                          <FileText className="w-4 h-4" />
                         )}
-                        {template.customization_name || template.name}
+                        {(template as any).customization_name || (template as any).name}
                       </CardTitle>
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                        {template.notes || template.description}
+                        {(template as any).notes || (template as any).description}
                       </p>
                     </div>
                     <div className="flex flex-col gap-1">
                       <Badge variant="outline" className="text-xs">
-                        {template.category}
+                        {(template as any).category}
                       </Badge>
-                      {template.source === 'project' && (
+                      {(template as any).source === 'project' && (
                         <Badge variant="secondary" className="text-xs">
                           Project
                         </Badge>
@@ -211,11 +214,11 @@ const SiteTemplateManager: React.FC<SiteTemplateManagerProps> = ({
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Network className="w-3 h-3" />
-                        {vendors.find(v => v.id === template.vendor_id)?.vendor_name || 'Generic'}
+                        {vendors.find(v => v.id === (template as any).vendor_id)?.vendor_name || 'Generic'}
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        {new Date(template.created_at).toLocaleDateString()}
+                        {new Date((template as any).created_at).toLocaleDateString()}
                       </div>
                     </div>
 
@@ -240,7 +243,7 @@ const SiteTemplateManager: React.FC<SiteTemplateManagerProps> = ({
                       </Button>
                       <Button
                         size="sm"
-                        onClick={() => handleAssignToSite(template.id)}
+                        onClick={() => handleAssignToSite((template as any).id)}
                       >
                         <CheckCircle className="w-3 h-3 mr-1" />
                         Assign
@@ -346,7 +349,7 @@ const SiteTemplateManager: React.FC<SiteTemplateManagerProps> = ({
           <DialogContent className="max-w-4xl h-[80vh]">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Template className="w-5 h-5" />
+                <FileText className="w-5 h-5" />
                 {selectedTemplate.customization_name || selectedTemplate.name}
               </DialogTitle>
             </DialogHeader>

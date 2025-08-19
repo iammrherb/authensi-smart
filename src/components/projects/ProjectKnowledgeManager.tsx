@@ -62,12 +62,13 @@ const ProjectKnowledgeManager: React.FC<ProjectKnowledgeManagerProps> = ({
         content: newEntry.content,
         tags: newEntry.tags,
         category: newEntry.category,
-        metadata: {},
         content_type: 'text/plain',
-        ai_analysis_results: null,
+        file_attachments: [],
         external_links: [],
-        version: 1,
-        is_public: false
+        ai_analysis_results: {},
+        priority_level: 'medium',
+        is_ai_enhanced: false,
+        metadata: {}
       });
       
       toast.success('Knowledge entry created');
@@ -90,10 +91,10 @@ const ProjectKnowledgeManager: React.FC<ProjectKnowledgeManagerProps> = ({
       refetch();
       
       // Trigger AI analysis for uploaded files
-      for (const file of result.uploadedFiles) {
+      for (const file of result) {
         analyzeFile.mutate({
           fileId: file.id,
-          criteria: 'network_security_analysis'
+          analysisCriteria: { type: 'network_security_analysis' }
         });
       }
     } catch (error) {

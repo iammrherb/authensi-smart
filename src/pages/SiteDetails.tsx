@@ -236,15 +236,13 @@ const SiteDetails = () => {
               <TabsContent value="templates">
                 <SiteTemplateManager 
                   siteId={site.id}
-                  projectId={site.project_id}
                   onTemplateAssigned={(templateId) => console.log('Template assigned to site:', templateId)}
                 />
               </TabsContent>
 
               <TabsContent value="knowledge">
                 <SiteKnowledgeManager 
-                  siteId={site.id} 
-                  projectId={site.project_id}
+                  siteId={site.id}
                 />
               </TabsContent>
 
