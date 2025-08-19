@@ -101,19 +101,28 @@ const portnoxSummaryRef = useRef<any>(null);
       if (Array.isArray(val)) return val.map((v) => (typeof v === "string" ? v : v.vendor || v.name)).filter(Boolean);
       return Object.values(val).flatMap((x: any) => collect(x));
     };
-    const vendors = new Set<string>(
-      [
-        ...collect(eco.wired_switching),
-        ...collect(eco.wireless),
-        ...collect(eco.firewalls),
-        ...collect(eco.vpn_solutions),
-        ...collect(eco.edr_solutions),
-        ...collect(eco.idp_solutions),
-        ...collect(eco.mdm_solutions),
-        ...collect(eco.siem_solutions),
-      ].filter(Boolean)
-    );
-    return Array.from(vendors).slice(0, 20); // limit seeds
+    
+    // Enhanced vendor extraction with better categorization
+    const vendors = new Set<string>([
+      ...collect(eco.wired_switching),
+      ...collect(eco.wireless),
+      ...collect(eco.firewalls),
+      ...collect(eco.vpn_solutions),
+      ...collect(eco.edr_solutions),
+      ...collect(eco.idp_solutions),
+      ...collect(eco.mdm_solutions),
+      ...collect(eco.siem_solutions),
+      ...collect(eco.network_access_control),
+      ...collect(eco.identity_management),
+      ...collect(eco.endpoint_protection),
+      ...collect(eco.cloud_security),
+      // Include Portnox-specific integrations
+      ...collect(data.portnox_integrations),
+      ...collect(data.authentication_methods),
+      ...collect(data.deployment_requirements)
+    ].filter(Boolean));
+    
+    return Array.from(vendors).slice(0, 30); // Increased limit for comprehensive coverage
   };
 
   const buildDocx = async (
@@ -179,10 +188,17 @@ const portnoxSummaryRef = useRef<any>(null);
       if (toggles.vendorDocs) {
         const crawl = crawls[project.id];
         children.push(
-          new Paragraph({ text: "Vendor Documentation", heading: HeadingLevel.HEADING_2 }),
-          ...(crawl?.aggregated || []).slice(0, 20).flatMap((entry: any) => [
-            new Paragraph({ text: `Source: ${entry.sourceUrl}`, heading: HeadingLevel.HEADING_3 }),
-            new Paragraph({ text: typeof entry.data === "string" ? entry.data : JSON.stringify(entry.data).slice(0, 2000) + "..." }),
+          new Paragraph({ text: "Vendor Documentation & Integration Requirements", heading: HeadingLevel.HEADING_2 }),
+          new Paragraph({ text: "This section includes comprehensive vendor-specific documentation, integration guides, prerequisites, and deployment considerations for Portnox NAC implementation." }),
+          ...(crawl?.aggregated || []).slice(0, 25).flatMap((entry: any) => [
+            new Paragraph({ text: `Integration Guide: ${entry.sourceUrl}`, heading: HeadingLevel.HEADING_3 }),
+            new Paragraph({ text: typeof entry.data === "string" ? entry.data : JSON.stringify(entry.data).slice(0, 3000) + "..." }),
+            new Paragraph({ text: "Prerequisites and Configuration Notes:", heading: HeadingLevel.HEADING_4 }),
+            new Paragraph({ text: "• Ensure proper network connectivity and firewall rules" }),
+            new Paragraph({ text: "• Verify authentication method compatibility" }),
+            new Paragraph({ text: "• Review certificate requirements and deployment methods" }),
+            new Paragraph({ text: "• Validate RADIUS/TACACS+ server configurations" }),
+            new Paragraph({ text: "" }) // spacing
           ])
         );
       }
@@ -372,11 +388,12 @@ portnoxSummaryRef.current = portnoxSummary;
             <Separator />
             {([
               ["overview", "Project Overview"],
-              ["checklist", "Checklist Progress"],
-              ["vendorDocs", "Vendor Documentation (crawl)"] ,
-              ["useCases", "Relevant Use Cases"],
-              ["recommendations", "Recommendations"],
-              ["appendices", "Appendices"],
+              ["checklist", "Implementation Checklist Progress"],
+              ["vendorDocs", "Vendor Documentation & Prerequisites"] ,
+              ["useCases", "Relevant Use Cases & Scenarios"],
+              ["recommendations", "AI Recommendations & Best Practices"],
+              ["portnoxDevices", "Portnox Device Inventory & Status"],
+              ["appendices", "Technical Appendices & References"],
             ] as [keyof SectionToggles, string][]).map(([k, label]) => (
               <label key={k} className="flex items-center gap-3">
                 <Checkbox
