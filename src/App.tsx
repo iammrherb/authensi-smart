@@ -53,6 +53,7 @@ import AIIntegrationTest from "./pages/AIIntegrationTest";
 import CustomerPortal from "./pages/CustomerPortal";
 import CustomerAuth from "./pages/CustomerAuth";
 import CustomerDashboard from "./pages/CustomerDashboard";
+import Testing from "./pages/Testing";
 
 const queryClient = new QueryClient();
 
@@ -233,6 +234,13 @@ const App = () => (
                   <Route path="/demo-data" element={
                     <ProtectedRoute>
                       <DemoDataManager />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* Testing & Validation */}
+                  <Route path="/testing" element={
+                    <ProtectedRoute>
+                      <Testing />
                     </ProtectedRoute>
                   } />
                   
