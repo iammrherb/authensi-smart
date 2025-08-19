@@ -1,8 +1,8 @@
 import React from 'react';
-import UltimateReportingCenter from '@/components/reports/UltimateReportingCenter';
+import MegaReportingCenter from '@/components/reports/MegaReportingCenter';
 
 const Reports = () => {
-  return <UltimateReportingCenter />;
+  return <MegaReportingCenter />;
 };
 
 export default Reports;
