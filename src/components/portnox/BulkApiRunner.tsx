@@ -31,28 +31,279 @@ const BulkApiRunner: React.FC<{ projectId?: string }> = ({ projectId }) => {
   const [results, setResults] = useState<RunResult[]>([]);
 
   const presets = [
+    // ===== SITE MANAGEMENT =====
     {
       id: "create-sites",
       name: "Create Sites",
       method: "POST",
       path: "/restapi/sites",
-      headers: ["name", "description"],
+      headers: ["name", "description", "location", "timezone", "contact_email"],
       buildBody: (row: Record<string, string>) => ({
         name: row.name,
         description: row.description || "",
+        location: row.location || "",
+        timezone: row.timezone || "UTC",
+        contactEmail: row.contact_email || "",
       }),
     },
+    {
+      id: "update-sites",
+      name: "Update Sites", 
+      method: "PUT",
+      path: "/restapi/sites/{site_id}",
+      headers: ["site_id", "name", "description", "location", "contact_email"],
+      buildBody: (row: Record<string, string>) => ({
+        name: row.name,
+        description: row.description,
+        location: row.location,
+        contactEmail: row.contact_email,
+      }),
+    },
+    {
+      id: "delete-sites",
+      name: "Delete Sites",
+      method: "DELETE", 
+      path: "/restapi/sites/{site_id}",
+      headers: ["site_id"],
+      buildBody: (row: Record<string, string>) => ({}),
+    },
+
+    // ===== NAS DEVICE MANAGEMENT =====
     {
       id: "create-nas",
       name: "Create NAS Devices",
       method: "POST", 
       path: "/restapi/nas",
-      headers: ["name", "ip", "description"],
+      headers: ["name", "ip", "shared_secret", "vendor", "model", "description", "site_id"],
       buildBody: (row: Record<string, string>) => ({
         name: row.name,
-        ip: row.ip || "",
+        ip: row.ip,
+        sharedSecret: row.shared_secret || "portnox123",
+        vendor: row.vendor || "Generic",
+        model: row.model || "Switch",
         description: row.description || "",
+        siteId: row.site_id || "",
       }),
+    },
+    {
+      id: "update-nas",
+      name: "Update NAS Devices",
+      method: "PUT",
+      path: "/restapi/nas/{nas_id}",
+      headers: ["nas_id", "name", "ip", "vendor", "model", "description"],
+      buildBody: (row: Record<string, string>) => ({
+        name: row.name,
+        ip: row.ip,
+        vendor: row.vendor,
+        model: row.model,
+        description: row.description,
+      }),
+    },
+    {
+      id: "delete-nas",
+      name: "Delete NAS Devices",
+      method: "DELETE",
+      path: "/restapi/nas/{nas_id}",
+      headers: ["nas_id"],
+      buildBody: (row: Record<string, string>) => ({}),
+    },
+
+    // ===== USER MANAGEMENT =====
+    {
+      id: "create-users",
+      name: "Create Users",
+      method: "POST",
+      path: "/restapi/users", 
+      headers: ["username", "email", "first_name", "last_name", "role", "groups", "password"],
+      buildBody: (row: Record<string, string>) => ({
+        username: row.username,
+        email: row.email,
+        firstName: row.first_name || "",
+        lastName: row.last_name || "",
+        role: row.role || "User",
+        groups: row.groups ? row.groups.split(",") : [],
+        password: row.password,
+      }),
+    },
+    {
+      id: "update-users",
+      name: "Update Users",
+      method: "PUT",
+      path: "/restapi/users/{user_id}",
+      headers: ["user_id", "email", "first_name", "last_name", "role", "groups"],
+      buildBody: (row: Record<string, string>) => ({
+        email: row.email,
+        firstName: row.first_name,
+        lastName: row.last_name,
+        role: row.role,
+        groups: row.groups ? row.groups.split(",") : [],
+      }),
+    },
+    {
+      id: "delete-users",
+      name: "Delete Users",
+      method: "DELETE",
+      path: "/restapi/users/{user_id}",
+      headers: ["user_id"],
+      buildBody: (row: Record<string, string>) => ({}),
+    },
+
+    // ===== GROUP MANAGEMENT =====
+    {
+      id: "create-groups",
+      name: "Create Groups",
+      method: "POST",
+      path: "/restapi/groups",
+      headers: ["name", "description", "policy_id", "vlan_id"],
+      buildBody: (row: Record<string, string>) => ({
+        name: row.name,
+        description: row.description || "",
+        policyId: row.policy_id || "",
+        vlanId: row.vlan_id || "",
+      }),
+    },
+    {
+      id: "update-groups",
+      name: "Update Groups",
+      method: "PUT",
+      path: "/restapi/groups/{group_id}",
+      headers: ["group_id", "name", "description", "policy_id", "vlan_id"],
+      buildBody: (row: Record<string, string>) => ({
+        name: row.name,
+        description: row.description,
+        policyId: row.policy_id,
+        vlanId: row.vlan_id,
+      }),
+    },
+
+    // ===== POLICY MANAGEMENT =====
+    {
+      id: "create-policies",
+      name: "Create Policies",
+      method: "POST",
+      path: "/restapi/policies",
+      headers: ["name", "description", "action", "conditions", "priority"],
+      buildBody: (row: Record<string, string>) => ({
+        name: row.name,
+        description: row.description || "",
+        action: row.action || "ALLOW",
+        conditions: row.conditions ? JSON.parse(row.conditions) : {},
+        priority: parseInt(row.priority) || 100,
+      }),
+    },
+
+    // ===== DEVICE MANAGEMENT =====
+    {
+      id: "update-devices",
+      name: "Update Devices", 
+      method: "PUT",
+      path: "/restapi/devices/{device_id}",
+      headers: ["device_id", "name", "description", "group_id", "status"],
+      buildBody: (row: Record<string, string>) => ({
+        name: row.name,
+        description: row.description,
+        groupId: row.group_id,
+        status: row.status || "active",
+      }),
+    },
+    {
+      id: "quarantine-devices",
+      name: "Quarantine Devices",
+      method: "POST",
+      path: "/restapi/devices/{device_id}/quarantine",
+      headers: ["device_id", "reason"],
+      buildBody: (row: Record<string, string>) => ({
+        reason: row.reason || "Security violation",
+      }),
+    },
+    {
+      id: "release-devices",
+      name: "Release Devices from Quarantine",
+      method: "POST",
+      path: "/restapi/devices/{device_id}/release",
+      headers: ["device_id", "reason"],
+      buildBody: (row: Record<string, string>) => ({
+        reason: row.reason || "Issue resolved",
+      }),
+    },
+
+    // ===== CERTIFICATE MANAGEMENT =====
+    {
+      id: "create-certificates",
+      name: "Create Certificates",
+      method: "POST",
+      path: "/restapi/certificates",
+      headers: ["name", "type", "subject", "validity_days"],
+      buildBody: (row: Record<string, string>) => ({
+        name: row.name,
+        type: row.type || "server",
+        subject: row.subject,
+        validityDays: parseInt(row.validity_days) || 365,
+      }),
+    },
+
+    // ===== NETWORK CONFIGURATION =====
+    {
+      id: "create-vlans",
+      name: "Create VLANs",
+      method: "POST", 
+      path: "/restapi/vlans",
+      headers: ["vlan_id", "name", "description", "subnet", "gateway"],
+      buildBody: (row: Record<string, string>) => ({
+        vlanId: parseInt(row.vlan_id),
+        name: row.name,
+        description: row.description || "",
+        subnet: row.subnet,
+        gateway: row.gateway,
+      }),
+    },
+    {
+      id: "create-radius-clients",
+      name: "Create RADIUS Clients",
+      method: "POST",
+      path: "/restapi/radius/clients",
+      headers: ["ip", "shared_secret", "name", "vendor", "nas_type"],
+      buildBody: (row: Record<string, string>) => ({
+        ip: row.ip,
+        sharedSecret: row.shared_secret,
+        name: row.name,
+        vendor: row.vendor || "Generic",
+        nasType: row.nas_type || "switch",
+      }),
+    },
+
+    // ===== REPORTING & ANALYTICS =====
+    {
+      id: "create-reports",
+      name: "Create Reports",
+      method: "POST",
+      path: "/restapi/reports", 
+      headers: ["name", "type", "parameters", "schedule"],
+      buildBody: (row: Record<string, string>) => ({
+        name: row.name,
+        type: row.type || "device_summary",
+        parameters: row.parameters ? JSON.parse(row.parameters) : {},
+        schedule: row.schedule || "daily",
+      }),
+    },
+
+    // ===== CUSTOM API CALLS =====
+    {
+      id: "custom-get",
+      name: "Custom GET Requests",
+      method: "GET",
+      path: "/restapi/{endpoint}",
+      headers: ["endpoint", "query_params"],
+      buildBody: (row: Record<string, string>) => ({}),
+    },
+    {
+      id: "custom-post", 
+      name: "Custom POST Requests",
+      method: "POST",
+      path: "/restapi/{endpoint}",
+      headers: ["endpoint", "body_json"],
+      buildBody: (row: Record<string, string>) => 
+        row.body_json ? JSON.parse(row.body_json) : {},
     },
   ];
 

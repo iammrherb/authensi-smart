@@ -33,7 +33,10 @@ export interface ExpandedVendor {
   documentationLinks?: string[];
 }
 
-export const expandedVendorLibrary: ExpandedVendor[] = [
+// Import comprehensive security vendor data
+import { comprehensiveSecurityVendorData } from './comprehensiveSecurityVendorData';
+
+export const expandedVendorLibrary: ExpandedVendor[] = comprehensiveSecurityVendorData.concat([
   // ========== NAC VENDORS ==========
   {
     id: "portnox",
