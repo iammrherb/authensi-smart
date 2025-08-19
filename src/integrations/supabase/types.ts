@@ -14,6 +14,76 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_analysis_sessions: {
+        Row: {
+          analysis_criteria: Json | null
+          analysis_model: string | null
+          analysis_results: Json | null
+          confidence_score: number | null
+          created_at: string | null
+          created_by: string | null
+          file_id: string | null
+          id: string
+          input_data: string
+          processing_time_ms: number | null
+          project_id: string | null
+          session_type: string
+          site_id: string | null
+        }
+        Insert: {
+          analysis_criteria?: Json | null
+          analysis_model?: string | null
+          analysis_results?: Json | null
+          confidence_score?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          file_id?: string | null
+          id?: string
+          input_data: string
+          processing_time_ms?: number | null
+          project_id?: string | null
+          session_type: string
+          site_id?: string | null
+        }
+        Update: {
+          analysis_criteria?: Json | null
+          analysis_model?: string | null
+          analysis_results?: Json | null
+          confidence_score?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          file_id?: string | null
+          id?: string
+          input_data?: string
+          processing_time_ms?: number | null
+          project_id?: string | null
+          session_type?: string
+          site_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_analysis_sessions_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: false
+            referencedRelation: "uploaded_files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_analysis_sessions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_analysis_sessions_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_optimization_history: {
         Row: {
           ai_model_used: string | null
@@ -1881,6 +1951,84 @@ export type Database = {
           },
         ]
       }
+      project_knowledge_base: {
+        Row: {
+          ai_analysis_results: Json | null
+          category: string
+          content: string | null
+          content_type: string
+          created_at: string | null
+          created_by: string | null
+          external_links: Json | null
+          file_attachments: Json | null
+          id: string
+          is_ai_enhanced: boolean | null
+          last_ai_analysis: string | null
+          metadata: Json | null
+          priority_level: string | null
+          project_id: string
+          site_id: string | null
+          tags: Json | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          ai_analysis_results?: Json | null
+          category?: string
+          content?: string | null
+          content_type?: string
+          created_at?: string | null
+          created_by?: string | null
+          external_links?: Json | null
+          file_attachments?: Json | null
+          id?: string
+          is_ai_enhanced?: boolean | null
+          last_ai_analysis?: string | null
+          metadata?: Json | null
+          priority_level?: string | null
+          project_id: string
+          site_id?: string | null
+          tags?: Json | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          ai_analysis_results?: Json | null
+          category?: string
+          content?: string | null
+          content_type?: string
+          created_at?: string | null
+          created_by?: string | null
+          external_links?: Json | null
+          file_attachments?: Json | null
+          id?: string
+          is_ai_enhanced?: boolean | null
+          last_ai_analysis?: string | null
+          metadata?: Json | null
+          priority_level?: string | null
+          project_id?: string
+          site_id?: string | null
+          tags?: Json | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_knowledge_base_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_knowledge_base_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_milestones: {
         Row: {
           actual_date: string | null
@@ -2213,6 +2361,66 @@ export type Database = {
             columns: ["site_id"]
             isOneToOne: false
             referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_template_assignments: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          assignment_role: string
+          custom_variables: Json | null
+          id: string
+          implementation_notes: string | null
+          implementation_status: string | null
+          implemented_at: string | null
+          is_active: boolean | null
+          project_id: string
+          template_id: string
+          template_type: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assignment_role: string
+          custom_variables?: Json | null
+          id?: string
+          implementation_notes?: string | null
+          implementation_status?: string | null
+          implemented_at?: string | null
+          is_active?: boolean | null
+          project_id: string
+          template_id: string
+          template_type: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assignment_role?: string
+          custom_variables?: Json | null
+          id?: string
+          implementation_notes?: string | null
+          implementation_status?: string | null
+          implemented_at?: string | null
+          is_active?: boolean | null
+          project_id?: string
+          template_id?: string
+          template_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_template_assignments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_template_assignments_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "configuration_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -3417,6 +3625,66 @@ export type Database = {
           },
         ]
       }
+      site_template_assignments: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          assignment_type: string
+          configuration_role: string
+          custom_variables: Json | null
+          deployed_at: string | null
+          deployment_notes: string | null
+          deployment_status: string | null
+          id: string
+          is_active: boolean | null
+          site_id: string
+          template_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assignment_type?: string
+          configuration_role: string
+          custom_variables?: Json | null
+          deployed_at?: string | null
+          deployment_notes?: string | null
+          deployment_status?: string | null
+          id?: string
+          is_active?: boolean | null
+          site_id: string
+          template_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assignment_type?: string
+          configuration_role?: string
+          custom_variables?: Json | null
+          deployed_at?: string | null
+          deployment_notes?: string | null
+          deployment_status?: string | null
+          id?: string
+          is_active?: boolean | null
+          site_id?: string
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_template_assignments_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_template_assignments_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "configuration_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_use_cases: {
         Row: {
           actual_completion: string | null
@@ -3582,6 +3850,82 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_customizations: {
+        Row: {
+          base_template_id: string
+          created_at: string | null
+          created_by: string | null
+          custom_content: string
+          custom_variables: Json | null
+          customization_name: string
+          customization_type: string
+          id: string
+          is_active: boolean | null
+          modification_notes: string | null
+          project_id: string | null
+          site_id: string | null
+          tags: Json | null
+          updated_at: string | null
+          version: number | null
+        }
+        Insert: {
+          base_template_id: string
+          created_at?: string | null
+          created_by?: string | null
+          custom_content: string
+          custom_variables?: Json | null
+          customization_name: string
+          customization_type?: string
+          id?: string
+          is_active?: boolean | null
+          modification_notes?: string | null
+          project_id?: string | null
+          site_id?: string | null
+          tags?: Json | null
+          updated_at?: string | null
+          version?: number | null
+        }
+        Update: {
+          base_template_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          custom_content?: string
+          custom_variables?: Json | null
+          customization_name?: string
+          customization_type?: string
+          id?: string
+          is_active?: boolean | null
+          modification_notes?: string | null
+          project_id?: string | null
+          site_id?: string | null
+          tags?: Json | null
+          updated_at?: string | null
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_customizations_base_template_id_fkey"
+            columns: ["base_template_id"]
+            isOneToOne: false
+            referencedRelation: "configuration_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_customizations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_customizations_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
             referencedColumns: ["id"]
           },
         ]
@@ -3899,6 +4243,65 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      uploaded_files: {
+        Row: {
+          ai_analysis_results: Json | null
+          ai_analysis_status: string | null
+          created_at: string | null
+          created_by: string | null
+          extracted_content: string | null
+          file_name: string
+          file_size: number | null
+          file_type: string
+          id: string
+          knowledge_base_id: string | null
+          mime_type: string | null
+          storage_path: string
+          updated_at: string | null
+          upload_status: string | null
+        }
+        Insert: {
+          ai_analysis_results?: Json | null
+          ai_analysis_status?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          extracted_content?: string | null
+          file_name: string
+          file_size?: number | null
+          file_type: string
+          id?: string
+          knowledge_base_id?: string | null
+          mime_type?: string | null
+          storage_path: string
+          updated_at?: string | null
+          upload_status?: string | null
+        }
+        Update: {
+          ai_analysis_results?: Json | null
+          ai_analysis_status?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          extracted_content?: string | null
+          file_name?: string
+          file_size?: number | null
+          file_type?: string
+          id?: string
+          knowledge_base_id?: string | null
+          mime_type?: string | null
+          storage_path?: string
+          updated_at?: string | null
+          upload_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uploaded_files_knowledge_base_id_fkey"
+            columns: ["knowledge_base_id"]
+            isOneToOne: false
+            referencedRelation: "project_knowledge_base"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       use_case_library: {
         Row: {
