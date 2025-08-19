@@ -54,7 +54,8 @@ import {
   Pause,
   RotateCcw,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Activity
 } from 'lucide-react';
 import { useConfigTemplates, useCreateConfigTemplate, useGenerateConfigWithAI } from '@/hooks/useConfigTemplates';
 import { useVendors } from '@/hooks/useVendors';
@@ -695,7 +696,7 @@ Generate a production-ready, enterprise-grade solution that meets all specified 
                     <SelectValue placeholder="Select timeline" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="urgent">Urgent (< 1 month)</SelectItem>
+                    <SelectItem value="urgent">Urgent (&lt; 1 month)</SelectItem>
                     <SelectItem value="normal">Normal (1-3 months)</SelectItem>
                     <SelectItem value="flexible">Flexible (3-6 months)</SelectItem>
                     <SelectItem value="long_term">Long-term (6+ months)</SelectItem>
@@ -712,7 +713,7 @@ Generate a production-ready, enterprise-grade solution that meets all specified 
                     <SelectValue placeholder="Select budget range" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="limited">Limited (< $50K)</SelectItem>
+                    <SelectItem value="limited">Limited (&lt; $50K)</SelectItem>
                     <SelectItem value="moderate">Moderate ($50K-$200K)</SelectItem>
                     <SelectItem value="substantial">Substantial ($200K-$500K)</SelectItem>
                     <SelectItem value="enterprise">Enterprise ($500K+)</SelectItem>
@@ -818,7 +819,6 @@ Generate a production-ready, enterprise-grade solution that meets all specified 
                     <CodeBlock
                       code={wizardData.output.generatedConfig}
                       language="bash"
-                      showLineNumbers={true}
                     />
                   </ScrollArea>
                 </div>
@@ -929,7 +929,7 @@ Generate a production-ready, enterprise-grade solution that meets all specified 
           </Card>
 
           {/* AI Insights Panel */}
-          {showAIFeatures && aiRecommendations.length > 0 && (
+          {showAiInsights && aiRecommendations.length > 0 && (
             <Card className="mt-6">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -980,7 +980,7 @@ Generate a production-ready, enterprise-grade solution that meets all specified 
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-3">
-                    <wizardSteps[currentStep].icon className="w-6 h-6" />
+                    {React.createElement(wizardSteps[currentStep].icon, { className: "w-6 h-6" })}
                     {wizardSteps[currentStep].title}
                   </CardTitle>
                   <CardDescription className="mt-1">

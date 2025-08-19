@@ -11,13 +11,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { 
-  Template, 
+  File, 
   Settings, 
   Copy, 
   Edit, 
   Save, 
   Download, 
-  Upload, 
+  Upload,
   Eye, 
   Star,
   Filter,
@@ -481,7 +481,6 @@ const EnhancedTemplateManager: React.FC<EnhancedTemplateManagerProps> = ({
                   <CodeBlock
                     code={selectedTemplate.template_content}
                     language="bash"
-                    showLineNumbers={true}
                   />
                 </div>
 
@@ -491,7 +490,6 @@ const EnhancedTemplateManager: React.FC<EnhancedTemplateManagerProps> = ({
                     <CodeBlock
                       code={JSON.stringify(selectedTemplate.template_variables, null, 2)}
                       language="json"
-                      showLineNumbers={true}
                     />
                   </div>
                 )}
