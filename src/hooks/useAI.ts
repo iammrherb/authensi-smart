@@ -33,35 +33,43 @@ export const useAI = () => {
     setError(null);
 
     try {
+      console.log('Starting AI completion request:', { provider: request.provider, model: request.model });
+      
       const { data, error: supabaseError } = await supabase.functions.invoke('ai-completion', {
         body: request
       });
 
+      console.log('Supabase function response:', { data, error: supabaseError });
+
       if (supabaseError) {
         console.error('Supabase function error:', supabaseError);
-        throw new Error(supabaseError.message || 'AI service unavailable');
+        throw new Error(`AI service error: ${supabaseError.message || 'Service unavailable'}`);
       }
 
       if (!data) {
+        console.error('No data returned from AI service');
         throw new Error('No response from AI service');
       }
 
+      if (data.error) {
+        console.error('AI service returned error:', data.error);
+        throw new Error(`AI API error: ${data.error}`);
+      }
+
+      console.log('AI completion successful');
       return data as AIResponse;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-      setError(errorMessage);
-      console.error('AI completion error:', err);
+      console.error('AI completion error details:', {
+        error: err,
+        message: errorMessage,
+        request: { ...request, prompt: request.prompt.substring(0, 100) + '...' }
+      });
       
-      // Return a fallback response to prevent crashes
-      return {
-        content: 'AI service is temporarily unavailable. Please try again later.',
-        provider: request.provider || 'openai',
-        usage: {
-          prompt_tokens: 0,
-          completion_tokens: 0,
-          total_tokens: 0
-        }
-      };
+      setError(errorMessage);
+      
+      // Return null to indicate failure, let components handle gracefully
+      return null;
     } finally {
       setIsLoading(false);
     }
@@ -135,9 +143,9 @@ Use professional formatting with headers, bullet points, and code blocks where a
       prompt,
       context: 'project_summary',
       provider: 'openai',
-      model: 'gpt-5-2025-08-07',
-      reasoningEffort: 'medium',
-      verbosity: 'medium'
+      model: 'gpt-4o-mini', // Use stable legacy model for now
+      temperature: 0.7,
+      maxTokens: 2000
     });
 
     return response?.content || null;
@@ -197,9 +205,9 @@ Ensure professional tone, proper grammar, and technical accuracy throughout.
       prompt,
       context: 'note_enhancement',
       provider: 'openai',
-      model: 'gpt-5-mini-2025-08-07',
-      reasoningEffort: 'low',
-      verbosity: 'medium'
+      model: 'gpt-4o-mini',
+      temperature: 0.7,
+      maxTokens: 1500
     });
 
     return response?.content || null;
@@ -230,9 +238,9 @@ Ensure professional tone, proper grammar, and technical accuracy throughout.
       prompt,
       context: 'project_recommendations',
       provider: 'openai',
-      model: 'gpt-5-2025-08-07',
-      reasoningEffort: 'high',
-      verbosity: 'high'
+      model: 'gpt-4o',
+      temperature: 0.7,
+      maxTokens: 2000
     });
 
     return response?.content || null;
@@ -262,9 +270,9 @@ Ensure professional tone, proper grammar, and technical accuracy throughout.
       prompt,
       context: 'troubleshooting',
       provider: 'openai',
-      model: 'gpt-5-2025-08-07',
-      reasoningEffort: 'high',
-      verbosity: 'medium'
+      model: 'gpt-4o',
+      temperature: 0.7,
+      maxTokens: 2000
     });
 
     return response?.content || null;

@@ -104,10 +104,24 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
         maxTokens: 2000
       });
 
+      let content: string;
+      
+      if (!response) {
+        content = "I apologize, but I'm unable to process your request at the moment. This could be due to:\n\n" +
+                 "• AI service configuration issues\n" +
+                 "• Network connectivity problems\n" +
+                 "• Temporary service unavailability\n\n" +
+                 "Please check your AI provider configuration in Settings and try again. If the problem persists, contact support.";
+      } else if (!response.content) {
+        content = "I received an empty response from the AI service. Please try again with a different question or check your settings.";
+      } else {
+        content = response.content;
+      }
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: response?.content || "I apologize, but I'm unable to process your request at the moment. Please check your AI provider configuration in Settings and try again.",
+        content,
         timestamp: new Date(),
         provider: selectedProvider
       };

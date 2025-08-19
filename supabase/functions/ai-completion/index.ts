@@ -23,15 +23,20 @@ async function callOpenAI(request: AIRequest) {
     throw new Error('OpenAI API key not configured');
   }
 
-  // Determine if we're using GPT-5 models or legacy models
+  console.log('OpenAI request:', { model: request.model, provider: request.provider });
+
+  // Determine the model and API to use
   const model = request.model || 'gpt-5-2025-08-07';
   const isGPT5Model = model.startsWith('gpt-5') || model.startsWith('o3') || model.startsWith('o4');
   
-  // For GPT-5 models, use the Responses API for better performance
+  // For GPT-5 and reasoning models, use correct parameters
   if (isGPT5Model) {
     const requestBody: any = {
       model: model,
-      input: `You are an expert network security engineer specializing in 802.1X, NAC, and enterprise network security. You have deep knowledge of Portnox NAC solutions and network infrastructure. Your expertise includes:
+      messages: [
+        {
+          role: 'system',
+          content: `You are an expert network security engineer specializing in 802.1X, NAC, and enterprise network security. You have deep knowledge of Portnox NAC solutions and network infrastructure. Your expertise includes:
 
 - Enterprise 802.1X authentication and authorization
 - Network Access Control (NAC) implementations  
@@ -51,25 +56,24 @@ Always provide comprehensive, production-ready configurations that include:
 - Implementation procedures
 - Validation steps
 
-${request.context ? ` Context: ${request.context}` : ''}
-
-User Query: ${request.prompt}`,
+${request.context ? ` Context: ${request.context}` : ''}`
+        },
+        {
+          role: 'user',
+          content: request.prompt
+        }
+      ]
     };
 
-    // Add GPT-5 specific parameters
+    // For GPT-5 models, use max_completion_tokens instead of max_tokens
     if (request.maxTokens) {
-      requestBody.max_output_tokens = request.maxTokens;
+      requestBody.max_completion_tokens = request.maxTokens;
     }
     
-    if (request.reasoningEffort) {
-      requestBody.reasoning = { effort: request.reasoningEffort };
-    }
-    
-    if (request.verbosity) {
-      requestBody.text = { verbosity: request.verbosity };
-    }
+    // GPT-5 models don't support temperature parameter
+    // reasoningEffort and verbosity are not standard OpenAI parameters
 
-    const response = await fetch('https://api.openai.com/v1/responses', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
@@ -85,28 +89,15 @@ User Query: ${request.prompt}`,
     }
 
     const data = await response.json();
-    
-    // Handle different response formats from OpenAI Responses API
-    let content = '';
-    if (data.choices && data.choices[0] && data.choices[0].message) {
-      content = data.choices[0].message.content;
-    } else if (data.output) {
-      content = data.output;
-    } else if (data.content && Array.isArray(data.content)) {
-      // Handle new response format with reasoning traces
-      const textContent = data.content.find(item => item.type === 'text');
-      content = textContent ? textContent.text : 'Connection successful';
-    } else {
-      content = 'Connection successful'; // Fallback for test purposes
-    }
+    console.log('OpenAI response received:', { status: response.status, hasChoices: !!data.choices });
     
     return {
-      content,
+      content: data.choices[0].message.content,
       provider: 'openai' as const,
       usage: data.usage
     };
   } else {
-    // Use Chat Completions API for legacy models
+    // Use Chat Completions API for legacy models (gpt-4o, gpt-4o-mini)
     const requestBody: any = {
       model: model,
       messages: [
@@ -160,10 +151,13 @@ ${request.context ? ` Context: ${request.context}` : ''}`
 
     if (!response.ok) {
       const error = await response.json();
+      console.error('OpenAI API error:', error);
       throw new Error(`OpenAI API error: ${error.error?.message || 'Unknown error'}`);
     }
 
     const data = await response.json();
+    console.log('OpenAI legacy response received:', { status: response.status, hasChoices: !!data.choices });
+    
     return {
       content: data.choices[0].message.content,
       provider: 'openai' as const,
