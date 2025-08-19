@@ -1,19 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect, useMemo } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
-import { PortnoxOpenApi } from "@/services/PortnoxOpenApi";
-import { supabase } from "@/integrations/supabase/client";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import { PortnoxApiService } from "@/services/PortnoxApiService";
-
-interface Credential { id: string; name: string; project_id: string | null }
+import { PortnoxOpenApi } from "@/services/PortnoxOpenApi";
+import { Loader2, Search, Play, Code } from "lucide-react";
 
 interface OperationRef {
   method: string;
@@ -24,207 +20,253 @@ interface OperationRef {
   requestBody?: any;
 }
 
-export default function PortnoxApiExplorer({ projectId }: { projectId?: string }) {
+const PortnoxApiExplorer: React.FC<{ projectId?: string }> = ({ projectId }) => {
+  const { toast } = useToast();
   const [spec, setSpec] = useState<any>(null);
   const [meta, setMeta] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [creds, setCreds] = useState<Credential[]>([]);
-  const [selectedCred, setSelectedCred] = useState<string | "__active__">("__active__");
-  const [filter, setFilter] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [executing, setExecuting] = useState(false);
   const [selectedOp, setSelectedOp] = useState<OperationRef | null>(null);
-  const [query, setQuery] = useState<string>("");
-  const [pathParams, setPathParams] = useState<string>("");
-  const [body, setBody] = useState<string>("");
+  const [searchFilter, setSearchFilter] = useState("");
+  const [queryParams, setQueryParams] = useState<Record<string, string>>({});
+  const [pathParams, setPathParams] = useState<Record<string, string>>({});
+  const [requestBody, setRequestBody] = useState("");
   const [response, setResponse] = useState<any>(null);
-  const [useTemp, setUseTemp] = useState(false);
-  const [tempBase, setTempBase] = useState("https://clear.portnox.com:8081/CloudPortalBackEnd");
-  const [tempToken, setTempToken] = useState("");
-  const [debugReq, setDebugReq] = useState(false);
 
   useEffect(() => {
-    (async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
-        const [s, c] = await Promise.all([
-          PortnoxOpenApi.fetchSpec(projectId ? { projectId } : undefined),
-          projectId
-            ? supabase.from("portnox_credentials").select("id, name, project_id").eq("project_id", projectId).order("updated_at", { ascending: false })
-            : supabase.from("portnox_credentials").select("id, name, project_id").order("updated_at", { ascending: false }),
-        ]);
-        setSpec(s);
+        const specData = await PortnoxOpenApi.fetchSpec();
+        setSpec(specData.data || specData);
         setMeta(PortnoxOpenApi.getMeta());
-        setCreds(c.data || []);
-      } catch (e: any) {
-        toast.error(e?.message || "Failed to load spec");
+      } catch (error) {
+        console.error("Error loading API explorer data:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load API specification",
+        });
       } finally {
         setLoading(false);
       }
-    })();
-  }, []);
+    };
 
-  const operations: OperationRef[] = useMemo(() => {
+    loadData();
+  }, [toast]);
+
+  const operations = useMemo(() => {
     if (!spec?.paths) return [];
+    
     const ops: OperationRef[] = [];
-    Object.entries(spec.paths).forEach(([p, methods]: any) => {
-      Object.entries(methods).forEach(([m, op]: any) => {
-        ops.push({ method: m.toUpperCase(), path: p, summary: op.summary, tags: op.tags, parameters: op.parameters, requestBody: op.requestBody });
+    
+    Object.entries(spec.paths).forEach(([path, pathItem]: [string, any]) => {
+      Object.entries(pathItem).forEach(([method, operation]: [string, any]) => {
+        if (typeof operation === 'object' && operation.summary) {
+          ops.push({
+            method: method.toUpperCase(),
+            path,
+            summary: operation.summary,
+            tags: operation.tags || [],
+            parameters: operation.parameters || [],
+            requestBody: operation.requestBody,
+          });
+        }
       });
     });
-    return ops
-      .sort((a, b) => (a.tags?.[0] || "").localeCompare(b.tags?.[0] || "") || a.path.localeCompare(b.path));
+    
+    return ops.sort((a, b) => {
+      const aTag = a.tags?.[0] || 'Other';
+      const bTag = b.tags?.[0] || 'Other';
+      if (aTag !== bTag) return aTag.localeCompare(bTag);
+      return a.path.localeCompare(b.path);
+    });
   }, [spec]);
 
   const filtered = useMemo(() => {
-    const f = filter.toLowerCase();
-    return operations.filter((op) =>
-      (op.summary || "").toLowerCase().includes(f) || op.path.toLowerCase().includes(f) || (op.tags || []).join(",").toLowerCase().includes(f)
+    if (!searchFilter) return operations;
+    const lower = searchFilter.toLowerCase();
+    return operations.filter(op => 
+      op.path.toLowerCase().includes(lower) ||
+      op.summary?.toLowerCase().includes(lower) ||
+      op.tags?.some(tag => tag.toLowerCase().includes(lower))
     );
-  }, [operations, filter]);
+  }, [operations, searchFilter]);
 
-  async function execute() {
+  const execute = async () => {
     if (!selectedOp) return;
+
     try {
-      setLoading(true);
-      let path = selectedOp.path;
-      // Apply path params from simple JSON map {id:"..."}
-      if (pathParams.trim()) {
+      setExecuting(true);
+      setResponse(null);
+
+      const query = Object.fromEntries(
+        Object.entries(queryParams).filter(([_, v]) => v.trim())
+      );
+
+      let finalPath = selectedOp.path;
+      Object.entries(pathParams).forEach(([param, value]) => {
+        if (value.trim()) {
+          finalPath = finalPath.replace(`{${param}}`, encodeURIComponent(value.trim()));
+        }
+      });
+
+      let body = undefined;
+      if (requestBody.trim()) {
         try {
-          const map = JSON.parse(pathParams);
-          Object.entries(map).forEach(([k, v]) => {
-            path = path.replace(new RegExp(`{${k}}`, "g"), encodeURIComponent(String(v)));
-          });
+          body = JSON.parse(requestBody);
         } catch {
-          toast.warning("Path params must be valid JSON map");
+          body = requestBody;
         }
       }
-      const queryObj = query.trim() ? JSON.parse(query) : undefined;
-      const bodyObj = body.trim() ? JSON.parse(body) : undefined;
-      const opts: any = {
-        ...(selectedCred !== "__active__" ? { credentialId: selectedCred } : {}),
-        ...(projectId ? { projectId } : {}),
-      };
-      if (useTemp && tempToken) {
-        opts.directToken = tempToken;
-        if (tempBase) opts.baseUrl = tempBase;
-      }
-      if (debugReq) opts.debug = true;
-      const res = await PortnoxApiService.proxy(selectedOp.method, path, queryObj, bodyObj, opts);
-      setResponse(res);
-      toast.success("Executed");
-    } catch (e: any) {
-      toast.error(e?.message || "Execution failed");
+
+      const result = await PortnoxApiService.proxy(
+        selectedOp.method,
+        finalPath,
+        query,
+        body,
+        { projectId }
+      );
+
+      setResponse(result);
+
+      toast({
+        title: "Request Executed",
+        description: `${selectedOp.method} ${finalPath}`,
+      });
+    } catch (error) {
+      console.error("API execution error:", error);
+      setResponse({ error: String(error) });
+      toast({
+        variant: "destructive",
+        title: "Request Failed",
+        description: "Check the response panel for details",
+      });
     } finally {
-      setLoading(false);
+      setExecuting(false);
     }
+  };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center p-8">
+          <Loader2 className="h-6 w-6 animate-spin" />
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Portnox API Explorer</CardTitle>
-        {meta?.derivedBase && (
-          <div className="text-xs text-muted-foreground mt-1">Base from Swagger: {meta.derivedBase} {meta.source ? `(source: ${meta.source}${meta.cache ? `, cache: ${meta.cache}` : ''})` : ''}</div>
-        )}
+        <CardTitle className="flex items-center gap-2">
+          <Code className="h-5 w-5" />
+          Portnox API Explorer
+        </CardTitle>
+        <CardDescription>
+          Explore and test Portnox API endpoints
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-          <div className="lg:col-span-1 space-y-3">
-            <div className="space-y-2">
-              <Label>Credential</Label>
-              <Select value={selectedCred} onValueChange={setSelectedCred as any}>
-                <SelectTrigger>
-                  <SelectValue placeholder={projectId ? "Use project's active credential" : "Use active credential"} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__active__">{projectId ? "Use project's active credential" : "Use active credential"}</SelectItem>
-                  {creds.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2 pt-2">
-              <div className="flex items-center justify-between">
-                <Label>Use temporary token</Label>
-                <Switch checked={useTemp} onCheckedChange={setUseTemp} />
-              </div>
-              {useTemp && (
-                <>
-                  <div className="space-y-2">
-                    <Label>Base URL</Label>
-                    <Input value={tempBase} onChange={(e) => setTempBase(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>API Token</Label>
-                    <Input type="password" value={tempToken} onChange={(e) => setTempToken(e.target.value)} />
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="flex items-center justify-between">
-              <Label>Return request debug</Label>
-              <Switch checked={debugReq} onCheckedChange={setDebugReq} />
-            </div>
-            <div className="space-y-2">
-              <Label>Search endpoints</Label>
-              <Input placeholder="Filter by path, tag, or summary" value={filter} onChange={(e) => setFilter(e.target.value)} />
-            </div>
-            <div className="border rounded-md h-[420px] overflow-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Endpoint</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filtered.map((op) => (
-                    <TableRow key={`${op.method}-${op.path}`} onClick={() => setSelectedOp(op)} className="cursor-pointer hover:bg-muted/40">
-                      <TableCell>
-                        <div className="text-xs text-muted-foreground">{op.tags?.[0] || "General"}</div>
-                        <div className="font-mono text-sm"><span className="font-semibold mr-2">{op.method}</span>{op.path}</div>
-                        <div className="text-xs">{op.summary}</div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-
-          <div className="lg:col-span-3 space-y-4">
-            <div className="space-y-1">
-              <div className="text-sm text-muted-foreground">Selected</div>
-              <div className="font-mono"><span className="font-semibold mr-2">{selectedOp?.method || "METHOD"}</span>{selectedOp?.path || "/api/..."}</div>
-              <div className="text-sm">{selectedOp?.summary}</div>
-            </div>
-            <Separator />
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Query (JSON)</Label>
-                <Textarea rows={6} placeholder='{"limit": 20}' value={query} onChange={(e) => setQuery(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label>Path Params (JSON map)</Label>
-                <Textarea rows={6} placeholder='{"id": "123"}' value={pathParams} onChange={(e) => setPathParams(e.target.value)} />
-              </div>
-              <div className="md:col-span-2 space-y-2">
-                <Label>Body (JSON)</Label>
-                <Textarea rows={10} placeholder='{"name": "New Site"}' value={body} onChange={(e) => setBody(e.target.value)} />
-              </div>
-            </div>
-            <div className="flex justify-end">
-              <Button onClick={execute} disabled={loading || !selectedOp}>Execute</Button>
-            </div>
-            <Separator />
-            <div className="space-y-2">
-              <Label>Response</Label>
-              <pre className="bg-muted rounded-md p-3 overflow-auto max-h-[360px] text-sm">
-                {response ? JSON.stringify(response, null, 2) : "Run a request to see the response."}
-              </pre>
-            </div>
+        <div>
+          <Label htmlFor="search">Search Operations</Label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              id="search"
+              value={searchFilter}
+              onChange={(e) => setSearchFilter(e.target.value)}
+              placeholder="Search by path, summary, or tag"
+              className="pl-9"
+            />
           </div>
         </div>
+
+        <div className="border rounded-lg max-h-64 overflow-y-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Method</TableHead>
+                <TableHead>Path</TableHead>
+                <TableHead>Summary</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((op, idx) => (
+                <TableRow
+                  key={`${op.method}-${op.path}-${idx}`}
+                  className={`cursor-pointer ${
+                    selectedOp === op ? 'bg-primary/10' : 'hover:bg-muted/50'
+                  }`}
+                  onClick={() => setSelectedOp(op)}
+                >
+                  <TableCell>
+                    <Badge 
+                      variant={
+                        op.method === 'GET' ? 'secondary' :
+                        op.method === 'POST' ? 'default' :
+                        op.method === 'PUT' ? 'outline' :
+                        op.method === 'DELETE' ? 'destructive' : 'secondary'
+                      }
+                    >
+                      {op.method}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="font-mono text-sm">{op.path}</TableCell>
+                  <TableCell>{op.summary}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        {selectedOp && (
+          <div className="space-y-4">
+            <h3 className="font-medium">
+              {selectedOp.method} {selectedOp.path}
+            </h3>
+
+            {selectedOp.requestBody && (
+              <div>
+                <Label htmlFor="requestBody">Request Body (JSON)</Label>
+                <Textarea
+                  id="requestBody"
+                  value={requestBody}
+                  onChange={(e) => setRequestBody(e.target.value)}
+                  placeholder='{"name": "example"}'
+                  rows={4}
+                  className="font-mono text-sm"
+                />
+              </div>
+            )}
+
+            <Button
+              onClick={execute}
+              disabled={executing}
+              className="flex items-center gap-2"
+            >
+              {executing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="h-4 w-4" />
+              )}
+              Execute Request
+            </Button>
+          </div>
+        )}
+
+        {response && (
+          <div>
+            <Label>Response</Label>
+            <pre className="bg-muted p-4 rounded-lg text-sm overflow-auto max-h-96 mt-2">
+              {JSON.stringify(response, null, 2)}
+            </pre>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
-}
+};
+
+export default PortnoxApiExplorer;

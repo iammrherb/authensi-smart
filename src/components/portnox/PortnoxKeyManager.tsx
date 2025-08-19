@@ -1,16 +1,22 @@
-import { useEffect, useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect, useMemo } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { PortnoxApiService } from "@/services/PortnoxApiService";
-import { toast } from "sonner";
+import { Loader2, Shield, Trash2, TestTube, Edit2 } from "lucide-react";
 
-interface Project { id: string; name: string }
+interface Project {
+  id: string;
+  name: string;
+}
+
 interface Credential {
   id: string;
   name: string;
@@ -22,255 +28,310 @@ interface Credential {
   updated_at: string;
 }
 
-export default function PortnoxKeyManager({ projectId }: { projectId?: string }) {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [creds, setCreds] = useState<Credential[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [filterProject, setFilterProject] = useState<string | null>(projectId ?? null);
+interface PortnoxKeyManagerProps {
+  projectId?: string;
+}
 
-  const [form, setForm] = useState<{
-    name: string;
-    base_url: string;
-    api_token: string;
-    is_active: boolean;
-    project_id: string | null;
-  }>({
-    name: "",
-    base_url: "https://clear.portnox.com:8081/CloudPortalBackEnd",
-    api_token: "",
-    is_active: true,
-    project_id: projectId ?? null,
-  });
+const PortnoxKeyManager: React.FC<PortnoxKeyManagerProps> = ({ projectId }) => {
+  const { toast } = useToast();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [credentials, setCredentials] = useState<Credential[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [formLoading, setFormLoading] = useState(false);
+  
+  const [selectedProject, setSelectedProject] = useState(projectId || "");
+  const [formCredName, setFormCredName] = useState("");
+  const [formBaseUrl, setFormBaseUrl] = useState("https://clear.portnox.com/restapi");
+  const [formToken, setFormToken] = useState("");
+  const [formIsActive, setFormIsActive] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [filterProject, setFilterProject] = useState(projectId || "");
 
   const filteredCreds = useMemo(() => {
-    const fp = projectId !== undefined ? projectId : filterProject;
-    if (fp === undefined) return creds;
-    if (fp === null) return creds.filter(c => c.project_id === null);
-    return creds.filter(c => c.project_id === fp);
-  }, [creds, filterProject, projectId]);
+    if (!filterProject) return credentials;
+    return credentials.filter(c => c.project_id === filterProject);
+  }, [credentials, filterProject]);
 
-  async function load() {
-    setLoading(true);
+  const load = async () => {
     try {
-      const [{ data: proj }, { data: c }] = await Promise.all([
-        supabase.from("projects").select("id, name").order("created_at", { ascending: false }),
-        supabase.from("portnox_credentials").select("*").order("updated_at", { ascending: false }),
-      ]);
-      setProjects(proj || []);
-      setCreds((c as any) || []);
-    } catch (e: any) {
-      toast.error(`Failed to load credentials: ${e?.message || e}`);
+      setLoading(true);
+      
+      const { data: projectsData, error: projectsError } = await supabase
+        .from("projects")
+        .select("id, name")
+        .order("name");
+
+      if (projectsError) throw projectsError;
+      setProjects(projectsData || []);
+
+      const { data: credsData, error: credsError } = await supabase
+        .from("portnox_credentials")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (credsError) throw credsError;
+      setCredentials(credsData || []);
+    } catch (error) {
+      console.error("Error loading data:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load credentials",
+      });
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     load();
   }, []);
 
-  useEffect(() => {
-    if (projectId !== undefined) {
-      setForm((f) => ({ ...f, project_id: projectId ?? null }));
-      setFilterProject(projectId ?? null);
-    }
-  }, [projectId]);
-  async function saveCredential() {
-    if (!form.name || !form.api_token) {
-      toast.warning("Please provide a name and API token");
+  const saveCredential = async () => {
+    if (!formCredName.trim() || !formToken.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "Name and API token are required",
+      });
       return;
     }
+
     try {
-      setLoading(true);
-      // If setting active for a project, deactivate others first to satisfy unique index
-      if (form.is_active) {
-        let q = supabase
+      setFormLoading(true);
+
+      if (formIsActive) {
+        const scope = selectedProject || null;
+        await supabase
           .from("portnox_credentials")
           .update({ is_active: false })
-          .eq("is_active", true);
-        if (form.project_id === null) {
-          q = q.is("project_id", null);
-        } else {
-          q = q.eq("project_id", form.project_id);
-        }
-        const { error: updErr } = await q;
+          .eq("project_id", scope);
       }
-      const { error } = await supabase.from("portnox_credentials").insert({
-        name: form.name,
-        base_url: form.base_url,
-        api_token: form.api_token,
-        is_active: form.is_active,
-        project_id: form.project_id,
-      });
-      if (error) throw error;
-      toast.success("Credential saved");
-      setForm({ name: "", base_url: "https://clear.portnox.com:8081/CloudPortalBackEnd", api_token: "", is_active: true, project_id: projectId ?? null });
-      await load();
-    } catch (e: any) {
-      toast.error(`Save failed: ${e?.message || e}`);
-    } finally {
-      setLoading(false);
-    }
-  }
 
-  async function setActive(cred: Credential) {
-    try {
-      setLoading(true);
-      // Deactivate others in same project scope
-      let q = supabase
-        .from("portnox_credentials")
-        .update({ is_active: false })
-        .eq("is_active", true);
-      if (cred.project_id === null) {
-        q = q.is("project_id", null);
+      const credData = {
+        name: formCredName.trim(),
+        base_url: formBaseUrl.trim(),
+        api_token: formToken.trim(),
+        is_active: formIsActive,
+        project_id: selectedProject || null,
+      };
+
+      if (editingId) {
+        const { error } = await supabase
+          .from("portnox_credentials")
+          .update(credData)
+          .eq("id", editingId);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "Credential updated successfully",
+        });
       } else {
-        q = q.eq("project_id", cred.project_id);
+        const { error } = await supabase
+          .from("portnox_credentials")
+          .insert([credData]);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Success", 
+          description: "Credential saved successfully",
+        });
       }
-      const { error: updErr } = await q;
-      if (updErr) throw updErr;
-      const { error } = await supabase
-        .from("portnox_credentials")
-        .update({ is_active: true })
-        .eq("id", cred.id);
-      if (error) throw error;
-      toast.success("Set as active");
-      await load();
-    } catch (e: any) {
-      toast.error(`Update failed: ${e?.message || e}`);
-    } finally {
-      setLoading(false);
-    }
-  }
 
-  async function remove(cred: Credential) {
-    if (!confirm("Delete this credential?")) return;
-    try {
-      setLoading(true);
-      const { error } = await supabase.from("portnox_credentials").delete().eq("id", cred.id);
-      if (error) throw error;
-      toast.success("Deleted credential");
+      setFormCredName("");
+      setFormBaseUrl("https://clear.portnox.com/restapi");
+      setFormToken("");
+      setFormIsActive(true);
+      setEditingId(null);
       await load();
-    } catch (e: any) {
-      toast.error(`Delete failed: ${e?.message || e}`);
+    } catch (error) {
+      console.error("Error saving credential:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to save credential",
+      });
     } finally {
-      setLoading(false);
+      setFormLoading(false);
     }
-  }
+  };
 
-  async function test(cred: Credential) {
+  const test = async (cred: Credential) => {
     try {
-      const res = await PortnoxApiService.testConnection({ credentialId: cred.id });
-      toast.success(`Test OK (status ${res?.status ?? 'ok'})`);
-    } catch (e: any) {
-      toast.error(`Test failed: ${e?.message || e}`);
+      const result = await PortnoxApiService.testConnection({
+        credentialId: cred.id,
+      });
+
+      toast({
+        title: "Connection Test",
+        description: result?.data ? "Connection successful!" : "Connection test completed",
+      });
+    } catch (error) {
+      console.error("Connection test failed:", error);
+      toast({
+        variant: "destructive",
+        title: "Connection Failed",
+        description: "Could not connect to Portnox API",
+      });
     }
+  };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center p-8">
+          <Loader2 className="h-6 w-6 animate-spin" />
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Portnox Credentials Manager</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <Shield className="h-5 w-5" />
+          Portnox API Credentials
+        </CardTitle>
+        <CardDescription>
+          Manage API credentials for Portnox integrations
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {!projectId && (
-            <div className="space-y-2">
-              <Label>Project</Label>
-              <Select onValueChange={(v) => setForm((f) => ({ ...f, project_id: v === "__global__" ? null : v }))}>
+        <div className="grid gap-4 p-4 border rounded-lg">
+          <h3 className="font-medium">
+            {editingId ? "Edit Credential" : "Add New Credential"}
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="credName">Name</Label>
+              <Input
+                id="credName"
+                value={formCredName}
+                onChange={(e) => setFormCredName(e.target.value)}
+                placeholder="e.g., Production API"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="project">Project</Label>
+              <Select value={selectedProject} onValueChange={setSelectedProject}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Global (default)" />
+                  <SelectValue placeholder="Select project (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__global__">Global (no project)</SelectItem>
+                  <SelectItem value="">Global (No project)</SelectItem>
                   {projects.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-          )}
-          <div className="space-y-2">
-            <Label>Name</Label>
-            <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Friendly name (e.g., Customer A)" />
           </div>
-          <div className="space-y-2">
-            <Label>Base URL</Label>
-            <Input value={form.base_url} onChange={(e) => setForm((f) => ({ ...f, base_url: e.target.value }))} />
+
+          <div>
+            <Label htmlFor="baseUrl">Base URL</Label>
+            <Input
+              id="baseUrl"
+              value={formBaseUrl}
+              onChange={(e) => setFormBaseUrl(e.target.value)}
+              placeholder="https://clear.portnox.com/restapi"
+            />
           </div>
-          <div className="space-y-2">
-            <Label>API Token</Label>
-            <Input type="password" value={form.api_token} onChange={(e) => setForm((f) => ({ ...f, api_token: e.target.value }))} />
+
+          <div>
+            <Label htmlFor="token">API Token</Label>
+            <Input
+              id="token"
+              type="password"
+              value={formToken}
+              onChange={(e) => setFormToken(e.target.value)}
+              placeholder="Enter API token"
+            />
           </div>
-          <div className="flex items-center justify-between col-span-full">
-            <div className="space-y-0.5">
-              <Label>Set as Active</Label>
-              <p className="text-sm text-muted-foreground">Only one active token per project</p>
-            </div>
-            <Switch checked={form.is_active} onCheckedChange={(v) => setForm((f) => ({ ...f, is_active: v }))} />
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="active"
+              checked={formIsActive}
+              onCheckedChange={setFormIsActive}
+            />
+            <Label htmlFor="active">Set as active credential</Label>
           </div>
-        </div>
-        <div className="flex justify-end">
-          <Button disabled={loading} onClick={saveCredential}>Save Credential</Button>
+
+          <Button
+            onClick={saveCredential}
+            disabled={formLoading}
+            className="flex items-center gap-2"
+          >
+            {formLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+            {editingId ? "Update" : "Save"} Credential
+          </Button>
         </div>
 
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label>Existing Credentials</Label>
-            {!projectId && (
-              <div className="flex items-center gap-2">
-                <Label>Filter by Project</Label>
-                <Select onValueChange={(v) => setFilterProject(v === "__all__" ? undefined as any : v === "__global__" ? null : v)}>
-                  <SelectTrigger className="w-56">
-                    <SelectValue placeholder="All" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__all__">All</SelectItem>
-                    <SelectItem value="__global__">Global</SelectItem>
-                    {projects.map((p) => (
-                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </div>
-          <div className="border rounded-md overflow-hidden">
-            <Table>
-              <TableHeader>
+        <div className="border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Project</TableHead>
+                <TableHead>Base URL</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredCreds.length === 0 ? (
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Project</TableHead>
-                  <TableHead>Base URL</TableHead>
-                  <TableHead>Active</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableCell colSpan={5} className="text-center text-muted-foreground">
+                    No credentials found
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredCreds.map((c) => (
-                  <TableRow key={c.id}>
-                    <TableCell className="font-medium">{c.name}</TableCell>
-                    <TableCell>{c.project_id ? (projects.find(p => p.id === c.project_id)?.name || c.project_id) : "Global"}</TableCell>
-                    <TableCell className="truncate max-w-[240px]">{c.base_url}</TableCell>
-                    <TableCell>{c.is_active ? "Yes" : "No"}</TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Button variant="outline" size="sm" onClick={() => test(c)}>Test</Button>
-                      {!c.is_active && (
-                        <Button variant="secondary" size="sm" onClick={() => setActive(c)}>Set Active</Button>
+              ) : (
+                filteredCreds.map((cred) => (
+                  <TableRow key={cred.id}>
+                    <TableCell className="font-medium">{cred.name}</TableCell>
+                    <TableCell>
+                      {cred.project_id ? (
+                        projects.find(p => p.id === cred.project_id)?.name || "Unknown"
+                      ) : (
+                        <span className="text-muted-foreground">Global</span>
                       )}
-                      <Button variant="destructive" size="sm" onClick={() => remove(c)}>Delete</Button>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {cred.base_url}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={cred.is_active ? "default" : "secondary"}>
+                        {cred.is_active ? "Active" : "Inactive"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => test(cred)}
+                        >
+                          <TestTube className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
-                ))}
-                {filteredCreds.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">No credentials found</TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </div>
       </CardContent>
     </Card>
   );
-}
+};
+
+export default PortnoxKeyManager;
