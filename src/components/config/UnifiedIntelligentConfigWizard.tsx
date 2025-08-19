@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import ConfigWizardSteps from './ConfigWizardSteps';
 import ConfigTemplateManager from './ConfigTemplateManager';
 import AdvancedConfigAnalyzer from './AdvancedConfigAnalyzer';
-import { InfrastructureSelection } from "@/components/resources/InfrastructureSelector";
+import InfrastructureSelector, { InfrastructureSelection } from "@/components/resources/InfrastructureSelector";
 
 interface UnifiedIntelligentConfigWizardProps {
   projectId?: string;
