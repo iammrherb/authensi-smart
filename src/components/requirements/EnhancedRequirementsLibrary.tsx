@@ -367,7 +367,7 @@ const EnhancedRequirementsLibrary: React.FC = () => {
       technical_details: 'Active-passive or active-active HA deployment with geographic redundancy',
       risk_assessment: {
         implementation_risk: 'high',
-        business_impact: 'critical',
+        business_impact: 'high',
         mitigation_strategies: [
           'Extensive testing in lab environment',
           'Phased implementation with rollback plans',
@@ -384,10 +384,14 @@ const EnhancedRequirementsLibrary: React.FC = () => {
 
   useEffect(() => {
     // Combine database requirements with enhanced Portnox requirements
-    const combinedRequirements = [
+    const combinedRequirements: EnhancedRequirement[] = [
       ...portnoxRequirements,
       ...dbRequirements.map(req => ({
-        ...req,
+        id: req.id,
+        title: req.title || 'Requirement',
+        description: req.description || 'Standard requirement description',
+        category: (req.category as any) || 'operational',
+        priority: (req.priority as any) || 'medium',
         complexity: 'moderate' as const,
         implementation_time: '1-2 weeks',
         prerequisites: [],
@@ -408,7 +412,9 @@ const EnhancedRequirementsLibrary: React.FC = () => {
           mitigation_strategies: []
         },
         tags: [],
-        status: 'draft' as const
+        status: 'draft' as const,
+        created_at: req.created_at || new Date().toISOString(),
+        updated_at: req.updated_at || new Date().toISOString()
       }))
     ];
     setRequirements(combinedRequirements);
