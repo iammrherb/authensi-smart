@@ -38,7 +38,7 @@ const PortnoxApiExplorer: React.FC<{ projectId?: string }> = ({ projectId }) => 
       try {
         setLoading(true);
         const specData = await PortnoxOpenApi.fetchSpec();
-        setSpec(specData.data || specData);
+        setSpec(specData);
         setMeta(PortnoxOpenApi.getMeta());
       } catch (error) {
         console.error("Error loading API explorer data:", error);
