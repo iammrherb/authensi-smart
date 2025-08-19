@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Download, FileText, BarChart3 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Download, FileText, Database } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ReportExporterProps {
   data?: any;
@@ -13,91 +11,154 @@ interface ReportExporterProps {
 }
 
 const ReportExporter: React.FC<ReportExporterProps> = ({ data, type, title }) => {
-  const { toast } = useToast();
-
   const exportAsJSON = () => {
-    if (!data) return;
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    if (!data) {
+      toast.error('No data available to export');
+      return;
+    }
+
+    const exportData = {
+      title,
+      type,
+      timestamp: new Date().toISOString(),
+      data
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: 'application/json'
+    });
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${type}-report-${Date.now()}.json`;
+    a.download = `${title.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast({ title: "Export complete", description: "JSON report downloaded" });
+
+    toast.success('JSON data exported successfully');
   };
 
-  const exportDetailedReport = async () => {
-    if (!data) return;
-    
-    const sections = [];
-    
-    if (type === 'scoping') {
-      sections.push(
-        `# Scoping Report - ${title}`,
-        `Generated: ${new Date().toLocaleString()}`,
-        '',
-        '## Organization',
-        `Name: ${data.organization?.name || 'N/A'}`,
-        `Industry: ${data.organization?.industry || 'N/A'}`,
-        `Users: ${data.organization?.total_users || 'N/A'}`,
-        '',
-        '## Pain Points',
-        ...(data.organization?.pain_points || []).map((p: any) => `- ${p.title || p}`),
-        '',
-        '## Infrastructure',
-        `Sites: ${data.network_infrastructure?.site_count || 'N/A'}`,
-        `Topology: ${data.network_infrastructure?.network_topology || 'N/A'}`,
-        '',
-        '## Vendor Ecosystem',
-        ...Object.entries(data.vendor_ecosystem || {}).map(([k, v]: [string, any]) => 
-          `${k}: ${Array.isArray(v) ? v.length : 0} items`
-        ),
-        '',
-        '## Use Cases',
-        ...(data.use_cases_requirements?.primary_use_cases || []).map((uc: any) => `- ${uc.name || uc}`),
-        '',
-        '## Compliance',
-        ...(data.integration_compliance?.compliance_frameworks || []).map((cf: string) => `- ${cf}`),
-        '',
-        '## AI Recommendations',
-        data.templates_ai?.ai_recommendations?.summary || 'No AI analysis completed'
-      );
+  const exportDetailedReport = () => {
+    if (!data) {
+      toast.error('No data available to export');
+      return;
     }
-    
-    const content = sections.join('\n');
-    const blob = new Blob([content], { type: 'text/markdown' });
+
+    let reportContent = `# ${title}\n\n`;
+    reportContent += `**Generated:** ${new Date().toLocaleString()}\n`;
+    reportContent += `**Type:** ${type.charAt(0).toUpperCase() + type.slice(1)} Report\n\n`;
+
+    if (type === 'scoping') {
+      reportContent += `## Project Overview\n\n`;
+      if (data.project) {
+        reportContent += `- **Project Name:** ${data.project.name || 'N/A'}\n`;
+        reportContent += `- **Client:** ${data.project.client_name || 'N/A'}\n`;
+        reportContent += `- **Industry:** ${data.project.industry || 'N/A'}\n`;
+        reportContent += `- **Deployment Type:** ${data.project.deployment_type || 'N/A'}\n`;
+        reportContent += `- **Security Level:** ${data.project.security_level || 'N/A'}\n\n`;
+      }
+
+      if (data.sites && data.sites.length > 0) {
+        reportContent += `## Sites Overview\n\n`;
+        reportContent += `**Total Sites:** ${data.sites.length}\n\n`;
+        data.sites.forEach((site: any, index: number) => {
+          reportContent += `### Site ${index + 1}: ${site.name || 'Unnamed Site'}\n`;
+          reportContent += `- **Location:** ${site.location || 'N/A'}\n`;
+          reportContent += `- **Type:** ${site.site_type || 'N/A'}\n`;
+          reportContent += `- **Endpoints:** ${site.total_endpoints || 'N/A'}\n`;
+          reportContent += `- **Network Segments:** ${site.network_segments || 'N/A'}\n\n`;
+        });
+      }
+
+      if (data.requirements && data.requirements.length > 0) {
+        reportContent += `## Requirements\n\n`;
+        data.requirements.forEach((req: any, index: number) => {
+          reportContent += `${index + 1}. **${req.name || 'Requirement'}**\n`;
+          reportContent += `   - Category: ${req.category || 'N/A'}\n`;
+          reportContent += `   - Priority: ${req.priority || 'N/A'}\n`;
+          if (req.description) {
+            reportContent += `   - Description: ${req.description}\n`;
+          }
+          reportContent += `\n`;
+        });
+      }
+
+      if (data.useCases && data.useCases.length > 0) {
+        reportContent += `## Selected Use Cases\n\n`;
+        data.useCases.forEach((useCase: any, index: number) => {
+          reportContent += `${index + 1}. **${useCase.name || 'Use Case'}**\n`;
+          reportContent += `   - Category: ${useCase.category || 'N/A'}\n`;
+          reportContent += `   - Complexity: ${useCase.complexity_level || 'N/A'}\n`;
+          if (useCase.description) {
+            reportContent += `   - Description: ${useCase.description}\n`;
+          }
+          reportContent += `\n`;
+        });
+      }
+
+      if (data.recommendations) {
+        reportContent += `## AI Recommendations\n\n`;
+        reportContent += data.recommendations;
+        reportContent += `\n\n`;
+      }
+    } else {
+      // Generic data export for other types
+      reportContent += `## Data Summary\n\n`;
+      reportContent += `\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\`\n\n`;
+    }
+
+    reportContent += `---\n\n`;
+    reportContent += `*Report generated by Portnox Professional Services Platform*\n`;
+
+    const blob = new Blob([reportContent], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${type}-detailed-report-${Date.now()}.md`;
+    a.download = `${title.toLowerCase().replace(/\s+/g, '-')}-detailed-report-${new Date().toISOString().split('T')[0]}.md`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast({ title: "Export complete", description: "Detailed report downloaded" });
+
+    toast.success('Detailed report exported successfully');
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm flex items-center gap-2">
-          <BarChart3 className="h-4 w-4" />
-          Export Reports
+        <CardTitle className="flex items-center gap-2">
+          <Download className="h-5 w-5" />
+          Export Options
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={exportAsJSON}>
-            <Download className="h-4 w-4 mr-2" />
+      <CardContent className="space-y-4">
+        <p className="text-sm text-muted-foreground">
+          Export your {type} data in different formats for documentation, sharing, or analysis purposes.
+        </p>
+        
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button
+            variant="outline"
+            onClick={exportAsJSON}
+            disabled={!data}
+            className="flex items-center gap-2"
+          >
+            <Database className="h-4 w-4" />
             JSON Data
           </Button>
-          <Button variant="outline" size="sm" onClick={exportDetailedReport}>
-            <FileText className="h-4 w-4 mr-2" />
+          
+          <Button
+            variant="outline"
+            onClick={exportDetailedReport}
+            disabled={!data}
+            className="flex items-center gap-2"
+          >
+            <FileText className="h-4 w-4" />
             Detailed Report
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Export comprehensive reports for documentation and analysis
-        </p>
       </CardContent>
     </Card>
   );
