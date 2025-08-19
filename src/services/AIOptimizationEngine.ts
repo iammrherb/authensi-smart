@@ -492,7 +492,7 @@ export class AIOptimizationEngine {
     return {
       complexity: data?.progress_percentage > 75 ? 'high' : 'medium',
       riskTolerance: data?.status === 'in_progress' ? 'low' : 'medium',
-      timeConstraints: data?.target_completion_date ? 'high' : 'low'
+      timeConstraints: data?.target_completion ? 'high' : 'low'
     };
   }
 

@@ -211,7 +211,7 @@ export const useAIInsights = () => {
     try {
       const { data: projectsData } = await supabase
         .from('projects')
-        .select('id, name, status, progress_percentage, start_date, target_completion_date');
+        .select('id, name, status, progress_percentage, start_date, target_completion');
 
       const { data: sitesData } = await supabase
         .from('sites')
@@ -226,8 +226,8 @@ export const useAIInsights = () => {
                  project.status === 'in_progress' ? 'in_progress' : 
                  project.progress_percentage > 75 ? 'at_risk' : 'in_progress' as const,
           progress: project.progress_percentage || 0,
-          targetDate: project.target_completion_date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          actualDate: project.status === 'completed' ? project.target_completion_date : undefined,
+          targetDate: project.target_completion || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          actualDate: project.status === 'completed' ? project.target_completion : undefined,
           impact: index % 3 === 0 ? 'high' : index % 3 === 1 ? 'medium' : 'low' as const,
           dependencies: sitesData?.slice(0, 2).map(s => s.name) || [],
           blockers: project.progress_percentage < 25 ? ['Resource allocation', 'Dependencies'] : [],
