@@ -1,8 +1,8 @@
 import React from 'react';
-import EnhancedCommandCenter from '@/components/command/EnhancedCommandCenter';
+import EnterpriseCommandCenter from '@/components/command/EnterpriseCommandCenter';
 
 const CommandCenter = () => {
-  return <EnhancedCommandCenter />;
+  return <EnterpriseCommandCenter />;
 };
 
 export default CommandCenter;
