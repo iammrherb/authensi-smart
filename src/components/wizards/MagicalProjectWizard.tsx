@@ -82,7 +82,7 @@ const MagicalProjectWizard: React.FC<MagicalProjectWizardProps> = ({ onComplete,
     transition: {
       duration: 2,
       repeat: Infinity,
-      ease: [0.4, 0, 0.6, 1]
+      ease: "easeInOut"
     }
   };
 
@@ -138,7 +138,8 @@ const MagicalProjectWizard: React.FC<MagicalProjectWizardProps> = ({ onComplete,
       component: (
         <motion.div variants={itemVariants} className="text-center space-y-8">
           <motion.div
-            animate={magicSparkleVariants}
+            animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             className="w-32 h-32 mx-auto bg-gradient-primary rounded-full flex items-center justify-center shadow-glow relative"
           >
             <Wand2 className="w-16 h-16 text-primary-foreground" />
