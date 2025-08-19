@@ -268,12 +268,12 @@ const ConfigTemplateManager: React.FC<ConfigTemplateManagerProps> = ({
             />
           </ScrollArea>
           
-          <div className="flex justify-between pt-4">
+            <div className="flex justify-between pt-4">
             <div className="flex items-center gap-2">
-              <Badge variant={getComplexityColor(selectedTemplate?.complexity) as any}>
-                {selectedTemplate?.complexity}
+              <Badge variant={getComplexityColor((selectedTemplate as any)?.complexity || 'basic') as any}>
+                {(selectedTemplate as any)?.complexity || 'basic'}
               </Badge>
-              <Badge variant="outline">{selectedTemplate?.vendor}</Badge>
+              <Badge variant="outline">{(selectedTemplate as any)?.vendor || 'Generic'}</Badge>
             </div>
             
             <div className="flex gap-2">
