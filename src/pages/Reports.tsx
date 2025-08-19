@@ -1,8 +1,8 @@
 import React from 'react';
-import MegaReportingCenter from '@/components/reports/MegaReportingCenter';
+import ComprehensiveReportsV2 from '@/components/reports/ComprehensiveReportsV2';
 
 const Reports = () => {
-  return <MegaReportingCenter />;
+  return <ComprehensiveReportsV2 />;
 };
 
 export default Reports;

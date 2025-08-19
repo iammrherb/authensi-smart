@@ -284,18 +284,25 @@ Our enterprise network access control implementation demonstrates industry-leadi
 
       if (saveError) throw saveError;
 
-      // Track generation history
-      await supabase
-        .from('report_generation_history')
-        .insert([{
-          report_id: savedReport.id,
-          template_id: template.id,
-          user_id: (await supabase.auth.getUser()).data.user?.id,
-          ai_model_used: data?.model || 'fallback',
-          processing_time_ms: 3000,
-          success: true,
-          tokens_used: data?.usage?.total_tokens || 0
-        }]);
+      // Track generation history (optional, ignore errors)
+      try {
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData.user?.id) {
+          await supabase
+            .from('report_generation_history')
+            .insert([{
+              report_id: savedReport.id,
+              template_id: template.id,
+              user_id: userData.user.id,
+              ai_model_used: data?.model || 'fallback',
+              processing_time_ms: 3000,
+              success: true,
+              tokens_used: data?.usage?.total_tokens || 0
+            }]);
+        }
+      } catch (historyError) {
+        console.log('History tracking error (non-critical):', historyError);
+      }
 
       await loadReports();
       
