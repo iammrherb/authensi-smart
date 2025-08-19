@@ -23,6 +23,7 @@ import UnifiedCreationWizard from '@/components/unified/UnifiedCreationWizard';
 import ConfigGeneratorManager from '@/components/config/ConfigGeneratorManager';
 import EnhancedConfigTemplateManager from '@/components/config/EnhancedConfigTemplateManager';
 import UnifiedIntelligentConfigWizard from '@/components/config/UnifiedIntelligentConfigWizard';
+import AdvancedConfigAnalyzer from '@/components/config/AdvancedConfigAnalyzer';
 
 interface ActionItem {
   id: string;
@@ -242,6 +243,18 @@ const EnterpriseCommandCenter = () => {
       badge: 'AI Enhanced',
       stats: 'Smart Seeding',
       color: 'from-slate-500 to-gray-600'
+    },
+    {
+      id: 'advanced-analyzer',
+      title: 'Advanced Config Analyzer',
+      description: 'AI-powered configuration analysis for security, performance, and compliance',
+      icon: Shield,
+      category: 'insights',
+      priority: 'high',
+      action: () => setActiveView('advanced-analyzer'),
+      badge: 'AI Analysis',
+      stats: 'Deep Scan',
+      color: 'from-emerald-500 to-cyan-600'
     }
   ];
 
@@ -410,6 +423,20 @@ const EnterpriseCommandCenter = () => {
           <h1 className="text-2xl font-bold">Smart Configuration Wizard</h1>
         </div>
         <UnifiedIntelligentConfigWizard onCancel={() => setActiveView(null)} />
+      </div>
+    );
+  }
+
+  if (activeView === 'advanced-analyzer') {
+    return (
+      <div className="p-6">
+        <div className="flex items-center gap-4 mb-6">
+          <Button variant="outline" onClick={() => setActiveView(null)}>
+            ← Back to Command Center
+          </Button>
+          <h1 className="text-2xl font-bold">Advanced Configuration Analyzer</h1>
+        </div>
+        <AdvancedConfigAnalyzer />
       </div>
     );
   }
