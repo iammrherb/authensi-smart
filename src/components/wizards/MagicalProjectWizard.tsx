@@ -76,15 +76,13 @@ const MagicalProjectWizard: React.FC<MagicalProjectWizardProps> = ({ onComplete,
   };
 
   const magicSparkleVariants = {
-    animate: {
-      scale: [1, 1.2, 1],
-      rotate: [0, 180, 360],
-      opacity: [0.7, 1, 0.7],
-      transition: {
-        duration: 2,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
+    scale: [1, 1.2, 1],
+    rotate: [0, 180, 360],
+    opacity: [0.7, 1, 0.7],
+    transition: {
+      duration: 2,
+      repeat: Infinity,
+      ease: [0.4, 0, 0.6, 1]
     }
   };
 
@@ -140,7 +138,7 @@ const MagicalProjectWizard: React.FC<MagicalProjectWizardProps> = ({ onComplete,
       component: (
         <motion.div variants={itemVariants} className="text-center space-y-8">
           <motion.div
-            animate={magicSparkleVariants.animate}
+            animate={magicSparkleVariants}
             className="w-32 h-32 mx-auto bg-gradient-primary rounded-full flex items-center justify-center shadow-glow relative"
           >
             <Wand2 className="w-16 h-16 text-primary-foreground" />
