@@ -120,6 +120,56 @@ const ComprehensiveReports = () => {
     }
   ];
 
+  const generateFallbackReport = (type: string, projects: any[], analytics: any): string => {
+    const timestamp = new Date().toLocaleDateString();
+    
+    return `# ${reportTypes.find(t => t.id === type)?.name || 'NAC Deployment Report'}
+
+Generated on: ${timestamp}
+
+## Executive Summary
+
+This comprehensive report provides an overview of your Network Access Control (NAC) deployment status across ${projects.length} project(s) and ${analytics.totalSites} site(s).
+
+### Key Metrics
+- **Total Projects**: ${analytics.totalProjects}
+- **Active Sites**: ${analytics.totalSites}
+- **Implementation Progress**: ${analytics.avgProgress.toFixed(1)}%
+- **Available Use Cases**: ${useCases.length}
+
+## Project Status Overview
+
+${projects.map(p => `### ${p.name}
+- **Client**: ${p.client_name || 'Not specified'}
+- **Industry**: ${p.industry || 'Not specified'}
+- **Status**: ${p.status}
+- **Progress**: ${p.progress_percentage || 0}%`).join('\n\n')}
+
+## Risk Assessment
+
+**Low Risk Projects**: ${projects.filter(p => (p.progress_percentage || 0) > 75).length}
+**Medium Risk Projects**: ${projects.filter(p => (p.progress_percentage || 0) > 25 && (p.progress_percentage || 0) <= 75).length}
+**High Risk Projects**: ${projects.filter(p => (p.progress_percentage || 0) <= 25).length}
+
+## Recommendations
+
+1. **Accelerate Deployment**: Focus on projects with completion rates below 50%
+2. **Resource Allocation**: Consider additional resources for high-risk projects
+3. **Best Practices**: Implement standardized deployment procedures
+4. **Monitoring**: Establish regular progress reviews and milestone checkpoints
+
+## Next Steps
+
+1. Review individual project timelines
+2. Identify and mitigate bottlenecks
+3. Ensure proper resource allocation
+4. Schedule regular progress reviews
+5. Prepare for production deployment phases
+
+---
+*This report was generated automatically. For detailed analysis, please ensure AI services are properly configured.*`;
+  };
+
   const buildPortnoxDocText = (doc: PortnoxDocumentationResult): string => {
     let out = 'Portnox Onboarding & Deployment Guide\n\n';
     if (doc.deploymentGuide?.length) {
@@ -216,10 +266,12 @@ const ComprehensiveReports = () => {
         prompt,
         context: `${type}_report`,
         provider: 'openai',
+        model: 'gpt-4o-mini',
         temperature: 0.3,
         maxTokens: 4000
       });
 
+      // Fallback to mock data if AI response is empty
       if (response?.content) {
         setReportData({
           type,
@@ -231,6 +283,21 @@ const ComprehensiveReports = () => {
         toast({
           title: 'Report Generated',
           description: 'AI-powered report has been generated successfully',
+        });
+      } else {
+        // Generate fallback report if AI fails
+        const fallbackContent = generateFallbackReport(type, projectsData, analytics);
+        setReportData({
+          type,
+          content: fallbackContent,
+          generatedAt: new Date().toISOString(),
+          analytics
+        });
+        setActiveTab('generated');
+        toast({
+          title: 'Report Generated',
+          description: 'Report generated with fallback content (AI service unavailable)',
+          variant: 'default'
         });
       }
     } catch (error) {
