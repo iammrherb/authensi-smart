@@ -150,7 +150,22 @@ const UltimateReportingCenter = () => {
         
         Make it extremely detailed, professional, and executive-ready with specific recommendations.`;
 
-      const aiResponse = await generateCompletion(aiPrompt);
+      // Generate AI-enhanced content using edge function
+      const response = await fetch('/functions/v1/enterprise-ai-report-generator', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: aiPrompt,
+          model: 'gpt-4o-mini',
+          maxTokens: 4000,
+          temperature: 0.7
+        })
+      });
+
+      const result = await response.json();
+      const aiResponse = result.content || 'AI content generation temporarily unavailable';
 
       // Enhanced content with additional sections
       const enhancedContent = `
@@ -160,7 +175,7 @@ const UltimateReportingCenter = () => {
 
 ## 🎯 Executive Summary
 
-${aiResponse || 'AI-generated executive summary focusing on strategic initiatives, key performance indicators, and critical business impacts.'}
+${aiResponse || 'Comprehensive analysis of strategic initiatives, focusing on key performance indicators, critical business impacts, and transformational technology implementations that drive organizational success.'}
 
 ## 📊 Key Performance Indicators
 
