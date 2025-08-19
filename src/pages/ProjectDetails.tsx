@@ -3,6 +3,8 @@ import EnhancedProjectTracker from '@/components/projects/EnhancedProjectTracker
 import ProjectEditDialog from '@/components/projects/ProjectEditDialog';
 import PhaseManagementPanel from '@/components/projects/PhaseManagementPanel';
 import CustomerPortalAccess from '@/components/projects/CustomerPortalAccess';
+import ProjectTemplateManager from '@/components/projects/ProjectTemplateManager';
+import ProjectKnowledgeManager from '@/components/projects/ProjectKnowledgeManager';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -212,6 +214,8 @@ const ProjectDetails = () => {
               <TabsList>
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="phases">Phases & Milestones</TabsTrigger>
+                <TabsTrigger value="templates">Templates</TabsTrigger>
+                <TabsTrigger value="knowledge">Knowledge Base</TabsTrigger>
                 <TabsTrigger value="sites">Sites</TabsTrigger>
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
@@ -233,6 +237,17 @@ const ProjectDetails = () => {
                   onUpdatePhase={(phase) => console.log('Update phase:', phase)}
                   onUpdateMilestone={(milestone) => console.log('Update milestone:', milestone)}
                 />
+              </TabsContent>
+
+              <TabsContent value="templates">
+                <ProjectTemplateManager 
+                  projectId={project.id}
+                  onTemplateAssigned={(templateId) => console.log('Template assigned:', templateId)}
+                />
+              </TabsContent>
+
+              <TabsContent value="knowledge">
+                <ProjectKnowledgeManager projectId={project.id} />
               </TabsContent>
 
               <TabsContent value="sites">

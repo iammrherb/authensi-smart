@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Edit, Settings, Users, FileText, BarChart3, Building } from 'lucide-react';
 import EnhancedProjectTracker from '@/components/projects/EnhancedProjectTracker';
 import PhaseManagementPanel from '@/components/projects/PhaseManagementPanel';
+import SiteTemplateManager from '@/components/sites/SiteTemplateManager';
+import SiteKnowledgeManager from '@/components/sites/SiteKnowledgeManager';
 import { useSites } from '@/hooks/useSites';
 
 const SiteDetails = () => {
@@ -206,6 +208,8 @@ const SiteDetails = () => {
               <TabsList>
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="phases">Phases & Milestones</TabsTrigger>
+                <TabsTrigger value="templates">Templates</TabsTrigger>
+                <TabsTrigger value="knowledge">Knowledge & Files</TabsTrigger>
                 <TabsTrigger value="implementation">Implementation</TabsTrigger>
                 <TabsTrigger value="settings">Site Settings</TabsTrigger>
               </TabsList>
@@ -226,6 +230,21 @@ const SiteDetails = () => {
                   milestones={siteMilestones}
                   onUpdatePhase={(phase) => console.log('Update phase:', phase)}
                   onUpdateMilestone={(milestone) => console.log('Update milestone:', milestone)}
+                />
+              </TabsContent>
+
+              <TabsContent value="templates">
+                <SiteTemplateManager 
+                  siteId={site.id}
+                  projectId={site.project_id}
+                  onTemplateAssigned={(templateId) => console.log('Template assigned to site:', templateId)}
+                />
+              </TabsContent>
+
+              <TabsContent value="knowledge">
+                <SiteKnowledgeManager 
+                  siteId={site.id} 
+                  projectId={site.project_id}
                 />
               </TabsContent>
 
