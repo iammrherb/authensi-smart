@@ -16,10 +16,11 @@ import {
   ChevronRight, Plus, Lock, Unlock, ExternalLink, ArrowRight
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import CustomerPortalBranding from '@/components/customer/CustomerPortalBranding';
-import AdvancedProgressTracker from '@/components/tracking/AdvancedProgressTracker';
-import MSTeamsIntegration from '@/components/meetings/MSTeamsIntegration';
-import ComprehensiveRiskAssessment from '@/components/risk/ComprehensiveRiskAssessment';
+// Placeholder components until we implement these features
+const CustomerPortalBranding = ({ organizationName, projectName, portalId }: any) => <div>Branding Component</div>;
+const AdvancedProgressTracker = ({ progress, milestones, projectId, sites }: any) => <div>Progress Tracker</div>;
+const MSTeamsIntegration = ({ projectId, teamMembers }: any) => <div>Teams Integration</div>;
+const ComprehensiveRiskAssessment = ({ projectId }: any) => <div>Risk Assessment</div>;
 import AdvancedReportGenerator from '@/components/reports/AdvancedReportGenerator';
 import EnhancedAnalyticsDashboard from '@/components/analytics/EnhancedAnalyticsDashboard';
 import IntelligentDocumentManager from '@/components/documents/IntelligentDocumentManager';
