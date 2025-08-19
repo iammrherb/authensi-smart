@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import AIProviderSetup from "@/components/ai/AIProviderSetup";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AIInsightsDashboard } from "@/components/ai/AIInsightsDashboard";
 import { Separator } from "@/components/ui/separator";
 
 interface SuperEnhancedAIConfig {
@@ -599,10 +600,14 @@ export const SuperEnhancedAIConfig: React.FC = () => {
           </CardHeader>
           <CardContent className="p-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-8 h-12">
+              <TabsList className="grid w-full grid-cols-9 h-12">
                 <TabsTrigger value="overview" className="flex items-center space-x-2">
                   <Monitor className="h-4 w-4" />
                   <span>Overview</span>
+                </TabsTrigger>
+                <TabsTrigger value="insights" className="flex items-center space-x-2">
+                  <Brain className="h-4 w-4" />
+                  <span>AI Insights</span>
                 </TabsTrigger>
                 <TabsTrigger value="providers" className="flex items-center space-x-2">
                   <Bot className="h-4 w-4" />
@@ -748,6 +753,11 @@ export const SuperEnhancedAIConfig: React.FC = () => {
                     Changes will affect all AI operations across the platform.
                   </AlertDescription>
                 </Alert>
+              </TabsContent>
+
+              {/* AI Insights Tab */}
+              <TabsContent value="insights" className="space-y-6">
+                <AIInsightsDashboard />
               </TabsContent>
 
               {/* API Provider Setup Tab */}
