@@ -1493,6 +1493,83 @@ export type Database = {
         }
         Relationships: []
       }
+      generated_reports: {
+        Row: {
+          access_level: string | null
+          analytics_data: Json | null
+          content: string
+          content_html: string | null
+          created_by: string | null
+          download_count: number | null
+          expiry_date: string | null
+          export_formats: Json | null
+          file_size_bytes: number | null
+          generated_at: string | null
+          id: string
+          is_favorite: boolean | null
+          metadata: Json | null
+          project_ids: Json | null
+          report_type: string
+          site_ids: Json | null
+          tags: Json | null
+          template_id: string | null
+          title: string
+          view_count: number | null
+        }
+        Insert: {
+          access_level?: string | null
+          analytics_data?: Json | null
+          content: string
+          content_html?: string | null
+          created_by?: string | null
+          download_count?: number | null
+          expiry_date?: string | null
+          export_formats?: Json | null
+          file_size_bytes?: number | null
+          generated_at?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          metadata?: Json | null
+          project_ids?: Json | null
+          report_type: string
+          site_ids?: Json | null
+          tags?: Json | null
+          template_id?: string | null
+          title: string
+          view_count?: number | null
+        }
+        Update: {
+          access_level?: string | null
+          analytics_data?: Json | null
+          content?: string
+          content_html?: string | null
+          created_by?: string | null
+          download_count?: number | null
+          expiry_date?: string | null
+          export_formats?: Json | null
+          file_size_bytes?: number | null
+          generated_at?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          metadata?: Json | null
+          project_ids?: Json | null
+          report_type?: string
+          site_ids?: Json | null
+          tags?: Json | null
+          template_id?: string | null
+          title?: string
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_reports_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "report_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       implementation_checklists: {
         Row: {
           assigned_to: string | null
@@ -3282,6 +3359,135 @@ export type Database = {
           related_pain_points?: Json | null
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      report_generation_history: {
+        Row: {
+          ai_model_used: string | null
+          cost_cents: number | null
+          created_at: string | null
+          error_message: string | null
+          generation_trigger: string | null
+          id: string
+          input_parameters: Json | null
+          processing_time_ms: number | null
+          report_id: string | null
+          success: boolean | null
+          template_id: string | null
+          tokens_used: number | null
+          user_id: string | null
+        }
+        Insert: {
+          ai_model_used?: string | null
+          cost_cents?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          generation_trigger?: string | null
+          id?: string
+          input_parameters?: Json | null
+          processing_time_ms?: number | null
+          report_id?: string | null
+          success?: boolean | null
+          template_id?: string | null
+          tokens_used?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          ai_model_used?: string | null
+          cost_cents?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          generation_trigger?: string | null
+          id?: string
+          input_parameters?: Json | null
+          processing_time_ms?: number | null
+          report_id?: string | null
+          success?: boolean | null
+          template_id?: string | null
+          tokens_used?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_generation_history_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "generated_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_generation_history_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "report_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      report_templates: {
+        Row: {
+          ai_prompt_template: string | null
+          category: string | null
+          complexity_level: string | null
+          content_template: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          estimated_time_minutes: number | null
+          formatting_rules: Json | null
+          id: string
+          is_active: boolean | null
+          is_public: boolean | null
+          name: string
+          rating: number | null
+          tags: Json | null
+          template_type: string
+          updated_at: string | null
+          usage_count: number | null
+          variables: Json | null
+        }
+        Insert: {
+          ai_prompt_template?: string | null
+          category?: string | null
+          complexity_level?: string | null
+          content_template: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          estimated_time_minutes?: number | null
+          formatting_rules?: Json | null
+          id?: string
+          is_active?: boolean | null
+          is_public?: boolean | null
+          name: string
+          rating?: number | null
+          tags?: Json | null
+          template_type: string
+          updated_at?: string | null
+          usage_count?: number | null
+          variables?: Json | null
+        }
+        Update: {
+          ai_prompt_template?: string | null
+          category?: string | null
+          complexity_level?: string | null
+          content_template?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          estimated_time_minutes?: number | null
+          formatting_rules?: Json | null
+          id?: string
+          is_active?: boolean | null
+          is_public?: boolean | null
+          name?: string
+          rating?: number | null
+          tags?: Json | null
+          template_type?: string
+          updated_at?: string | null
+          usage_count?: number | null
+          variables?: Json | null
         }
         Relationships: []
       }
