@@ -16,6 +16,7 @@ import UnifiedCommandCenter from "./pages/UnifiedCommandCenter";
 // Page imports
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import AIContextManager from "./components/ai/AIContextManager";
 import Designer from "./pages/Designer";
 import UnifiedTrackingCenter from "./pages/UnifiedTrackingCenter";
 import UnifiedImplementationHub from "./pages/UnifiedImplementationHub";
@@ -91,6 +92,11 @@ const App = () => (
                   <Route path="/intelligence" element={
                     <ProtectedRoute>
                       <IntelligenceTrackerHub />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/ai-context" element={
+                    <ProtectedRoute>
+                      <AIContextManager />
                     </ProtectedRoute>
                   } />
                   <Route path="/scoping" element={

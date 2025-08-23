@@ -30,7 +30,7 @@ const AIContextManager: React.FC = () => {
   } = useAIContextEngine();
 
   const [preferencesForm, setPreferencesForm] = useState({
-    technicalExpertiseLevel: 'intermediate',
+    technicalExpertiseLevel: 'intermediate' as 'beginner' | 'intermediate' | 'advanced' | 'expert',
     contextRetentionDays: 90,
     autoContextBuilding: true,
     communicationStyle: {}

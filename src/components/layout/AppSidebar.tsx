@@ -78,6 +78,12 @@ const managementItems = [{
   icon: Users,
   tooltip: "Manage users, roles, and permissions"
 }, {
+  title: "AI Context Engine",
+  url: "/ai-context",
+  icon: Brain,
+  badge: "AI",
+  tooltip: "Intelligent conversation memory and contextual learning"
+}, {
   title: "Resource Library",
   url: "/resource-library",
   icon: FolderOpen,
@@ -237,7 +243,12 @@ export function AppSidebar() {
                     <SidebarMenuButton asChild>
                       <NavLink to={item.url} className={`${getNavCls(isActive(item.url))} group relative flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 hover-scale`}>
                         <item.icon className="h-4 w-4 flex-shrink-0" />
-                        {!collapsed && <span className="text-sm truncate">{item.title}</span>}
+                         {!collapsed && <div className="flex items-center space-x-2 min-w-0">
+                             <span className="text-sm truncate">{item.title}</span>
+                             {item.badge && <Badge variant="outline" className="text-xs bg-accent/20 text-accent-foreground">
+                                 {item.badge}
+                               </Badge>}
+                           </div>}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>;
