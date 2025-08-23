@@ -1709,6 +1709,87 @@ export type Database = {
         }
         Relationships: []
       }
+      enhanced_scoping_sessions: {
+        Row: {
+          ai_analysis: Json | null
+          completed_at: string | null
+          completion_percentage: number | null
+          compliance_mapping: Json | null
+          cost_estimates: Json | null
+          created_at: string
+          id: string
+          inventory_data: Json | null
+          phase_breakdown: Json | null
+          project_id: string | null
+          recommended_approach: Json | null
+          requirements_analysis: Json | null
+          resource_requirements: Json | null
+          risk_assessment: Json | null
+          scoping_data: Json
+          session_name: string
+          session_type: string
+          stakeholder_mapping: Json | null
+          status: string | null
+          success_criteria: Json | null
+          timeline_estimates: Json | null
+          updated_at: string
+          user_id: string
+          vendor_recommendations: Json | null
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          completed_at?: string | null
+          completion_percentage?: number | null
+          compliance_mapping?: Json | null
+          cost_estimates?: Json | null
+          created_at?: string
+          id?: string
+          inventory_data?: Json | null
+          phase_breakdown?: Json | null
+          project_id?: string | null
+          recommended_approach?: Json | null
+          requirements_analysis?: Json | null
+          resource_requirements?: Json | null
+          risk_assessment?: Json | null
+          scoping_data?: Json
+          session_name: string
+          session_type?: string
+          stakeholder_mapping?: Json | null
+          status?: string | null
+          success_criteria?: Json | null
+          timeline_estimates?: Json | null
+          updated_at?: string
+          user_id: string
+          vendor_recommendations?: Json | null
+        }
+        Update: {
+          ai_analysis?: Json | null
+          completed_at?: string | null
+          completion_percentage?: number | null
+          compliance_mapping?: Json | null
+          cost_estimates?: Json | null
+          created_at?: string
+          id?: string
+          inventory_data?: Json | null
+          phase_breakdown?: Json | null
+          project_id?: string | null
+          recommended_approach?: Json | null
+          requirements_analysis?: Json | null
+          resource_requirements?: Json | null
+          risk_assessment?: Json | null
+          scoping_data?: Json
+          session_name?: string
+          session_type?: string
+          stakeholder_mapping?: Json | null
+          status?: string | null
+          success_criteria?: Json | null
+          timeline_estimates?: Json | null
+          updated_at?: string
+          user_id?: string
+          vendor_recommendations?: Json | null
+        }
+        Relationships: []
+      }
       generated_reports: {
         Row: {
           access_level: string | null
@@ -1882,6 +1963,87 @@ export type Database = {
           name?: string
           tags?: Json
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      infrastructure_inventory: {
+        Row: {
+          ai_recommendations: Json | null
+          capacity_analysis: Json | null
+          compliance_status: Json | null
+          cost_analysis: Json | null
+          created_at: string
+          created_by: string | null
+          device_catalog: Json
+          id: string
+          integration_readiness: Json | null
+          inventory_type: string
+          lifecycle_analysis: Json | null
+          migration_requirements: Json | null
+          network_topology: Json | null
+          optimization_opportunities: Json | null
+          performance_metrics: Json | null
+          project_id: string | null
+          risk_factors: Json | null
+          scoping_session_id: string | null
+          security_assessment: Json | null
+          site_id: string | null
+          support_requirements: Json | null
+          updated_at: string
+          validation_status: string | null
+          vendor_analysis: Json | null
+        }
+        Insert: {
+          ai_recommendations?: Json | null
+          capacity_analysis?: Json | null
+          compliance_status?: Json | null
+          cost_analysis?: Json | null
+          created_at?: string
+          created_by?: string | null
+          device_catalog?: Json
+          id?: string
+          integration_readiness?: Json | null
+          inventory_type?: string
+          lifecycle_analysis?: Json | null
+          migration_requirements?: Json | null
+          network_topology?: Json | null
+          optimization_opportunities?: Json | null
+          performance_metrics?: Json | null
+          project_id?: string | null
+          risk_factors?: Json | null
+          scoping_session_id?: string | null
+          security_assessment?: Json | null
+          site_id?: string | null
+          support_requirements?: Json | null
+          updated_at?: string
+          validation_status?: string | null
+          vendor_analysis?: Json | null
+        }
+        Update: {
+          ai_recommendations?: Json | null
+          capacity_analysis?: Json | null
+          compliance_status?: Json | null
+          cost_analysis?: Json | null
+          created_at?: string
+          created_by?: string | null
+          device_catalog?: Json
+          id?: string
+          integration_readiness?: Json | null
+          inventory_type?: string
+          lifecycle_analysis?: Json | null
+          migration_requirements?: Json | null
+          network_topology?: Json | null
+          optimization_opportunities?: Json | null
+          performance_metrics?: Json | null
+          project_id?: string | null
+          risk_factors?: Json | null
+          scoping_session_id?: string | null
+          security_assessment?: Json | null
+          site_id?: string | null
+          support_requirements?: Json | null
+          updated_at?: string
+          validation_status?: string | null
+          vendor_analysis?: Json | null
         }
         Relationships: []
       }
@@ -4719,6 +4881,75 @@ export type Database = {
         }
         Relationships: []
       }
+      smart_template_usage: {
+        Row: {
+          compliance_validation: Json | null
+          configuration_complexity: string | null
+          created_at: string
+          customizations_applied: Json | null
+          deployment_results: Json | null
+          deployment_time_minutes: number | null
+          feedback_notes: string | null
+          id: string
+          issues_encountered: Json | null
+          performance_metrics: Json | null
+          project_id: string | null
+          resolution_notes: string | null
+          site_id: string | null
+          success_indicators: Json | null
+          template_id: string
+          updated_at: string
+          usage_context: Json
+          user_id: string
+          user_rating: number | null
+          vendor_compatibility_score: number | null
+        }
+        Insert: {
+          compliance_validation?: Json | null
+          configuration_complexity?: string | null
+          created_at?: string
+          customizations_applied?: Json | null
+          deployment_results?: Json | null
+          deployment_time_minutes?: number | null
+          feedback_notes?: string | null
+          id?: string
+          issues_encountered?: Json | null
+          performance_metrics?: Json | null
+          project_id?: string | null
+          resolution_notes?: string | null
+          site_id?: string | null
+          success_indicators?: Json | null
+          template_id: string
+          updated_at?: string
+          usage_context?: Json
+          user_id: string
+          user_rating?: number | null
+          vendor_compatibility_score?: number | null
+        }
+        Update: {
+          compliance_validation?: Json | null
+          configuration_complexity?: string | null
+          created_at?: string
+          customizations_applied?: Json | null
+          deployment_results?: Json | null
+          deployment_time_minutes?: number | null
+          feedback_notes?: string | null
+          id?: string
+          issues_encountered?: Json | null
+          performance_metrics?: Json | null
+          project_id?: string | null
+          resolution_notes?: string | null
+          site_id?: string | null
+          success_indicators?: Json | null
+          template_id?: string
+          updated_at?: string
+          usage_context?: Json
+          user_id?: string
+          user_rating?: number | null
+          vendor_compatibility_score?: number | null
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           created_at: string | null
@@ -4829,6 +5060,120 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      template_performance_analytics: {
+        Row: {
+          complexity_analysis: Json | null
+          compliance_coverage: Json | null
+          created_at: string
+          deployment_time_avg: number | null
+          error_patterns: Json | null
+          id: string
+          last_analyzed: string | null
+          optimization_suggestions: Json | null
+          performance_metrics: Json
+          security_score: number | null
+          success_rate: number | null
+          template_id: string
+          updated_at: string
+          usage_statistics: Json
+          vendor_compatibility: Json | null
+        }
+        Insert: {
+          complexity_analysis?: Json | null
+          compliance_coverage?: Json | null
+          created_at?: string
+          deployment_time_avg?: number | null
+          error_patterns?: Json | null
+          id?: string
+          last_analyzed?: string | null
+          optimization_suggestions?: Json | null
+          performance_metrics?: Json
+          security_score?: number | null
+          success_rate?: number | null
+          template_id: string
+          updated_at?: string
+          usage_statistics?: Json
+          vendor_compatibility?: Json | null
+        }
+        Update: {
+          complexity_analysis?: Json | null
+          compliance_coverage?: Json | null
+          created_at?: string
+          deployment_time_avg?: number | null
+          error_patterns?: Json | null
+          id?: string
+          last_analyzed?: string | null
+          optimization_suggestions?: Json | null
+          performance_metrics?: Json
+          security_score?: number | null
+          success_rate?: number | null
+          template_id?: string
+          updated_at?: string
+          usage_statistics?: Json
+          vendor_compatibility?: Json | null
+        }
+        Relationships: []
+      }
+      template_recommendations: {
+        Row: {
+          applied_filters: Json
+          confidence_score: number | null
+          context_data: Json
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          project_id: string | null
+          recommendation_metadata: Json | null
+          recommendation_reason: string | null
+          recommendation_scores: Json
+          recommendation_type: string
+          recommended_templates: Json
+          site_id: string | null
+          updated_at: string
+          user_feedback: Json | null
+          user_id: string
+        }
+        Insert: {
+          applied_filters?: Json
+          confidence_score?: number | null
+          context_data?: Json
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          project_id?: string | null
+          recommendation_metadata?: Json | null
+          recommendation_reason?: string | null
+          recommendation_scores?: Json
+          recommendation_type?: string
+          recommended_templates?: Json
+          site_id?: string | null
+          updated_at?: string
+          user_feedback?: Json | null
+          user_id: string
+        }
+        Update: {
+          applied_filters?: Json
+          confidence_score?: number | null
+          context_data?: Json
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          project_id?: string | null
+          recommendation_metadata?: Json | null
+          recommendation_reason?: string | null
+          recommendation_scores?: Json
+          recommendation_type?: string
+          recommended_templates?: Json
+          site_id?: string | null
+          updated_at?: string
+          user_feedback?: Json | null
+          user_id?: string
+        }
+        Relationships: []
       }
       template_usage_analytics: {
         Row: {

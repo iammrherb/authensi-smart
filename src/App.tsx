@@ -17,6 +17,7 @@ import UnifiedCommandCenter from "./pages/UnifiedCommandCenter";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AIContextManager from "./components/ai/AIContextManager";
+import SmartTemplateCenter from "./pages/SmartTemplateCenter";
 import Designer from "./pages/Designer";
 import UnifiedTrackingCenter from "./pages/UnifiedTrackingCenter";
 import UnifiedImplementationHub from "./pages/UnifiedImplementationHub";
@@ -97,6 +98,16 @@ const App = () => (
                   <Route path="/ai-context" element={
                     <ProtectedRoute requiredRoles={['super_admin']}>
                       <AIContextManager />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/smart-templates" element={
+                    <ProtectedRoute>
+                      <SmartTemplateCenter />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/smart-templates" element={
+                    <ProtectedRoute>
+                      <SmartTemplateCenter />
                     </ProtectedRoute>
                   } />
                   <Route path="/scoping" element={
