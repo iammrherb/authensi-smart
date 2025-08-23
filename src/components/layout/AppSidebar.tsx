@@ -4,6 +4,7 @@ import { Brain, Target, Rocket, BarChart3, Settings, BookOpen, Building2, Users,
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAuth } from '@/contexts/AuthContext';
 import portnoxLogo from '@/assets/portnox-logo.png';
 const primaryNavItems = [{
   title: "Command Center",
@@ -108,6 +109,7 @@ export function AppSidebar() {
   const {
     state
   } = useSidebar();
+  const { isAdmin } = useAuth();
   const collapsed = state === 'collapsed';
   const location = useLocation();
   const currentPath = location.pathname;
@@ -238,7 +240,13 @@ export function AppSidebar() {
           {!collapsed && <SidebarGroupLabel className="text-primary font-semibold">Enterprise Management</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
-              {managementItems.map(item => {
+              {managementItems.filter(item => {
+                // Only show AI Context Engine for super admins
+                if (item.title === "AI Context Engine") {
+                  return isAdmin;
+                }
+                return true;
+              }).map(item => {
                 const menuItem = <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
                       <NavLink to={item.url} className={`${getNavCls(isActive(item.url))} group relative flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 hover-scale`}>

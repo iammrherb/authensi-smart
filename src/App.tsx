@@ -95,7 +95,7 @@ const App = () => (
                     </ProtectedRoute>
                   } />
                   <Route path="/ai-context" element={
-                    <ProtectedRoute>
+                    <ProtectedRoute requiredRoles={['super_admin']}>
                       <AIContextManager />
                     </ProtectedRoute>
                   } />
