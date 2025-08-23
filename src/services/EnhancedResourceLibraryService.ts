@@ -41,6 +41,32 @@ export interface MultiTenantResourceSharing {
   sharedWith: string[];
 }
 
+export interface EnhancedResourceSession {
+  id: string;
+  user_id: string;
+  session_type: 'scoping' | 'configuration' | 'planning' | 'tracking';
+  session_data: any;
+  resource_selections: any;
+  is_active: boolean;
+  sharing_enabled: boolean;
+  last_activity: string;
+  expires_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ResourceSharingSetting {
+  id: string;
+  resource_id: string;
+  resource_type: string;
+  sharing_level: 'global' | 'organization' | 'project' | 'private';
+  permissions: any;
+  created_by: string;
+  shared_with: string[];
+  created_at: string;
+  updated_at: string;
+}
+
 export class EnhancedResourceLibraryService {
   
   // Core Resource Consolidation
@@ -165,47 +191,59 @@ export class EnhancedResourceLibraryService {
           const portnoxDocs = await PortnoxDocumentationService.scrapePortnoxDocumentation([vendor.vendor_name]);
           
           // Enrich with AI if enabled
-          let aiEnrichment = {};
+          let aiEnrichment: any = {};
           if (useAI) {
-            aiEnrichment = await PortnoxDocumentationService.enrichVendorWithDocumentation(vendor);
+            try {
+              aiEnrichment = await PortnoxDocumentationService.enrichVendorWithDocumentation(vendor);
+            } catch (error) {
+              console.warn(`AI enrichment failed for ${vendor.vendor_name}:`, error);
+            }
           }
 
           // Use Firecrawl for external documentation if enabled
           let externalDocs: string[] = [];
           if (useFirecrawl && vendor.website_url) {
-            const crawlResult = await supabase.functions.invoke('documentation-crawler', {
-              body: {
-                urls: [vendor.website_url],
-                maxPages: 5,
-                includePatterns: ['/docs/', '/documentation/', '/support/', '/integration/']
+            try {
+              const crawlResult = await supabase.functions.invoke('documentation-crawler', {
+                body: {
+                  urls: [vendor.website_url],
+                  maxPages: 5,
+                  includePatterns: ['/docs/', '/documentation/', '/support/', '/integration/']
+                }
+              });
+              
+              if (crawlResult.data?.success && Array.isArray(crawlResult.data.aggregated)) {
+                externalDocs = crawlResult.data.aggregated
+                  .filter((result: any) => result.success)
+                  .flatMap((result: any) => result.data?.data || [])
+                  .map((doc: any) => doc.metadata?.sourceURL || doc.url)
+                  .filter(Boolean);
               }
-            });
-            
-            if (crawlResult.data?.success) {
-              externalDocs = crawlResult.data.aggregated
-                .filter((result: any) => result.success)
-                .flatMap((result: any) => result.data?.data || [])
-                .map((doc: any) => doc.metadata?.sourceURL || doc.url)
-                .filter(Boolean);
+            } catch (error) {
+              console.warn(`Firecrawl failed for ${vendor.vendor_name}:`, error);
             }
           }
+
+          // Safely handle documentation links
+          const existingDocLinks = Array.isArray(vendor.documentation_links) ? vendor.documentation_links : [];
+          const portnoxDocLinks = portnoxDocs[vendor.vendor_name] || [];
 
           // Update vendor with enriched data
           const enrichedData = {
             documentation_links: [
-              ...(vendor.documentation_links || []),
-              ...(portnoxDocs[vendor.vendor_name] || []),
+              ...existingDocLinks,
+              ...portnoxDocLinks,
               ...externalDocs
             ],
             portnox_documentation: {
-              ...(vendor.portnox_documentation || {}),
-              links: portnoxDocs[vendor.vendor_name] || [],
+              ...(typeof vendor.portnox_documentation === 'object' ? vendor.portnox_documentation : {}),
+              links: portnoxDocLinks,
               lastUpdated: new Date().toISOString()
             },
-            ...(useAI && aiEnrichment ? {
-              ai_enhanced_docs: aiEnrichment.ai_enhanced_docs || [],
-              portnox_integration_guide: aiEnrichment.portnox_integration_guide || [],
-              configuration_examples: aiEnrichment.configuration_examples || []
+            ...(useAI && aiEnrichment && typeof aiEnrichment === 'object' ? {
+              ai_enhanced_docs: Array.isArray(aiEnrichment.ai_enhanced_docs) ? aiEnrichment.ai_enhanced_docs : [],
+              portnox_integration_guide: Array.isArray(aiEnrichment.portnox_integration_guide) ? aiEnrichment.portnox_integration_guide : [],
+              configuration_examples: Array.isArray(aiEnrichment.configuration_examples) ? aiEnrichment.configuration_examples : []
             } : {}),
             enrichment_metadata: {
               lastEnriched: new Date().toISOString(),

@@ -1493,6 +1493,48 @@ export type Database = {
         }
         Relationships: []
       }
+      enhanced_resource_sessions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          is_active: boolean
+          last_activity: string
+          resource_selections: Json
+          session_data: Json
+          session_type: string
+          sharing_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          is_active?: boolean
+          last_activity?: string
+          resource_selections?: Json
+          session_data?: Json
+          session_type: string
+          sharing_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean
+          last_activity?: string
+          resource_selections?: Json
+          session_data?: Json
+          session_type?: string
+          sharing_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       generated_reports: {
         Row: {
           access_level: string | null
@@ -3724,6 +3766,90 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      resource_enrichment_log: {
+        Row: {
+          ai_generated_content: Json
+          created_at: string
+          created_by: string | null
+          enrichment_data: Json
+          enrichment_status: string
+          enrichment_type: string
+          error_message: string | null
+          external_links: Json
+          id: string
+          portnox_links: Json
+          processing_time_ms: number | null
+          resource_id: string
+          resource_type: string
+        }
+        Insert: {
+          ai_generated_content?: Json
+          created_at?: string
+          created_by?: string | null
+          enrichment_data?: Json
+          enrichment_status?: string
+          enrichment_type: string
+          error_message?: string | null
+          external_links?: Json
+          id?: string
+          portnox_links?: Json
+          processing_time_ms?: number | null
+          resource_id: string
+          resource_type: string
+        }
+        Update: {
+          ai_generated_content?: Json
+          created_at?: string
+          created_by?: string | null
+          enrichment_data?: Json
+          enrichment_status?: string
+          enrichment_type?: string
+          error_message?: string | null
+          external_links?: Json
+          id?: string
+          portnox_links?: Json
+          processing_time_ms?: number | null
+          resource_id?: string
+          resource_type?: string
+        }
+        Relationships: []
+      }
+      resource_sharing_settings: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          permissions: Json
+          resource_id: string
+          resource_type: string
+          shared_with: Json
+          sharing_level: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          permissions?: Json
+          resource_id: string
+          resource_type: string
+          shared_with?: Json
+          sharing_level?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          permissions?: Json
+          resource_id?: string
+          resource_type?: string
+          shared_with?: Json
+          sharing_level?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       resource_tags: {
         Row: {
