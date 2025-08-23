@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Brain, Target, Rocket, BarChart3, Settings, BookOpen, Building2, Users, Network, FolderOpen, Bot, Sparkles, Command, PieChart, TestTube, ChevronRight, Home, Database } from 'lucide-react';
+import { Brain, Target, Rocket, BarChart3, Settings, BookOpen, Building2, Users, Network, FolderOpen, Bot, Sparkles, Command, PieChart, TestTube, ChevronRight, Home, Database, Zap } from 'lucide-react';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -84,6 +84,12 @@ const managementItems = [{
   icon: Brain,
   badge: "AI",
   tooltip: "Intelligent conversation memory and contextual learning"
+}, {
+  title: "Smart Template Center",
+  url: "/smart-templates",
+  icon: Zap,
+  badge: "AI",
+  tooltip: "AI-powered template recommendations and optimization"
 }, {
   title: "Resource Library",
   url: "/resource-library",
@@ -240,7 +246,7 @@ export function AppSidebar() {
           {!collapsed && <SidebarGroupLabel className="text-primary font-semibold">Enterprise Management</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
-              {managementItems.filter(item => {
+            {managementItems.filter(item => {
                 // Only show AI Context Engine for super admins
                 if (item.title === "AI Context Engine") {
                   return isAdmin;

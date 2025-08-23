@@ -177,7 +177,9 @@ class SmartTemplateRecommendationEngine {
   }
 
   private async identifyCandidate(context: RecommendationContext) {
-    let candidates = [...unifiedTemplates];
+    // Handle both array format and object format from unifiedTemplates
+    const templates = Array.isArray(unifiedTemplates) ? unifiedTemplates : unifiedTemplates.templates || [];
+    let candidates = [...templates];
 
     // Filter by existing vendors if specified
     if (context.existingVendors?.length) {
@@ -605,7 +607,7 @@ class SmartTemplateRecommendationEngine {
           project_id: context.projectId,
           site_id: context.siteId,
           recommendation_type: 'ai_powered',
-          context_data: context,
+          context_data: context as any,
           recommended_templates: result.recommendations.map(r => r.templateId),
           recommendation_scores: result.recommendations.reduce((acc, r) => {
             acc[r.templateId] = r.score;

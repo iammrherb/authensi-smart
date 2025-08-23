@@ -105,11 +105,6 @@ const App = () => (
                       <SmartTemplateCenter />
                     </ProtectedRoute>
                   } />
-                  <Route path="/smart-templates" element={
-                    <ProtectedRoute>
-                      <SmartTemplateCenter />
-                    </ProtectedRoute>
-                  } />
                   <Route path="/scoping" element={
                     <ProtectedRoute>
                       <IntelligentScoping />

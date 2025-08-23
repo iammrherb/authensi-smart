@@ -136,7 +136,9 @@ const SmartTemplateRecommendationEngine: React.FC<SmartTemplateRecommendationEng
   };
 
   const getTemplate = (templateId: string) => {
-    return unifiedTemplates.find(t => t.id === templateId);
+    // Handle both array format and object format from unifiedTemplates
+    const templates = Array.isArray(unifiedTemplates) ? unifiedTemplates : unifiedTemplates.templates || [];
+    return templates.find(t => t.id === templateId);
   };
 
   const filteredRecommendations = recommendations?.recommendations.filter(rec => {
@@ -340,7 +342,7 @@ const SmartTemplateRecommendationEngine: React.FC<SmartTemplateRecommendationEng
                   <SelectValue placeholder="Select timeline" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="urgent">Urgent (< 1 month)</SelectItem>
+                  <SelectItem value="urgent">Urgent (&lt; 1 month)</SelectItem>
                   <SelectItem value="fast">Fast (1-3 months)</SelectItem>
                   <SelectItem value="normal">Normal (3-6 months)</SelectItem>
                   <SelectItem value="extended">Extended (6+ months)</SelectItem>
