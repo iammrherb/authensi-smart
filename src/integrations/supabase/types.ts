@@ -84,6 +84,135 @@ export type Database = {
           },
         ]
       }
+      ai_context_patterns: {
+        Row: {
+          confidence_score: number | null
+          context_tags: Json | null
+          created_at: string
+          frequency_count: number | null
+          id: string
+          last_seen: string | null
+          pattern_data: Json
+          pattern_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          context_tags?: Json | null
+          created_at?: string
+          frequency_count?: number | null
+          id?: string
+          last_seen?: string | null
+          pattern_data?: Json
+          pattern_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          confidence_score?: number | null
+          context_tags?: Json | null
+          created_at?: string
+          frequency_count?: number | null
+          id?: string
+          last_seen?: string | null
+          pattern_data?: Json
+          pattern_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_context_sessions: {
+        Row: {
+          accumulated_context: Json | null
+          context_summary: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          is_active: boolean | null
+          project_context: Json | null
+          session_token: string
+          session_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accumulated_context?: Json | null
+          context_summary?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          is_active?: boolean | null
+          project_context?: Json | null
+          session_token: string
+          session_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accumulated_context?: Json | null
+          context_summary?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean | null
+          project_context?: Json | null
+          session_token?: string
+          session_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_conversation_history: {
+        Row: {
+          ai_model_used: string | null
+          context_data: Json | null
+          conversation_type: string
+          created_at: string
+          id: string
+          message_content: string
+          message_metadata: Json | null
+          message_role: string
+          project_id: string | null
+          session_id: string
+          site_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_model_used?: string | null
+          context_data?: Json | null
+          conversation_type?: string
+          created_at?: string
+          id?: string
+          message_content: string
+          message_metadata?: Json | null
+          message_role: string
+          project_id?: string | null
+          session_id: string
+          site_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_model_used?: string | null
+          context_data?: Json | null
+          conversation_type?: string
+          created_at?: string
+          id?: string
+          message_content?: string
+          message_metadata?: Json | null
+          message_role?: string
+          project_id?: string | null
+          session_id?: string
+          site_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_optimization_history: {
         Row: {
           ai_model_used: string | null
@@ -261,6 +390,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ai_user_preferences: {
+        Row: {
+          auto_context_building: boolean | null
+          communication_style: Json | null
+          context_retention_days: number | null
+          created_at: string
+          domain_expertise: Json | null
+          id: string
+          learning_preferences: Json | null
+          preferred_methodologies: Json | null
+          preferred_vendors: Json | null
+          technical_expertise_level: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_context_building?: boolean | null
+          communication_style?: Json | null
+          context_retention_days?: number | null
+          created_at?: string
+          domain_expertise?: Json | null
+          id?: string
+          learning_preferences?: Json | null
+          preferred_methodologies?: Json | null
+          preferred_vendors?: Json | null
+          technical_expertise_level?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_context_building?: boolean | null
+          communication_style?: Json | null
+          context_retention_days?: number | null
+          created_at?: string
+          domain_expertise?: Json | null
+          id?: string
+          learning_preferences?: Json | null
+          preferred_methodologies?: Json | null
+          preferred_vendors?: Json | null
+          technical_expertise_level?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       authentication_methods: {
         Row: {
