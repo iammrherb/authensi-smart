@@ -339,7 +339,7 @@ export default function ScopingRequirementsCapture() {
         <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <categories[selectedCategory].icon className="h-5 w-5" />
+              {React.createElement(categories[selectedCategory].icon, { className: "h-5 w-5" })}
               {categories[selectedCategory].name}
             </CardTitle>
             <p className="text-muted-foreground">{categories[selectedCategory].description}</p>
