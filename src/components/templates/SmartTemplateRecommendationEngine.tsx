@@ -527,7 +527,7 @@ const SmartTemplateRecommendationEngine: React.FC<SmartTemplateRecommendationEng
                     <SelectValue placeholder="All vendors" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All vendors</SelectItem>
+                    <SelectItem value="all">All vendors</SelectItem>
                     <SelectItem value="cisco">Cisco</SelectItem>
                     <SelectItem value="fortinet">Fortinet</SelectItem>
                     <SelectItem value="aruba">Aruba</SelectItem>
@@ -541,7 +541,7 @@ const SmartTemplateRecommendationEngine: React.FC<SmartTemplateRecommendationEng
                     <SelectValue placeholder="All levels" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All levels</SelectItem>
+                    <SelectItem value="all">All levels</SelectItem>
                     <SelectItem value="basic">Basic</SelectItem>
                     <SelectItem value="intermediate">Intermediate</SelectItem>
                     <SelectItem value="advanced">Advanced</SelectItem>

@@ -224,7 +224,7 @@ const PortnoxKeyManager: React.FC<PortnoxKeyManagerProps> = ({ projectId }) => {
                   <SelectValue placeholder="Select project (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Global (No project)</SelectItem>
+                  <SelectItem value="global">Global (No project)</SelectItem>
                   {projects.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
                       {p.name}

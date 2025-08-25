@@ -69,7 +69,7 @@ const infrastructureTypes = [
   { id: 'cloud', name: 'Cloud Services', icon: Cloud, color: 'cyan' }
 ];
 
-const compatibilityLevels = [
+const infraCompatibilityLevels = [
   { id: 'full', name: 'Full Support', color: 'green', description: 'Fully compatible with NAC solution' },
   { id: 'partial', name: 'Partial Support', color: 'yellow', description: 'Limited compatibility, may require workarounds' },
   { id: 'none', name: 'Not Supported', color: 'red', description: 'Not compatible with NAC solution' },
@@ -183,6 +183,8 @@ export default function InfrastructureInventoryManager() {
           notes: 'Legacy device without 802.1X support',
           requirements: ['MAC address bypass', 'Static VLAN assignment']
         },
+        specifications: {},
+        documentation: {},
         risks: {
           security: ['No authentication capability', 'Potential security gap'],
           compatibility: ['Cannot participate in dynamic NAC']
@@ -290,7 +292,7 @@ export default function InfrastructureInventoryManager() {
   };
 
   const getCompatibilityBadge = (compatibility: string) => {
-    const level = compatibilityLevels.find(l => l.id === compatibility);
+    const level = infraCompatibilityLevels.find(l => l.id === compatibility);
     if (!level) return null;
 
     return (
@@ -521,10 +523,11 @@ function AddItemForm({
   };
 
   const updateNestedField = (parent: string, field: string, value: any) => {
+    const currentParent = item[parent as keyof typeof item] as any;
     onChange({
       ...item,
       [parent]: {
-        ...item[parent as keyof typeof item],
+        ...(currentParent || {}),
         [field]: value
       }
     });
@@ -629,7 +632,7 @@ function AddItemForm({
               <SelectValue placeholder="Select compatibility" />
             </SelectTrigger>
             <SelectContent>
-              {compatibilityLevels.map(level => (
+              {infraCompatibilityLevels.map(level => (
                 <SelectItem key={level.id} value={level.id}>{level.name}</SelectItem>
               ))}
             </SelectContent>
@@ -917,7 +920,7 @@ function getStatusIcon(status: string) {
 
 // Helper function to get compatibility badge
 function getCompatibilityBadge(compatibility: string) {
-  const level = compatibilityLevels.find(l => l.id === compatibility);
+  const level = infraCompatibilityLevels.find(l => l.id === compatibility);
   if (!level) return null;
 
   return (
@@ -930,10 +933,3 @@ function getCompatibilityBadge(compatibility: string) {
     </Badge>
   );
 }
-
-const compatibilityLevels = [
-  { id: 'full', name: 'Full Support', color: 'green', description: 'Fully compatible with NAC solution' },
-  { id: 'partial', name: 'Partial Support', color: 'yellow', description: 'Limited compatibility, may require workarounds' },
-  { id: 'none', name: 'Not Supported', color: 'red', description: 'Not compatible with NAC solution' },
-  { id: 'unknown', name: 'Unknown', color: 'gray', description: 'Compatibility needs to be assessed' }
-];

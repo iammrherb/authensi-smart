@@ -145,7 +145,7 @@ const SiteTemplateManager: React.FC<SiteTemplateManagerProps> = ({
               <SelectValue placeholder="All Vendors" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Vendors</SelectItem>
+              <SelectItem value="all">All Vendors</SelectItem>
               {vendors.map((vendor) => (
                 <SelectItem key={vendor.id} value={vendor.id}>
                   {vendor.vendor_name}
@@ -158,7 +158,7 @@ const SiteTemplateManager: React.FC<SiteTemplateManagerProps> = ({
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {categories.map((category) => (
                 <SelectItem key={category} value={category}>
                   {category}
