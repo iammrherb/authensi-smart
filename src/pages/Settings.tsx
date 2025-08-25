@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHasRole } from "@/hooks/useUserRoles";
 import ComprehensiveUserManagement from "@/components/admin/ComprehensiveUserManagement";
+import { DatabaseExporter } from "@/components/admin/DatabaseExporter";
 import AISettings from "@/components/ai/AISettings";
 import { Settings as SettingsIcon, User, Bell, Shield, Database, Globe, Users, Brain } from "lucide-react";
 const Settings = () => {
@@ -357,6 +358,9 @@ const Settings = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Data Management</CardTitle>
+                  <CardDescription>
+                    Backup settings and basic data management options
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -375,17 +379,10 @@ const Settings = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  
-                  <div className="pt-4 space-y-2">
-                    <Button variant="outline" className="w-full">
-                      Export All Data
-                    </Button>
-                    <Button variant="outline" className="w-full">
-                      Import Data
-                    </Button>
-                  </div>
                 </CardContent>
               </Card>
+
+              <DatabaseExporter />
             </TabsContent>
 
         <TabsContent value="ai" className="space-y-6">
