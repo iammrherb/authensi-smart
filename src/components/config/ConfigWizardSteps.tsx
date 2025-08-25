@@ -24,6 +24,8 @@ import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
 import { useVendorModels } from '@/hooks/useVendorModels';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
+import { motion, AnimatePresence } from 'framer-motion';
+import InfrastructureSelector from "@/components/resources/InfrastructureSelector";
 
 interface ConfigWizardStepsProps {
   currentStep: number;

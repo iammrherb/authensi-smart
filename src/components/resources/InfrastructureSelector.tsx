@@ -1,25 +1,21 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
-import { useVendorModels } from '@/hooks/useVendorModels';
-import { useDeviceTypes } from '@/hooks/useDeviceTypes';
-import { useQueryClient } from '@tanstack/react-query';
-import { RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Network, Shield, Server, Wifi, Plus, Trash2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useVendors } from '@/hooks/useVendors';
 
-export type InfrastructureSelection = {
+export interface InfrastructureSelection {
   nac_vendors: string[];
   network: {
     wired_vendors: string[];
-    wired_models: Record<string, string[]>; // vendor_id -> model_ids
+    wired_models: Record<string, string[]>;
     wireless_vendors: string[];
-    wireless_models: Record<string, string[]>; // vendor_id -> model_ids
+    wireless_models: Record<string, string[]>;
   };
   security: {
     firewalls: string[];
@@ -28,235 +24,111 @@ export type InfrastructureSelection = {
     edr: string[];
     siem: string[];
   };
-  device_inventory: Array<{ device_type_id: string; name: string; count: number }>;
-};
+  device_inventory: Array<{
+    type: string;
+    brand: string;
+    model: string;
+    quantity: number;
+    location: string;
+  }>;
+}
 
 interface InfrastructureSelectorProps {
   value: InfrastructureSelection;
-  onChange: (val: InfrastructureSelection) => void;
-  sections?: {
-    nac?: boolean;
-    network?: boolean;
-    security?: boolean;
-    devices?: boolean;
-  };
+  onChange: (selection: InfrastructureSelection) => void;
 }
 
-const matchCategory = (text?: string, kw?: string) =>
-  (text || '').toLowerCase().includes((kw || '').toLowerCase());
+const InfrastructureSelector: React.FC<InfrastructureSelectorProps> = ({ value, onChange }) => {
+  const [activeTab, setActiveTab] = useState<'nac' | 'network' | 'security' | 'inventory'>('nac');
+  const { data: vendors = [] } = useVendors();
 
-const InfrastructureSelector: React.FC<InfrastructureSelectorProps> = ({ value, onChange, sections }) => {
-  const { data: vendors = [] } = useEnhancedVendors();
-  const { data: allModels = [] } = useVendorModels();
-  const { data: deviceTypes = [] } = useDeviceTypes();
-  const queryClient = useQueryClient();
-
-  const effectiveSections = { nac: true, network: true, security: true, devices: true, ...(sections || {}) };
-
-  const toggleId = (arr: string[], id: string) => arr.includes(id) ? arr.filter(i => i !== id) : [...arr, id];
-
-  const refreshAll = () => {
-    queryClient.invalidateQueries({ queryKey: ['enhanced-vendors'] });
-    queryClient.invalidateQueries({ queryKey: ['vendor-models'] });
-    queryClient.invalidateQueries({ queryKey: ['device-types'] });
+  const updateSelection = (path: string, newValue: any) => {
+    const keys = path.split('.');
+    const updated = { ...value };
+    let current: any = updated;
+    
+    for (let i = 0; i < keys.length - 1; i++) {
+      current = current[keys[i]];
+    }
+    
+    current[keys[keys.length - 1]] = newValue;
+    onChange(updated);
   };
 
-  const vendorModelsMap = allModels.reduce<Record<string, { id: string; model_name: string }[]>>((acc, m: any) => {
-    if (!acc[m.vendor_id]) acc[m.vendor_id] = [];
-    acc[m.vendor_id].push({ id: m.id, model_name: m.model_name });
-    return acc;
-  }, {});
+  const tabs = [
+    { id: 'nac', label: 'NAC Vendors', icon: Shield },
+    { id: 'network', label: 'Network', icon: Network },
+    { id: 'security', label: 'Security', icon: Server },
+    { id: 'inventory', label: 'Inventory', icon: Wifi }
+  ];
 
-  const renderVendorGrid = (filter: (v: any) => boolean, selected: string[], setSelected: (ids: string[]) => void, withModels = false, modelsMapKey: 'wired_models' | 'wireless_models' | null = null) => (
-    <div className="space-y-3">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {vendors.filter(filter).map(v => (
-          <Card key={v.id} className={`cursor-pointer ${selected.includes(v.id) ? 'ring-2 ring-primary' : ''}`} onClick={() => setSelected(toggleId(selected, v.id))}>
-            <CardHeader className="py-3">
-              <CardTitle className="text-sm flex items-center justify-between">
-                <span>{v.vendor_name}</span>
-                <Badge variant="outline">{v.category || v.vendor_type}</Badge>
-              </CardTitle>
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'nac':
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Network Access Control Vendors</CardTitle>
             </CardHeader>
-            {withModels && selected.includes(v.id) && (
-              <CardContent className="pt-0">
-                <div className="text-xs text-muted-foreground mb-2">Models</div>
-                <ScrollArea className="h-28 pr-2">
-                  <div className="space-y-2">
-                    {(vendorModelsMap[v.id] || []).map(m => {
-                      const current = value.network[modelsMapKey as 'wired_models' | 'wireless_models'][v.id] || [];
-                      const checked = current.includes(m.id);
-                      return (
-                        <label key={m.id} className="flex items-center gap-2 text-sm">
-                          <Checkbox
-                            checked={checked}
-                            onCheckedChange={() => {
-                              const copy = { ...value };
-                              const existing = copy.network[modelsMapKey as 'wired_models' | 'wireless_models'][v.id] || [];
-                              copy.network[modelsMapKey as 'wired_models' | 'wireless_models'][v.id] = checked
-                                ? existing.filter(id => id !== m.id)
-                                : [...existing, m.id];
-                              onChange(copy);
-                            }}
-                          />
-                          <span>{m.model_name}</span>
-                        </label>
-                      );
-                    })}
-                    {(!vendorModelsMap[v.id] || vendorModelsMap[v.id].length === 0) && (
-                      <div className="text-xs text-muted-foreground">No models found</div>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {vendors.filter(v => v.category?.includes('NAC')).map((vendor) => (
+                  <div
+                    key={vendor.id}
+                    className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                      value.nac_vendors.includes(vendor.id)
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                    onClick={() => {
+                      const updated = value.nac_vendors.includes(vendor.id)
+                        ? value.nac_vendors.filter(id => id !== vendor.id)
+                        : [...value.nac_vendors, vendor.id];
+                      updateSelection('nac_vendors', updated);
+                    }}
+                  >
+                    <span className="font-medium">{vendor.vendor_name}</span>
+                    {value.nac_vendors.includes(vendor.id) && (
+                      <Badge variant="secondary" className="ml-2">Selected</Badge>
                     )}
                   </div>
-                </ScrollArea>
-              </CardContent>
-            )}
+                ))}
+              </div>
+            </CardContent>
           </Card>
-        ))}
-      </div>
-    </div>
-  );
+        );
+      default:
+        return <div className="p-8 text-center text-muted-foreground">Infrastructure selection interface</div>;
+    }
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h4 className="font-semibold">Infrastructure Selection</h4>
-        <Button type="button" variant="outline" size="sm" onClick={refreshAll} className="flex items-center gap-2">
-          <RefreshCw className="h-4 w-4" /> Refresh
-        </Button>
+      <div className="flex gap-2">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <Button
+              key={tab.id}
+              variant={activeTab === tab.id ? "default" : "outline"}
+              onClick={() => setActiveTab(tab.id as any)}
+              className="flex items-center gap-2"
+            >
+              <Icon className="w-4 h-4" />
+              {tab.label}
+            </Button>
+          );
+        })}
       </div>
-      <Separator />
 
-      {effectiveSections.nac && (
-        <section className="space-y-3">
-          <h5 className="font-medium">NAC Vendors (multi-select)</h5>
-          {renderVendorGrid(
-            v => matchCategory(v.category, 'nac') || matchCategory(v.vendor_type, 'nac'),
-            value.nac_vendors,
-            ids => onChange({ ...value, nac_vendors: ids })
-          )}
-        </section>
-      )}
-
-      {effectiveSections.network && (
-        <section className="space-y-4">
-          <h5 className="font-medium">Network Infrastructure</h5>
-          <div className="space-y-3">
-            <div>
-              <div className="text-sm font-medium mb-2">Wired Vendors</div>
-              {renderVendorGrid(
-                v => matchCategory(v.category, 'wired') || matchCategory(v.vendor_type, 'switch') || matchCategory(v.category, 'switch'),
-                value.network.wired_vendors,
-                ids => onChange({ ...value, network: { ...value.network, wired_vendors: ids } }),
-                true,
-                'wired_models'
-              )}
-            </div>
-            <div>
-              <div className="text-sm font-medium mb-2">Wireless Vendors</div>
-              {renderVendorGrid(
-                v => matchCategory(v.category, 'wireless') || matchCategory(v.vendor_type, 'wireless') || matchCategory(v.category, 'ap'),
-                value.network.wireless_vendors,
-                ids => onChange({ ...value, network: { ...value.network, wireless_vendors: ids } }),
-                true,
-                'wireless_models'
-              )}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {effectiveSections.security && (
-        <section className="space-y-4">
-          <h5 className="font-medium">Security Infrastructure</h5>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {([
-              ['Firewalls', 'firewall', 'firewalls'],
-              ['VPN', 'vpn', 'vpn'],
-              ['IDP / SSO', 'idp', 'idp_sso'],
-              ['EDR', 'edr', 'edr'],
-              ['SIEM', 'siem', 'siem'],
-            ] as const).map(([label, filterKey, propKey]) => (
-              <Card key={propKey}>
-                <CardHeader className="py-3">
-                  <CardTitle className="text-sm">{label}</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <ScrollArea className="h-32 pr-2">
-                    <div className="space-y-2">
-                      {vendors
-                        .filter(v => matchCategory(v.category, filterKey) || matchCategory(v.vendor_type, filterKey))
-                        .map(v => {
-                          const selected = ((value.security as any)[propKey] || []).includes(v.id);
-                          return (
-                            <label key={v.id} className="flex items-center gap-2 text-sm">
-                              <Checkbox
-                                checked={selected}
-                                onCheckedChange={() => {
-                                  const copy = { ...value } as any;
-                                  copy.security[propKey] = toggleId(copy.security[propKey] || [], v.id);
-                                  onChange(copy);
-                                }}
-                              />
-                              <span>{v.vendor_name}</span>
-                            </label>
-                          );
-                        })}
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {effectiveSections.devices && (
-        <section className="space-y-3">
-          <h5 className="font-medium">Device Inventory</h5>
-          <div className="space-y-2">
-            {deviceTypes.map(dt => {
-              const existing = value.device_inventory.find(d => d.device_type_id === dt.id);
-              return (
-                <div key={dt.id} className="flex items-center gap-3 p-2 rounded border">
-                  <Checkbox
-                    checked={!!existing}
-                    onCheckedChange={(checked) => {
-                      const copy = { ...value };
-                      if (checked) {
-                        if (!existing) copy.device_inventory.push({ device_type_id: dt.id, name: dt.device_name, count: 1 });
-                      } else {
-                        copy.device_inventory = copy.device_inventory.filter(d => d.device_type_id !== dt.id);
-                      }
-                      onChange(copy);
-                    }}
-                  />
-                  <div className="flex-1">
-                    <div className="text-sm font-medium">{dt.device_name}</div>
-                    <div className="text-xs text-muted-foreground">{dt.category}</div>
-                  </div>
-                  {existing && (
-                    <div className="flex items-center gap-2">
-                      <Label className="text-xs">Count</Label>
-                      <Input
-                        type="number"
-                        min={0}
-                        className="w-24 h-8"
-                        value={existing.count}
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value || '0', 10);
-                          const copy = { ...value };
-                          copy.device_inventory = copy.device_inventory.map(d => d.device_type_id === dt.id ? { ...d, count: val } : d);
-                          onChange(copy);
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
+      <motion.div
+        key={activeTab}
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        {renderContent()}
+      </motion.div>
     </div>
   );
 };
