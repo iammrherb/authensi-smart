@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ProfessionalMarkdown } from '@/components/ui/professional-markdown';
 import { useAI, AIProvider } from '@/hooks/useAI';
 import { 
   Bot, 
@@ -15,7 +16,10 @@ import {
   Settings,
   Lightbulb,
   FileText,
-  Zap
+  Zap,
+  Shield,
+  Network,
+  Target
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -54,17 +58,49 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
   };
 
   const contextPrompts = {
-    project: 'You are a Portnox NAC deployment specialist helping with project management.',
-    scoping: 'You are an expert in network access control scoping and requirements gathering.',
-    troubleshooting: 'You are a technical support specialist for Portnox NAC solutions.',
-    general: 'You are an AI assistant helping with Portnox NAC deployment and management.'
+    project: `You are a Portnox NAC deployment specialist with expertise in enterprise network security. 
+    Reference the Product Requirements Document (PRD v2.1) for NAC Solution Platform standards.
+    Provide professional, detailed responses formatted in markdown with:
+    - Executive summaries for complex topics
+    - Clear action items with priorities [HIGH], [MEDIUM], [LOW]
+    - Technical specifications using appropriate code blocks
+    - Risk assessments and compliance considerations
+    - Implementation timelines and milestones`,
+    
+    scoping: `You are an expert NAC scoping consultant following enterprise best practices.
+    Reference PRD requirements for multi-vendor environments and compliance frameworks.
+    Structure responses with:
+    - Requirements analysis with priority indicators
+    - Vendor-specific considerations (Cisco, Aruba, Fortinet, etc.)
+    - Compliance framework alignment (SOX, HIPAA, PCI-DSS, NIST)
+    - Resource allocation and timeline estimates
+    - Risk mitigation strategies`,
+    
+    troubleshooting: `You are a senior technical support specialist for enterprise NAC implementations.
+    Follow PRD technical architecture guidelines and provide:
+    - Systematic diagnostic procedures
+    - Root cause analysis with technical depth
+    - Step-by-step resolution guides
+    - Configuration validation steps
+    - Performance optimization recommendations
+    - Escalation criteria and next steps`,
+    
+    general: `You are a NAC Solution Platform AI assistant aligned with PRD v2.1 standards.
+    Provide enterprise-grade responses with:
+    - Professional formatting using markdown
+    - Reference to platform capabilities and features
+    - Industry best practices and standards
+    - Clear, actionable recommendations
+    - Appropriate technical depth for the audience`
   };
 
   const quickActions = [
-    { icon: Lightbulb, label: 'Get Recommendations', action: 'recommendations' },
-    { icon: FileText, label: 'Generate Report', action: 'report' },
-    { icon: Settings, label: 'Best Practices', action: 'best-practices' },
-    { icon: MessageSquare, label: 'Troubleshoot', action: 'troubleshoot' }
+    { icon: Target, label: 'PRD Compliance Check', action: 'prd-compliance' },
+    { icon: Shield, label: 'Security Analysis', action: 'security-analysis' },
+    { icon: Network, label: 'Architecture Review', action: 'architecture-review' },
+    { icon: FileText, label: 'Professional Report', action: 'professional-report' },
+    { icon: Lightbulb, label: 'AI Recommendations', action: 'ai-recommendations' },
+    { icon: Settings, label: 'Best Practices', action: 'best-practices' }
   ];
 
   useEffect(() => {
@@ -90,11 +126,30 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
 
     try {
       const contextualPrompt = `${contextPrompts[context]}
-      ${projectId ? `Project ID: ${projectId}` : ''}
+      ${projectId ? `Project Context: Project ID ${projectId}` : ''}
       
-      User Question: ${userInput}
+      ## Context Requirements
+      - Follow NAC Solution Platform PRD v2.1 standards
+      - Provide enterprise-grade professional responses
+      - Use structured markdown formatting with appropriate sections
+      - Include executive summaries for complex topics
+      - Add priority indicators: [HIGH], [MEDIUM], [LOW] for action items
+      - Reference relevant compliance frameworks when applicable
+      - Provide technical specifications with proper code formatting
+      - Include risk assessments and mitigation strategies
       
-      Please provide helpful, accurate, and actionable advice for Portnox NAC deployments, security best practices, troubleshooting, and configuration guidance. Be specific and practical in your responses.`;
+      ## User Request
+      ${userInput}
+      
+      ## Response Format Requirements
+      Please structure your response using professional markdown formatting with:
+      1. Executive Summary (for complex topics)
+      2. Main Content with clear sections and headers
+      3. Action Items with priority indicators
+      4. Technical Specifications (if applicable)
+      5. Risk Considerations
+      6. Compliance Notes (if relevant)
+      7. Next Steps or Recommendations`;
 
       const response = await generateCompletion({
         prompt: contextualPrompt,
@@ -144,10 +199,12 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
 
   const handleQuickAction = (action: string) => {
     const prompts = {
-      recommendations: `Based on my current project context, what are your top recommendations for optimizing our Portnox NAC deployment?`,
-      report: `Please generate a comprehensive status report for this project including key metrics, progress, and next steps.`,
-      'best-practices': `What are the current best practices for Portnox NAC implementation in enterprise environments?`,
-      troubleshoot: `Help me troubleshoot common issues with Portnox NAC deployment and configuration.`
+      'prd-compliance': `Generate a PRD v2.1 compliance assessment for this NAC implementation project. Include executive summary, current compliance status, gap analysis, and recommended actions with priorities.`,
+      'security-analysis': `Perform a comprehensive security analysis of our NAC deployment following enterprise security requirements from PRD v2.1. Include threat assessment, vulnerability analysis, and mitigation strategies.`,
+      'architecture-review': `Conduct a technical architecture review of our NAC solution against PRD v2.1 specifications. Analyze scalability, performance, integration points, and provide optimization recommendations.`,
+      'professional-report': `Generate a professional project status report including executive summary, progress metrics, milestone tracking, risk assessment, and next steps. Format according to enterprise reporting standards.`,
+      'ai-recommendations': `Provide AI-powered recommendations for optimizing our NAC deployment based on PRD v2.1 best practices, including performance optimization, security enhancements, and compliance improvements.`,
+      'best-practices': `Outline enterprise NAC implementation best practices per PRD v2.1 standards, including vendor selection criteria, security frameworks, compliance requirements, and implementation methodologies.`
     };
     
     setInputValue(prompts[action as keyof typeof prompts] || '');
@@ -187,16 +244,16 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
         </div>
         
         {/* Quick Actions */}
-        <div className="flex space-x-2 mt-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-3">
           {quickActions.map((action) => (
             <EnhancedButton
               key={action.action}
               variant="outline"
               size="sm"
               onClick={() => handleQuickAction(action.action)}
-              className="text-xs"
+              className="text-xs justify-start h-8"
             >
-              <action.icon className="h-3 w-3 mr-1" />
+              <action.icon className="h-3 w-3 mr-1.5" />
               {action.label}
             </EnhancedButton>
           ))}
@@ -210,13 +267,24 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
             {messages.length === 0 && (
               <div className="text-center text-muted-foreground py-8">
                 <Bot className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-                <p className="text-sm">
-                  Hi! I'm your Portnox AI assistant. I can help with deployment planning, 
-                  troubleshooting, best practices, and more.
-                </p>
-                <p className="text-xs mt-2">
-                  Try using one of the quick actions above or ask me anything!
-                </p>
+                <div className="prose prose-sm dark:prose-invert text-center">
+                  <h3 className="text-lg font-semibold text-primary mb-3">
+                    NAC Solution Platform AI Assistant
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Enterprise-grade AI assistant aligned with PRD v2.1 standards. 
+                    I provide professional, detailed guidance for NAC deployments, 
+                    security analysis, and compliance requirements.
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-2 text-xs">
+                    <Badge variant="secondary">PRD v2.1 Compliant</Badge>
+                    <Badge variant="secondary">Multi-Vendor Support</Badge>
+                    <Badge variant="secondary">Enterprise Security</Badge>
+                  </div>
+                  <p className="text-xs mt-3 text-muted-foreground">
+                    Select a quick action above or ask specific questions about NAC implementation.
+                  </p>
+                </div>
               </div>
             )}
             
@@ -230,13 +298,23 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
               >
                 <div
                   className={cn(
-                    "max-w-[80%] rounded-lg px-3 py-2 text-sm",
+                    "max-w-[85%] rounded-lg px-3 py-2",
                     message.role === 'user'
-                      ? 'bg-primary text-primary-foreground ml-4'
-                      : 'bg-muted mr-4'
+                      ? 'bg-primary text-primary-foreground ml-4 text-sm'
+                      : 'bg-card border mr-4 shadow-sm'
                   )}
                 >
-                  <div className="whitespace-pre-wrap">{message.content}</div>
+                  {message.role === 'assistant' ? (
+                    <ProfessionalMarkdown 
+                      content={message.content}
+                      documentType="analysis"
+                      className="prose prose-sm dark:prose-invert max-w-none"
+                      enableCopy={true}
+                      enableDownload={false}
+                    />
+                  ) : (
+                    <div className="whitespace-pre-wrap text-sm">{message.content}</div>
+                  )}
                   <div className="flex items-center justify-between mt-1">
                     <span className="text-xs opacity-70">
                       {formatTimestamp(message.timestamp)}
