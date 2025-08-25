@@ -401,7 +401,7 @@ export const ProfessionalMarkdown: React.FC<ProfessionalMarkdownProps> = ({
           className="document-content space-y-6"
           dangerouslySetInnerHTML={{
             __html: (() => {
-              const DOMPurify = require('dompurify');
+              const DOMPurify = (window as any).DOMPurify;
               return DOMPurify.sanitize(processMarkdown(content), {
                 ALLOWED_TAGS: ['div', 'span', 'h1', 'h2', 'h3', 'h4', 'pre', 'code', 'strong', 'em', 'button', 'input', 'svg', 'path', 'p'],
                 ALLOWED_ATTR: ['class', 'id', 'onclick', 'type', 'disabled', 'checked', 'stroke-linecap', 'stroke-linejoin', 'stroke-width', 'fill', 'stroke', 'viewBox', 'style']
