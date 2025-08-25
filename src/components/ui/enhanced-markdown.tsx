@@ -159,7 +159,13 @@ export const EnhancedMarkdown: React.FC<EnhancedMarkdownProps> = ({
       <div 
         className="space-y-4"
         dangerouslySetInnerHTML={{
-          __html: processMarkdown(content)
+          __html: (() => {
+            const DOMPurify = require('dompurify');
+            return DOMPurify.sanitize(processMarkdown(content), {
+              ALLOWED_TAGS: ['div', 'span', 'h1', 'h2', 'h3', 'pre', 'code', 'strong', 'em', 'button', 'input', 'svg', 'path'],
+              ALLOWED_ATTR: ['class', 'id', 'onclick', 'type', 'disabled', 'checked', 'stroke-linecap', 'stroke-linejoin', 'stroke-width', 'fill', 'stroke', 'viewBox']
+            });
+          })()
         }}
       />
     </div>

@@ -205,14 +205,11 @@ const CustomerPortalAccess: React.FC<CustomerPortalAccessProps> = ({ project, on
     }
   };
 
-  // Simple password hashing (in production, use proper bcrypt)
+  // Secure password hashing using bcrypt
   const hashPassword = async (password: string): Promise<string> => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hash = await crypto.subtle.digest('SHA-256', data);
-    return Array.from(new Uint8Array(hash))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
+    const bcrypt = (await import('bcryptjs')).default;
+    const saltRounds = 12;
+    return await bcrypt.hash(password, saltRounds);
   };
 
   const formatExpiryDate = (dateString?: string) => {

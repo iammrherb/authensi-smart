@@ -375,18 +375,25 @@ const SmartProjectInsights: React.FC<SmartProjectInsightsProps> = ({
                       <div 
                         className="bg-card/50 border rounded-lg p-4"
                         dangerouslySetInnerHTML={{
-                          __html: tab.content
-                            .replace(/```(\w+)?\n([\s\S]*?)\n```/g, (match, lang, code) => {
-                              const language = lang || 'text';
-                              return `<div class="border rounded-lg overflow-hidden my-4"><div class="border-b bg-muted/30 px-3 py-2 text-xs font-medium flex items-center justify-between"><span>${language.toUpperCase()}</span><button class="text-xs text-muted-foreground hover:text-foreground">Copy</button></div><pre class="p-4 bg-muted/10 overflow-x-auto"><code class="language-${language} text-sm font-mono">${code.trim()}</code></pre></div>`;
-                            })
-                            .replace(/### (.*)/g, '<h3 class="text-lg font-semibold text-primary mt-6 mb-3 flex items-center"><span class="w-2 h-2 bg-primary rounded-full mr-2"></span>$1</h3>')
-                            .replace(/## (.*)/g, '<h2 class="text-xl font-bold text-primary mt-8 mb-4">$1</h2>')
-                            .replace(/# (.*)/g, '<h1 class="text-2xl font-bold text-primary mb-6">$1</h1>')
-                            .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-primary">$1</strong>')
-                            .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
-                            .replace(/^- (.*)$/gm, '<div class="flex items-start space-x-2 py-1"><div class="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div><span>$1</span></div>')
-                            .replace(/^\d+\. (.*)$/gm, '<div class="flex items-start space-x-2 py-1"><div class="w-5 h-5 bg-primary/10 text-primary text-xs rounded-full flex items-center justify-center mt-0.5 flex-shrink-0 font-medium">$&</div><span>$1</span></div>')
+                          __html: (() => {
+                            const DOMPurify = require('dompurify');
+                            const processedContent = tab.content
+                              .replace(/```(\w+)?\n([\s\S]*?)\n```/g, (match, lang, code) => {
+                                const language = lang || 'text';
+                                return `<div class="border rounded-lg overflow-hidden my-4"><div class="border-b bg-muted/30 px-3 py-2 text-xs font-medium flex items-center justify-between"><span>${language.toUpperCase()}</span><button class="text-xs text-muted-foreground hover:text-foreground">Copy</button></div><pre class="p-4 bg-muted/10 overflow-x-auto"><code class="language-${language} text-sm font-mono">${code.trim()}</code></pre></div>`;
+                              })
+                              .replace(/### (.*)/g, '<h3 class="text-lg font-semibold text-primary mt-6 mb-3 flex items-center"><span class="w-2 h-2 bg-primary rounded-full mr-2"></span>$1</h3>')
+                              .replace(/## (.*)/g, '<h2 class="text-xl font-bold text-primary mt-8 mb-4">$1</h2>')
+                              .replace(/# (.*)/g, '<h1 class="text-2xl font-bold text-primary mb-6">$1</h1>')
+                              .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-primary">$1</strong>')
+                              .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
+                              .replace(/^- (.*)$/gm, '<div class="flex items-start space-x-2 py-1"><div class="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div><span>$1</span></div>')
+                              .replace(/^\d+\. (.*)$/gm, '<div class="flex items-start space-x-2 py-1"><div class="w-5 h-5 bg-primary/10 text-primary text-xs rounded-full flex items-center justify-center mt-0.5 flex-shrink-0 font-medium">$&</div><span>$1</span></div>');
+                            return DOMPurify.sanitize(processedContent, { 
+                              ALLOWED_TAGS: ['div', 'span', 'h1', 'h2', 'h3', 'pre', 'code', 'strong', 'em', 'button'],
+                              ALLOWED_ATTR: ['class']
+                            });
+                          })()
                         }}
                       />
                     </div>
