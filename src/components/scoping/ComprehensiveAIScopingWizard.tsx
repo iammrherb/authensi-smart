@@ -20,8 +20,7 @@ import {
   Download, Save, Eye, Wand2, BookOpen, Filter
 } from 'lucide-react';
 
-import { useVendors } from '@/hooks/useVendors';
-import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { usePainPoints, useCreatePainPoint } from '@/hooks/usePainPoints';

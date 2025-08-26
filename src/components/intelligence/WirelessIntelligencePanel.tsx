@@ -429,7 +429,7 @@ wlan ssid-profile "Enterprise-SSID"
 
               <div className="flex items-center justify-between pt-2 border-t">
                 <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                  <Calendar className="h-3 w-3" />
+                  <CalendarDays className="h-3 w-3" />
                   <span>Updated {rec.lastTested}</span>
                 </div>
                 <div className="flex items-center space-x-1">

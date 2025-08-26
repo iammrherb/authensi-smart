@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 // Import all the existing hooks
-import { useUnifiedVendors, useCreateVendor, useUpdateVendor, useDeleteVendor } from '@/hooks/useUnifiedVendors';
+import { useUnifiedVendors, useCreateUnifiedVendor, useUpdateUnifiedVendor, useDeleteUnifiedVendor } from '@/hooks/useUnifiedVendors';
 import { useIndustryOptions, useCreateIndustryOption } from '@/hooks/useResourceLibrary';
 import { useUseCases, useCreateUseCase } from '@/hooks/useUseCases';
 import { useRequirements, useCreateRequirement } from '@/hooks/useRequirements';
@@ -40,9 +40,9 @@ const ComprehensiveTaxonomyManager = () => {
   const { data: requirements = [] } = useRequirements();
   
   // Mutation hooks
-  const createVendor = useCreateVendor();
-  const updateVendor = useUpdateVendor();
-  const deleteVendor = useDeleteVendor();
+  const createVendor = useCreateUnifiedVendor();
+  const updateVendor = useUpdateUnifiedVendor();
+  const deleteVendor = useDeleteUnifiedVendor();
   const createIndustry = useCreateIndustryOption();
   const createUseCase = useCreateUseCase();
   const createRequirement = useCreateRequirement();
@@ -54,7 +54,7 @@ const ComprehensiveTaxonomyManager = () => {
         return vendors.filter(v => 
           v.name?.toLowerCase().includes(searchLower) ||
           v.category?.toLowerCase().includes(searchLower) ||
-          v.vendor_type?.toLowerCase().includes(searchLower)
+          v.subcategory?.toLowerCase().includes(searchLower)
         );
       case 'industries':
         return industries.filter(i => 
@@ -144,12 +144,12 @@ const ComprehensiveTaxonomyManager = () => {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <CardTitle className="text-lg flex items-center gap-2">
-              {vendor.vendor_type === 'NAC' && <Shield className="h-5 w-5 text-blue-500" />}
-              {vendor.vendor_type === 'Switch' && <Network className="h-5 w-5 text-green-500" />}
-              {vendor.vendor_type === 'Wireless' && <Globe className="h-5 w-5 text-purple-500" />}
-              {vendor.vendor_type === 'Firewall' && <Shield className="h-5 w-5 text-red-500" />}
-              {vendor.vendor_type === 'EDR' && <Monitor className="h-5 w-5 text-orange-500" />}
-              {vendor.vendor_type === 'MDM' && <Smartphone className="h-5 w-5 text-cyan-500" />}
+              {vendor.category === 'nac' && <Shield className="h-5 w-5 text-blue-500" />}
+              {vendor.category === 'switch' && <Network className="h-5 w-5 text-green-500" />}
+              {vendor.category === 'wireless' && <Globe className="h-5 w-5 text-purple-500" />}
+              {vendor.category === 'firewall' && <Shield className="h-5 w-5 text-red-500" />}
+              {vendor.category === 'edr' && <Monitor className="h-5 w-5 text-orange-500" />}
+              {vendor.category === 'mdm' && <Smartphone className="h-5 w-5 text-cyan-500" />}
               {vendor.name}
             </CardTitle>
             <div className="flex items-center gap-2 mt-1">
@@ -157,7 +157,7 @@ const ComprehensiveTaxonomyManager = () => {
                 {vendor.status}
               </Badge>
               <Badge variant="outline">{vendor.category}</Badge>
-              <Badge variant="outline">{vendor.portnox_integration_level}</Badge>
+              <Badge variant="outline">{vendor.portnoxCompatibility}</Badge>
             </div>
           </div>
           <div className="flex gap-1">
@@ -470,10 +470,10 @@ const ComprehensiveTaxonomyManager = () => {
                   {filteredData.map((vendor: any) => (
                     <TableRow key={vendor.id}>
                       <TableCell className="font-medium">{vendor.name}</TableCell>
-                      <TableCell>{vendor.vendor_type}</TableCell>
+                      <TableCell>{vendor.subcategory || vendor.category}</TableCell>
                       <TableCell>{vendor.category}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">{vendor.portnox_integration_level}</Badge>
+                        <Badge variant="outline">{vendor.portnoxCompatibility}</Badge>
                       </TableCell>
                       <TableCell>
                         <Badge variant={vendor.status === 'active' ? 'default' : 'secondary'}>
