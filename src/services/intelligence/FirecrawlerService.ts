@@ -108,8 +108,8 @@ class FirecrawlerService {
 
   constructor() {
     this.config = {
-      apiKey: process.env.VITE_FIRECRAWLER_API_KEY || '',
-      baseUrl: process.env.VITE_FIRECRAWLER_BASE_URL || 'https://api.firecrawl.dev',
+      apiKey: (import.meta as any).env?.VITE_FIRECRAWLER_API_KEY || '',
+      baseUrl: (import.meta as any).env?.VITE_FIRECRAWLER_BASE_URL || 'https://api.firecrawl.dev',
       timeout: 30000,
       retryAttempts: 3
     };
