@@ -1,34 +1,24 @@
 -- =============================================================================
--- CLEANUP DUPLICATE VENDORS MIGRATION
+-- SIMPLE VENDOR LIBRARY CLEANUP
 -- =============================================================================
--- This migration removes duplicate vendor entries and ensures data consistency
--- across the vendor_library table
+-- Run this in Supabase SQL Editor to clean up duplicate vendors
 
--- First, identify and log duplicate vendors
-CREATE TEMP TABLE duplicate_vendors AS
+-- Step 1: Show current duplicate vendors
 SELECT 
   vendor_name,
-  COUNT(*) as count,
-  array_agg(id) as duplicate_ids,
-  array_agg(created_at) as created_dates
+  COUNT(*) as duplicate_count,
+  array_agg(id) as vendor_ids
 FROM vendor_library 
 GROUP BY vendor_name 
-HAVING COUNT(*) > 1;
+HAVING COUNT(*) > 1
+ORDER BY duplicate_count DESC;
 
--- Keep the most recent entry for each duplicate vendor
--- Delete older duplicates
-DELETE FROM vendor_library 
-WHERE id IN (
-  SELECT unnest(duplicate_ids[2:array_length(duplicate_ids, 1)]) 
-  FROM duplicate_vendors
-);
-
--- Clean up vendor names to ensure consistency
+-- Step 2: Clean up vendor names (remove extra spaces)
 UPDATE vendor_library 
 SET vendor_name = TRIM(vendor_name)
 WHERE vendor_name != TRIM(vendor_name);
 
--- Standardize common vendor name variations
+-- Step 3: Standardize vendor names
 UPDATE vendor_library 
 SET vendor_name = 'Cisco'
 WHERE vendor_name IN ('Cisco Systems', 'Cisco Systems Inc', 'Cisco Inc');
@@ -45,7 +35,7 @@ UPDATE vendor_library
 SET vendor_name = 'Portnox'
 WHERE vendor_name IN ('Portnox Ltd', 'Portnox Inc');
 
--- Ensure all vendors have required fields
+-- Step 4: Ensure all vendors have required fields
 UPDATE vendor_library 
 SET 
   category = COALESCE(category, 'Unknown'),
@@ -60,25 +50,24 @@ WHERE
   status IS NULL OR 
   portnox_integration_level IS NULL;
 
--- Add missing indexes for better performance
+-- Step 5: Add performance indexes
 CREATE INDEX IF NOT EXISTS idx_vendor_library_name ON vendor_library(vendor_name);
 CREATE INDEX IF NOT EXISTS idx_vendor_library_category ON vendor_library(category);
 CREATE INDEX IF NOT EXISTS idx_vendor_library_support_level ON vendor_library(support_level);
 CREATE INDEX IF NOT EXISTS idx_vendor_library_status ON vendor_library(status);
 
--- Add unique constraint on vendor_name to prevent future duplicates
-ALTER TABLE vendor_library 
-ADD CONSTRAINT unique_vendor_name UNIQUE (vendor_name);
-
--- Update statistics
-ANALYZE vendor_library;
-
--- Clean up temporary table
-DROP TABLE duplicate_vendors;
-
--- Display cleanup results
+-- Step 6: Show final results
 SELECT 
   'CLEANUP_COMPLETED' as status,
-  COUNT(*) as total_vendors_after_cleanup,
+  COUNT(*) as total_vendors,
+  COUNT(DISTINCT vendor_name) as unique_vendors,
   now() as cleanup_timestamp
 FROM vendor_library;
+
+-- Step 7: Show vendor categories
+SELECT 
+  category,
+  COUNT(*) as vendor_count
+FROM vendor_library 
+GROUP BY category 
+ORDER BY vendor_count DESC;
