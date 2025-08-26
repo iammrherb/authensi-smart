@@ -1,6 +1,6 @@
 
 import { Badge } from "@/components/ui/badge";
-import { comprehensiveVendorData } from "@/data/comprehensiveVendorData";
+import { unifiedVendorLibrary } from "@/data/unifiedVendorLibrary";
 
 interface VendorSelectorProps {
   selectedVendor: string;
@@ -8,7 +8,7 @@ interface VendorSelectorProps {
 }
 
 const VendorSelector = ({ selectedVendor, onVendorChange }: VendorSelectorProps) => {
-  const vendors = comprehensiveVendorData.map(vendor => ({
+  const vendors = unifiedVendorLibrary.map(vendor => ({
     id: vendor.id,
     name: vendor.name,
     icon: vendor.icon,

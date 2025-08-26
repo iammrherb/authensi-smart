@@ -5,7 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, CheckCircle, AlertCircle, Database, Cpu, Wifi, Shield, Key, Eye, Lock, Smartphone } from 'lucide-react';
-import { expandedVendorLibrary, getCategoryStats, getTotalVendorsCount, getTotalModelsCount } from '@/data/expandedVendorLibrary';
+import { unifiedVendorLibrary, getVendorStats } from '@/data/unifiedVendorLibrary';
 import { TaxonomySeederService } from '@/services/TaxonomySeederService';
 
 interface SeedingProgress {
@@ -27,11 +27,11 @@ const ExpandedVendorSeeder: React.FC = () => {
   });
   const { toast } = useToast();
 
-  const categoryStats = getCategoryStats();
-  const totalVendors = getTotalVendorsCount();
-  const totalModels = getTotalModelsCount();
+  const vendorStats = getVendorStats();
+  const totalVendors = vendorStats.totalVendors;
+  const totalModels = vendorStats.totalModels;
 
-  const seedExpandedVendorLibrary = async () => {
+  const seedUnifiedVendorLibrary = async () => {
     try {
       setIsSeeding(true);
       setProgress({
@@ -42,8 +42,8 @@ const ExpandedVendorSeeder: React.FC = () => {
         total: totalVendors
       });
 
-      // Transform expanded vendor library for seeding
-      const vendorData = expandedVendorLibrary.map(vendor => ({
+      // Transform unified vendor library for seeding
+      const vendorData = unifiedVendorLibrary.map(vendor => ({
         vendor_name: vendor.name,
         vendor_type: vendor.subcategory || vendor.category,
         category: vendor.category,
@@ -82,8 +82,8 @@ const ExpandedVendorSeeder: React.FC = () => {
         currentItem: 'Seeding vendor library...'
       }));
 
-      // Seed the expanded vendor library
-      await TaxonomySeederService.seed(['expanded_vendor_library']);
+      // Seed the unified vendor library
+      await TaxonomySeederService.seed(['unified_vendor_library']);
 
       setProgress(prev => ({
         ...prev,
@@ -168,7 +168,7 @@ const ExpandedVendorSeeder: React.FC = () => {
           </div>
           <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
             <span className="text-sm font-medium">Categories</span>
-            <Badge variant="secondary">{Object.keys(categoryStats).length}</Badge>
+            <Badge variant="secondary">{Object.keys(vendorStats.categoryStats).length}</Badge>
           </div>
         </div>
 
@@ -204,7 +204,7 @@ const ExpandedVendorSeeder: React.FC = () => {
         <div className="space-y-3">
           <h4 className="text-sm font-medium text-muted-foreground">Categories to be seeded:</h4>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-            {Object.entries(categoryStats).map(([category, stats]) => (
+            {Object.entries(vendorStats.categoryStats).map(([category, stats]) => (
               <Badge key={category} variant="outline" className="justify-between p-2">
                 <div className="flex items-center gap-1">
                   {getCategoryIcon(category)}
@@ -219,7 +219,7 @@ const ExpandedVendorSeeder: React.FC = () => {
         </div>
 
         <Button
-          onClick={seedExpandedVendorLibrary}
+          onClick={seedUnifiedVendorLibrary}
           disabled={isSeeding}
           size="lg"
           className="w-full"
