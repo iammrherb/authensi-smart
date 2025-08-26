@@ -118,15 +118,17 @@ export const useUnifiedVendors = (filters?: VendorFilters) => {
             icon: "🏢",
             color: "bg-gray-500",
             description: dbVendor.description || "",
-            models: dbVendor.models || [],
+        models: Array.isArray(dbVendor.models) ? dbVendor.models.map((m: any) => 
+          typeof m === 'string' ? { name: m, series: '', description: '' } : m
+        ) : [],
             commonFeatures: [],
             supportLevel: (dbVendor.support_level as UnifiedVendor['supportLevel']) || 'limited',
             portnoxCompatibility: 'limited',
-            integrationMethods: dbVendor.integration_methods || [],
+            integrationMethods: Array.isArray(dbVendor.integration_methods) ? dbVendor.integration_methods : [],
             status: (dbVendor.status as UnifiedVendor['status']) || 'active',
-            websiteUrl: dbVendor.website_url,
-            supportContact: dbVendor.support_contact,
-            certifications: dbVendor.certifications,
+        websiteUrl: dbVendor.website_url,
+        supportContact: typeof dbVendor.support_contact === 'object' ? dbVendor.support_contact : {},
+        certifications: Array.isArray(dbVendor.certifications) ? dbVendor.certifications : [],
             lastTestedDate: dbVendor.last_tested_date
           });
         }
@@ -195,15 +197,17 @@ export const useUnifiedVendor = (id: string) => {
         icon: "🏢",
         color: "bg-gray-500",
         description: data.description || "",
-        models: data.models || [],
+        models: Array.isArray(data.models) ? data.models.map((m: any) => 
+          typeof m === 'string' ? { name: m, series: '', description: '' } : m
+        ) : [],
         commonFeatures: [],
         supportLevel: (data.support_level as UnifiedVendor['supportLevel']) || 'limited',
         portnoxCompatibility: 'limited',
-        integrationMethods: data.integration_methods || [],
+        integrationMethods: Array.isArray(data.integration_methods) ? data.integration_methods : [],
         status: (data.status as UnifiedVendor['status']) || 'active',
         websiteUrl: data.website_url,
-        supportContact: data.support_contact,
-        certifications: data.certifications,
+        supportContact: typeof data.support_contact === 'object' ? data.support_contact : {},
+        certifications: Array.isArray(data.certifications) ? data.certifications : [],
         lastTestedDate: data.last_tested_date
       } as UnifiedVendor;
     },

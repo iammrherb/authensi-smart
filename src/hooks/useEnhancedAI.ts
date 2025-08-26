@@ -223,38 +223,39 @@ export const useEnhancedAI = (options: UseEnhancedAIOptions = {}): UseEnhancedAI
 
   // Legacy compatibility functions
   const generateCompletion = useCallback(async (options: { prompt: string; taskType?: string; context?: string }): Promise<{ content: string } | null> => {
-    const context = {
-      prompt: options.prompt,
-      taskType: options.taskType || 'general',
-      context: options.context || 'general'
+    const aiContext: AIContext = {
+      painPoints: [options.prompt],
+      businessObjectives: [options.taskType || 'general'],
+      projectPhase: 'discovery'
     };
 
     const result = await executeWithErrorHandling(
-      () => enhancedAIService.generateRecommendations('completion', context),
+      () => enhancedAIService.generateRecommendations('completion', aiContext, options.prompt),
       'Generate Completion'
     );
 
     if (result) {
-      return { content: result.content || 'Completion generated successfully' };
+      return { content: result.recommendations?.[0]?.description || 'Completion generated successfully' };
     }
     
     return null;
   }, [executeWithErrorHandling]);
 
   const generateProjectSummary = useCallback(async (projectData: any): Promise<{ content: string } | null> => {
-    const context = {
-      projectData,
-      taskType: 'project_summary',
-      context: 'project_planning'
+    const aiContext: AIContext = {
+      projectId: projectData.id,
+      industry: projectData.industry,
+      organizationSize: projectData.organizationSize,
+      projectPhase: 'discovery'
     };
 
     const result = await executeWithErrorHandling(
-      () => enhancedAIService.generateRecommendations('project_summary', context),
+      () => enhancedAIService.generateRecommendations('project_summary', aiContext, 'Generate project summary'),
       'Generate Project Summary'
     );
 
     if (result) {
-      return { content: result.content || 'Project summary generated successfully' };
+      return { content: result.recommendations?.[0]?.description || 'Project summary generated successfully' };
     }
     
     return null;

@@ -5,22 +5,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
-import { useUnifiedVendors, useCreateVendor, type Vendor } from '@/hooks/useUnifiedVendors';
+import { useUnifiedVendors, useCreateUnifiedVendor, type UnifiedVendor } from '@/hooks/useUnifiedVendors';
 import { CheckCircle, XCircle, AlertCircle, Plus, Search, ExternalLink, Edit, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const VendorManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+  const [selectedVendor, setSelectedVendor] = useState<UnifiedVendor | null>(null);
   
   const { data: vendors = [], isLoading } = useUnifiedVendors({});
-  const createVendor = useCreateVendor();
+  const createVendor = useCreateUnifiedVendor();
 
   const filteredVendors = vendors.filter(vendor => {
     const matchesSearch = vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          vendor.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         vendor.vendor_type.toLowerCase().includes(searchTerm.toLowerCase());
+                         (vendor.subcategory || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || vendor.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -123,9 +123,9 @@ const VendorManagement = () => {
                     <Badge variant="secondary" className="text-xs">
                       {vendor.category}
                     </Badge>
-                    <Badge variant="outline" className="text-xs">
-                      {vendor.vendor_type}
-                    </Badge>
+                     <Badge variant="outline" className="text-xs">
+                       {vendor.subcategory || vendor.category}
+                     </Badge>
                     <Badge className={`text-xs ${getStatusColor(vendor.status)}`}>
                       {vendor.status}
                     </Badge>
@@ -134,7 +134,7 @@ const VendorManagement = () => {
                 <CardContent className="space-y-3">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Support Level</p>
-                    <p className="text-sm capitalize">{vendor.support_level || 'Not specified'}</p>
+                    <p className="text-sm capitalize">{vendor.supportLevel || 'Not specified'}</p>
                   </div>
                   
                   <div>
@@ -182,7 +182,7 @@ const VendorManagement = () => {
                               <h4 className="font-semibold mb-2">Category & Type</h4>
                               <div className="space-y-2">
                                 <Badge>{selectedVendor.category}</Badge>
-                                <Badge variant="outline">{selectedVendor.vendor_type}</Badge>
+                                <Badge variant="outline">{selectedVendor.subcategory || selectedVendor.category}</Badge>
                                 <Badge className={getStatusColor(selectedVendor.status)}>
                                   {selectedVendor.status}
                                 </Badge>
@@ -190,7 +190,7 @@ const VendorManagement = () => {
                             </div>
                             <div>
                               <h4 className="font-semibold mb-2">Support Level</h4>
-                              <p className="capitalize">{selectedVendor.support_level || 'Not specified'}</p>
+                              <p className="capitalize">{selectedVendor.supportLevel || 'Not specified'}</p>
                             </div>
                           </div>
 
@@ -207,24 +207,24 @@ const VendorManagement = () => {
                             </div>
                           )}
 
-                          {selectedVendor.supported_protocols && selectedVendor.supported_protocols.length > 0 && (
+                          {selectedVendor.commonFeatures && selectedVendor.commonFeatures.length > 0 && (
                             <div>
-                              <h4 className="font-semibold mb-2">Supported Protocols</h4>
+                              <h4 className="font-semibold mb-2">Common Features</h4>
                               <div className="flex flex-wrap gap-2">
-                                {selectedVendor.supported_protocols.map((protocol: any, index: number) => (
-                                  <Badge key={index} variant="outline">
-                                    {typeof protocol === 'string' ? protocol : protocol.name || `Protocol ${index + 1}`}
+                                 {selectedVendor.commonFeatures.map((feature: any, index: number) => (
+                                   <Badge key={index} variant="outline">
+                                     {typeof feature === 'string' ? feature : feature.name || `Feature ${index + 1}`}
                                   </Badge>
                                 ))}
                               </div>
                             </div>
                           )}
 
-                          {selectedVendor.integration_methods && selectedVendor.integration_methods.length > 0 && (
+                          {selectedVendor.integrationMethods && selectedVendor.integrationMethods.length > 0 && (
                             <div>
                               <h4 className="font-semibold mb-2">Integration Methods</h4>
                               <div className="flex flex-wrap gap-2">
-                                {selectedVendor.integration_methods.map((method: any, index: number) => (
+                                {selectedVendor.integrationMethods.map((method: any, index: number) => (
                                   <Badge key={index} variant="secondary">
                                     {typeof method === 'string' ? method : method.name || `Method ${index + 1}`}
                                   </Badge>
@@ -233,11 +233,11 @@ const VendorManagement = () => {
                             </div>
                           )}
 
-                          {selectedVendor.known_limitations && selectedVendor.known_limitations.length > 0 && (
+                          {selectedVendor.knownLimitations && selectedVendor.knownLimitations.length > 0 && (
                             <div>
                               <h4 className="font-semibold mb-2">Known Limitations</h4>
                               <div className="space-y-2">
-                                {selectedVendor.known_limitations.map((limitation: any, index: number) => (
+                                {selectedVendor.knownLimitations.map((limitation: any, index: number) => (
                                   <div key={index} className="p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
                                     {typeof limitation === 'string' ? limitation : limitation.description || `Limitation ${index + 1}`}
                                   </div>
@@ -246,11 +246,11 @@ const VendorManagement = () => {
                             </div>
                           )}
 
-                          {selectedVendor.documentation_links && selectedVendor.documentation_links.length > 0 && (
+                          {selectedVendor.documentationLinks && selectedVendor.documentationLinks.length > 0 && (
                             <div>
                               <h4 className="font-semibold mb-2">Documentation</h4>
                               <div className="space-y-2">
-                                {selectedVendor.documentation_links.map((doc: any, index: number) => (
+                                {selectedVendor.documentationLinks.map((doc: any, index: number) => (
                                   <div key={index} className="flex items-center justify-between p-2 bg-muted/50 rounded">
                                     <div>
                                       <span className="font-medium">
@@ -271,9 +271,9 @@ const VendorManagement = () => {
                             </div>
                           )}
 
-                          {selectedVendor.last_tested_date && (
+                          {selectedVendor.lastTestedDate && (
                             <div className="text-xs text-muted-foreground">
-                              Last tested: {new Date(selectedVendor.last_tested_date).toLocaleDateString()}
+                              Last tested: {new Date(selectedVendor.lastTestedDate).toLocaleDateString()}
                             </div>
                           )}
                         </div>
