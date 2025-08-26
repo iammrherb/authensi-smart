@@ -1,283 +1,314 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { 
-  EnhancedResourceLibraryService, 
-  ResourceEnrichmentResult,
-  SessionPersistenceData,
-  EnhancedResourceSession 
-} from '@/services/EnhancedResourceLibraryService';
+  enhancedResourceLibraryService,
+  EnhancedResourceItem,
+  ResourceTag,
+  ResourceLabel,
+  ExternalResourceLink,
+  ResourceSearchFilters,
+  ResourceBulkOperation
+} from '@/services/resourceLibrary/EnhancedResourceLibraryService';
 
-// Enhanced Resource Consolidation Hook
-export const useConsolidateResources = () => {
+export const useEnhancedResourceLibrary = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async () => {
-      return await EnhancedResourceLibraryService.consolidateAllResources();
-    },
-    onSuccess: (data) => {
-      // Invalidate all resource-related queries
-      queryClient.invalidateQueries({ queryKey: ['vendors'] });
-      queryClient.invalidateQueries({ queryKey: ['vendor-models'] });
-      queryClient.invalidateQueries({ queryKey: ['configuration-templates'] });
-      queryClient.invalidateQueries({ queryKey: ['use-cases'] });
-      queryClient.invalidateQueries({ queryKey: ['requirements'] });
-      queryClient.invalidateQueries({ queryKey: ['authentication-methods'] });
+  // Get enhanced resource with all related data
+  const useEnhancedResource = (type: string, id: string) => {
+    return useQuery<EnhancedResourceItem | null>({
+      queryKey: ['enhanced-resource', type, id],
+      queryFn: () => enhancedResourceLibraryService.getEnhancedResource(type, id),
+      enabled: !!type && !!id,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    });
+  };
 
-      toast({
-        title: "Resource Consolidation Complete",
-        description: `Successfully consolidated ${data.total} resources across all libraries.`
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Consolidation Failed",
-        description: error.message || "Failed to consolidate resources",
-        variant: "destructive"
-      });
-    }
-  });
-};
+  // Search resources with advanced filtering
+  const useSearchResources = (filters: ResourceSearchFilters) => {
+    return useQuery<EnhancedResourceItem[]>({
+      queryKey: ['search-resources', filters],
+      queryFn: () => enhancedResourceLibraryService.searchResources(filters),
+      enabled: Object.keys(filters).length > 0,
+      staleTime: 2 * 60 * 1000, // 2 minutes
+    });
+  };
 
-// Enhanced Resource Enrichment Hook
-export const useEnrichResources = () => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  // Get all tags
+  const useResourceTags = () => {
+    return useQuery<ResourceTag[]>({
+      queryKey: ['resource-tags'],
+      queryFn: () => enhancedResourceLibraryService.getAllTags(),
+      staleTime: 10 * 60 * 1000, // 10 minutes
+    });
+  };
 
-  return useMutation({
-    mutationFn: async ({
-      resourceType,
-      useFirecrawl = true,
-      useAI = true
-    }: {
-      resourceType: 'vendors' | 'models' | 'templates' | 'use_cases' | 'requirements' | 'all';
-      useFirecrawl?: boolean;
-      useAI?: boolean;
-    }) => {
-      return await EnhancedResourceLibraryService.enrichResourcesWithDocumentation(
-        resourceType,
-        useFirecrawl,
-        useAI
-      );
-    },
-    onSuccess: (data: ResourceEnrichmentResult) => {
-      queryClient.invalidateQueries({ queryKey: ['vendors'] });
-      queryClient.invalidateQueries({ queryKey: ['vendor-models'] });
-      queryClient.invalidateQueries({ queryKey: ['configuration-templates'] });
-      queryClient.invalidateQueries({ queryKey: ['use-cases'] });
-      queryClient.invalidateQueries({ queryKey: ['requirements'] });
+  // Get all labels
+  const useResourceLabels = () => {
+    return useQuery<ResourceLabel[]>({
+      queryKey: ['resource-labels'],
+      queryFn: () => enhancedResourceLibraryService.getAllLabels(),
+      staleTime: 10 * 60 * 1000, // 10 minutes
+    });
+  };
 
-      toast({
-        title: "Resource Enrichment Complete",
-        description: `Successfully enriched ${data.enrichedCount} resources. ${data.failedCount} failed.`
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Enrichment Failed",
-        description: error.message || "Failed to enrich resources",
-        variant: "destructive"
-      });
-    }
-  });
-};
+  // Get resource analytics
+  const useResourceAnalytics = () => {
+    return useQuery({
+      queryKey: ['resource-analytics'],
+      queryFn: () => enhancedResourceLibraryService.getResourceAnalytics(),
+      staleTime: 15 * 60 * 1000, // 15 minutes
+    });
+  };
 
-// Enhanced Session Persistence Hooks
-export const useCreateResourceSession = () => {
-  const { toast } = useToast();
-
-  return useMutation({
-    mutationFn: async ({
-      sessionType,
-      sessionData,
-      resourceSelections,
-      expirationHours = 72
-    }: {
-      sessionType: 'scoping' | 'configuration' | 'planning' | 'tracking';
-      sessionData: any;
-      resourceSelections: any;
-      expirationHours?: number;
-    }) => {
-      return await EnhancedResourceLibraryService.createResourceSession(
-        sessionType,
-        sessionData,
-        resourceSelections,
-        expirationHours
-      );
-    },
-    onSuccess: (sessionId: string) => {
-      toast({
-        title: "Session Created",
-        description: `Session ${sessionId.slice(0, 8)}... created successfully and will be available for sharing.`
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Session Creation Failed",
-        description: error.message || "Failed to create session",
-        variant: "destructive"
-      });
-    }
-  });
-};
-
-export const useGetResourceSession = (sessionId: string) => {
-  return useQuery({
-    queryKey: ['resource-session', sessionId],
-    queryFn: async (): Promise<SessionPersistenceData | null> => {
-      return await EnhancedResourceLibraryService.getResourceSession(sessionId);
-    },
-    enabled: !!sessionId,
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes to check expiration
-    staleTime: 2 * 60 * 1000, // Consider data stale after 2 minutes
-  });
-};
-
-// Enhanced Multi-Tenant Resource Sharing Hooks
-export const useShareResource = () => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      resourceId,
-      resourceType,
-      sharingLevel,
-      permissions,
-      sharedWithUsers = []
-    }: {
-      resourceId: string;
-      resourceType: string;
-      sharingLevel: 'global' | 'organization' | 'project' | 'private';
-      permissions: { view: boolean; edit: boolean; delete: boolean; share: boolean };
-      sharedWithUsers?: string[];
-    }) => {
-      return await EnhancedResourceLibraryService.shareResource(
-        resourceId,
-        resourceType,
-        sharingLevel,
-        permissions,
-        sharedWithUsers
-      );
-    },
+  // Create tag mutation
+  const createTagMutation = useMutation({
+    mutationFn: (tag: Omit<ResourceTag, 'id' | 'usage_count' | 'created_at' | 'created_by'>) =>
+      enhancedResourceLibraryService.createTag(tag),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['shared-resources'] });
+      queryClient.invalidateQueries({ queryKey: ['resource-tags'] });
       toast({
-        title: "Resource Shared",
-        description: "Resource sharing settings updated successfully."
+        title: "Tag Created",
+        description: "New resource tag has been created successfully.",
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Sharing Failed",
-        description: error.message || "Failed to update sharing settings",
-        variant: "destructive"
+        title: "Create Tag Failed",
+        description: error.message || "Failed to create tag.",
+        variant: "destructive",
       });
-    }
-  });
-};
-
-export const useGetSharedResources = (resourceType?: string, includePrivate: boolean = false) => {
-  return useQuery({
-    queryKey: ['shared-resources', resourceType, includePrivate],
-    queryFn: async () => {
-      return await EnhancedResourceLibraryService.getSharedResources(resourceType, includePrivate);
     },
-    staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
   });
-};
 
-// Cross-tenant Resource Access Hook
-export const useCrossTenantResources = (resourceTypes: string[] = []) => {
-  return useQuery({
-    queryKey: ['cross-tenant-resources', resourceTypes],
-    queryFn: async () => {
-      const results: Record<string, any[]> = {};
-      
-      for (const resourceType of resourceTypes) {
-        try {
-          const resources = await EnhancedResourceLibraryService.getSharedResources(resourceType, false);
-          results[resourceType] = resources.filter(r => 
-            r.sharing_level === 'global' || r.sharing_level === 'organization'
-          );
-        } catch (error) {
-          console.error(`Failed to fetch shared resources for ${resourceType}:`, error);
-          results[resourceType] = [];
-        }
-      }
-      
-      return results;
-    },
-    enabled: resourceTypes.length > 0,
-    staleTime: 10 * 60 * 1000, // Consider data stale after 10 minutes
-  });
-};
-
-// Session Management for Sales Engineers and Technical Account Managers
-export const useSessionManager = () => {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  const createSession = useCreateResourceSession();
-  
-  const saveSessionState = useMutation({
-    mutationFn: async ({
-      sessionId,
-      sessionData,
-      resourceSelections
-    }: {
-      sessionId: string;
-      sessionData: any;
-      resourceSelections: any;
-    }) => {
-      // This would update existing session
-      // Implementation depends on if we want to support session updates
-      return { sessionId, saved: true };
-    },
+  // Create label mutation
+  const createLabelMutation = useMutation({
+    mutationFn: (label: Omit<ResourceLabel, 'id' | 'created_at'>) =>
+      enhancedResourceLibraryService.createLabel(label),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['resource-session'] });
+      queryClient.invalidateQueries({ queryKey: ['resource-labels'] });
       toast({
-        title: "Session Saved",
-        description: "Your session has been automatically saved."
+        title: "Label Created",
+        description: "New resource label has been created successfully.",
       });
-    }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Create Label Failed",
+        description: error.message || "Failed to create label.",
+        variant: "destructive",
+      });
+    },
   });
 
-  const shareSession = useShareResource();
+  // Add tag to resource mutation
+  const addTagToResourceMutation = useMutation({
+    mutationFn: ({ resourceType, resourceId, tagId }: { resourceType: string; resourceId: string; tagId: string }) =>
+      enhancedResourceLibraryService.addTagToResource(resourceType, resourceId, tagId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['enhanced-resource', variables.resourceType, variables.resourceId] });
+      queryClient.invalidateQueries({ queryKey: ['resource-tags'] });
+      toast({
+        title: "Tag Added",
+        description: "Tag has been added to the resource.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Add Tag Failed",
+        description: error.message || "Failed to add tag to resource.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Remove tag from resource mutation
+  const removeTagFromResourceMutation = useMutation({
+    mutationFn: ({ resourceType, resourceId, tagId }: { resourceType: string; resourceId: string; tagId: string }) =>
+      enhancedResourceLibraryService.removeTagFromResource(resourceType, resourceId, tagId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['enhanced-resource', variables.resourceType, variables.resourceId] });
+      queryClient.invalidateQueries({ queryKey: ['resource-tags'] });
+      toast({
+        title: "Tag Removed",
+        description: "Tag has been removed from the resource.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Remove Tag Failed",
+        description: error.message || "Failed to remove tag from resource.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Add label to resource mutation
+  const addLabelToResourceMutation = useMutation({
+    mutationFn: ({ resourceType, resourceId, labelId }: { resourceType: string; resourceId: string; labelId: string }) =>
+      enhancedResourceLibraryService.addLabelToResource(resourceType, resourceId, labelId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['enhanced-resource', variables.resourceType, variables.resourceId] });
+      toast({
+        title: "Label Added",
+        description: "Label has been added to the resource.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Add Label Failed",
+        description: error.message || "Failed to add label to resource.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Add external link mutation
+  const addExternalLinkMutation = useMutation({
+    mutationFn: (link: Omit<ExternalResourceLink, 'id' | 'created_at' | 'updated_at'>) =>
+      enhancedResourceLibraryService.addExternalLink(link),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['enhanced-resource', variables.resource_type, variables.resource_id] });
+      toast({
+        title: "External Link Added",
+        description: "External link has been added to the resource.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Add Link Failed",
+        description: error.message || "Failed to add external link.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update external link mutation
+  const updateExternalLinkMutation = useMutation({
+    mutationFn: ({ linkId, updates }: { linkId: string; updates: Partial<ExternalResourceLink> }) =>
+      enhancedResourceLibraryService.updateExternalLink(linkId, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['enhanced-resource'] });
+      toast({
+        title: "Link Updated",
+        description: "External link has been updated.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update Link Failed",
+        description: error.message || "Failed to update external link.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Verify external link mutation
+  const verifyExternalLinkMutation = useMutation({
+    mutationFn: (linkId: string) => enhancedResourceLibraryService.verifyExternalLink(linkId),
+    onSuccess: (isAccessible, linkId) => {
+      queryClient.invalidateQueries({ queryKey: ['enhanced-resource'] });
+      toast({
+        title: "Link Verified",
+        description: isAccessible ? "Link is accessible." : "Link appears to be inaccessible.",
+        variant: isAccessible ? "default" : "destructive",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Verification Failed",
+        description: error.message || "Failed to verify external link.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Bulk operations mutation
+  const performBulkOperationMutation = useMutation({
+    mutationFn: (operation: ResourceBulkOperation) =>
+      enhancedResourceLibraryService.performBulkOperation(operation),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ['enhanced-resource'] });
+      queryClient.invalidateQueries({ queryKey: ['resource-tags'] });
+      toast({
+        title: "Bulk Operation Completed",
+        description: `Successfully processed ${result.success} items. ${result.failed > 0 ? `${result.failed} failed.` : ''}`,
+        variant: result.failed > 0 ? "destructive" : "default",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Bulk Operation Failed",
+        description: error.message || "Failed to perform bulk operation.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update resource usage mutation
+  const updateResourceUsageMutation = useMutation({
+    mutationFn: ({ resourceType, resourceId, action }: { resourceType: string; resourceId: string; action: 'select' | 'project_add' | 'success' | 'failure' }) =>
+      enhancedResourceLibraryService.updateResourceUsage(resourceType, resourceId, action),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resource-analytics'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to update resource usage:', error);
+    },
+  });
+
+  // Get resource recommendations
+  const useResourceRecommendations = (
+    currentResources: { type: string; id: string }[],
+    context: { industry?: string; useCase?: string; complexity?: string } = {}
+  ) => {
+    return useQuery<EnhancedResourceItem[]>({
+      queryKey: ['resource-recommendations', currentResources, context],
+      queryFn: () => enhancedResourceLibraryService.getResourceRecommendations(currentResources, context),
+      enabled: currentResources.length > 0,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    });
+  };
 
   return {
-    createSession,
-    saveSessionState,
-    shareSession,
-    isCreatingSession: createSession.isPending,
-    isSavingSession: saveSessionState.isPending,
-    isSharingSession: shareSession.isPending
+    // Query hooks
+    useEnhancedResource,
+    useSearchResources,
+    useResourceTags,
+    useResourceLabels,
+    useResourceAnalytics,
+    useResourceRecommendations,
+
+    // Mutations
+    createTag: createTagMutation.mutateAsync,
+    isCreatingTag: createTagMutation.isPending,
+    
+    createLabel: createLabelMutation.mutateAsync,
+    isCreatingLabel: createLabelMutation.isPending,
+    
+    addTagToResource: addTagToResourceMutation.mutateAsync,
+    isAddingTag: addTagToResourceMutation.isPending,
+    
+    removeTagFromResource: removeTagFromResourceMutation.mutateAsync,
+    isRemovingTag: removeTagFromResourceMutation.isPending,
+    
+    addLabelToResource: addLabelToResourceMutation.mutateAsync,
+    isAddingLabel: addLabelToResourceMutation.isPending,
+    
+    addExternalLink: addExternalLinkMutation.mutateAsync,
+    isAddingLink: addExternalLinkMutation.isPending,
+    
+    updateExternalLink: updateExternalLinkMutation.mutateAsync,
+    isUpdatingLink: updateExternalLinkMutation.isPending,
+    
+    verifyExternalLink: verifyExternalLinkMutation.mutateAsync,
+    isVerifyingLink: verifyExternalLinkMutation.isPending,
+    
+    performBulkOperation: performBulkOperationMutation.mutateAsync,
+    isPerformingBulkOperation: performBulkOperationMutation.isPending,
+    
+    updateResourceUsage: updateResourceUsageMutation.mutate,
   };
 };
 
-// Global Resource Library Status Hook for Solutions Architects
-export const useResourceLibraryStatus = () => {
-  return useQuery({
-    queryKey: ['resource-library-status'],
-    queryFn: async () => {
-      try {
-        // Get counts and enrichment status for all resource types
-        const status = await EnhancedResourceLibraryService.consolidateAllResources();
-        
-        return {
-          ...status,
-          lastUpdated: new Date().toISOString(),
-          enrichmentAvailable: true,
-          sessionPersistenceActive: true,
-          multiTenantSharingEnabled: true
-        };
-      } catch (error) {
-        console.error('Failed to get resource library status:', error);
-        throw error;
-      }
-    },
-    refetchInterval: 30 * 60 * 1000, // Refetch every 30 minutes
-    staleTime: 15 * 60 * 1000, // Consider data stale after 15 minutes
-  });
-};
+export default useEnhancedResourceLibrary;

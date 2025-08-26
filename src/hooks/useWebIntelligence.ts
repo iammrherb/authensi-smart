@@ -1,4 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
+import { WebCrawlingEngine, CrawlRequest, CrawledContent, ExternalLink } from '@/services/intelligence/WebCrawlingEngine';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { webCrawlingEngine, CrawlTarget, CrawledContent, BusinessIntelligence, SearchResult, WirelessConfigRecommendation, SecurityAlert } from '@/services/intelligence/WebCrawlingEngine';
 
