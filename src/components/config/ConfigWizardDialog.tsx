@@ -34,7 +34,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useConfigTemplates, useCreateConfigTemplate, useGenerateConfigWithAI } from '@/hooks/useConfigTemplates';
-import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
+import { useUnifiedVendors, useUnifiedVendorModels } from '@/hooks/useUnifiedVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { useToast } from '@/hooks/use-toast';
@@ -73,7 +73,7 @@ const ConfigWizardDialog: React.FC<ConfigWizardDialogProps> = ({
 
   const { data: templates } = useConfigTemplates();
   const { data: vendors } = useUnifiedVendors({});
-  const { data: vendorModels } = useUnifiedVendors({ enabled: !!wizardData.basic.vendor });
+  const { data: vendorModels } = useUnifiedVendorModels(wizardData.basic.vendor);
   const { data: useCases } = useUseCases();
   const { data: requirements } = useRequirements();
   const createTemplate = useCreateConfigTemplate();

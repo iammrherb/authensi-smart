@@ -156,14 +156,14 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
   // Filter templates based on search term
   const filteredTemplates = templates?.filter(template =>
     template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (template.vendor?.vendor_name || template.vendor?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (template.vendor?.vendor_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     template.category.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
-  // Filter models based on selected vendor
-  const filteredModels = vendorModels?.filter(model => 
+  // Filter models based on selected vendor  
+  const filteredModels = Array.isArray(vendorModels) ? vendorModels.filter((model: any) => 
     selectedVendor ? model.vendor_id === selectedVendor : true
-  ) || [];
+  ) : [];
 
   // Helper function to get difficulty color
   const getDifficultyColor = (difficulty: string) => {
@@ -253,13 +253,13 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
 
     try {
       const selectedVendorData = vendors?.find(v => v.id === selectedVendor);
-      const selectedModelData = vendorModels?.find(m => m.id === selectedModel);
+      const selectedModelData = Array.isArray(vendorModels) ? vendorModels.find((m: any) => m?.id === selectedModel) : undefined;
       
-      const enhancedPrompt = `COMPREHENSIVE NETWORK CONFIGURATION REQUEST\n\nDEVICE SPECIFICATIONS:\n- Vendor: ${selectedVendorData?.name || 'Generic'}\n- Model: ${selectedModelData?.name || 'Generic Model'}\n- Model Series: ${selectedModelData?.series || 'Standard'}\n- Firmware: ${selectedFirmware || 'Latest Stable'}\n- Configuration Type: ${configType}\n\nDETAILED REQUIREMENTS:\n${aiRequirements}\n\nCONFIGURATION SCOPE:\nPlease generate a comprehensive, enterprise-grade configuration that includes:\n1. Complete device configuration with all necessary commands\n2. Security hardening and best practices implementation\n3. Detailed inline documentation and comments\n4. RADIUS/AAA integration for authentication\n5. Dynamic VLAN assignment configuration\n6. Quality of Service (QoS) configuration\n7. SNMP and monitoring setup\n8. Access control lists and security policies\n9. Backup and recovery procedures\n10. Comprehensive troubleshooting guide\n11. Implementation and validation steps\n12. Maintenance and update procedures\n\nADDITIONAL REQUIREMENTS:\n- Follow vendor-specific best practices for ${selectedVendorData?.name || 'the selected vendor'}\n- Include security considerations for ${configType}\n- Provide production-ready configuration suitable for enterprise deployment\n- Include performance optimization settings\n- Add comprehensive error handling and failover configurations\n\nFORMAT: Provide a well-structured, professional configuration document with clear sections, detailed explanations, and actionable implementation guidance.`;
+      const enhancedPrompt = `COMPREHENSIVE NETWORK CONFIGURATION REQUEST\n\nDEVICE SPECIFICATIONS:\n- Vendor: ${selectedVendorData?.name || 'Generic'}\n- Model: ${selectedModelData?.name || 'Generic Model'}\n- Model Series: ${(selectedModelData as any)?.series || 'Standard'}\n- Firmware: ${selectedFirmware || 'Latest Stable'}\n- Configuration Type: ${configType}\n\nDETAILED REQUIREMENTS:\n${aiRequirements}\n\nCONFIGURATION SCOPE:\nPlease generate a comprehensive, enterprise-grade configuration that includes:\n1. Complete device configuration with all necessary commands\n2. Security hardening and best practices implementation\n3. Detailed inline documentation and comments\n4. RADIUS/AAA integration for authentication\n5. Dynamic VLAN assignment configuration\n6. Quality of Service (QoS) configuration\n7. SNMP and monitoring setup\n8. Access control lists and security policies\n9. Backup and recovery procedures\n10. Comprehensive troubleshooting guide\n11. Implementation and validation steps\n12. Maintenance and update procedures\n\nADDITIONAL REQUIREMENTS:\n- Follow vendor-specific best practices for ${selectedVendorData?.name || 'the selected vendor'}\n- Include security considerations for ${configType}\n- Provide production-ready configuration suitable for enterprise deployment\n- Include performance optimization settings\n- Add comprehensive error handling and failover configurations\n\nFORMAT: Provide a well-structured, professional configuration document with clear sections, detailed explanations, and actionable implementation guidance.`;
       
       const result = await generateWithAI.mutateAsync({
         vendor: selectedVendorData?.name || '',
-        model: selectedModelData?.name || '',
+        model: (selectedModelData as any)?.name || '',
         firmware: selectedFirmware,
         configType,
         requirements: enhancedPrompt,

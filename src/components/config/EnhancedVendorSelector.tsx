@@ -39,10 +39,7 @@ const EnhancedVendorSelector: React.FC<EnhancedVendorSelectorProps> = ({
   showDetails = true
 }) => {
   const { data: vendors, isLoading: vendorsLoading } = useUnifiedVendors({});
-  const { data: vendorModels } = useUnifiedVendors({ vendorId: selectedVendor });
-
   const selectedVendorData = vendors?.find(v => v.id === selectedVendor);
-  const selectedModelData = vendorModels?.find(m => m.id === selectedModel);
 
   const getCategoryIcon = (category: string) => {
     switch (category.toLowerCase()) {
@@ -79,12 +76,12 @@ const EnhancedVendorSelector: React.FC<EnhancedVendorSelectorProps> = ({
 
   const getSupportLevelColor = (level: string | undefined) => {
     switch (level) {
-      case 'certified':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'supported':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
       case 'native':
-          return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'api':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      case 'limited':
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
     }
@@ -116,7 +113,7 @@ const EnhancedVendorSelector: React.FC<EnhancedVendorSelectorProps> = ({
           </Select>
         </div>
 
-        {selectedVendor && vendorModels && vendorModels.length > 0 && (
+        {selectedVendor && selectedVendorData?.models && Array.isArray(selectedVendorData.models) && selectedVendorData.models.length > 0 && (
           <div className="space-y-2">
             <Label>Model</Label>
             <Select value={selectedModel} onValueChange={onModelChange}>
@@ -124,11 +121,11 @@ const EnhancedVendorSelector: React.FC<EnhancedVendorSelectorProps> = ({
                 <SelectValue placeholder="Select model" />
               </SelectTrigger>
               <SelectContent>
-                {vendorModels.map(model => (
+                {selectedVendorData.models.map(model => (
                   <SelectItem key={model.id} value={model.id}>
                     <div className="flex flex-col">
                       <span className="font-medium">{model.name}</span>
-                      <span className="text-sm text-muted-foreground">{model.series}</span>
+                      <span className="text-sm text-muted-foreground">{model.series || model.category}</span>
                     </div>
                   </SelectItem>
                 ))}
@@ -137,26 +134,31 @@ const EnhancedVendorSelector: React.FC<EnhancedVendorSelectorProps> = ({
           </div>
         )}
 
-        {selectedModel && selectedModelData?.firmware_versions && (
-          <div className="space-y-2">
-            <Label>Firmware Version</Label>
-            <Select value={selectedFirmware} onValueChange={onFirmwareChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select firmware" />
-              </SelectTrigger>
-              <SelectContent>
-                {selectedModelData.firmware_versions.map((version: string, index: number) => (
-                  <SelectItem key={index} value={version}>
-                    <div className="flex items-center gap-2">
-                      <span>{version}</span>
-                      {index === 0 && <Badge variant="outline" className="text-xs">Latest</Badge>}
-                      {index === 1 && <Badge variant="secondary" className="text-xs">Stable</Badge>}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        {selectedModel && selectedVendorData?.models && Array.isArray(selectedVendorData.models) && (
+          (() => {
+            const model = selectedVendorData.models.find(m => m.id === selectedModel);
+            return model?.firmwareVersions && Array.isArray(model.firmwareVersions) && model.firmwareVersions.length > 0 ? (
+              <div className="space-y-2">
+                <Label>Firmware Version</Label>
+                <Select value={selectedFirmware} onValueChange={onFirmwareChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select firmware" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {model.firmwareVersions.map((version: string, index: number) => (
+                      <SelectItem key={index} value={version}>
+                        <div className="flex items-center gap-2">
+                          <span>{version}</span>
+                          {index === 0 && <Badge variant="outline" className="text-xs">Latest</Badge>}
+                          {index === 1 && <Badge variant="secondary" className="text-xs">Stable</Badge>}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : null;
+          })()
         )}
       </div>
     );
@@ -185,9 +187,9 @@ const EnhancedVendorSelector: React.FC<EnhancedVendorSelectorProps> = ({
                     <CardTitle className="text-base">{vendor.name}</CardTitle>
                   </div>
                   <div className="flex items-center gap-1">
-                    {getSupportLevelIcon(vendor.portnox_integration_level || '')}
-                    <Badge className={getSupportLevelColor(vendor.portnox_integration_level)}>
-                      {vendor.portnox_integration_level || 'N/A'}
+                    {getSupportLevelIcon(vendor.portnoxCompatibility)}
+                    <Badge className={getSupportLevelColor(vendor.portnoxCompatibility)}>
+                      {vendor.portnoxCompatibility}
                     </Badge>
                   </div>
                 </div>
@@ -210,7 +212,7 @@ const EnhancedVendorSelector: React.FC<EnhancedVendorSelectorProps> = ({
       </div>
 
       {/* Model Selection */}
-      {selectedVendor && vendorModels && vendorModels.length > 0 && (
+      {selectedVendor && selectedVendorData?.models && Array.isArray(selectedVendorData.models) && selectedVendorData.models.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-semibold">Select Device Model</h3>
@@ -219,7 +221,7 @@ const EnhancedVendorSelector: React.FC<EnhancedVendorSelectorProps> = ({
           
           <ScrollArea className="h-64">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {vendorModels.map(model => (
+              {selectedVendorData.models.map(model => (
                 <Card 
                   key={model.id}
                   className={`cursor-pointer transition-all duration-200 ${
@@ -233,21 +235,21 @@ const EnhancedVendorSelector: React.FC<EnhancedVendorSelectorProps> = ({
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm">{model.name}</CardTitle>
                       <Badge variant="outline" className="text-xs">
-                        {model.series}
+                        {model.series || model.category}
                       </Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="space-y-2">
                       <div className="flex flex-wrap gap-1">
-                        {(model.supported_features as string[])?.slice(0, 3).map((feature, index) => (
+                        {model.capabilities?.slice(0, 3).map((feature, index) => (
                           <Badge key={index} variant="outline" className="text-xs">
                             {feature}
                           </Badge>
                         ))}
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        Firmware: {(model.firmware_versions as string[])?.length || 0} versions available
+                        Firmware: {model.firmwareVersions?.length || 0} versions available
                       </p>
                     </div>
                   </CardContent>
@@ -259,36 +261,41 @@ const EnhancedVendorSelector: React.FC<EnhancedVendorSelectorProps> = ({
       )}
 
       {/* Firmware Selection */}
-      {selectedModel && selectedModelData?.firmware_versions && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold">Select Firmware Version</h3>
-            <Badge variant="secondary">{selectedModelData.name}</Badge>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {(selectedModelData.firmware_versions as string[]).map((version, index) => (
-              <Card 
-                key={index}
-                className={`cursor-pointer transition-all duration-200 ${
-                  selectedFirmware === version 
-                    ? 'ring-2 ring-primary border-primary bg-primary/5' 
-                    : 'hover:shadow-sm hover:border-primary/20'
-                }`}
-                onClick={() => onFirmwareChange(version)}
-              >
-                <CardContent className="p-3 text-center">
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="font-medium text-sm">{version}</span>
-                    {index === 0 && <Badge className="text-xs">Latest</Badge>}
-                    {index === 1 && <Badge variant="secondary" className="text-xs">Stable</Badge>}
-                    {index > 1 && <Badge variant="outline" className="text-xs">Legacy</Badge>}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
+      {selectedModel && selectedVendorData?.models && Array.isArray(selectedVendorData.models) && (
+        (() => {
+          const model = selectedVendorData.models.find(m => m.id === selectedModel);
+          return model?.firmwareVersions && Array.isArray(model.firmwareVersions) && model.firmwareVersions.length > 0 ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-semibold">Select Firmware Version</h3>
+                <Badge variant="secondary">{model.name}</Badge>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {model.firmwareVersions.map((version, index) => (
+                  <Card 
+                    key={index}
+                    className={`cursor-pointer transition-all duration-200 ${
+                      selectedFirmware === version 
+                        ? 'ring-2 ring-primary border-primary bg-primary/5' 
+                        : 'hover:shadow-sm hover:border-primary/20'
+                    }`}
+                    onClick={() => onFirmwareChange(version)}
+                  >
+                    <CardContent className="p-3 text-center">
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="font-medium text-sm">{version}</span>
+                        {index === 0 && <Badge className="text-xs">Latest</Badge>}
+                        {index === 1 && <Badge variant="secondary" className="text-xs">Stable</Badge>}
+                        {index > 1 && <Badge variant="outline" className="text-xs">Legacy</Badge>}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          ) : null;
+        })()
       )}
 
       {/* Selection Summary */}
@@ -303,11 +310,16 @@ const EnhancedVendorSelector: React.FC<EnhancedVendorSelectorProps> = ({
                 <p className="font-medium">Vendor</p>
                 <p className="text-muted-foreground">{selectedVendorData?.name}</p>
               </div>
-              {selectedModelData && (
-                <div>
-                  <p className="font-medium">Model</p>
-                  <p className="text-muted-foreground">{selectedModelData.name}</p>
-                </div>
+              {selectedModel && selectedVendorData?.models && Array.isArray(selectedVendorData.models) && (
+                (() => {
+                  const model = selectedVendorData.models.find(m => m.id === selectedModel);
+                  return model ? (
+                    <div>
+                      <p className="font-medium">Model</p>
+                      <p className="text-muted-foreground">{model.name}</p>
+                    </div>
+                  ) : null;
+                })()
               )}
               {selectedFirmware && (
                 <div>

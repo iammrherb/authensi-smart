@@ -253,8 +253,8 @@ export const ResourceCreationDialog: React.FC<ResourceCreationDialogProps> = ({
             subcategory: formData.vendor_type,
             category: formData.category,
             description: formData.description,
-            portnox_integration_level: formData.portnox_integration_level,
-            support_level: formData.support_level,
+            portnoxCompatibility: formData.portnox_integration_level,
+            supportLevel: formData.support_level,
             status: formData.status
           });
           break;

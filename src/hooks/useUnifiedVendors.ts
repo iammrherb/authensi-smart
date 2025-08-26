@@ -119,16 +119,33 @@ export const useUnifiedVendors = (filters?: VendorFilters) => {
             color: "bg-gray-500",
             description: dbVendor.description || "",
         models: Array.isArray(dbVendor.models) ? dbVendor.models.map((m: any) => 
-          typeof m === 'string' ? { name: m, series: '', description: '' } : m
+          typeof m === 'string' ? { 
+            id: m, 
+            name: m, 
+            series: '', 
+            category: '', 
+            firmwareVersions: [], 
+            capabilities: [] 
+          } : {
+            id: m.id || m.name || 'unknown',
+            name: m.name || '',
+            series: m.series || '',
+            category: m.category || '',
+            firmwareVersions: Array.isArray(m.firmwareVersions) ? m.firmwareVersions.filter((v: any) => typeof v === 'string') : [],
+            capabilities: Array.isArray(m.capabilities) ? m.capabilities.filter((c: any) => typeof c === 'string') : [],
+            ...m
+          }
         ) : [],
             commonFeatures: [],
             supportLevel: (dbVendor.support_level as UnifiedVendor['supportLevel']) || 'limited',
             portnoxCompatibility: 'limited',
-            integrationMethods: Array.isArray(dbVendor.integration_methods) ? dbVendor.integration_methods : [],
+        integrationMethods: Array.isArray(dbVendor.integration_methods) ? 
+          dbVendor.integration_methods.filter((m: any) => typeof m === 'string') : [],
             status: (dbVendor.status as UnifiedVendor['status']) || 'active',
         websiteUrl: dbVendor.website_url,
         supportContact: typeof dbVendor.support_contact === 'object' ? dbVendor.support_contact : {},
-        certifications: Array.isArray(dbVendor.certifications) ? dbVendor.certifications : [],
+        certifications: Array.isArray(dbVendor.certifications) ? 
+          dbVendor.certifications.filter((c: any) => typeof c === 'string') : [],
             lastTestedDate: dbVendor.last_tested_date
           });
         }
@@ -198,16 +215,33 @@ export const useUnifiedVendor = (id: string) => {
         color: "bg-gray-500",
         description: data.description || "",
         models: Array.isArray(data.models) ? data.models.map((m: any) => 
-          typeof m === 'string' ? { name: m, series: '', description: '' } : m
+          typeof m === 'string' ? { 
+            id: m, 
+            name: m, 
+            series: '', 
+            category: '', 
+            firmwareVersions: [], 
+            capabilities: [] 
+          } : {
+            id: m.id || m.name || 'unknown',
+            name: m.name || '',
+            series: m.series || '',
+            category: m.category || '',
+            firmwareVersions: Array.isArray(m.firmwareVersions) ? m.firmwareVersions.filter((v: any) => typeof v === 'string') : [],
+            capabilities: Array.isArray(m.capabilities) ? m.capabilities.filter((c: any) => typeof c === 'string') : [],
+            ...m
+          }
         ) : [],
         commonFeatures: [],
         supportLevel: (data.support_level as UnifiedVendor['supportLevel']) || 'limited',
         portnoxCompatibility: 'limited',
-        integrationMethods: Array.isArray(data.integration_methods) ? data.integration_methods : [],
+        integrationMethods: Array.isArray(data.integration_methods) ? 
+          data.integration_methods.filter((m: any) => typeof m === 'string') : [],
         status: (data.status as UnifiedVendor['status']) || 'active',
         websiteUrl: data.website_url,
         supportContact: typeof data.support_contact === 'object' ? data.support_contact : {},
-        certifications: Array.isArray(data.certifications) ? data.certifications : [],
+        certifications: Array.isArray(data.certifications) ? 
+          data.certifications.filter((c: any) => typeof c === 'string') : [],
         lastTestedDate: data.last_tested_date
       } as UnifiedVendor;
     },
@@ -235,31 +269,31 @@ export const useCreateUnifiedVendor = () => {
 
       const { data, error } = await supabase
         .from('vendor_library')
-        .insert([{
+        .insert({
           vendor_name: vendorData.name!,
           category: vendorData.category!,
           vendor_type: vendorData.subcategory || vendorData.category!,
           description: vendorData.description,
           website_url: vendorData.websiteUrl,
           support_contact: vendorData.supportContact || {},
-          certifications: vendorData.certifications || [],
+          certifications: Array.isArray(vendorData.certifications) ? vendorData.certifications : [],
           portnox_integration_level: vendorData.portnoxCompatibility || 'limited',
           portnox_documentation: {},
-          models: vendorData.models || [],
+          models: [],
           supported_protocols: [],
-          integration_methods: vendorData.integrationMethods || [],
+          integration_methods: Array.isArray(vendorData.integrationMethods) ? vendorData.integrationMethods : [],
           portnox_compatibility: {},
           configuration_templates: {},
-          known_limitations: vendorData.knownLimitations || [],
+          known_limitations: Array.isArray(vendorData.knownLimitations) ? vendorData.knownLimitations : [],
           firmware_requirements: {},
-          documentation_links: vendorData.documentationLinks || [],
+          documentation_links: Array.isArray(vendorData.documentationLinks) ? vendorData.documentationLinks : [],
           support_level: vendorData.supportLevel || 'limited',
           last_tested_date: vendorData.lastTestedDate,
           status: vendorData.status || 'active',
           created_by: user.id,
-        }])
+        })
         .select()
-        .maybeSingle();
+        .single();
 
       if (error) throw error;
       return data;
@@ -302,7 +336,7 @@ export const useUpdateUnifiedVendor = () => {
           support_contact: updates.supportContact,
           certifications: updates.certifications,
           portnox_integration_level: updates.portnoxCompatibility,
-          models: updates.models,
+          models: [],
           integration_methods: updates.integrationMethods,
           known_limitations: updates.knownLimitations,
           documentation_links: updates.documentationLinks,
