@@ -677,7 +677,7 @@ INSERT INTO public.resource_labels (name, type, value, description, applies_to, 
 ('Must Have', 'priority', 'must-have', 'Essential resources that must be included', ARRAY['vendor', 'use_case', 'requirement', 'pain_point'], '#DC2626', '⭐', true),
 ('Should Have', 'priority', 'should-have', 'Important resources that should be included', ARRAY['vendor', 'use_case', 'requirement', 'pain_point'], '#F59E0B', '⚡', true),
 ('Could Have', 'priority', 'could-have', 'Nice-to-have resources', ARRAY['vendor', 'use_case', 'requirement', 'pain_point'], '#10B981', '💡', true),
-('Won\'t Have', 'priority', 'wont-have', 'Resources that will not be included', ARRAY['vendor', 'use_case', 'requirement', 'pain_point'], '#6B7280', '❌', true),
+('Won''t Have', 'priority', 'wont-have', 'Resources that will not be included', ARRAY['vendor', 'use_case', 'requirement', 'pain_point'], '#6B7280', '❌', true),
 
 -- Status Labels
 ('Validated', 'status', 'validated', 'Resources that have been validated and approved', ARRAY['vendor', 'use_case', 'requirement', 'pain_point', 'test_case'], '#059669', '✅', true),
