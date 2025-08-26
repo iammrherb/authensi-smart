@@ -438,7 +438,7 @@ const EnhancedVendorManagement = () => {
                                     <div className="text-center">
                                       <Star className="h-8 w-8 mx-auto mb-2 text-primary" />
                                       <p className="text-sm font-medium">Support Level</p>
-                                      <p className="text-xs text-muted-foreground capitalize">{selectedVendor.support_level}</p>
+                                      <p className="text-xs text-muted-foreground capitalize">{selectedVendor.supportLevel}</p>
                                     </div>
                                   </CardContent>
                                 </Card>
@@ -456,7 +456,7 @@ const EnhancedVendorManagement = () => {
                                     <div className="text-center">
                                       <CheckCircle className="h-8 w-8 mx-auto mb-2 text-success" />
                                       <p className="text-sm font-medium">Protocols</p>
-                                      <p className="text-xs text-muted-foreground">{selectedVendor.supported_protocols.length} supported</p>
+                                      <p className="text-xs text-muted-foreground">{selectedVendor.commonFeatures.length} supported</p>
                                     </div>
                                   </CardContent>
                                 </Card>
@@ -465,7 +465,7 @@ const EnhancedVendorManagement = () => {
                                     <div className="text-center">
                                       <ExternalLink className="h-8 w-8 mx-auto mb-2 text-primary" />
                                       <p className="text-sm font-medium">Documentation</p>
-                                      <p className="text-xs text-muted-foreground">{selectedVendor.documentation_links.length} resources</p>
+                                      <p className="text-xs text-muted-foreground">{selectedVendor.documentationLinks?.length || 0} resources</p>
                                     </div>
                                   </CardContent>
                                 </Card>
@@ -479,18 +479,18 @@ const EnhancedVendorManagement = () => {
                                   <div>
                                     <h4 className="font-semibold mb-3">Available Models</h4>
                                     <div className="flex flex-wrap gap-2">
-                                      {selectedVendor.models.map((model, index) => (
-                                        <Badge key={index} variant="secondary">
-                                          {model}
-                                        </Badge>
-                                      ))}
+                                       {selectedVendor.models.map((model, index) => (
+                                         <Badge key={index} variant="secondary">
+                                           {model.name}
+                                         </Badge>
+                                       ))}
                                     </div>
                                   </div>
 
                                   <div>
                                     <h4 className="font-semibold mb-3">Supported Protocols</h4>
                                     <div className="flex flex-wrap gap-2">
-                                      {selectedVendor.supported_protocols.map((protocol, index) => (
+                                      {selectedVendor.commonFeatures.map((protocol, index) => (
                                         <Badge key={index} variant="outline">
                                           {protocol}
                                         </Badge>
@@ -501,7 +501,7 @@ const EnhancedVendorManagement = () => {
                                   <div>
                                     <h4 className="font-semibold mb-3">Integration Methods</h4>
                                     <div className="flex flex-wrap gap-2">
-                                      {selectedVendor.integration_methods.map((method, index) => (
+                                      {selectedVendor.integrationMethods.map((method, index) => (
                                         <Badge key={index} variant="secondary">
                                           {method}
                                         </Badge>
@@ -511,48 +511,27 @@ const EnhancedVendorManagement = () => {
                                 </div>
 
                                 <div className="space-y-4">
-                                  {selectedVendor.portnox_compatibility && (
-                                    <div>
-                                      <h4 className="font-semibold mb-3">Portnox Compatibility</h4>
-                                      <div className="bg-muted/50 p-3 rounded-lg">
-                                        <Badge className="mb-2">
-                                          {selectedVendor.portnox_compatibility.level || 'Standard'}
-                                        </Badge>
-                                        {selectedVendor.portnox_compatibility.features && (
-                                          <div className="flex flex-wrap gap-1 mt-2">
-                                            {selectedVendor.portnox_compatibility.features.map((feature: string, index: number) => (
-                                              <Badge key={index} variant="outline" className="text-xs">
-                                                {feature.replace(/_/g, ' ')}
-                                              </Badge>
-                                            ))}
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                  )}
+                                   <div>
+                                     <h4 className="font-semibold mb-3">Portnox Compatibility</h4>
+                                     <div className="bg-muted/50 p-3 rounded-lg">
+                                       <Badge className="mb-2">
+                                         {selectedVendor.portnoxCompatibility || 'Standard'}
+                                       </Badge>
+                                     </div>
+                                   </div>
 
-                                  {selectedVendor.firmware_requirements && (
-                                    <div>
-                                      <h4 className="font-semibold mb-3">Firmware Requirements</h4>
-                                      <div className="bg-muted/50 p-3 rounded-lg text-sm">
-                                        <p><strong>Minimum:</strong> {selectedVendor.firmware_requirements.minimum || 'N/A'}</p>
-                                        <p><strong>Recommended:</strong> {selectedVendor.firmware_requirements.recommended || 'Latest'}</p>
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {selectedVendor.known_limitations && selectedVendor.known_limitations.length > 0 && (
-                                    <div>
-                                      <h4 className="font-semibold mb-3">Known Limitations</h4>
-                                      <div className="space-y-1">
-                                        {selectedVendor.known_limitations.map((limitation, index) => (
-                                          <div key={index} className="text-sm text-muted-foreground bg-warning/10 p-2 rounded">
-                                            • {limitation}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
+                                   {selectedVendor.knownLimitations && selectedVendor.knownLimitations.length > 0 && (
+                                     <div>
+                                       <h4 className="font-semibold mb-3">Known Limitations</h4>
+                                       <div className="space-y-1">
+                                         {selectedVendor.knownLimitations.map((limitation, index) => (
+                                           <div key={index} className="text-sm text-muted-foreground bg-warning/10 p-2 rounded">
+                                             • {limitation}
+                                           </div>
+                                         ))}
+                                       </div>
+                                     </div>
+                                   )}
                                 </div>
                               </div>
 
@@ -562,16 +541,16 @@ const EnhancedVendorManagement = () => {
                               <div>
                                 <h4 className="font-semibold mb-3">Documentation & Resources</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                  {selectedVendor.documentation_links.map((doc, index) => (
+                                  {selectedVendor.documentationLinks?.map((doc, index) => (
                                     <Card key={index}>
                                       <CardContent className="p-4">
                                         <div className="flex items-center justify-between">
-                                          <div>
-                                            <p className="font-medium">{doc.title}</p>
-                                            <Badge variant="outline" className="text-xs mt-1">
-                                              {doc.type}
-                                            </Badge>
-                                          </div>
+                                         <div>
+                                           <p className="font-medium">{typeof doc === 'string' ? doc : doc.title || 'Documentation'}</p>
+                                           <Badge variant="outline" className="text-xs mt-1">
+                                             {typeof doc === 'string' ? 'Link' : doc.type || 'Document'}
+                                           </Badge>
+                                         </div>
                                           <Button variant="ghost" size="sm">
                                             <ExternalLink className="h-4 w-4" />
                                           </Button>
@@ -583,8 +562,7 @@ const EnhancedVendorManagement = () => {
                               </div>
 
                               <div className="text-xs text-muted-foreground pt-4 border-t">
-                                Last tested: {selectedVendor.last_tested_date || 'Unknown'} | 
-                                Last updated: {new Date(selectedVendor.updated_at).toLocaleDateString()}
+                                Last tested: {selectedVendor.lastTestedDate || 'Unknown'}
                               </div>
                             </div>
                           </ScrollArea>

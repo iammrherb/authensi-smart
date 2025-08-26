@@ -66,6 +66,32 @@ export interface VendorFilters {
 // MAIN HOOK
 // =============================================================================
 
+// Export UnifiedVendor type for components
+export type { UnifiedVendor, UnifiedVendorModel } from '@/data/unifiedVendorLibrary';
+
+export const useUnifiedVendorModels = (vendorId?: string) => {
+  return useQuery({
+    queryKey: ['unified-vendor-models', vendorId],
+    queryFn: async () => {
+      if (!vendorId) return [];
+
+      const vendor = getVendorById(vendorId);
+      if (vendor) return vendor.models;
+
+      // Check database for vendor models
+      const { data, error } = await supabase
+        .from('vendor_library')
+        .select('models')
+        .eq('id', vendorId)
+        .single();
+      
+      if (error) throw error;
+      return data.models || [];
+    },
+    enabled: !!vendorId,
+  });
+};
+
 export const useUnifiedVendors = (filters?: VendorFilters) => {
   return useQuery({
     queryKey: ['unified-vendors', filters],
@@ -185,32 +211,7 @@ export const useUnifiedVendor = (id: string) => {
   });
 };
 
-// =============================================================================
-// VENDOR MODELS HOOK
-// =============================================================================
-
-export const useUnifiedVendorModels = (vendorId?: string) => {
-  return useQuery({
-    queryKey: ['unified-vendor-models', vendorId],
-    queryFn: async () => {
-      if (!vendorId) return [];
-
-      const vendor = getVendorById(vendorId);
-      if (vendor) return vendor.models;
-
-      // Check database for vendor models
-      const { data, error } = await supabase
-        .from('vendor_library')
-        .select('models')
-        .eq('id', vendorId)
-        .single();
-      
-      if (error) throw error;
-      return data.models || [];
-    },
-    enabled: !!vendorId,
-  });
-};
+// Removed duplicate hook definition
 
 // =============================================================================
 // VENDOR CREATION HOOK

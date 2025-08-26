@@ -20,6 +20,10 @@ interface UseEnhancedAIReturn {
   generateSERecommendations: (context: AIContext) => Promise<AIResponse>;
   generateCustomerSuccessRecommendations: (context: AIContext) => Promise<AIResponse>;
   
+  // Legacy compatibility functions
+  generateCompletion: (options: { prompt: string; taskType?: string; context?: string }) => Promise<{ content: string } | null>;
+  generateProjectSummary: (projectData: any) => Promise<{ content: string } | null>;
+  
   // State management
   isLoading: boolean;
   error: string | null;
@@ -217,6 +221,45 @@ export const useEnhancedAI = (options: UseEnhancedAIOptions = {}): UseEnhancedAI
     }
   }, [toast, showToasts]);
 
+  // Legacy compatibility functions
+  const generateCompletion = useCallback(async (options: { prompt: string; taskType?: string; context?: string }): Promise<{ content: string } | null> => {
+    const context = {
+      prompt: options.prompt,
+      taskType: options.taskType || 'general',
+      context: options.context || 'general'
+    };
+
+    const result = await executeWithErrorHandling(
+      () => enhancedAIService.generateRecommendations('completion', context),
+      'Generate Completion'
+    );
+
+    if (result) {
+      return { content: result.content || 'Completion generated successfully' };
+    }
+    
+    return null;
+  }, [executeWithErrorHandling]);
+
+  const generateProjectSummary = useCallback(async (projectData: any): Promise<{ content: string } | null> => {
+    const context = {
+      projectData,
+      taskType: 'project_summary',
+      context: 'project_planning'
+    };
+
+    const result = await executeWithErrorHandling(
+      () => enhancedAIService.generateRecommendations('project_summary', context),
+      'Generate Project Summary'
+    );
+
+    if (result) {
+      return { content: result.content || 'Project summary generated successfully' };
+    }
+    
+    return null;
+  }, [executeWithErrorHandling]);
+
   // Utility functions
   const clearError = useCallback(() => {
     setError(null);
@@ -238,6 +281,10 @@ export const useEnhancedAI = (options: UseEnhancedAIOptions = {}): UseEnhancedAI
     generateSalesRecommendations,
     generateSERecommendations,
     generateCustomerSuccessRecommendations,
+    
+    // Legacy compatibility functions
+    generateCompletion,
+    generateProjectSummary,
     
     // State
     isLoading,

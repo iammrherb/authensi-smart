@@ -41,7 +41,7 @@ import {
   Bot
 } from 'lucide-react';
 import { useConfigTemplates, useCreateConfigTemplate, useUpdateConfigTemplate, useDeleteConfigTemplate, useGenerateConfigWithAI } from '@/hooks/useConfigTemplates';
-import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
+import { useUnifiedVendors, useUnifiedVendorModels } from '@/hooks/useUnifiedVendors';
 import { useToast } from '@/hooks/use-toast';
 import EnhancedVendorSelector from './EnhancedVendorSelector';
 import ResourceLibraryIntegration from '@/components/resources/ResourceLibraryIntegration';
@@ -82,7 +82,8 @@ const templateFormSchema = z.object({
 const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchTerm }) => {
   const { data: templates, isLoading: templatesLoading } = useConfigTemplates();
   const { data: vendors, isLoading: vendorsLoading } = useUnifiedVendors({});
-  const { data: vendorModels } = useUnifiedVendors({ enabled: !!selectedVendor });
+  const [selectedVendor, setSelectedVendor] = useState("");
+  const { data: vendorModels } = useUnifiedVendorModels(selectedVendor);
   const createTemplate = useCreateConfigTemplate();
   const updateTemplate = useUpdateConfigTemplate();
   const deleteTemplate = useDeleteConfigTemplate();
@@ -98,7 +99,6 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
-  const [selectedVendor, setSelectedVendor] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
   const [selectedFirmware, setSelectedFirmware] = useState("");
   const [configType, setConfigType] = useState("");
@@ -156,7 +156,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
   // Filter templates based on search term
   const filteredTemplates = templates?.filter(template =>
     template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    template.vendor?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (template.vendor?.vendor_name || template.vendor?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     template.category.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
@@ -862,7 +862,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
                   <CardTitle className="text-lg">{template.name}</CardTitle>
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="secondary" className="text-xs">
-                      {template.vendor?.name || 'Unknown Vendor'}
+                      {template.vendor?.vendor_name || template.vendor?.name || 'Unknown Vendor'}
                     </Badge>
                     <Badge className={getDifficultyColor(template.complexity_level)}>
                       {template.complexity_level}

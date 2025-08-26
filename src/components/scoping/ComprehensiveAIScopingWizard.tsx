@@ -20,7 +20,7 @@ import {
   Download, Save, Eye, Wand2, BookOpen, Filter
 } from 'lucide-react';
 
-import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
+import { useUnifiedVendors, type UnifiedVendor } from '@/hooks/useUnifiedVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { usePainPoints, useCreatePainPoint } from '@/hooks/usePainPoints';
@@ -39,10 +39,8 @@ import { useCreateProject, useUpdateProject } from '@/hooks/useProjects';
 import { useToast } from '@/hooks/use-toast';
 import { useAI } from '@/hooks/useAI';
 import EnhancedScopingActions from './EnhancedScopingActions';
-import { useUnifiedProjectManagement } from '@/hooks/useUnifiedProjectManagement';
-import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useProjectTemplates } from '@/hooks/useProjectTemplates';
-import { useSmartTemplateRecommendations } from '@/hooks/useSmartTemplateRecommendations';
+import { useTemplateRecommendations } from '@/hooks/useSmartTemplateRecommendations';
 import { useUpdateRequirement } from '@/hooks/useUpdateRequirement';
 import { useUpdateUseCase } from '@/hooks/useUpdateUseCase';
 import { useUserRoles } from '@/hooks/useUserRoles';
@@ -350,20 +348,20 @@ const ComprehensiveAIScopingWizard: React.FC<ComprehensiveAIScopingWizardProps> 
 
   // Enhanced vendor categories with comprehensive vendor options
   const vendorsByCategory = {
-    nac_vendors: enhancedVendors.filter(v => v.category === 'NAC' || v.vendor_type === 'NAC').map(v => v.name),
-    wired_switches: enhancedVendors.filter(v => v.category === 'Wired Switch' || v.vendor_type === 'Switch').map(v => v.name),
-    wireless_aps: enhancedVendors.filter(v => v.category === 'Wireless' || v.vendor_type === 'Access Point').map(v => v.name),
-    routers: enhancedVendors.filter(v => v.category === 'Router' || v.vendor_type === 'Router').map(v => v.name),
-    firewalls: enhancedVendors.filter(v => v.category === 'Firewall' || v.vendor_type === 'Security').map(v => v.name),
-    vpn_solutions: enhancedVendors.filter(v => v.category === 'VPN' || v.vendor_type === 'VPN').map(v => v.name),
-    edr_xdr: enhancedVendors.filter(v => v.category === 'EDR' || v.category === 'XDR' || v.vendor_type === 'Security').map(v => v.name),
-    siem_mdr: enhancedVendors.filter(v => v.category === 'SIEM' || v.category === 'MDR' || v.vendor_type === 'Security').map(v => v.name),
-    mfa_solutions: enhancedVendors.filter(v => v.category === 'MFA' || v.vendor_type === 'Authentication').map(v => v.name),
-    sso_solutions: enhancedVendors.filter(v => v.category === 'SSO' || v.vendor_type === 'Identity').map(v => v.name),
-    identity_providers: enhancedVendors.filter(v => v.category === 'IDP' || v.vendor_type === 'Identity').map(v => v.name),
-    radius_vendors: enhancedVendors.filter(v => v.category === 'RADIUS' || v.vendor_type === 'Authentication').map(v => v.name),
-    pki_cert_authorities: enhancedVendors.filter(v => v.category === 'PKI' || v.vendor_type === 'Certificate').map(v => v.name),
-    monitoring_tools: enhancedVendors.filter(v => v.category === 'Monitoring' || v.vendor_type === 'Management').map(v => v.name)
+    nac_vendors: enhancedVendors.filter(v => v.category === 'NAC' || v.subcategory === 'NAC').map(v => v.name),
+    wired_switches: enhancedVendors.filter(v => v.category === 'Switch' || v.subcategory === 'Switch').map(v => v.name),
+    wireless_aps: enhancedVendors.filter(v => v.category === 'Wireless' || v.subcategory === 'Access Point').map(v => v.name),
+    routers: enhancedVendors.filter(v => v.category === 'Router' || v.subcategory === 'Router').map(v => v.name),
+    firewalls: enhancedVendors.filter(v => v.category === 'Firewall' || v.subcategory === 'Security').map(v => v.name),
+    vpn_solutions: enhancedVendors.filter(v => v.category === 'VPN' || v.subcategory === 'VPN').map(v => v.name),
+    edr_xdr: enhancedVendors.filter(v => v.category === 'EDR' || v.category === 'XDR' || v.subcategory === 'Security').map(v => v.name),
+    siem_mdr: enhancedVendors.filter(v => v.category === 'SIEM' || v.category === 'MDR' || v.subcategory === 'Security').map(v => v.name),
+    mfa_solutions: enhancedVendors.filter(v => v.category === 'MFA' || v.subcategory === 'Authentication').map(v => v.name),
+    sso_solutions: enhancedVendors.filter(v => v.category === 'SSO' || v.subcategory === 'Identity').map(v => v.name),
+    identity_providers: enhancedVendors.filter(v => v.category === 'IDP' || v.subcategory === 'Identity').map(v => v.name),
+    radius_vendors: enhancedVendors.filter(v => v.category === 'RADIUS' || v.subcategory === 'Authentication').map(v => v.name),
+    pki_cert_authorities: enhancedVendors.filter(v => v.category === 'PKI' || v.subcategory === 'Certificate').map(v => v.name),
+    monitoring_tools: enhancedVendors.filter(v => v.category === 'Monitoring' || v.subcategory === 'Management').map(v => v.name)
   };
 
   // Removed static fallbacks to ensure wizards only use Resource Center data

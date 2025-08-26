@@ -17,7 +17,8 @@ import {
   Wifi, Shield, Settings, Code, AlertTriangle, CheckCircle, 
   Copy, Download, ExternalLink, Plus, Search, Filter,
   Zap, Timer, Signal, Lock, Key, Globe, Smartphone,
-  Router, Cpu, Database, FileText, BookOpen, Star
+  Router, Cpu, Database, FileText, BookOpen, Star,
+  Calendar as CalendarDays, Terminal
 } from 'lucide-react';
 
 import { useWebIntelligence } from '@/hooks/useWebIntelligence';
