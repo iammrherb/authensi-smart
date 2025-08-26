@@ -56,6 +56,8 @@ import CustomerPortal from "./pages/CustomerPortal";
 import CustomerAuth from "./pages/CustomerAuth";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import Testing from "./pages/Testing";
+import EnterpriseReportGenerator from "./components/reports/EnterpriseReportGenerator";
+import EnhancedResourceManager from "./components/library/EnhancedResourceManager";
 
 const queryClient = new QueryClient();
 
@@ -253,6 +255,18 @@ const App = () => (
                   <Route path="/testing" element={
                     <ProtectedRoute>
                       <Testing />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* Development Testing Routes */}
+                  <Route path="/dev/reports" element={
+                    <ProtectedRoute>
+                      <EnterpriseReportGenerator />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/dev/resource/:type/:id" element={
+                    <ProtectedRoute>
+                      <EnhancedResourceManager />
                     </ProtectedRoute>
                   } />
                   
