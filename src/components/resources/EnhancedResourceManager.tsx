@@ -13,7 +13,7 @@ import {
   Network, Target, CheckSquare, Building2, Shield, Globe,
   Users, Database, Workflow
 } from 'lucide-react';
-import { useUnifiedVendors, useCreateVendor } from '@/hooks/useUnifiedVendors';
+import { useUnifiedVendors, useCreateUnifiedVendor } from '@/hooks/useUnifiedVendors';
 import { useUseCases, useCreateUseCase } from '@/hooks/useUseCases';
 import { useRequirements, useCreateRequirement } from '@/hooks/useRequirements';
 import { 
@@ -66,7 +66,7 @@ export const EnhancedResourceManager: React.FC<EnhancedResourceManagerProps> = (
   const { data: projectPhases = [] } = useProjectPhases();
   
   // Mutation hooks
-  const createVendorMutation = useCreateVendor();
+  const createVendorMutation = useCreateUnifiedVendor();
   const createUseCaseMutation = useCreateUseCase();
   const createRequirementMutation = useCreateRequirement();
   const createIndustryMutation = useCreateIndustryOption();

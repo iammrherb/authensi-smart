@@ -13,7 +13,7 @@ import { EnhancedButton } from '@/components/ui/enhanced-button';
 import { 
   Building2, Network, Shield, Users, Target, Clock, Brain, CheckCircle, 
   AlertTriangle, Globe, Zap, ArrowRight, ArrowLeft, Wand2, Lightbulb,
-  TrendingUp, DollarSign, Calendar, FileText, Settings, Sparkles
+  TrendingUp, DollarSign, Calendar, FileText, Settings, Sparkles, X, Save
 } from 'lucide-react';
 
 import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
@@ -404,7 +404,7 @@ const AIEnhancedScopingWizard: React.FC<AIEnhancedScopingWizardProps> = ({
                 <SelectItem value="250k-500k">$250K - $500K</SelectItem>
                 <SelectItem value="500k-1m">$500K - $1M</SelectItem>
                 <SelectItem value="over-1m">Over $1M</SelectItem>
-              </SelectTrigger>
+              </SelectContent>
             </Select>
           </div>
 
