@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { useVendors, useCreateVendor, type Vendor } from "@/hooks/useVendors";
+import { useUnifiedVendors, useCreateVendor, type Vendor } from '@/hooks/useUnifiedVendors';
 import { CheckCircle, XCircle, AlertCircle, Plus, Search, ExternalLink, Edit, Trash2, Star, Globe, Phone, Mail } from "lucide-react";
 
 const EnhancedVendorManagement = () => {
@@ -20,14 +20,14 @@ const EnhancedVendorManagement = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  const { data: vendorsFromDB = [], isLoading } = useVendors();
+  const { data: vendorsFromDB = [], isLoading } = useUnifiedVendors({});
   const createVendor = useCreateVendor();
 
   // Enhanced mock data for comprehensive vendor management
   const comprehensiveVendors: Vendor[] = [
     {
       id: "portnox-001",
-      vendor_name: "Portnox",
+      name: "Portnox",
       vendor_type: "Primary NAC",
       category: "NAC",
       models: ["CORE", "CLEAR", "EDGE"],
@@ -51,7 +51,7 @@ const EnhancedVendorManagement = () => {
     },
     {
       id: "cisco-meraki-001",
-      vendor_name: "Cisco Meraki",
+      name: "Cisco Meraki",
       vendor_type: "Wireless Controller",
       category: "Wireless",
       models: ["MR46", "MR56", "MR86", "MR46E", "MR57"],
@@ -74,7 +74,7 @@ const EnhancedVendorManagement = () => {
     },
     {
       id: "palo-alto-001",
-      vendor_name: "Palo Alto Networks",
+      name: "Palo Alto Networks",
       vendor_type: "Next-Gen Firewall",
       category: "Security",
       models: ["PA-220", "PA-820", "PA-3220", "PA-5220", "VM-Series"],
@@ -97,7 +97,7 @@ const EnhancedVendorManagement = () => {
     },
     {
       id: "microsoft-intune-001",
-      vendor_name: "Microsoft Intune",
+      name: "Microsoft Intune",
       vendor_type: "Mobile Device Management",
       category: "MDM",
       models: ["Cloud Service"],
@@ -124,7 +124,7 @@ const EnhancedVendorManagement = () => {
   const allVendors = [...vendorsFromDB, ...comprehensiveVendors];
 
   const filteredVendors = allVendors.filter(vendor => {
-    const matchesSearch = vendor.vendor_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          vendor.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          vendor.vendor_type.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || vendor.category === selectedCategory;
@@ -152,7 +152,7 @@ const EnhancedVendorManagement = () => {
   };
 
   const [newVendorForm, setNewVendorForm] = useState({
-    vendor_name: "",
+    name: "",
     vendor_type: "",
     category: "",
     models: [],
@@ -172,7 +172,7 @@ const EnhancedVendorManagement = () => {
       await createVendor.mutateAsync(newVendorForm as any);
       setIsAddDialogOpen(false);
       setNewVendorForm({
-        vendor_name: "",
+        name: "",
         vendor_type: "",
         category: "",
         models: [],
@@ -223,11 +223,11 @@ const EnhancedVendorManagement = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="vendor_name">Vendor Name *</Label>
+                    <Label htmlFor="name">Vendor Name *</Label>
                     <Input
-                      id="vendor_name"
-                      value={newVendorForm.vendor_name}
-                      onChange={(e) => setNewVendorForm(prev => ({ ...prev, vendor_name: e.target.value }))}
+                      id="name"
+                      value={newVendorForm.name}
+                      onChange={(e) => setNewVendorForm(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="e.g., Cisco, Aruba, Fortinet"
                     />
                   </div>
@@ -335,7 +335,7 @@ const EnhancedVendorManagement = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg flex items-center gap-2">
-                        {vendor.vendor_name}
+                        {vendor.name}
                         {getStatusIcon(vendor.status)}
                       </CardTitle>
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity">
@@ -418,7 +418,7 @@ const EnhancedVendorManagement = () => {
                       <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
                         <DialogHeader>
                           <DialogTitle className="flex items-center gap-2">
-                            {vendor.vendor_name}
+                            {vendor.name}
                             {getStatusIcon(vendor.status)}
                             <Badge className="ml-auto">{vendor.category}</Badge>
                           </DialogTitle>

@@ -21,7 +21,7 @@ import {
  } from 'lucide-react';
 
 import { PortnoxDocumentationService, PortnoxDocumentationResult } from '@/services/PortnoxDocumentationService';
-import { useVendors } from '@/hooks/useVendors';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { Document, Packer, Paragraph, HeadingLevel, TextRun } from 'docx';
 
 interface ReportFilters {
@@ -36,7 +36,7 @@ const ComprehensiveReports = () => {
   const { data: projects = [] } = useProjects();
   const { data: sites = [] } = useSites();
   const { data: useCases = [] } = useUseCases();
-  const { data: vendors = [] } = useVendors();
+  const { data: vendors = [] } = useUnifiedVendors({});
   const { generateCompletion, isLoading } = useAI();
   const { toast } = useToast();
 

@@ -3,12 +3,12 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { DocumentationCrawlerService } from "@/services/DocumentationCrawlerService";
-import { useVendors } from "@/hooks/useVendors";
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 export const VendorsDocsCrawlerPanel = () => {
-  const { data: vendors, isLoading } = useVendors();
+  const { data: vendors, isLoading } = useUnifiedVendors({});
   const { toast } = useToast();
   const [running, setRunning] = useState(false);
   const [lastResult, setLastResult] = useState<{ totalSeeds: number; totalItems?: number } | null>(null);
@@ -26,7 +26,7 @@ export const VendorsDocsCrawlerPanel = () => {
       return;
     }
 
-    const vendorNames = vendors.map((v) => v.vendor_name).filter(Boolean);
+    const vendorNames = vendors.map((v) => v.name).filter(Boolean);
     setRunning(true);
     setLastResult(null);
 

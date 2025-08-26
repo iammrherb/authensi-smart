@@ -18,7 +18,7 @@ import {
   useGenerateConfigWithAI,
   type ConfigTemplate 
 } from "@/hooks/useConfigTemplates";
-import { useVendors } from "@/hooks/useVendors";
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useVendorModels } from "@/hooks/useVendorModels";
 import { 
   Plus, 
@@ -58,7 +58,7 @@ const EnhancedConfigTemplateManager: React.FC<EnhancedConfigTemplateManagerProps
   const [tagInput, setTagInput] = useState("");
 
   const { data: templates = [], isLoading } = useConfigTemplates();
-  const { data: vendors = [] } = useVendors();
+  const { data: vendors = [] } = useUnifiedVendors({});
   const { data: models = [] } = useVendorModels();
   const createTemplate = useCreateConfigTemplate();
   const updateTemplate = useUpdateConfigTemplate();
@@ -316,7 +316,7 @@ const EnhancedConfigTemplateManager: React.FC<EnhancedConfigTemplateManagerProps
                         <SelectContent>
                           {vendors.map(vendor => (
                             <SelectItem key={vendor.id} value={vendor.id}>
-                              {vendor.vendor_name}
+                              {vendor.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -545,7 +545,7 @@ const EnhancedConfigTemplateManager: React.FC<EnhancedConfigTemplateManagerProps
                   </Badge>
                   {template.vendor && (
                     <Badge variant="outline" className="text-xs">
-                      {template.vendor.vendor_name}
+                      {template.vendor.name}
                     </Badge>
                   )}
                 </div>

@@ -13,7 +13,7 @@ import { ChevronRight, ChevronLeft, Save, CheckCircle, AlertTriangle } from "luc
 import { useCreateProject } from "@/hooks/useProjects";
 import { useUseCases } from "@/hooks/useUseCases";
 import { useRequirements } from "@/hooks/useRequirements";
-import { useVendors } from "@/hooks/useVendors";
+import { useUnifiedVendors } from "@/hooks/useUnifiedVendors";
 
 interface ProjectScopingData {
   // Basic Project Info
@@ -80,7 +80,7 @@ const ProjectScopingWizard = ({ onComplete }: { onComplete?: () => void }) => {
 
   const { data: useCases = [] } = useUseCases();
   const { data: requirements = [] } = useRequirements();
-  const { data: vendors = [] } = useVendors();
+  const { data: vendors = [] } = useUnifiedVendors({});
   const createProject = useCreateProject();
 
   const steps = [
@@ -434,7 +434,7 @@ const ProjectScopingWizard = ({ onComplete }: { onComplete?: () => void }) => {
                         }
                       }}
                     />
-                    <Label htmlFor={vendor.id} className="text-sm">{vendor.vendor_name}</Label>
+                    <Label htmlFor={vendor.id} className="text-sm">{vendor.name}</Label>
                     <Badge variant="outline" className="text-xs">{vendor.category}</Badge>
                   </div>
                 ))}

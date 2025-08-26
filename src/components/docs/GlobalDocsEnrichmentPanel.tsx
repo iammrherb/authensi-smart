@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { useVendors } from "@/hooks/useVendors";
+import { useUnifiedVendors } from "@/hooks/useUnifiedVendors";
 import { DocumentationCrawlerService } from "@/services/DocumentationCrawlerService";
 
 interface CategoryOption {
@@ -91,7 +91,7 @@ const CATEGORY_OPTIONS: CategoryOption[] = [
 ];
 
 export const GlobalDocsEnrichmentPanel = () => {
-  const { data: vendors } = useVendors();
+  const { data: vendors } = useUnifiedVendors({});
   const { toast } = useToast();
 
   const [running, setRunning] = useState(false);
@@ -131,7 +131,7 @@ export const GlobalDocsEnrichmentPanel = () => {
       setRunning(true);
       setLastResult(null);
 
-      const vendorNames = (vendors || []).map((v: any) => v.vendor_name).filter(Boolean);
+      const vendorNames = (vendors || []).map((v: any) => v.name).filter(Boolean);
 
       const extraSeedsArr = extraSeeds
         .split(/\n|,/)

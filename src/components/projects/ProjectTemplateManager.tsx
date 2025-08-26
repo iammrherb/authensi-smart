@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useConfigTemplates } from '@/hooks/useConfigTemplates';
 import { useTemplateCustomizations, useCreateTemplateCustomization, useCloneTemplate } from '@/hooks/useTemplateCustomizations';
-import { useVendors } from '@/hooks/useVendors';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import CodeBlock from '@/components/ui/code-block';
 import { toast } from 'sonner';
 
@@ -39,7 +39,7 @@ const ProjectTemplateManager: React.FC<ProjectTemplateManagerProps> = ({
 
   const { data: templates = [], isLoading } = useConfigTemplates();
   const { data: customizations = [], refetch } = useTemplateCustomizations(projectId);
-  const { data: vendors = [] } = useVendors();
+  const { data: vendors = [] } = useUnifiedVendors({});
   const createCustomization = useCreateTemplateCustomization();
   const cloneTemplate = useCloneTemplate();
 
@@ -149,7 +149,7 @@ const ProjectTemplateManager: React.FC<ProjectTemplateManagerProps> = ({
               <SelectItem value="all">All Vendors</SelectItem>
               {vendors.map((vendor) => (
                 <SelectItem key={vendor.id} value={vendor.id}>
-                  {vendor.vendor_name}
+                  {vendor.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -204,7 +204,7 @@ const ProjectTemplateManager: React.FC<ProjectTemplateManagerProps> = ({
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Network className="w-3 h-3" />
-                        {vendors.find(v => v.id === template.vendor_id)?.vendor_name || 'Generic'}
+                        {vendors.find(v => v.id === template.vendor_id)?.name || 'Generic'}
                       </div>
                       <div className="flex items-center gap-1">
                         <Star className="w-3 h-3" />

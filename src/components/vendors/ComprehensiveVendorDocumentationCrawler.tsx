@@ -17,7 +17,7 @@ import {
   Network, Shield, Server, Database, Monitor
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useVendors } from '@/hooks/useVendors';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 
 interface DocumentationSource {
   id: string;
@@ -53,7 +53,7 @@ const ComprehensiveVendorDocumentationCrawler: React.FC = () => {
   const [crawlResults, setCrawlResults] = useState<CrawlResult[]>([]);
   const [documentationSources, setDocumentationSources] = useState<DocumentationSource[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const { data: vendors = [] } = useVendors();
+  const { data: vendors = [] } = useUnifiedVendors({});
   const { toast } = useToast();
 
   // Comprehensive Portnox documentation sources
@@ -436,12 +436,12 @@ const ComprehensiveVendorDocumentationCrawler: React.FC = () => {
                   {vendors.map(vendor => (
                     <div key={vendor.id} className="flex items-center gap-2">
                       <Checkbox 
-                        checked={selectedVendors.includes(vendor.vendor_name)}
-                        onCheckedChange={() => handleVendorSelection(vendor.vendor_name)}
+                        checked={selectedVendors.includes(vendor.name)}
+                        onCheckedChange={() => handleVendorSelection(vendor.name)}
                       />
-                      <span className="text-sm">{vendor.vendor_name}</span>
+                      <span className="text-sm">{vendor.name}</span>
                       <Badge variant="outline" className="text-xs">
-                        {vendorIntegrationSources[vendor.vendor_name]?.length || 0} docs
+                        {vendorIntegrationSources[vendor.name]?.length || 0} docs
                       </Badge>
                     </div>
                   ))}

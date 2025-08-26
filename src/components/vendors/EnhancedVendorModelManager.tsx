@@ -16,7 +16,7 @@ import {
   useDeleteVendorModel,
   type VendorModel 
 } from "@/hooks/useVendorModels";
-import { useVendors } from "@/hooks/useVendors";
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { 
   Plus, 
   Edit, 
@@ -52,7 +52,7 @@ const EnhancedVendorModelManager: React.FC<EnhancedVendorModelManagerProps> = ({
   const [tagInput, setTagInput] = useState("");
 
   const { data: models = [], isLoading } = useVendorModels(vendorId);
-  const { data: vendors = [] } = useVendors();
+  const { data: vendors = [] } = useUnifiedVendors({});
   const createModel = useCreateVendorModel();
   const updateModel = useUpdateVendorModel();
   const deleteModel = useDeleteVendorModel();
@@ -75,7 +75,7 @@ const EnhancedVendorModelManager: React.FC<EnhancedVendorModelManagerProps> = ({
   const filteredModels = models.filter(model =>
     model.model_name.toLowerCase().includes(localSearchTerm.toLowerCase()) ||
     model.model_series?.toLowerCase().includes(localSearchTerm.toLowerCase()) ||
-    model.vendor?.vendor_name.toLowerCase().includes(localSearchTerm.toLowerCase())
+    model.vendor?.name.toLowerCase().includes(localSearchTerm.toLowerCase())
   );
 
   const handleCreateModel = async () => {
@@ -210,7 +210,7 @@ const EnhancedVendorModelManager: React.FC<EnhancedVendorModelManagerProps> = ({
                       <SelectContent>
                         {vendors.map(vendor => (
                           <SelectItem key={vendor.id} value={vendor.id}>
-                            {vendor.vendor_name}
+                            {vendor.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -361,7 +361,7 @@ const EnhancedVendorModelManager: React.FC<EnhancedVendorModelManagerProps> = ({
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <Badge variant="secondary" className="text-xs">
-                    {model.vendor?.vendor_name}
+                    {model.vendor?.name}
                   </Badge>
                   {model.model_series && (
                     <Badge variant="outline" className="text-xs">

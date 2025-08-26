@@ -20,8 +20,7 @@ import {
   ChevronRight,
   ChevronLeft
 } from 'lucide-react';
-import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
-import { useVendorModels } from '@/hooks/useVendorModels';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -46,8 +45,8 @@ const ConfigWizardSteps: React.FC<ConfigWizardStepsProps> = ({
   canProceed,
   configurationScenarios
 }) => {
-  const { data: vendors } = useEnhancedVendors();
-  const { data: vendorModels } = useVendorModels();
+  const { data: vendors } = useUnifiedVendors({});
+  const { data: vendorModels } = useUnifiedVendors({ vendorId: wizardData.basic.vendor });
   const { data: useCases } = useUseCases();
   const { data: requirements } = useRequirements();
 
@@ -111,7 +110,7 @@ const ConfigWizardSteps: React.FC<ConfigWizardStepsProps> = ({
               <SelectContent>
                 {vendors?.map((vendor) => (
                   <SelectItem key={vendor.id} value={vendor.id}>
-                    {vendor.vendor_name}
+                    {vendor.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -131,7 +130,7 @@ const ConfigWizardSteps: React.FC<ConfigWizardStepsProps> = ({
               <SelectContent>
                 {filteredModels.map((model) => (
                   <SelectItem key={model.id} value={model.id}>
-                    {model.model_name}
+                    {model.name}
                   </SelectItem>
                 ))}
               </SelectContent>

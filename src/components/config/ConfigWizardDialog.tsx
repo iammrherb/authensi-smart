@@ -34,8 +34,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useConfigTemplates, useCreateConfigTemplate, useGenerateConfigWithAI } from '@/hooks/useConfigTemplates';
-import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
-import { useVendorModels } from '@/hooks/useVendorModels';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { useToast } from '@/hooks/use-toast';
@@ -73,8 +72,8 @@ const ConfigWizardDialog: React.FC<ConfigWizardDialogProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
 
   const { data: templates } = useConfigTemplates();
-  const { data: vendors } = useEnhancedVendors();
-  const { data: vendorModels } = useVendorModels();
+  const { data: vendors } = useUnifiedVendors({});
+  const { data: vendorModels } = useUnifiedVendors({ enabled: !!wizardData.basic.vendor });
   const { data: useCases } = useUseCases();
   const { data: requirements } = useRequirements();
   const createTemplate = useCreateConfigTemplate();
@@ -228,8 +227,8 @@ const ConfigWizardDialog: React.FC<ConfigWizardDialogProps> = ({
       const scenario = configurationScenarios.find(s => s.id === wizardData.scenario.selectedScenario);
 
       const prompt = `Generate a comprehensive 802.1X configuration for:
-        Vendor: ${selectedVendor?.vendor_name}
-        Model: ${selectedModel?.model_name || 'Generic'}
+        Vendor: ${selectedVendor?.name}
+        Model: ${selectedModel?.name || 'Generic'}
         Firmware: ${wizardData.basic.firmwareVersion || 'Latest'}
         Scenario: ${scenario?.name}
         Authentication Methods: ${wizardData.scenario.authMethods.join(', ')}
@@ -249,8 +248,8 @@ const ConfigWizardDialog: React.FC<ConfigWizardDialogProps> = ({
         - Troubleshooting commands`;
 
       const result = await generateWithAI.mutateAsync({
-        vendor: selectedVendor?.vendor_name || '',
-        model: selectedModel?.model_name || '',
+        vendor: selectedVendor?.name || '',
+        model: selectedModel?.name || '',
         configType: '802.1X',
         requirements: prompt
       });
@@ -283,7 +282,7 @@ const ConfigWizardDialog: React.FC<ConfigWizardDialogProps> = ({
       const scenario = configurationScenarios.find(s => s.id === wizardData.scenario.selectedScenario);
       
       const templateData = {
-        name: wizardData.basic.name || `${selectedVendor?.vendor_name} ${scenario?.name}`,
+        name: wizardData.basic.name || `${selectedVendor?.name} ${scenario?.name}`,
         description: wizardData.basic.description || scenario?.description,
         vendor_id: wizardData.basic.vendor,
         model_id: wizardData.basic.model || undefined,
@@ -413,7 +412,7 @@ const ConfigWizardDialog: React.FC<ConfigWizardDialogProps> = ({
                   <SelectContent>
                     {vendors?.map(vendor => (
                       <SelectItem key={vendor.id} value={vendor.id}>
-                        {vendor.vendor_name}
+                        {vendor.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -431,7 +430,7 @@ const ConfigWizardDialog: React.FC<ConfigWizardDialogProps> = ({
                   <SelectContent>
                     {vendorModels?.filter(m => !wizardData.basic.vendor || m.vendor_id === wizardData.basic.vendor).map(model => (
                       <SelectItem key={model.id} value={model.id}>
-                        {model.model_name}
+                        {model.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

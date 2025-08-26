@@ -58,8 +58,7 @@ import {
   Activity
 } from 'lucide-react';
 import { useConfigTemplates, useCreateConfigTemplate, useGenerateConfigWithAI } from '@/hooks/useConfigTemplates';
-import { useVendors } from '@/hooks/useVendors';
-import { useVendorModels } from '@/hooks/useVendorModels';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useTemplateCustomizations, useCreateTemplateCustomization } from '@/hooks/useTemplateCustomizations';
 import { useToast } from '@/hooks/use-toast';
 import CodeBlock from '@/components/ui/code-block';
@@ -106,8 +105,8 @@ const SmartTemplateWizard: React.FC<SmartTemplateWizardProps> = ({
   initialMode = 'create'
 }) => {
   const { data: templates } = useConfigTemplates();
-  const { data: vendors } = useVendors();
-  const { data: vendorModels } = useVendorModels();
+  const { data: vendors } = useUnifiedVendors({});
+  const { data: vendorModels } = useUnifiedVendors({});
   const { data: customizations } = useTemplateCustomizations(projectId, siteId);
   const createTemplate = useCreateConfigTemplate();
   const createCustomization = useCreateTemplateCustomization();

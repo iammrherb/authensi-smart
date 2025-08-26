@@ -41,8 +41,7 @@ import {
   Bot
 } from 'lucide-react';
 import { useConfigTemplates, useCreateConfigTemplate, useUpdateConfigTemplate, useDeleteConfigTemplate, useGenerateConfigWithAI } from '@/hooks/useConfigTemplates';
-import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
-import { useVendorModels } from '@/hooks/useVendorModels';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useToast } from '@/hooks/use-toast';
 import EnhancedVendorSelector from './EnhancedVendorSelector';
 import ResourceLibraryIntegration from '@/components/resources/ResourceLibraryIntegration';
@@ -82,8 +81,8 @@ const templateFormSchema = z.object({
 
 const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchTerm }) => {
   const { data: templates, isLoading: templatesLoading } = useConfigTemplates();
-  const { data: vendors, isLoading: vendorsLoading } = useEnhancedVendors();
-  const { data: vendorModels } = useVendorModels();
+  const { data: vendors, isLoading: vendorsLoading } = useUnifiedVendors({});
+  const { data: vendorModels } = useUnifiedVendors({ enabled: !!selectedVendor });
   const createTemplate = useCreateConfigTemplate();
   const updateTemplate = useUpdateConfigTemplate();
   const deleteTemplate = useDeleteConfigTemplate();
@@ -157,7 +156,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
   // Filter templates based on search term
   const filteredTemplates = templates?.filter(template =>
     template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    template.vendor?.vendor_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    template.vendor?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     template.category.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
@@ -256,11 +255,11 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
       const selectedVendorData = vendors?.find(v => v.id === selectedVendor);
       const selectedModelData = vendorModels?.find(m => m.id === selectedModel);
       
-      const enhancedPrompt = `COMPREHENSIVE NETWORK CONFIGURATION REQUEST\n\nDEVICE SPECIFICATIONS:\n- Vendor: ${selectedVendorData?.vendor_name || 'Generic'}\n- Model: ${selectedModelData?.model_name || 'Generic Model'}\n- Model Series: ${selectedModelData?.model_series || 'Standard'}\n- Firmware: ${selectedFirmware || 'Latest Stable'}\n- Configuration Type: ${configType}\n\nDETAILED REQUIREMENTS:\n${aiRequirements}\n\nCONFIGURATION SCOPE:\nPlease generate a comprehensive, enterprise-grade configuration that includes:\n1. Complete device configuration with all necessary commands\n2. Security hardening and best practices implementation\n3. Detailed inline documentation and comments\n4. RADIUS/AAA integration for authentication\n5. Dynamic VLAN assignment configuration\n6. Quality of Service (QoS) configuration\n7. SNMP and monitoring setup\n8. Access control lists and security policies\n9. Backup and recovery procedures\n10. Comprehensive troubleshooting guide\n11. Implementation and validation steps\n12. Maintenance and update procedures\n\nADDITIONAL REQUIREMENTS:\n- Follow vendor-specific best practices for ${selectedVendorData?.vendor_name || 'the selected vendor'}\n- Include security considerations for ${configType}\n- Provide production-ready configuration suitable for enterprise deployment\n- Include performance optimization settings\n- Add comprehensive error handling and failover configurations\n\nFORMAT: Provide a well-structured, professional configuration document with clear sections, detailed explanations, and actionable implementation guidance.`;
+      const enhancedPrompt = `COMPREHENSIVE NETWORK CONFIGURATION REQUEST\n\nDEVICE SPECIFICATIONS:\n- Vendor: ${selectedVendorData?.name || 'Generic'}\n- Model: ${selectedModelData?.name || 'Generic Model'}\n- Model Series: ${selectedModelData?.series || 'Standard'}\n- Firmware: ${selectedFirmware || 'Latest Stable'}\n- Configuration Type: ${configType}\n\nDETAILED REQUIREMENTS:\n${aiRequirements}\n\nCONFIGURATION SCOPE:\nPlease generate a comprehensive, enterprise-grade configuration that includes:\n1. Complete device configuration with all necessary commands\n2. Security hardening and best practices implementation\n3. Detailed inline documentation and comments\n4. RADIUS/AAA integration for authentication\n5. Dynamic VLAN assignment configuration\n6. Quality of Service (QoS) configuration\n7. SNMP and monitoring setup\n8. Access control lists and security policies\n9. Backup and recovery procedures\n10. Comprehensive troubleshooting guide\n11. Implementation and validation steps\n12. Maintenance and update procedures\n\nADDITIONAL REQUIREMENTS:\n- Follow vendor-specific best practices for ${selectedVendorData?.name || 'the selected vendor'}\n- Include security considerations for ${configType}\n- Provide production-ready configuration suitable for enterprise deployment\n- Include performance optimization settings\n- Add comprehensive error handling and failover configurations\n\nFORMAT: Provide a well-structured, professional configuration document with clear sections, detailed explanations, and actionable implementation guidance.`;
       
       const result = await generateWithAI.mutateAsync({
-        vendor: selectedVendorData?.vendor_name || '',
-        model: selectedModelData?.model_name || '',
+        vendor: selectedVendorData?.name || '',
+        model: selectedModelData?.name || '',
         firmware: selectedFirmware,
         configType,
         requirements: enhancedPrompt,
@@ -304,8 +303,8 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
   };
 
   const handleSaveGeneratedConfig = () => {
-    const selectedVendorName = vendors?.find(v => v.id === selectedVendor)?.vendor_name || '';
-    const selectedModelName = vendorModels?.find(m => m.id === selectedModel)?.model_name || '';
+    const selectedVendorName = vendors?.find(v => v.id === selectedVendor)?.name || '';
+    const selectedModelName = vendorModels?.find(m => m.id === selectedModel)?.name || '';
     
     form.reset({
       name: `${selectedVendorName} ${configType} Configuration`,
@@ -356,7 +355,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
 
       // Detect vendor by keywords
       let detectedVendorId = selectedVendor;
-      const findVendor = (namePart: string) => vendors?.find(v => v.vendor_name.toLowerCase().includes(namePart))?.id;
+      const findVendor = (namePart: string) => vendors?.find(v => v.name.toLowerCase().includes(namePart))?.id;
       if (!detectedVendorId) {
         if (text.includes('cisco') || text.includes('ios-xe') || text.includes('cat9')) detectedVendorId = findVendor('cisco') || '';
         else if (text.includes('forti') || text.includes('fortiswitch') || text.includes('fortios')) detectedVendorId = findVendor('forti') || '';
@@ -368,7 +367,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
       if (detectedVendorId && !detectedModelId) {
         const models = vendorModels?.filter(m => m.vendor_id === detectedVendorId) || [];
         for (const m of models) {
-          const name = (m.model_name || '').toLowerCase();
+          const name = (m.name || '').toLowerCase();
           if (name && text.includes(name)) { detectedModelId = m.id; break; }
         }
       }
@@ -671,7 +670,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
                     <Label>Optimized Configuration</Label>
                     <CodeBlock code={optimizedConfig} heightClass="h-[60vh]" filename={`optimized-config.txt`} />
                     <Button onClick={() => {
-                      const vendorName = vendors?.find(v => v.id === selectedVendor)?.vendor_name || '';
+                      const vendorName = vendors?.find(v => v.id === selectedVendor)?.name || '';
                       form.reset({
                         name: `${vendorName || 'Generic'} Optimized Configuration`,
                         description: `Optimized configuration generated by AI with Portnox best practices.`,
@@ -707,8 +706,8 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
                     if (!pastedConfig?.trim()) return;
 
                     // Build context strings
-                    const vendorName = vendors?.find(v => v.id === selectedVendor)?.vendor_name || 'Unknown';
-                    const modelName = vendorModels?.find(m => m.id === selectedModel)?.model_name || '';
+                    const vendorName = vendors?.find(v => v.id === selectedVendor)?.name || 'Unknown';
+                    const modelName = vendorModels?.find(m => m.id === selectedModel)?.name || '';
                     const firmware = selectedFirmware || '';
 
                     const featureLines = [
@@ -808,7 +807,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
                             <SelectContent>
                               {vendors?.map(vendor => (
                                 <SelectItem key={vendor.id} value={vendor.id}>
-                                  {vendor.vendor_name}
+                                  {vendor.name}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -863,7 +862,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
                   <CardTitle className="text-lg">{template.name}</CardTitle>
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="secondary" className="text-xs">
-                      {template.vendor?.vendor_name || 'Unknown Vendor'}
+                      {template.vendor?.name || 'Unknown Vendor'}
                     </Badge>
                     <Badge className={getDifficultyColor(template.complexity_level)}>
                       {template.complexity_level}
@@ -953,7 +952,7 @@ const ConfigGeneratorManager: React.FC<ConfigGeneratorManagerProps> = ({ searchT
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm font-medium">Vendor:</p>
-                  <p className="text-sm text-muted-foreground">{selectedTemplate.vendor?.vendor_name}</p>
+                  <p className="text-sm text-muted-foreground">{selectedTemplate.vendor?.name}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium">Category:</p>

@@ -48,7 +48,7 @@ import {
   CheckSquare
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useEnhancedVendors } from "@/hooks/useEnhancedVendors";
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useIndustryOptions, useComplianceFrameworks } from "@/hooks/useResourceLibrary";
 import { useRefreshResources } from "@/hooks/useRefreshResources";
 import { useAI } from "@/hooks/useAI";
@@ -266,7 +266,7 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
   ];
 
   const { data: industryOptionsData = [] } = useIndustryOptions();
-  const { data: enhancedVendors = [] } = useEnhancedVendors();
+  const { data: enhancedVendors = [] } = useUnifiedVendors({});
   const { refreshAll } = useRefreshResources();
   useEffect(() => { refreshAll(); }, []);
 
@@ -292,9 +292,9 @@ const UltimateAIScopingWizard: React.FC<UltimateAIScopingWizardProps> = ({
 
   const mapVendor = (ev: any) => ({
     id: ev.id,
-    name: ev.vendor_name,
+    name: ev.name,
     category: ev.category,
-    icon: (ev.vendor_name || '?').toString().charAt(0).toUpperCase(),
+    icon: (ev.name || '?').toString().charAt(0).toUpperCase(),
     color: 'bg-primary',
     models: (ev.models || []).map((m: any) => ({
       name: m.name || m.model_name || 'Model',

@@ -17,7 +17,7 @@ import {
   useCreateAuthenticationMethod,
   useCreateNetworkSegment
 } from '@/hooks/useResourceLibrary';
-import { useCreateEnhancedVendor } from '@/hooks/useEnhancedVendors';
+import { useCreateVendor } from '@/hooks/useUnifiedVendors';
 import { useCreateUseCase } from '@/hooks/useUseCases';
 import { useCreateRequirement } from '@/hooks/useRequirements';
 
@@ -44,7 +44,7 @@ export const ResourceCreationDialog: React.FC<ResourceCreationDialogProps> = ({
   const createBusinessMutation = useCreateBusinessDomain();
   const createAuthMutation = useCreateAuthenticationMethod();
   const createNetworkMutation = useCreateNetworkSegment();
-  const createVendorMutation = useCreateEnhancedVendor();
+  const createVendorMutation = useCreateVendor();
   const createUseCaseMutation = useCreateUseCase();
   const createRequirementMutation = useCreateRequirement();
 
@@ -54,7 +54,6 @@ export const ResourceCreationDialog: React.FC<ResourceCreationDialogProps> = ({
     title: '',
     description: '',
     category: '',
-    vendor_name: '',
     vendor_type: '',
     method_type: '',
     segment_type: '',
@@ -93,7 +92,6 @@ export const ResourceCreationDialog: React.FC<ResourceCreationDialogProps> = ({
       title: '',
       description: '',
       category: '',
-      vendor_name: '',
       vendor_type: '',
       method_type: '',
       segment_type: '',
@@ -251,7 +249,7 @@ export const ResourceCreationDialog: React.FC<ResourceCreationDialogProps> = ({
           break;
         case 'vendor':
           result = await createVendorMutation.mutateAsync({
-            vendor_name: formData.vendor_name,
+            name: formData.name,
             vendor_type: formData.vendor_type,
             category: formData.category,
             description: formData.description,
@@ -354,11 +352,11 @@ export const ResourceCreationDialog: React.FC<ResourceCreationDialogProps> = ({
                  resourceType === 'requirement' ? 'Title' : 'Name'}
               </Label>
               <Input
-                value={resourceType === 'vendor' ? formData.vendor_name : 
+                value={resourceType === 'vendor' ? formData.name : 
                        resourceType === 'requirement' ? formData.title : formData.name}
                 onChange={(e) => setFormData(prev => ({ 
                   ...prev, 
-                  [resourceType === 'vendor' ? 'vendor_name' : 
+                  [resourceType === 'vendor' ? 'name' : 
                     resourceType === 'requirement' ? 'title' : 'name']: e.target.value 
                 }))}
                 placeholder={`Enter ${resourceType === 'vendor' ? 'vendor name' : 
@@ -518,7 +516,7 @@ export const ResourceCreationDialog: React.FC<ResourceCreationDialogProps> = ({
             </Button>
             <Button 
               onClick={handleCreate} 
-              disabled={isCreating || !(formData.name || formData.vendor_name || formData.title)}
+              disabled={isCreating || !(formData.name || formData.name || formData.title)}
             >
               {isCreating ? 'Creating...' : `Create ${getResourceTitle()}`}
             </Button>

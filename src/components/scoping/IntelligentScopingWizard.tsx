@@ -17,7 +17,7 @@ import {
 import { useCreateProject } from '@/hooks/useProjects';
 import { useIndustryOptions, useComplianceFrameworks, useAuthenticationMethods } from '@/hooks/useResourceLibrary';
 import { useDeviceTypes } from '@/hooks/useDeviceTypes';
-import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRefreshResources } from '@/hooks/useRefreshResources';
 import { useToast } from '@/hooks/use-toast';
@@ -154,7 +154,7 @@ const IntelligentScopingWizard: React.FC<IntelligentScopingWizardProps> = ({ onC
   const { data: complianceData = [] } = useComplianceFrameworks();
   const { data: authMethods = [] } = useAuthenticationMethods();
   const { data: deviceTypes = [] } = useDeviceTypes();
-  const { data: enhancedVendors = [] } = useEnhancedVendors();
+  const { data: enhancedVendors = [] } = useUnifiedVendors({});
   const { data: useCases = [] } = useUseCases();
   const { refreshAll } = useRefreshResources();
 
@@ -165,10 +165,10 @@ const IntelligentScopingWizard: React.FC<IntelligentScopingWizardProps> = ({ onC
   const endpointTypes = deviceTypes.map((d: any) => d.device_name);
   const networkVendors = enhancedVendors
     .filter((v: any) => ['Wired Switch', 'Wireless', 'Router'].includes(v.category) || ['Switch','Access Point','Router'].includes(v.vendor_type))
-    .map((v: any) => v.vendor_name);
+    .map((v: any) => v.name);
   const primaryGoals = useCases.map((uc: any) => uc.name);
   const authenticationMethods = authMethods.map((m: any) => m.name);
-  const integrationNeeds = enhancedVendors.map((v: any) => v.vendor_name);
+  const integrationNeeds = enhancedVendors.map((v: any) => v.name);
 
   const calculateProgress = () => {
     if (currentStep === steps.length - 1 && formData.ai_recommendations) return 100;

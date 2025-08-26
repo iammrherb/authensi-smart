@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Network, Shield, Server, Wifi, Plus, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useVendors } from '@/hooks/useVendors';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 
 export interface InfrastructureSelection {
   nac_vendors: string[];
@@ -40,7 +40,7 @@ interface InfrastructureSelectorProps {
 
 const InfrastructureSelector: React.FC<InfrastructureSelectorProps> = ({ value, onChange }) => {
   const [activeTab, setActiveTab] = useState<'nac' | 'network' | 'security' | 'inventory'>('nac');
-  const { data: vendors = [] } = useVendors();
+  const { data: vendors = [] } = useUnifiedVendors({});
 
   const updateSelection = (path: string, newValue: any) => {
     const keys = path.split('.');
@@ -87,7 +87,7 @@ const InfrastructureSelector: React.FC<InfrastructureSelectorProps> = ({ value, 
                       updateSelection('nac_vendors', updated);
                     }}
                   >
-                    <span className="font-medium">{vendor.vendor_name}</span>
+                    <span className="font-medium">{vendor.name}</span>
                     {value.nac_vendors.includes(vendor.id) && (
                       <Badge variant="secondary" className="ml-2">Selected</Badge>
                     )}

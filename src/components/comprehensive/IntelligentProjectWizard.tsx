@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { UnifiedDecisionEngine, DecisionContext, DecisionRecommendation, DecisionPath } from '@/services/UnifiedDecisionEngine';
 import { useIndustryOptions, useComplianceFrameworks, useDeploymentTypes, useAuthenticationMethods } from '@/hooks/useResourceLibrary';
-import { useVendors } from '@/hooks/useVendors';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useToast } from '@/hooks/use-toast';
 
 interface ProjectData {
@@ -94,7 +94,7 @@ const IntelligentProjectWizard: React.FC<IntelligentProjectWizardProps> = ({
   const { data: complianceFrameworks } = useComplianceFrameworks();
   const { data: deploymentTypes } = useDeploymentTypes();
   const { data: authMethods } = useAuthenticationMethods();
-  const { data: vendors } = useVendors();
+  const { data: vendors } = useUnifiedVendors({});
   const { toast } = useToast();
 
   const steps = [
@@ -419,14 +419,14 @@ const IntelligentProjectWizard: React.FC<IntelligentProjectWizardProps> = ({
                     <div key={vendor.id} className="flex items-center space-x-2">
                       <Checkbox
                         id={`${category}-${vendor.id}`}
-                        checked={selectedVendors.includes(vendor.vendor_name)}
+                        checked={selectedVendors.includes(vendor.name)}
                         onCheckedChange={(checked) => {
                           if (checked) {
                             setProjectData(prev => ({
                               ...prev,
                               existingVendors: {
                                 ...prev.existingVendors,
-                                [category]: [...selectedVendors, vendor.vendor_name]
+                                [category]: [...selectedVendors, vendor.name]
                               }
                             }));
                           } else {
@@ -434,14 +434,14 @@ const IntelligentProjectWizard: React.FC<IntelligentProjectWizardProps> = ({
                               ...prev,
                               existingVendors: {
                                 ...prev.existingVendors,
-                                [category]: selectedVendors.filter(v => v !== vendor.vendor_name)
+                                [category]: selectedVendors.filter(v => v !== vendor.name)
                               }
                             }));
                           }
                         }}
                       />
                       <Label htmlFor={`${category}-${vendor.id}`} className="text-sm">
-                        {vendor.vendor_name}
+                        {vendor.name}
                       </Label>
                     </div>
                   ))}

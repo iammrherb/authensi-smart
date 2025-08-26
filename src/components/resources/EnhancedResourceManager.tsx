@@ -13,7 +13,7 @@ import {
   Network, Target, CheckSquare, Building2, Shield, Globe,
   Users, Database, Workflow
 } from 'lucide-react';
-import { useEnhancedVendors, useCreateEnhancedVendor } from '@/hooks/useEnhancedVendors';
+import { useUnifiedVendors, useCreateVendor } from '@/hooks/useUnifiedVendors';
 import { useUseCases, useCreateUseCase } from '@/hooks/useUseCases';
 import { useRequirements, useCreateRequirement } from '@/hooks/useRequirements';
 import { 
@@ -53,7 +53,7 @@ export const EnhancedResourceManager: React.FC<EnhancedResourceManagerProps> = (
   const [newResourceDialog, setNewResourceDialog] = useState(false);
 
   // Data hooks
-  const { data: vendors = [], isLoading: vendorsLoading } = useEnhancedVendors();
+  const { data: vendors = [], isLoading: vendorsLoading } = useUnifiedVendors({});
   const { data: useCases = [], isLoading: useCasesLoading } = useUseCases();
   const { data: requirements = [], isLoading: requirementsLoading } = useRequirements();
   const { data: industries = [] } = useIndustryOptions();
@@ -66,7 +66,7 @@ export const EnhancedResourceManager: React.FC<EnhancedResourceManagerProps> = (
   const { data: projectPhases = [] } = useProjectPhases();
   
   // Mutation hooks
-  const createVendorMutation = useCreateEnhancedVendor();
+  const createVendorMutation = useCreateVendor();
   const createUseCaseMutation = useCreateUseCase();
   const createRequirementMutation = useCreateRequirement();
   const createIndustryMutation = useCreateIndustryOption();
@@ -83,7 +83,7 @@ export const EnhancedResourceManager: React.FC<EnhancedResourceManagerProps> = (
   // Form states
   const [newResourceData, setNewResourceData] = useState({
     vendor: {
-      vendor_name: '',
+      name: '',
       vendor_type: '',
       category: 'NAC',
       description: '',
@@ -162,7 +162,7 @@ export const EnhancedResourceManager: React.FC<EnhancedResourceManagerProps> = (
     const searchLower = searchTerm.toLowerCase();
     switch (activeTab) {
       case 'vendors': return { 
-        data: vendors.filter(v => v.vendor_name?.toLowerCase().includes(searchLower) || v.category?.toLowerCase().includes(searchLower)), 
+        data: vendors.filter(v => v.name?.toLowerCase().includes(searchLower) || v.category?.toLowerCase().includes(searchLower)), 
         loading: vendorsLoading 
       };
       case 'usecases': return { 
@@ -273,7 +273,7 @@ export const EnhancedResourceManager: React.FC<EnhancedResourceManagerProps> = (
 
   const getDefaultFormData = (type: string) => {
     const defaults: any = {
-      vendor: { vendor_name: '', vendor_type: '', category: 'NAC', description: '', website_url: '', support_contact: {}, certifications: [], portnox_integration_level: 'supported', portnox_documentation: {}, models: [], supported_protocols: [], integration_methods: [], portnox_compatibility: {}, configuration_templates: {}, known_limitations: [], firmware_requirements: {}, documentation_links: [], support_level: 'full', status: 'active' },
+      vendor: { name: '', vendor_type: '', category: 'NAC', description: '', website_url: '', support_contact: {}, certifications: [], portnox_integration_level: 'supported', portnox_documentation: {}, models: [], supported_protocols: [], integration_methods: [], portnox_compatibility: {}, configuration_templates: {}, known_limitations: [], firmware_requirements: {}, documentation_links: [], support_level: 'full', status: 'active' },
       usecase: { name: '', description: '', category: '', industry_focus: [], technical_requirements: [], portnox_features: [], complexity_level: 'medium', implementation_time: '1-2 weeks', tags: [] },
       requirement: { title: '', description: '', category: 'functional', priority: 'medium', complexity: 'medium', validation_criteria: [], dependencies: [], tags: [] },
       industries: { name: '', description: '', category: 'general' },
@@ -297,7 +297,7 @@ export const EnhancedResourceManager: React.FC<EnhancedResourceManagerProps> = (
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <CardTitle className="text-lg">
-                {resource.vendor_name || resource.name || resource.title}
+                {resource.name || resource.title}
               </CardTitle>
               <p className="text-sm text-muted-foreground line-clamp-2">
                 {resource.vendor_type || resource.description || resource.category}
@@ -386,8 +386,8 @@ export const EnhancedResourceManager: React.FC<EnhancedResourceManagerProps> = (
           <div>
             <Label>Name/Title</Label>
             <Input 
-              value={data.vendor_name || data.name || data.title || ''}
-              onChange={(e) => updateData(data.vendor_name !== undefined ? 'vendor_name' : data.name !== undefined ? 'name' : 'title', e.target.value)}
+              value={data.name || data.title || ''}
+              onChange={(e) => updateData(data.name !== undefined ? 'name' : 'title', e.target.value)}
               placeholder="Enter name or title"
             />
           </div>
@@ -504,7 +504,7 @@ export const EnhancedResourceManager: React.FC<EnhancedResourceManagerProps> = (
         
         <Button 
           onClick={handleCreateResource} 
-          disabled={!data.vendor_name && !data.name && !data.title}
+          disabled={!data.name && !data.title}
           className="w-full"
         >
           Create {resourceType.charAt(0).toUpperCase() + resourceType.slice(1)}

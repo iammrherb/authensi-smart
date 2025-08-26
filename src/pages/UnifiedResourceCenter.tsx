@@ -20,7 +20,7 @@ import RequirementsManagement from '@/components/requirements/RequirementsManage
 import ProjectTemplatesManager from '@/components/templates/ProjectTemplatesManager';
 
 // Import hooks for real data
-import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { useConfigTemplates } from '@/hooks/useConfigTemplates';
@@ -40,7 +40,7 @@ const UnifiedResourceCenter = () => {
   const [activeCategory, setActiveCategory] = useState('overview');
 
   // Fetch real data for counts
-  const { data: vendors = [] } = useEnhancedVendors();
+  const { data: vendors = [] } = useUnifiedVendors({});
   const { data: useCases = [] } = useUseCases();
   const { data: requirements = [] } = useRequirements();
   const { data: configTemplates = [] } = useConfigTemplates();

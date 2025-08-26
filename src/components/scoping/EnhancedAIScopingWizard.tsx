@@ -12,7 +12,7 @@ import {
    Globe, Server, Database, Monitor, Smartphone, Lock
  } from 'lucide-react';
 
-import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 import { 
@@ -75,7 +75,7 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
   const updateSessionDb = useUpdateScopingSession();
   const [dbSessionId, setDbSessionId] = useState<string | null>(null);
 
-  const { data: vendors = [] } = useEnhancedVendors();
+  const { data: vendors = [] } = useUnifiedVendors({});
   const { data: useCases = [] } = useUseCases();
   const { data: requirements = [] } = useRequirements();
   const createProjectMutation = useCreateProject();
@@ -125,7 +125,7 @@ const EnhancedAIScopingWizard: React.FC<EnhancedAIScopingWizardProps> = ({
     const requirementIds = completedScopingData.use_cases_requirements?.selected_requirements || [];
     
     // Map to actual objects from Resource Library
-    const mappedVendors = vendors.filter(v => vendorIds.includes(v.id) || vendorIds.includes(v.vendor_name));
+    const mappedVendors = vendors.filter(v => vendorIds.includes(v.id) || vendorIds.includes(v.name));
     const mappedUseCases = useCases.filter(uc => useCaseIds.includes(uc.id) || useCaseIds.includes(uc.name));
     const mappedRequirements = requirements.filter(req => requirementIds.includes(req.id) || requirementIds.includes(req.title));
     

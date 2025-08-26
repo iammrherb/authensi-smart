@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 // Import all the existing hooks
-import { useEnhancedVendors, useCreateEnhancedVendor, useUpdateEnhancedVendor, useDeleteEnhancedVendor } from '@/hooks/useEnhancedVendors';
+import { useUnifiedVendors, useCreateVendor, useUpdateVendor, useDeleteVendor } from '@/hooks/useUnifiedVendors';
 import { useIndustryOptions, useCreateIndustryOption } from '@/hooks/useResourceLibrary';
 import { useUseCases, useCreateUseCase } from '@/hooks/useUseCases';
 import { useRequirements, useCreateRequirement } from '@/hooks/useRequirements';
@@ -34,15 +34,15 @@ const ComprehensiveTaxonomyManager = () => {
   const { toast } = useToast();
   
   // Data hooks
-  const { data: vendors = [], isLoading: vendorsLoading } = useEnhancedVendors();
+  const { data: vendors = [], isLoading: vendorsLoading } = useUnifiedVendors({});
   const { data: industries = [] } = useIndustryOptions();
   const { data: useCases = [] } = useUseCases();
   const { data: requirements = [] } = useRequirements();
   
   // Mutation hooks
-  const createVendor = useCreateEnhancedVendor();
-  const updateVendor = useUpdateEnhancedVendor();
-  const deleteVendor = useDeleteEnhancedVendor();
+  const createVendor = useCreateVendor();
+  const updateVendor = useUpdateVendor();
+  const deleteVendor = useDeleteVendor();
   const createIndustry = useCreateIndustryOption();
   const createUseCase = useCreateUseCase();
   const createRequirement = useCreateRequirement();
@@ -52,7 +52,7 @@ const ComprehensiveTaxonomyManager = () => {
     switch (activeTab) {
       case 'vendors':
         return vendors.filter(v => 
-          v.vendor_name?.toLowerCase().includes(searchLower) ||
+          v.name?.toLowerCase().includes(searchLower) ||
           v.category?.toLowerCase().includes(searchLower) ||
           v.vendor_type?.toLowerCase().includes(searchLower)
         );
@@ -150,7 +150,7 @@ const ComprehensiveTaxonomyManager = () => {
               {vendor.vendor_type === 'Firewall' && <Shield className="h-5 w-5 text-red-500" />}
               {vendor.vendor_type === 'EDR' && <Monitor className="h-5 w-5 text-orange-500" />}
               {vendor.vendor_type === 'MDM' && <Smartphone className="h-5 w-5 text-cyan-500" />}
-              {vendor.vendor_name}
+              {vendor.name}
             </CardTitle>
             <div className="flex items-center gap-2 mt-1">
               <Badge variant={vendor.status === 'active' ? 'default' : 'secondary'}>
@@ -469,7 +469,7 @@ const ComprehensiveTaxonomyManager = () => {
                 <TableBody>
                   {filteredData.map((vendor: any) => (
                     <TableRow key={vendor.id}>
-                      <TableCell className="font-medium">{vendor.vendor_name}</TableCell>
+                      <TableCell className="font-medium">{vendor.name}</TableCell>
                       <TableCell>{vendor.vendor_type}</TableCell>
                       <TableCell>{vendor.category}</TableCell>
                       <TableCell>

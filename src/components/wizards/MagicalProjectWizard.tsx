@@ -16,7 +16,7 @@ import {
   Layers, Network, Database, Lock, Award, TrendingUp, BarChart3
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useVendors } from '@/hooks/useVendors';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
 
@@ -37,7 +37,7 @@ interface MagicalProjectWizardProps {
 
 const MagicalProjectWizard: React.FC<MagicalProjectWizardProps> = ({ onComplete, onCancel }) => {
   const { toast } = useToast();
-  const { data: vendors } = useVendors();
+  const { data: vendors } = useUnifiedVendors({});
   const { data: useCases } = useUseCases();
   const { data: requirements } = useRequirements();
 

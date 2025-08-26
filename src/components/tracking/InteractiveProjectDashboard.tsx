@@ -13,7 +13,7 @@ import IntelligentProjectPlanningEngine from '@/components/ai/IntelligentProject
 import { useProjects } from '@/hooks/useProjects';
 import { useSites } from '@/hooks/useSites';
 import { useUseCases } from '@/hooks/useUseCases';
-import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useEnhancedAI } from '@/hooks/useEnhancedAI';
 import { 
   BarChart, 
@@ -87,7 +87,7 @@ const InteractiveProjectDashboard: React.FC<InteractiveProjectDashboardProps> = 
   const { data: projects } = useProjects();
   const { data: sites } = useSites();
   const { data: useCases } = useUseCases();
-  const { data: vendors } = useEnhancedVendors();
+  const { data: vendors } = useUnifiedVendors({});
   const { generateCompletion, isLoading } = useEnhancedAI();
 
   const project = projects?.find(p => p.id === projectId);

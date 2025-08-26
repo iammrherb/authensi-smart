@@ -36,7 +36,7 @@ import {
 } from 'lucide-react';
 import { useConfigTemplates, useCreateConfigTemplate, useUpdateConfigTemplate } from '@/hooks/useConfigTemplates';
 import { useTemplateCustomizations, useCreateTemplateCustomization, useCloneTemplate } from '@/hooks/useTemplateCustomizations';
-import { useVendors } from '@/hooks/useVendors';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useToast } from '@/hooks/use-toast';
 import CodeBlock from '@/components/ui/code-block';
 
@@ -55,7 +55,7 @@ const EnhancedTemplateManager: React.FC<EnhancedTemplateManagerProps> = ({
 }) => {
   const { data: templates } = useConfigTemplates();
   const { data: customizations } = useTemplateCustomizations(projectId, siteId);
-  const { data: vendors } = useVendors();
+  const { data: vendors } = useUnifiedVendors({});
   const createTemplate = useCreateConfigTemplate();
   const updateTemplate = useUpdateConfigTemplate();
   const createCustomization = useCreateTemplateCustomization();
@@ -201,7 +201,7 @@ const EnhancedTemplateManager: React.FC<EnhancedTemplateManagerProps> = ({
                       <SelectContent>
                         {vendors?.map(vendor => (
                           <SelectItem key={vendor.id} value={vendor.id}>
-                            {vendor.vendor_name}
+                            {vendor.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -304,7 +304,7 @@ const EnhancedTemplateManager: React.FC<EnhancedTemplateManagerProps> = ({
               <SelectItem value="all">All Vendors</SelectItem>
               {vendors?.map(vendor => (
                 <SelectItem key={vendor.id} value={vendor.id}>
-                  {vendor.vendor_name}
+                  {vendor.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -332,7 +332,7 @@ const EnhancedTemplateManager: React.FC<EnhancedTemplateManagerProps> = ({
                     <div className="flex-1">
                       <CardTitle className="text-lg">{template.name}</CardTitle>
                       <CardDescription className="text-sm">
-                        {template.vendor?.vendor_name} • {template.category}
+                        {template.vendor?.name} • {template.category}
                       </CardDescription>
                     </div>
                     <Badge className={getComplexityColor(template.complexity_level)}>
@@ -466,7 +466,7 @@ const EnhancedTemplateManager: React.FC<EnhancedTemplateManagerProps> = ({
             <DialogHeader>
               <DialogTitle>{selectedTemplate.name}</DialogTitle>
               <DialogDescription>
-                {selectedTemplate.vendor?.vendor_name} • {selectedTemplate.category} • {selectedTemplate.complexity_level}
+                {selectedTemplate.vendor?.name} • {selectedTemplate.category} • {selectedTemplate.complexity_level}
               </DialogDescription>
             </DialogHeader>
             <ScrollArea className="max-h-[70vh]">

@@ -42,7 +42,7 @@ import {
   Edit
 } from 'lucide-react';
 import { useConfigTemplates, useCreateConfigTemplate, useGenerateConfigWithAI } from '@/hooks/useConfigTemplates';
-import { useEnhancedVendors } from '@/hooks/useEnhancedVendors';
+import { useUnifiedVendors } from '@/hooks/useUnifiedVendors';
 import { useVendorModels } from '@/hooks/useVendorModels';
 import { useUseCases } from '@/hooks/useUseCases';
 import { useRequirements } from '@/hooks/useRequirements';
@@ -77,7 +77,7 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
   onCancel 
 }) => {
   const { data: templates } = useConfigTemplates();
-  const { data: vendors } = useEnhancedVendors();
+  const { data: vendors } = useUnifiedVendors({});
   const { data: vendorModels } = useVendorModels();
   const { data: useCases } = useUseCases();
   const { data: requirements } = useRequirements();
@@ -244,7 +244,7 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
 
       // Build comprehensive context for AI generation
       const contextData = {
-        vendor: selectedVendor?.vendor_name || 'Generic',
+        vendor: selectedVendor?.name || 'Generic',
         model: selectedModel?.model_name || 'Generic Model',
         firmware: wizardData.basic.firmwareVersion || 'Latest',
         deviceType: wizardData.basic.deviceType,
@@ -307,7 +307,7 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
       const scenario = configurationScenarios.find(s => s.id === wizardData.scenario.selectedScenario);
       
       const templateData = {
-        name: wizardData.basic.name || `${selectedVendor?.vendor_name} ${scenario?.name}`,
+        name: wizardData.basic.name || `${selectedVendor?.name} ${scenario?.name}`,
         description: wizardData.basic.description || scenario?.description,
         vendor_id: wizardData.basic.vendor,
         model_id: wizardData.basic.model || undefined,
@@ -801,7 +801,7 @@ const OneXerConfigWizard: React.FC<OneXerConfigWizardProps> = ({
             <div className="flex justify-between">
               <span className="text-sm text-muted-foreground">Vendor:</span>
               <span className="text-sm font-medium">
-                {vendors?.find(v => v.id === wizardData.basic.vendor)?.vendor_name}
+                {vendors?.find(v => v.id === wizardData.basic.vendor)?.name}
               </span>
             </div>
             <div className="flex justify-between">
