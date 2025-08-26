@@ -10,113 +10,106 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { useUnifiedVendors, useCreateVendor, type Vendor } from '@/hooks/useUnifiedVendors';
+import { useUnifiedVendors, useCreateUnifiedVendor, type UnifiedVendor } from '@/hooks/useUnifiedVendors';
 import { CheckCircle, XCircle, AlertCircle, Plus, Search, ExternalLink, Edit, Trash2, Star, Globe, Phone, Mail } from "lucide-react";
 
 const EnhancedVendorManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+  const [selectedVendor, setSelectedVendor] = useState<UnifiedVendor | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
   const { data: vendorsFromDB = [], isLoading } = useUnifiedVendors({});
-  const createVendor = useCreateVendor();
+  const createVendor = useCreateUnifiedVendor();
 
   // Enhanced mock data for comprehensive vendor management
-  const comprehensiveVendors: Vendor[] = [
+  const comprehensiveVendors: UnifiedVendor[] = [
     {
       id: "portnox-001",
       name: "Portnox",
-      vendor_type: "Primary NAC",
       category: "NAC",
-      models: ["CORE", "CLEAR", "EDGE"],
-      supported_protocols: ["RADIUS", "802.1X", "MAB", "TACACS+", "LDAP"],
-      integration_methods: ["Native API", "REST API", "SAML", "SCIM"],
-      portnox_compatibility: { level: "native", features: ["full_integration", "advanced_policies"] },
-      configuration_templates: { available: true, count: 15 },
-      known_limitations: [],
-      firmware_requirements: { minimum: "21.1", recommended: "22.3" },
-      documentation_links: [
-        { title: "Admin Guide", url: "#", type: "setup" },
-        { title: "API Reference", url: "#", type: "api" },
-        { title: "Best Practices", url: "#", type: "best-practices" }
+      subcategory: "Primary NAC",
+      icon: "🔐",
+      color: "bg-blue-500",
+      description: "AI-Powered Network Access Control Platform",
+      models: [
+        { id: "core-1", name: "CORE", series: "Enterprise", category: "NAC Platform", firmwareVersions: ["21.1", "22.3"], capabilities: ["AI Analytics", "Zero Trust"] },
+        { id: "clear-1", name: "CLEAR", series: "Cloud", category: "Cloud NAC", firmwareVersions: ["Cloud-2024.3"], capabilities: ["Cloud Management"] },
+        { id: "edge-1", name: "EDGE", series: "Branch", category: "Branch NAC", firmwareVersions: ["6.5.2"], capabilities: ["Branch Protection"] }
       ],
-      support_level: "full",
-      last_tested_date: "2024-01-15",
-      status: "active",
-      created_at: "2024-01-01",
-      updated_at: "2024-01-15",
-      created_by: "system"
+      commonFeatures: ["RADIUS", "802.1X", "MAB", "TACACS+", "LDAP"],
+      supportLevel: "full",
+      portnoxCompatibility: "native",
+      integrationMethods: ["Native API", "REST API", "SAML", "SCIM"],
+      knownLimitations: [],
+      documentationLinks: ["#admin-guide", "#api-reference", "#best-practices"],
+      lastTestedDate: "2024-01-15",
+      status: "active"
     },
     {
       id: "cisco-meraki-001",
       name: "Cisco Meraki",
-      vendor_type: "Wireless Controller",
       category: "Wireless",
-      models: ["MR46", "MR56", "MR86", "MR46E", "MR57"],
-      supported_protocols: ["802.11ax", "802.11ac", "WPA3-Enterprise", "RADSec"],
-      integration_methods: ["Cloud API", "Dashboard API", "Webhook"],
-      portnox_compatibility: { level: "certified", features: ["radsec", "dynamic_policies"] },
-      configuration_templates: { available: true, count: 8 },
-      known_limitations: ["Cloud dependency", "Limited on-premise control"],
-      firmware_requirements: { minimum: "28.6", recommended: "29.7" },
-      documentation_links: [
-        { title: "Meraki Integration Guide", url: "#", type: "setup" },
-        { title: "Dashboard API", url: "#", type: "api" }
+      subcategory: "Wireless Controller",
+      icon: "📶",
+      color: "bg-blue-600",
+      description: "Cloud-managed wireless access points",
+      models: [
+        { id: "mr46-1", name: "MR46", series: "Wi-Fi 6", category: "Indoor AP", firmwareVersions: ["28.6", "29.7"], capabilities: ["802.11ax", "WPA3-Enterprise"] },
+        { id: "mr56-1", name: "MR56", series: "Wi-Fi 6E", category: "Indoor AP", firmwareVersions: ["28.6", "29.7"], capabilities: ["802.11ax", "6GHz"] },
+        { id: "mr86-1", name: "MR86", series: "Wi-Fi 6E", category: "Outdoor AP", firmwareVersions: ["28.6", "29.7"], capabilities: ["802.11ax", "Outdoor"] }
       ],
-      support_level: "full",
-      last_tested_date: "2024-01-12",
-      status: "active",
-      created_at: "2024-01-01",
-      updated_at: "2024-01-12",
-      created_by: "system"
+      commonFeatures: ["802.11ax", "802.11ac", "WPA3-Enterprise", "RADSec"],
+      supportLevel: "full",
+      portnoxCompatibility: "api",
+      integrationMethods: ["Cloud API", "Dashboard API", "Webhook"],
+      knownLimitations: ["Cloud dependency", "Limited on-premise control"],
+      documentationLinks: ["#meraki-guide", "#dashboard-api"],
+      lastTestedDate: "2024-01-12",
+      status: "active"
     },
     {
       id: "palo-alto-001",
       name: "Palo Alto Networks",
-      vendor_type: "Next-Gen Firewall",
-      category: "Security",
-      models: ["PA-220", "PA-820", "PA-3220", "PA-5220", "VM-Series"],
-      supported_protocols: ["User-ID", "GlobalProtect", "WildFire API"],
-      integration_methods: ["XML API", "REST API", "User-ID Agent"],
-      portnox_compatibility: { level: "certified", features: ["user_mapping", "dynamic_groups"] },
-      configuration_templates: { available: true, count: 12 },
-      known_limitations: ["Licensing requirements", "Complex policy management"],
-      firmware_requirements: { minimum: "10.1", recommended: "11.0" },
-      documentation_links: [
-        { title: "PAN-OS Integration", url: "#", type: "setup" },
-        { title: "XML API Guide", url: "#", type: "api" }
+      category: "Firewall",
+      subcategory: "Next-Gen Firewall",
+      icon: "🔥",
+      color: "bg-orange-500",
+      description: "Next-generation firewall and security platform",
+      models: [
+        { id: "pa220-1", name: "PA-220", series: "200 Series", category: "Entry Firewall", firmwareVersions: ["10.1", "11.0"], capabilities: ["User-ID", "GlobalProtect"] },
+        { id: "pa820-1", name: "PA-820", series: "800 Series", category: "Branch Firewall", firmwareVersions: ["10.1", "11.0"], capabilities: ["User-ID", "WildFire"] },
+        { id: "vm-1", name: "VM-Series", series: "Virtual", category: "Virtual Firewall", firmwareVersions: ["10.1", "11.0"], capabilities: ["Cloud", "Virtualization"] }
       ],
-      support_level: "full",
-      last_tested_date: "2024-01-10",
-      status: "active",
-      created_at: "2024-01-01",
-      updated_at: "2024-01-10",
-      created_by: "system"
+      commonFeatures: ["User-ID", "GlobalProtect", "WildFire API"],
+      supportLevel: "full",
+      portnoxCompatibility: "api",
+      integrationMethods: ["XML API", "REST API", "User-ID Agent"],
+      knownLimitations: ["Licensing requirements", "Complex policy management"],
+      documentationLinks: ["#panos-integration", "#xml-api-guide"],
+      lastTestedDate: "2024-01-10",
+      status: "active"
     },
     {
       id: "microsoft-intune-001",
       name: "Microsoft Intune",
-      vendor_type: "Mobile Device Management",
       category: "MDM",
-      models: ["Cloud Service"],
-      supported_protocols: ["SCEP", "PKCS", "Azure AD", "Graph API"],
-      integration_methods: ["Graph API", "PowerShell", "Azure Logic Apps"],
-      portnox_compatibility: { level: "certified", features: ["certificate_deployment", "compliance_sync"] },
-      configuration_templates: { available: true, count: 6 },
-      known_limitations: ["Cloud-only", "Azure AD dependency"],
-      firmware_requirements: { minimum: "N/A", recommended: "Latest" },
-      documentation_links: [
-        { title: "Intune Integration", url: "#", type: "setup" },
-        { title: "Graph API", url: "#", type: "api" }
+      subcategory: "Mobile Device Management",
+      icon: "📱",
+      color: "bg-blue-700",
+      description: "Cloud-based mobile device and application management",
+      models: [
+        { id: "intune-1", name: "Cloud Service", series: "Intune", category: "MDM Platform", firmwareVersions: ["Latest"], capabilities: ["SCEP", "PKCS", "Graph API"] }
       ],
-      support_level: "full",
-      last_tested_date: "2024-01-14",
-      status: "active",
-      created_at: "2024-01-01",
-      updated_at: "2024-01-14",
-      created_by: "system"
+      commonFeatures: ["SCEP", "PKCS", "Azure AD", "Graph API"],
+      supportLevel: "full",
+      portnoxCompatibility: "api",
+      integrationMethods: ["Graph API", "PowerShell", "Azure Logic Apps"],
+      knownLimitations: ["Cloud-only", "Azure AD dependency"],
+      documentationLinks: ["#intune-integration", "#graph-api"],
+      lastTestedDate: "2024-01-14",
+      status: "active"
     }
   ];
 
@@ -126,7 +119,8 @@ const EnhancedVendorManagement = () => {
   const filteredVendors = allVendors.filter(vendor => {
     const matchesSearch = vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          vendor.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         vendor.vendor_type.toLowerCase().includes(searchTerm.toLowerCase());
+                         (vendor.subcategory && vendor.subcategory.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                         (vendor.description && vendor.description.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = selectedCategory === "all" || vendor.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -142,29 +136,31 @@ const EnhancedVendorManagement = () => {
     }
   };
 
-  const getSupportLevelColor = (level?: string) => {
+  const getSupportLevelColor = (level: UnifiedVendor['supportLevel']) => {
     switch (level) {
       case "full": return "bg-success/10 text-success";
       case "partial": return "bg-warning/10 text-warning";
       case "limited": return "bg-destructive/10 text-destructive";
+      case "none": return "bg-muted text-muted-foreground";
       default: return "bg-muted text-muted-foreground";
     }
   };
 
   const [newVendorForm, setNewVendorForm] = useState({
     name: "",
-    vendor_type: "",
     category: "",
+    subcategory: "",
+    icon: "🏢",
+    color: "bg-gray-500",
+    description: "",
     models: [],
-    supported_protocols: [],
-    integration_methods: [],
-    portnox_compatibility: {},
-    configuration_templates: {},
-    known_limitations: [],
-    firmware_requirements: {},
-    documentation_links: [],
-    support_level: "full",
-    status: "active"
+    commonFeatures: [],
+    supportLevel: "full" as UnifiedVendor['supportLevel'],
+    portnoxCompatibility: "limited" as UnifiedVendor['portnoxCompatibility'],
+    integrationMethods: [],
+    knownLimitations: [],
+    documentationLinks: [],
+    status: "active" as UnifiedVendor['status']
   });
 
   const handleCreateVendor = async () => {
@@ -173,18 +169,19 @@ const EnhancedVendorManagement = () => {
       setIsAddDialogOpen(false);
       setNewVendorForm({
         name: "",
-        vendor_type: "",
         category: "",
+        subcategory: "",
+        icon: "🏢",
+        color: "bg-gray-500",
+        description: "",
         models: [],
-        supported_protocols: [],
-        integration_methods: [],
-        portnox_compatibility: {},
-        configuration_templates: {},
-        known_limitations: [],
-        firmware_requirements: {},
-        documentation_links: [],
-        support_level: "full",
-        status: "active"
+        commonFeatures: [],
+        supportLevel: "full" as UnifiedVendor['supportLevel'],
+        portnoxCompatibility: "limited" as UnifiedVendor['portnoxCompatibility'],
+        integrationMethods: [],
+        knownLimitations: [],
+        documentationLinks: [],
+        status: "active" as UnifiedVendor['status']
       });
     } catch (error) {
       console.error("Failed to create vendor:", error);
@@ -232,12 +229,12 @@ const EnhancedVendorManagement = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="vendor_type">Vendor Type *</Label>
+                    <Label htmlFor="subcategory">Subcategory</Label>
                     <Input
-                      id="vendor_type"
-                      value={newVendorForm.vendor_type}
-                      onChange={(e) => setNewVendorForm(prev => ({ ...prev, vendor_type: e.target.value }))}
-                      placeholder="e.g., Wireless Controller, Firewall"
+                      id="subcategory"
+                      value={newVendorForm.subcategory}
+                      onChange={(e) => setNewVendorForm(prev => ({ ...prev, subcategory: e.target.value }))}
+                      placeholder="e.g., Wireless Controller, Next-Gen Firewall"
                     />
                   </div>
                 </div>
@@ -260,10 +257,10 @@ const EnhancedVendorManagement = () => {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="support_level">Support Level</Label>
+                    <Label htmlFor="supportLevel">Support Level</Label>
                     <Select 
-                      value={newVendorForm.support_level} 
-                      onValueChange={(value) => setNewVendorForm(prev => ({ ...prev, support_level: value as any }))}
+                      value={newVendorForm.supportLevel} 
+                      onValueChange={(value) => setNewVendorForm(prev => ({ ...prev, supportLevel: value as UnifiedVendor['supportLevel'] }))}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -279,9 +276,12 @@ const EnhancedVendorManagement = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Additional Details</Label>
+                  <Label htmlFor="description">Description</Label>
                   <Textarea
-                    placeholder="Models, protocols, integration notes..."
+                    id="description"
+                    value={newVendorForm.description}
+                    onChange={(e) => setNewVendorForm(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Brief description of the vendor and their solutions..."
                     rows={3}
                   />
                 </div>
@@ -348,12 +348,14 @@ const EnhancedVendorManagement = () => {
                       <Badge variant="secondary" className="text-xs">
                         {vendor.category}
                       </Badge>
-                      <Badge className={`text-xs ${getSupportLevelColor(vendor.support_level)}`}>
-                        {vendor.support_level || 'unknown'} support
+                      <Badge className={`text-xs ${getSupportLevelColor(vendor.supportLevel)}`}>
+                        {vendor.supportLevel} support
                       </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        {vendor.vendor_type}
-                      </Badge>
+                      {vendor.subcategory && (
+                        <Badge variant="outline" className="text-xs">
+                          {vendor.subcategory}
+                        </Badge>
+                      )}
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -362,7 +364,7 @@ const EnhancedVendorManagement = () => {
                       <div className="flex flex-wrap gap-1 mt-1">
                         {vendor.models.slice(0, 3).map((model, index) => (
                           <Badge key={index} variant="outline" className="text-xs">
-                            {model}
+                            {model.name}
                           </Badge>
                         ))}
                         {vendor.models.length > 3 && (
@@ -374,35 +376,34 @@ const EnhancedVendorManagement = () => {
                     </div>
                     
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Key Protocols</p>
+                      <p className="text-sm font-medium text-muted-foreground">Key Features</p>
                       <div className="flex flex-wrap gap-1 mt-1">
-                        {vendor.supported_protocols.slice(0, 3).map((protocol, index) => (
+                        {vendor.commonFeatures.slice(0, 3).map((feature, index) => (
                           <Badge key={index} variant="secondary" className="text-xs">
-                            {protocol}
+                            {feature}
                           </Badge>
                         ))}
-                        {vendor.supported_protocols.length > 3 && (
+                        {vendor.commonFeatures.length > 3 && (
                           <Badge variant="secondary" className="text-xs">
-                            +{vendor.supported_protocols.length - 3} more
+                            +{vendor.commonFeatures.length - 3} more
                           </Badge>
                         )}
                       </div>
                     </div>
 
-                    {vendor.portnox_compatibility && (
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Portnox Integration</p>
-                        <Badge 
-                          className={`text-xs mt-1 ${
-                            vendor.portnox_compatibility.level === 'native' ? 'bg-success/10 text-success' :
-                            vendor.portnox_compatibility.level === 'certified' ? 'bg-primary/10 text-primary' :
-                            'bg-muted text-muted-foreground'
-                          }`}
-                        >
-                          {vendor.portnox_compatibility.level || 'Standard'}
-                        </Badge>
-                      </div>
-                    )}
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Portnox Integration</p>
+                      <Badge 
+                        className={`text-xs mt-1 ${
+                          vendor.portnoxCompatibility === 'native' ? 'bg-success/10 text-success' :
+                          vendor.portnoxCompatibility === 'api' ? 'bg-primary/10 text-primary' :
+                          vendor.portnoxCompatibility === 'limited' ? 'bg-warning/10 text-warning' :
+                          'bg-muted text-muted-foreground'
+                        }`}
+                      >
+                        {vendor.portnoxCompatibility}
+                      </Badge>
+                    </div>
 
                     <Dialog>
                       <DialogTrigger asChild>
@@ -437,7 +438,7 @@ const EnhancedVendorManagement = () => {
                                     <div className="text-center">
                                       <Star className="h-8 w-8 mx-auto mb-2 text-primary" />
                                       <p className="text-sm font-medium">Support Level</p>
-                                      <p className="text-xs text-muted-foreground capitalize">{selectedVendor.support_level}</p>
+                                      <p className="text-xs text-muted-foreground capitalize">{selectedVendor.supportLevel}</p>
                                     </div>
                                   </CardContent>
                                 </Card>
@@ -455,7 +456,7 @@ const EnhancedVendorManagement = () => {
                                     <div className="text-center">
                                       <CheckCircle className="h-8 w-8 mx-auto mb-2 text-success" />
                                       <p className="text-sm font-medium">Protocols</p>
-                                      <p className="text-xs text-muted-foreground">{selectedVendor.supported_protocols.length} supported</p>
+                                      <p className="text-xs text-muted-foreground">{selectedVendor.commonFeatures.length} supported</p>
                                     </div>
                                   </CardContent>
                                 </Card>
@@ -464,7 +465,7 @@ const EnhancedVendorManagement = () => {
                                     <div className="text-center">
                                       <ExternalLink className="h-8 w-8 mx-auto mb-2 text-primary" />
                                       <p className="text-sm font-medium">Documentation</p>
-                                      <p className="text-xs text-muted-foreground">{selectedVendor.documentation_links.length} resources</p>
+                                      <p className="text-xs text-muted-foreground">{selectedVendor.documentationLinks?.length || 0} resources</p>
                                     </div>
                                   </CardContent>
                                 </Card>
@@ -478,18 +479,18 @@ const EnhancedVendorManagement = () => {
                                   <div>
                                     <h4 className="font-semibold mb-3">Available Models</h4>
                                     <div className="flex flex-wrap gap-2">
-                                      {selectedVendor.models.map((model, index) => (
-                                        <Badge key={index} variant="secondary">
-                                          {model}
-                                        </Badge>
-                                      ))}
+                                       {selectedVendor.models.map((model, index) => (
+                                         <Badge key={index} variant="secondary">
+                                           {model.name}
+                                         </Badge>
+                                       ))}
                                     </div>
                                   </div>
 
                                   <div>
                                     <h4 className="font-semibold mb-3">Supported Protocols</h4>
                                     <div className="flex flex-wrap gap-2">
-                                      {selectedVendor.supported_protocols.map((protocol, index) => (
+                                      {selectedVendor.commonFeatures.map((protocol, index) => (
                                         <Badge key={index} variant="outline">
                                           {protocol}
                                         </Badge>
@@ -500,7 +501,7 @@ const EnhancedVendorManagement = () => {
                                   <div>
                                     <h4 className="font-semibold mb-3">Integration Methods</h4>
                                     <div className="flex flex-wrap gap-2">
-                                      {selectedVendor.integration_methods.map((method, index) => (
+                                      {selectedVendor.integrationMethods.map((method, index) => (
                                         <Badge key={index} variant="secondary">
                                           {method}
                                         </Badge>
@@ -510,48 +511,27 @@ const EnhancedVendorManagement = () => {
                                 </div>
 
                                 <div className="space-y-4">
-                                  {selectedVendor.portnox_compatibility && (
-                                    <div>
-                                      <h4 className="font-semibold mb-3">Portnox Compatibility</h4>
-                                      <div className="bg-muted/50 p-3 rounded-lg">
-                                        <Badge className="mb-2">
-                                          {selectedVendor.portnox_compatibility.level || 'Standard'}
-                                        </Badge>
-                                        {selectedVendor.portnox_compatibility.features && (
-                                          <div className="flex flex-wrap gap-1 mt-2">
-                                            {selectedVendor.portnox_compatibility.features.map((feature: string, index: number) => (
-                                              <Badge key={index} variant="outline" className="text-xs">
-                                                {feature.replace(/_/g, ' ')}
-                                              </Badge>
-                                            ))}
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                  )}
+                                   <div>
+                                     <h4 className="font-semibold mb-3">Portnox Compatibility</h4>
+                                     <div className="bg-muted/50 p-3 rounded-lg">
+                                       <Badge className="mb-2">
+                                         {selectedVendor.portnoxCompatibility || 'Standard'}
+                                       </Badge>
+                                     </div>
+                                   </div>
 
-                                  {selectedVendor.firmware_requirements && (
-                                    <div>
-                                      <h4 className="font-semibold mb-3">Firmware Requirements</h4>
-                                      <div className="bg-muted/50 p-3 rounded-lg text-sm">
-                                        <p><strong>Minimum:</strong> {selectedVendor.firmware_requirements.minimum || 'N/A'}</p>
-                                        <p><strong>Recommended:</strong> {selectedVendor.firmware_requirements.recommended || 'Latest'}</p>
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {selectedVendor.known_limitations && selectedVendor.known_limitations.length > 0 && (
-                                    <div>
-                                      <h4 className="font-semibold mb-3">Known Limitations</h4>
-                                      <div className="space-y-1">
-                                        {selectedVendor.known_limitations.map((limitation, index) => (
-                                          <div key={index} className="text-sm text-muted-foreground bg-warning/10 p-2 rounded">
-                                            • {limitation}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
+                                   {selectedVendor.knownLimitations && selectedVendor.knownLimitations.length > 0 && (
+                                     <div>
+                                       <h4 className="font-semibold mb-3">Known Limitations</h4>
+                                       <div className="space-y-1">
+                                         {selectedVendor.knownLimitations.map((limitation, index) => (
+                                           <div key={index} className="text-sm text-muted-foreground bg-warning/10 p-2 rounded">
+                                             • {limitation}
+                                           </div>
+                                         ))}
+                                       </div>
+                                     </div>
+                                   )}
                                 </div>
                               </div>
 
@@ -561,16 +541,16 @@ const EnhancedVendorManagement = () => {
                               <div>
                                 <h4 className="font-semibold mb-3">Documentation & Resources</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                  {selectedVendor.documentation_links.map((doc, index) => (
+                                  {selectedVendor.documentationLinks?.map((doc, index) => (
                                     <Card key={index}>
                                       <CardContent className="p-4">
                                         <div className="flex items-center justify-between">
-                                          <div>
-                                            <p className="font-medium">{doc.title}</p>
-                                            <Badge variant="outline" className="text-xs mt-1">
-                                              {doc.type}
-                                            </Badge>
-                                          </div>
+                                         <div>
+                                           <p className="font-medium">{typeof doc === 'string' ? doc : doc.title || 'Documentation'}</p>
+                                           <Badge variant="outline" className="text-xs mt-1">
+                                             {typeof doc === 'string' ? 'Link' : doc.type || 'Document'}
+                                           </Badge>
+                                         </div>
                                           <Button variant="ghost" size="sm">
                                             <ExternalLink className="h-4 w-4" />
                                           </Button>
@@ -582,8 +562,7 @@ const EnhancedVendorManagement = () => {
                               </div>
 
                               <div className="text-xs text-muted-foreground pt-4 border-t">
-                                Last tested: {selectedVendor.last_tested_date || 'Unknown'} | 
-                                Last updated: {new Date(selectedVendor.updated_at).toLocaleDateString()}
+                                Last tested: {selectedVendor.lastTestedDate || 'Unknown'}
                               </div>
                             </div>
                           </ScrollArea>

@@ -103,8 +103,6 @@ export const ProfessionalAIReportGenerator: React.FC<ProfessionalAIReportGenerat
           reportConfig,
           additionalContext: context
         }),
-        temperature: 0.3,
-        maxTokens: 4000
       });
 
       clearInterval(progressInterval);

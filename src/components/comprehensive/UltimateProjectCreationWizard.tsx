@@ -586,7 +586,7 @@ const UltimateProjectCreationWizard: React.FC<Props> = ({
       const response = await generateCompletion({
         prompt: analysisPrompt,
         taskType: 'analysis',
-        maxTokens: 2000
+        
       });
 
       if (response?.content) {
@@ -654,7 +654,7 @@ const UltimateProjectCreationWizard: React.FC<Props> = ({
       const response = await generateCompletion({
         prompt: deploymentPrompt,
         taskType: 'reasoning',
-        maxTokens: 1500
+        
       });
 
       if (response?.content) {

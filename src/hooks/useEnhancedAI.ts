@@ -20,6 +20,10 @@ interface UseEnhancedAIReturn {
   generateSERecommendations: (context: AIContext) => Promise<AIResponse>;
   generateCustomerSuccessRecommendations: (context: AIContext) => Promise<AIResponse>;
   
+  // Legacy compatibility functions
+  generateCompletion: (options: { prompt: string; taskType?: string; context?: string }) => Promise<{ content: string } | null>;
+  generateProjectSummary: (projectData: any) => Promise<{ content: string } | null>;
+  
   // State management
   isLoading: boolean;
   error: string | null;
@@ -217,6 +221,46 @@ export const useEnhancedAI = (options: UseEnhancedAIOptions = {}): UseEnhancedAI
     }
   }, [toast, showToasts]);
 
+  // Legacy compatibility functions
+  const generateCompletion = useCallback(async (options: { prompt: string; taskType?: string; context?: string }): Promise<{ content: string } | null> => {
+    const aiContext: AIContext = {
+      painPoints: [options.prompt],
+      businessObjectives: [options.taskType || 'general'],
+      projectPhase: 'discovery'
+    };
+
+    const result = await executeWithErrorHandling(
+      () => enhancedAIService.generateRecommendations('completion', aiContext, options.prompt),
+      'Generate Completion'
+    );
+
+    if (result) {
+      return { content: result.recommendations?.[0]?.description || 'Completion generated successfully' };
+    }
+    
+    return null;
+  }, [executeWithErrorHandling]);
+
+  const generateProjectSummary = useCallback(async (projectData: any): Promise<{ content: string } | null> => {
+    const aiContext: AIContext = {
+      projectId: projectData.id,
+      industry: projectData.industry,
+      organizationSize: projectData.organizationSize,
+      projectPhase: 'discovery'
+    };
+
+    const result = await executeWithErrorHandling(
+      () => enhancedAIService.generateRecommendations('project_summary', aiContext, 'Generate project summary'),
+      'Generate Project Summary'
+    );
+
+    if (result) {
+      return { content: result.recommendations?.[0]?.description || 'Project summary generated successfully' };
+    }
+    
+    return null;
+  }, [executeWithErrorHandling]);
+
   // Utility functions
   const clearError = useCallback(() => {
     setError(null);
@@ -238,6 +282,10 @@ export const useEnhancedAI = (options: UseEnhancedAIOptions = {}): UseEnhancedAI
     generateSalesRecommendations,
     generateSERecommendations,
     generateCustomerSuccessRecommendations,
+    
+    // Legacy compatibility functions
+    generateCompletion,
+    generateProjectSummary,
     
     // State
     isLoading,

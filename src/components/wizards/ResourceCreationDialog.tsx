@@ -17,7 +17,7 @@ import {
   useCreateAuthenticationMethod,
   useCreateNetworkSegment
 } from '@/hooks/useResourceLibrary';
-import { useCreateVendor } from '@/hooks/useUnifiedVendors';
+import { useCreateUnifiedVendor } from '@/hooks/useUnifiedVendors';
 import { useCreateUseCase } from '@/hooks/useUseCases';
 import { useCreateRequirement } from '@/hooks/useRequirements';
 
@@ -44,7 +44,7 @@ export const ResourceCreationDialog: React.FC<ResourceCreationDialogProps> = ({
   const createBusinessMutation = useCreateBusinessDomain();
   const createAuthMutation = useCreateAuthenticationMethod();
   const createNetworkMutation = useCreateNetworkSegment();
-  const createVendorMutation = useCreateVendor();
+  const createVendorMutation = useCreateUnifiedVendor();
   const createUseCaseMutation = useCreateUseCase();
   const createRequirementMutation = useCreateRequirement();
 
@@ -250,11 +250,11 @@ export const ResourceCreationDialog: React.FC<ResourceCreationDialogProps> = ({
         case 'vendor':
           result = await createVendorMutation.mutateAsync({
             name: formData.name,
-            vendor_type: formData.vendor_type,
+            subcategory: formData.vendor_type,
             category: formData.category,
             description: formData.description,
-            portnox_integration_level: formData.portnox_integration_level,
-            support_level: formData.support_level,
+            portnoxCompatibility: formData.portnox_integration_level,
+            supportLevel: formData.support_level,
             status: formData.status
           });
           break;

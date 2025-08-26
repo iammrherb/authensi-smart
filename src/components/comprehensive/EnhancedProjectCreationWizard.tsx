@@ -537,7 +537,7 @@ const EnhancedProjectCreationWizard: React.FC<Props> = ({ onComplete, onCancel }
     lines.push(`- Security Stack: Firewalls(${infrastructure.security.firewalls.length}), VPN(${infrastructure.security.vpn.length}), IDP/SSO(${infrastructure.security.idp_sso.length}), EDR(${infrastructure.security.edr.length}), SIEM(${infrastructure.security.siem.length})`);
     lines.push(`- Device Inventory:`);
     if (infrastructure.device_inventory.length) {
-      infrastructure.device_inventory.forEach(d => lines.push(`  - ${d.name}: ${d.count}`));
+      infrastructure.device_inventory.forEach(d => lines.push(`  - ${d.type} (${d.brand} ${d.model}): ${d.quantity}`));
     } else {
       lines.push('  - Not specified');
     }

@@ -414,7 +414,7 @@ const IntelligentProjectWizard: React.FC<IntelligentProjectWizardProps> = ({
                 <div className="grid grid-cols-3 gap-2 mt-2">
                   {vendors?.filter(v => 
                     v.category.toLowerCase().includes(category.toLowerCase()) ||
-                    v.vendor_type.toLowerCase().includes(category.toLowerCase())
+                    (v.subcategory && v.subcategory.toLowerCase().includes(category.toLowerCase()))
                   ).map(vendor => (
                     <div key={vendor.id} className="flex items-center space-x-2">
                       <Checkbox

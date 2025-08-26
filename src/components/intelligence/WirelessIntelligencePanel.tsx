@@ -17,7 +17,8 @@ import {
   Wifi, Shield, Settings, Code, AlertTriangle, CheckCircle, 
   Copy, Download, ExternalLink, Plus, Search, Filter,
   Zap, Timer, Signal, Lock, Key, Globe, Smartphone,
-  Router, Cpu, Database, FileText, BookOpen, Star
+  Router, Cpu, Database, FileText, BookOpen, Star,
+  Calendar as CalendarDays, Terminal
 } from 'lucide-react';
 
 import { useWebIntelligence } from '@/hooks/useWebIntelligence';
@@ -429,7 +430,7 @@ wlan ssid-profile "Enterprise-SSID"
 
               <div className="flex items-center justify-between pt-2 border-t">
                 <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                  <Calendar className="h-3 w-3" />
+                  <CalendarDays className="h-3 w-3" />
                   <span>Updated {rec.lastTested}</span>
                 </div>
                 <div className="flex items-center space-x-1">
