@@ -61,6 +61,7 @@ import EnhancedResourceManager from "./components/library/EnhancedResourceManage
 import NewFeaturesShowcase from "./components/dashboard/NewFeaturesShowcase";
 import AnalyticsReportingCenter from "./pages/AnalyticsReportingCenter";
 import SystemHealthCenter from "./components/admin/SystemHealthCenter";
+import UserManagementCenter from "./components/admin/UserManagementCenter";
 
 const queryClient = new QueryClient();
 
@@ -282,11 +283,16 @@ const App = () => (
                       <AnalyticsReportingCenter />
                     </ProtectedRoute>
                   } />
-                  <Route path="/system-health" element={
-                    <ProtectedRoute>
-                      <SystemHealthCenter />
-                    </ProtectedRoute>
-                  } />
+                            <Route path="/system-health" element={
+            <ProtectedRoute>
+              <SystemHealthCenter />
+            </ProtectedRoute>
+          } />
+          <Route path="/user-management" element={
+            <ProtectedRoute>
+              <UserManagementCenter />
+            </ProtectedRoute>
+          } />
                   
                   {/* Legacy/Deprecated Routes */}
                   <Route path="/admin" element={

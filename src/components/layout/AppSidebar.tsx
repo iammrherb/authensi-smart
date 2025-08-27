@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Brain, Target, Rocket, BarChart3, Settings, BookOpen, Building2, Users, Network, FolderOpen, Bot, Sparkles, Command, PieChart, TestTube, ChevronRight, Home, Database, Zap, FileText, Globe, Tag, Presentation, Activity } from 'lucide-react';
+import { Brain, Target, Rocket, BarChart3, Settings, BookOpen, Building2, Users, Network, FolderOpen, Bot, Sparkles, Command, PieChart, TestTube, ChevronRight, Home, Database, Zap, FileText, Globe, Tag, Presentation, Activity, UserCheck } from 'lucide-react';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -101,6 +101,12 @@ const managementItems = [{
   icon: Activity,
   badge: "NEW",
   tooltip: "Comprehensive system monitoring, configuration, and health checks"
+}, {
+  title: "User Management",
+  url: "/user-management",
+  icon: UserCheck,
+  badge: "NEW",
+  tooltip: "Comprehensive user and role management"
 }, {
   title: "Features Showcase",
   url: "/showcase",
