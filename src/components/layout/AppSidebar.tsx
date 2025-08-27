@@ -20,11 +20,11 @@ const primaryNavItems = [{
   description: "Simple Project Creation & Management",
   tooltip: "Create, scope, and manage your NAC projects"
 }, {
-  title: "Analytics",
-  url: "/reports",
-  icon: PieChart,
-  description: "Advanced Performance Insights & Reports",
-  tooltip: "Comprehensive analytics and reporting dashboard"
+  title: "Analytics & Reports",
+  url: "/analytics",
+  icon: BarChart3,
+  description: "Comprehensive Analytics & Reporting Center",
+  tooltip: "Advanced analytics, reporting, and system monitoring"
 }];
 const lifecycleItems = [{
   title: "Planning & Scoping",
@@ -96,17 +96,11 @@ const managementItems = [{
   icon: FolderOpen,
   tooltip: "Centralized templates, use cases, and vendor resources"
 }, {
-  title: "Enterprise Reports",
-  url: "/dev/reports",
-  icon: FileText,
+  title: "System Health",
+  url: "/system-health",
+  icon: Activity,
   badge: "NEW",
-  tooltip: "AI-powered enterprise report generation with Firecrawler integration"
-}, {
-  title: "Enhanced Resources",
-  url: "/dev/resource/vendor/1",
-  icon: Tag,
-  badge: "NEW",
-  tooltip: "Advanced resource management with tagging, labeling, and external links"
+  tooltip: "Comprehensive system monitoring, configuration, and health checks"
 }, {
   title: "Features Showcase",
   url: "/showcase",

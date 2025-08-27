@@ -59,6 +59,8 @@ import Testing from "./pages/Testing";
 import EnterpriseReportGenerator from "./components/reports/EnterpriseReportGenerator";
 import EnhancedResourceManager from "./components/library/EnhancedResourceManager";
 import NewFeaturesShowcase from "./components/dashboard/NewFeaturesShowcase";
+import AnalyticsReportingCenter from "./pages/AnalyticsReportingCenter";
+import SystemHealthCenter from "./components/admin/SystemHealthCenter";
 
 const queryClient = new QueryClient();
 
@@ -273,6 +275,16 @@ const App = () => (
                   <Route path="/showcase" element={
                     <ProtectedRoute>
                       <NewFeaturesShowcase />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/analytics" element={
+                    <ProtectedRoute>
+                      <AnalyticsReportingCenter />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/system-health" element={
+                    <ProtectedRoute>
+                      <SystemHealthCenter />
                     </ProtectedRoute>
                   } />
                   
