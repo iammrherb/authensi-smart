@@ -58,6 +58,7 @@ import CustomerDashboard from "./pages/CustomerDashboard";
 import Testing from "./pages/Testing";
 import EnterpriseReportGenerator from "./components/reports/EnterpriseReportGenerator";
 import EnhancedResourceManager from "./components/library/EnhancedResourceManager";
+import NewFeaturesShowcase from "./components/dashboard/NewFeaturesShowcase";
 
 const queryClient = new QueryClient();
 
@@ -267,6 +268,11 @@ const App = () => (
                   <Route path="/dev/resource/:type/:id" element={
                     <ProtectedRoute>
                       <EnhancedResourceManager />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/showcase" element={
+                    <ProtectedRoute>
+                      <NewFeaturesShowcase />
                     </ProtectedRoute>
                   } />
                   
