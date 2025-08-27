@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Brain, Target, Rocket, BarChart3, Settings, BookOpen, Building2, Users, Network, FolderOpen, Bot, Sparkles, Command, PieChart, TestTube, ChevronRight, Home, Database, Zap, FileText, Globe, Tag, Presentation } from 'lucide-react';
+import { Brain, Target, Rocket, BarChart3, Settings, BookOpen, Building2, Users, Network, FolderOpen, Bot, Sparkles, Command, PieChart, TestTube, ChevronRight, Home, Database, Zap, FileText, Globe, Tag, Presentation, Activity } from 'lucide-react';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
