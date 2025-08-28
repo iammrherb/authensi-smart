@@ -12,6 +12,21 @@ interface Project {
   updated_at: string;
 }
 
+interface Site {
+  id: string;
+  project_id: string;
+  name: string;
+  location: string;
+  status: string;
+  created_at: string;
+}
+
+// Data type for creating a new project
+type NewProject = Omit<Project, 'id' | 'created_at' | 'updated_at'>;
+
+// Data type for updating an existing project
+type UpdateProject = Partial<Omit<Project, 'id'>> & { id: string };
+
 export const useProjects = () => {
   return useQuery({
     queryKey: ['projects'],
@@ -54,12 +69,12 @@ export const useProject = (projectId: string) => {
 
 export const useCreateProject = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: async (projectData: Omit<Project, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (newProject: NewProject): Promise<Project> => {
       const { data, error } = await supabase
         .from('projects')
-        .insert(projectData)
+        .insert(newProject)
         .select()
         .single();
 
@@ -70,6 +85,7 @@ export const useCreateProject = () => {
       return data;
     },
     onSuccess: () => {
+      // Invalidate and refetch the projects list after a new one is created
       queryClient.invalidateQueries({ queryKey: ['projects'] });
     },
   });
@@ -78,7 +94,7 @@ export const useCreateProject = () => {
 export const useProjectSites = (projectId: string) => {
   return useQuery({
     queryKey: ['project-sites', projectId],
-    queryFn: async () => {
+    queryFn: async (): Promise<Site[]> => {
       const { data, error } = await supabase
         .from('sites')
         .select('*')
@@ -93,5 +109,56 @@ export const useProjectSites = (projectId: string) => {
     },
     enabled: !!projectId,
     staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+export const useUpdateProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (updatedProject: UpdateProject): Promise<Project> => {
+      const { id, ...updateData } = updatedProject;
+      const { data, error } = await supabase
+        .from('projects')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        throw new Error(`Failed to update project: ${error.message}`);
+      }
+
+      return data;
+    },
+    onSuccess: (updatedProject) => {
+      // Invalidate the list of all projects
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      // Invalidate the specific project query to get fresh data
+      queryClient.invalidateQueries({ queryKey: ['project', updatedProject.id] });
+    },
+  });
+};
+
+export const useDeleteProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (projectId: string): Promise<void> => {
+      const { error } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', projectId);
+
+      if (error) {
+        throw new Error(`Failed to delete project: ${error.message}`);
+      }
+    },
+    onSuccess: (_, projectId) => {
+      // Invalidate the list of all projects
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      // Remove the specific project from the cache
+      queryClient.removeQueries({ queryKey: ['project', projectId] });
+    },
   });
 };

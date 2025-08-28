@@ -6,6 +6,7 @@ import {
   ResourceTag,
   ResourceLabel,
   ExternalResourceLink,
+  ResourceRelationship, // Import the new type
   ResourceSearchFilters,
   ResourceBulkOperation
 } from '@/services/resourceLibrary/EnhancedResourceLibraryService';
@@ -163,6 +164,50 @@ export const useEnhancedResourceLibrary = () => {
     },
   });
 
+  // Create relationship mutation
+  const createRelationshipMutation = useMutation({
+    mutationFn: (relationshipData: Omit<ResourceRelationship, 'id'>) =>
+      enhancedResourceLibraryService.createRelationship(relationshipData),
+    onSuccess: (_, variables) => {
+      // Invalidate both the source and target resources to refresh their relationship lists
+      queryClient.invalidateQueries({ queryKey: ['enhanced-resource', variables.source_resource_type, variables.source_resource_id] });
+      queryClient.invalidateQueries({ queryKey: ['enhanced-resource', variables.target_resource_type, variables.target_resource_id] });
+      toast({
+        title: "Relationship Created",
+        description: "The resource relationship has been successfully created.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Create Relationship Failed",
+        description: error.message || "Failed to create the relationship.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete relationship mutation
+  const deleteRelationshipMutation = useMutation({
+    mutationFn: (relationshipId: string) =>
+      enhancedResourceLibraryService.deleteRelationship(relationshipId),
+    onSuccess: () => {
+      // This is tricky without more context, so we'll invalidate all resources for now.
+      // A better approach might involve passing source/target info through the mutation.
+      queryClient.invalidateQueries({ queryKey: ['enhanced-resource'] });
+      toast({
+        title: "Relationship Deleted",
+        description: "The resource relationship has been successfully deleted.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Delete Relationship Failed",
+        description: error.message || "Failed to delete the relationship.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Add external link mutation
   const addExternalLinkMutation = useMutation({
     mutationFn: (link: Omit<ExternalResourceLink, 'id' | 'created_at' | 'updated_at'>) =>
@@ -294,6 +339,12 @@ export const useEnhancedResourceLibrary = () => {
     
     addLabelToResource: addLabelToResourceMutation.mutateAsync,
     isAddingLabel: addLabelToResourceMutation.isPending,
+    
+    createRelationship: createRelationshipMutation.mutateAsync,
+    isCreatingRelationship: createRelationshipMutation.isPending,
+    
+    deleteRelationship: deleteRelationshipMutation.mutateAsync,
+    isDeletingRelationship: deleteRelationshipMutation.isPending,
     
     addExternalLink: addExternalLinkMutation.mutateAsync,
     isAddingLink: addExternalLinkMutation.isPending,

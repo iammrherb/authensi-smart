@@ -39,6 +39,19 @@ export interface ExternalResourceLink {
   updated_at: string;
 }
 
+export interface ResourceRelationship {
+  id: string;
+  source_resource_id: string;
+  source_resource_type: string;
+  source_resource_name?: string;
+  target_resource_id: string;
+  target_resource_type: string;
+  target_resource_name?: string;
+  relationship_type: string;
+  description?: string;
+  metadata?: any;
+}
+
 export interface EnhancedResourceItem {
   id: string;
   type: 'vendor' | 'use_case' | 'requirement' | 'pain_point' | 'test_case' | 'project_template';
@@ -53,13 +66,7 @@ export interface EnhancedResourceItem {
   external_links: ExternalResourceLink[];
   
   // Relationships
-  related_resources: {
-    type: string;
-    id: string;
-    name: string;
-    relationship_type: 'depends_on' | 'conflicts_with' | 'enhances' | 'alternative_to' | 'part_of';
-    strength: number; // 1-10
-  }[];
+  relationships: ResourceRelationship[];
   
   // Classification and organization
   industry_relevance: string[];
@@ -160,12 +167,14 @@ class EnhancedResourceLibraryService {
         .eq('resource_id', id)
         .eq('is_active', true);
 
-      // Get related resources
+      // Get related resources with names
       const { data: relationships = [] } = await supabase
         .from('resource_relationships')
         .select('*')
-        .or(`source_resource_id.eq.${id},target_resource_id.eq.${id}`)
-        .eq('is_active', true);
+        .or(`source_resource_id.eq.${id},target_resource_id.eq.${id}`);
+
+      // Enrich relationships with resource names
+      const enrichedRelationships = await this.enrichRelationshipsWithNames(relationships, id);
 
       // Get usage statistics
       const { data: usageStats } = await supabase
@@ -186,7 +195,7 @@ class EnhancedResourceLibraryService {
         tags: tags.map((t: any) => t.resource_tags).filter(Boolean),
         labels: labels.map((l: any) => l.resource_labels).filter(Boolean),
         external_links: externalLinks,
-        related_resources: await this.processRelationships(relationships, id),
+        relationships: enrichedRelationships,
         industry_relevance: resource.industry_relevance || [],
         compliance_frameworks: resource.compliance_frameworks || [],
         deployment_phases: resource.deployment_phases || [],
@@ -384,6 +393,47 @@ class EnhancedResourceLibraryService {
     // Decrement tag usage count
     const { error: updateError } = await supabase.rpc('decrement_tag_usage', { tag_id: tagId });
     if (updateError) console.error('Error updating tag usage:', updateError);
+  }
+
+  // =========================================================================
+  // RELATIONSHIP MANAGEMENT
+  // =========================================================================
+
+  /**
+   * Create a new relationship between two resources
+   */
+  async createRelationship(relationshipData: Omit<ResourceRelationship, 'id'>): Promise<ResourceRelationship> {
+    const { data: user } = await supabase.auth.getUser();
+
+    const { data, error } = await supabase
+      .from('resource_relationships')
+      .insert({
+        ...relationshipData,
+        created_by: user.user?.id,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating relationship:', error);
+      throw error;
+    }
+    return data as ResourceRelationship;
+  }
+
+  /**
+   * Delete a relationship between two resources
+   */
+  async deleteRelationship(relationshipId: string): Promise<void> {
+    const { error } = await supabase
+      .from('resource_relationships')
+      .delete()
+      .eq('id', relationshipId);
+
+    if (error) {
+      console.error('Error deleting relationship:', error);
+      throw error;
+    }
   }
 
   // =========================================================================
@@ -635,6 +685,47 @@ class EnhancedResourceLibraryService {
   // HELPER METHODS
   // =========================================================================
 
+  /**
+   * Enrich relationships with resource names for better UI display
+   */
+  private async enrichRelationshipsWithNames(relationships: any[], currentResourceId: string): Promise<ResourceRelationship[]> {
+    const enriched: ResourceRelationship[] = [];
+    
+    for (const rel of relationships) {
+      const enrichedRel: ResourceRelationship = { ...rel };
+      
+      // Get source resource name if we don't already have it
+      if (rel.source_resource_type && rel.source_resource_id) {
+        const { data: sourceResource } = await supabase
+          .from(`${rel.source_resource_type}_library`)
+          .select('name')
+          .eq('id', rel.source_resource_id)
+          .single();
+        
+        if (sourceResource) {
+          enrichedRel.source_resource_name = sourceResource.name;
+        }
+      }
+      
+      // Get target resource name if we don't already have it
+      if (rel.target_resource_type && rel.target_resource_id) {
+        const { data: targetResource } = await supabase
+          .from(`${rel.target_resource_type}_library`)
+          .select('name')
+          .eq('id', rel.target_resource_id)
+          .single();
+        
+        if (targetResource) {
+          enrichedRel.target_resource_name = targetResource.name;
+        }
+      }
+      
+      enriched.push(enrichedRel);
+    }
+    
+    return enriched;
+  }
+
   private async processRelationships(relationships: any[], currentResourceId: string): Promise<EnhancedResourceItem['related_resources']> {
     const processed = [];
     
@@ -642,6 +733,8 @@ class EnhancedResourceLibraryService {
       const isSource = rel.source_resource_id === currentResourceId;
       const relatedId = isSource ? rel.target_resource_id : rel.source_resource_id;
       const relatedType = isSource ? rel.target_resource_type : rel.source_resource_type;
+
+      if (!relatedType || !relatedId) continue;
 
       // Get related resource name
       const { data: relatedResource } = await supabase

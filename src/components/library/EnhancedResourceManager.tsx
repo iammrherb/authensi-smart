@@ -17,12 +17,15 @@ import {
   Tags, Plus, ExternalLink, Edit, Trash2, Search, Filter, Star, 
   CheckCircle, AlertCircle, Info, Link, Globe, FileText, Zap,
   Target, Shield, Settings, BarChart3, TrendingUp, Users, Clock,
-  Bookmark, Eye, EyeOff, Lightbulb, Award, Flag, Heart
+  Bookmark, Eye, EyeOff, Lightbulb, Award, Flag, Heart, Share2
 } from 'lucide-react';
 
 import { useEnhancedResourceLibrary } from '@/hooks/useEnhancedResourceLibrary';
 import { EnhancedResourceItem, ResourceTag, ResourceLabel, ExternalResourceLink } from '@/services/resourceLibrary/EnhancedResourceLibraryService';
 import { EnhancedButton } from '@/components/ui/enhanced-button';
+import ResourceRelationshipsManager from './ResourceRelationshipsManager'; // Import the new component
+import AIRelationshipSuggestions from './AIRelationshipSuggestions'; // Import AI suggestions
+import WebContentEnrichment from './WebContentEnrichment'; // Import web enrichment
 
 interface EnhancedResourceManagerProps {
   resourceType: string;
@@ -458,6 +461,12 @@ const EnhancedResourceManager: React.FC<EnhancedResourceManagerProps> = ({
 
   const renderLinksTab = () => (
     <div className="space-y-6">
+      <WebContentEnrichment resource={resource} onEnrichmentComplete={() => {
+        // Refresh the resource data after enrichment
+        updateResourceUsage(resourceType, resourceId, 'select');
+      }} />
+      
+      <Separator className="my-6" />
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">External Links</h3>
         <Dialog open={showAddLinkDialog} onOpenChange={setShowAddLinkDialog}>
@@ -753,6 +762,7 @@ const EnhancedResourceManager: React.FC<EnhancedResourceManagerProps> = ({
     { id: 'tags', label: 'Tags', icon: Tags, count: resource.tags?.length },
     { id: 'labels', label: 'Labels', icon: Bookmark, count: resource.labels?.length },
     { id: 'links', label: 'Links', icon: ExternalLink, count: resource.external_links?.length },
+    { id: 'relationships', label: 'Relationships', icon: Share2, count: resource.relationships?.length },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 }
   ];
 
@@ -802,6 +812,12 @@ const EnhancedResourceManager: React.FC<EnhancedResourceManagerProps> = ({
         {activeTab === 'overview' && renderOverviewTab()}
         {activeTab === 'tags' && renderTagsTab()}
         {activeTab === 'links' && renderLinksTab()}
+        {activeTab === 'relationships' && (
+          <div className="space-y-6">
+            <ResourceRelationshipsManager resource={resource} />
+            <AIRelationshipSuggestions resource={resource} />
+          </div>
+        )}
         {activeTab === 'analytics' && renderAnalyticsTab()}
       </div>
     </div>
