@@ -74,3 +74,24 @@ export const useCreateProject = () => {
     },
   });
 };
+
+export const useProjectSites = (projectId: string) => {
+  return useQuery({
+    queryKey: ['project-sites', projectId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sites')
+        .select('*')
+        .eq('project_id', projectId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw new Error(`Failed to fetch project sites: ${error.message}`);
+      }
+
+      return data || [];
+    },
+    enabled: !!projectId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
