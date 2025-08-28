@@ -847,7 +847,7 @@ line vty 0 15
                 <RadioGroup value={deploymentSize} onValueChange={setDeploymentSize}>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="small" id="small" />
-                    <Label htmlFor="small">Small (< 1,000 devices)</Label>
+                    <Label htmlFor="small">Small (&lt; 1,000 devices)</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="medium" id="medium" />
@@ -859,7 +859,7 @@ line vty 0 15
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="enterprise" id="enterprise" />
-                    <Label htmlFor="enterprise">Enterprise (> 50,000 devices)</Label>
+                    <Label htmlFor="enterprise">Enterprise (&gt; 50,000 devices)</Label>
                   </div>
                 </RadioGroup>
               </div>

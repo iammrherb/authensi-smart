@@ -1436,6 +1436,114 @@ export type Database = {
           },
         ]
       }
+      customer_portal_users: {
+        Row: {
+          access_level: string | null
+          assigned_at: string | null
+          assigned_by: string | null
+          customer_portal_id: string
+          expires_at: string | null
+          id: string
+          is_billing_contact: boolean | null
+          is_primary_contact: boolean | null
+          is_technical_contact: boolean | null
+          notes: string | null
+          role_id: string
+          user_id: string
+        }
+        Insert: {
+          access_level?: string | null
+          assigned_at?: string | null
+          assigned_by?: string | null
+          customer_portal_id: string
+          expires_at?: string | null
+          id?: string
+          is_billing_contact?: boolean | null
+          is_primary_contact?: boolean | null
+          is_technical_contact?: boolean | null
+          notes?: string | null
+          role_id: string
+          user_id: string
+        }
+        Update: {
+          access_level?: string | null
+          assigned_at?: string | null
+          assigned_by?: string | null
+          customer_portal_id?: string
+          expires_at?: string | null
+          id?: string
+          is_billing_contact?: boolean | null
+          is_primary_contact?: boolean | null
+          is_technical_contact?: boolean | null
+          notes?: string | null
+          role_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_portal_users_customer_portal_id_fkey"
+            columns: ["customer_portal_id"]
+            isOneToOne: false
+            referencedRelation: "customer_portals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_portal_users_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_portals: {
+        Row: {
+          address: Json | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          created_by: string | null
+          customer_code: string | null
+          customer_name: string
+          description: string | null
+          id: string
+          industry: string | null
+          size: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: Json | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          customer_code?: string | null
+          customer_name: string
+          description?: string | null
+          id?: string
+          industry?: string | null
+          size?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: Json | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          customer_code?: string | null
+          customer_name?: string
+          description?: string | null
+          id?: string
+          industry?: string | null
+          size?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       customer_team_members: {
         Row: {
           can_receive_notifications: boolean | null
@@ -1562,6 +1670,63 @@ export type Database = {
           },
         ]
       }
+      deployment_checklists: {
+        Row: {
+          category: string
+          checklist_items: Json
+          complexity_level: string | null
+          created_at: string
+          created_by: string | null
+          deployment_type: string | null
+          description: string | null
+          estimated_duration: string | null
+          id: string
+          name: string
+          order_sequence: number
+          prerequisites_checklist_ids: string[] | null
+          product: string | null
+          updated_at: string
+          vendor: string | null
+          version: string | null
+        }
+        Insert: {
+          category: string
+          checklist_items?: Json
+          complexity_level?: string | null
+          created_at?: string
+          created_by?: string | null
+          deployment_type?: string | null
+          description?: string | null
+          estimated_duration?: string | null
+          id?: string
+          name: string
+          order_sequence?: number
+          prerequisites_checklist_ids?: string[] | null
+          product?: string | null
+          updated_at?: string
+          vendor?: string | null
+          version?: string | null
+        }
+        Update: {
+          category?: string
+          checklist_items?: Json
+          complexity_level?: string | null
+          created_at?: string
+          created_by?: string | null
+          deployment_type?: string | null
+          description?: string | null
+          estimated_duration?: string | null
+          id?: string
+          name?: string
+          order_sequence?: number
+          prerequisites_checklist_ids?: string[] | null
+          product?: string | null
+          updated_at?: string
+          vendor?: string | null
+          version?: string | null
+        }
+        Relationships: []
+      }
       deployment_types: {
         Row: {
           complexity_level: string | null
@@ -1603,6 +1768,47 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      device_permissions: {
+        Row: {
+          conditions: Json | null
+          device_id: string
+          expires_at: string | null
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          permission_id: string
+          user_id: string
+        }
+        Insert: {
+          conditions?: Json | null
+          device_id: string
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permission_id: string
+          user_id: string
+        }
+        Update: {
+          conditions?: Json | null
+          device_id?: string
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permission_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       device_types: {
         Row: {
@@ -1664,6 +1870,75 @@ export type Database = {
           tags?: Json
           typical_use_cases?: Json | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      documentation_sources: {
+        Row: {
+          content_freshness_score: number | null
+          content_hash: string
+          created_at: string
+          document_type: string | null
+          extracted_content: string | null
+          id: string
+          last_crawled_at: string | null
+          last_modified_at: string | null
+          processing_status: string
+          product: string | null
+          quality_score: number | null
+          relevance_score: number | null
+          source_type: string
+          structured_data: Json | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          url: string
+          vendor: string | null
+          version: string | null
+        }
+        Insert: {
+          content_freshness_score?: number | null
+          content_hash: string
+          created_at?: string
+          document_type?: string | null
+          extracted_content?: string | null
+          id?: string
+          last_crawled_at?: string | null
+          last_modified_at?: string | null
+          processing_status?: string
+          product?: string | null
+          quality_score?: number | null
+          relevance_score?: number | null
+          source_type: string
+          structured_data?: Json | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          url: string
+          vendor?: string | null
+          version?: string | null
+        }
+        Update: {
+          content_freshness_score?: number | null
+          content_hash?: string
+          created_at?: string
+          document_type?: string | null
+          extracted_content?: string | null
+          id?: string
+          last_crawled_at?: string | null
+          last_modified_at?: string | null
+          processing_status?: string
+          product?: string | null
+          quality_score?: number | null
+          relevance_score?: number | null
+          source_type?: string
+          structured_data?: Json | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          url?: string
+          vendor?: string | null
+          version?: string | null
         }
         Relationships: []
       }
@@ -1787,6 +2062,251 @@ export type Database = {
           updated_at?: string
           user_id?: string
           vendor_recommendations?: Json | null
+        }
+        Relationships: []
+      }
+      enterprise_reports: {
+        Row: {
+          content: Json
+          created_at: string
+          generated_at: string
+          generated_by: string | null
+          id: string
+          metadata: Json
+          project_id: string | null
+          report_type: string
+          status: string
+          title: string
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+          metadata?: Json
+          project_id?: string | null
+          report_type: string
+          status?: string
+          title: string
+          updated_at?: string
+          version?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+          metadata?: Json
+          project_id?: string | null
+          report_type?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enterprise_reports_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      external_resource_links: {
+        Row: {
+          check_frequency_days: number | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          is_verified: boolean
+          last_checked_at: string | null
+          link_title: string
+          link_type: string
+          link_url: string
+          metadata: Json | null
+          relevance_score: number
+          resource_id: string
+          resource_type: string
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          check_frequency_days?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_verified?: boolean
+          last_checked_at?: string | null
+          link_title: string
+          link_type: string
+          link_url: string
+          metadata?: Json | null
+          relevance_score?: number
+          resource_id: string
+          resource_type: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          check_frequency_days?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_verified?: boolean
+          last_checked_at?: string | null
+          link_title?: string
+          link_type?: string
+          link_url?: string
+          metadata?: Json | null
+          relevance_score?: number
+          resource_id?: string
+          resource_type?: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      firecrawler_jobs: {
+        Row: {
+          completed_at: string | null
+          content_size_bytes: number | null
+          crawl_type: string
+          created_at: string
+          error_message: string | null
+          id: string
+          initiated_by: string | null
+          job_id: string
+          max_retries: number
+          options: Json
+          pages_crawled: number | null
+          processing_time_ms: number | null
+          related_entity_id: string | null
+          related_entity_type: string | null
+          result: Json | null
+          retry_count: number
+          status: string
+          tags: string[] | null
+          url: string
+        }
+        Insert: {
+          completed_at?: string | null
+          content_size_bytes?: number | null
+          crawl_type?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          initiated_by?: string | null
+          job_id: string
+          max_retries?: number
+          options?: Json
+          pages_crawled?: number | null
+          processing_time_ms?: number | null
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          result?: Json | null
+          retry_count?: number
+          status?: string
+          tags?: string[] | null
+          url: string
+        }
+        Update: {
+          completed_at?: string | null
+          content_size_bytes?: number | null
+          crawl_type?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          initiated_by?: string | null
+          job_id?: string
+          max_retries?: number
+          options?: Json
+          pages_crawled?: number | null
+          processing_time_ms?: number | null
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          result?: Json | null
+          retry_count?: number
+          status?: string
+          tags?: string[] | null
+          url?: string
+        }
+        Relationships: []
+      }
+      firewall_requirements: {
+        Row: {
+          category: string
+          component: string
+          created_at: string
+          created_by: string | null
+          description: string
+          destination_description: string
+          direction: string
+          documentation_url: string | null
+          id: string
+          is_mandatory: boolean
+          ports: string[]
+          product: string | null
+          protocol: string
+          service_name: string
+          source_description: string
+          source_document_id: string | null
+          updated_at: string
+          vendor: string | null
+          version: string | null
+        }
+        Insert: {
+          category?: string
+          component: string
+          created_at?: string
+          created_by?: string | null
+          description: string
+          destination_description: string
+          direction: string
+          documentation_url?: string | null
+          id?: string
+          is_mandatory?: boolean
+          ports: string[]
+          product?: string | null
+          protocol: string
+          service_name: string
+          source_description: string
+          source_document_id?: string | null
+          updated_at?: string
+          vendor?: string | null
+          version?: string | null
+        }
+        Update: {
+          category?: string
+          component?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          destination_description?: string
+          direction?: string
+          documentation_url?: string | null
+          id?: string
+          is_mandatory?: boolean
+          ports?: string[]
+          product?: string | null
+          protocol?: string
+          service_name?: string
+          source_description?: string
+          source_document_id?: string | null
+          updated_at?: string
+          vendor?: string | null
+          version?: string | null
         }
         Relationships: []
       }
@@ -2149,39 +2669,66 @@ export type Database = {
       pain_points_library: {
         Row: {
           category: string
+          complexity_level: string | null
+          compliance_frameworks: string[] | null
           created_at: string
           created_by: string | null
+          deployment_phases: string[] | null
           description: string | null
           id: string
+          industry_relevance: string[] | null
           industry_specific: Json | null
+          last_modified_by: string | null
+          maturity_level: string | null
+          quality_score: number | null
           recommended_solutions: Json | null
           severity: string
           title: string
           updated_at: string
+          validation_status: string | null
+          version: string | null
         }
         Insert: {
           category?: string
+          complexity_level?: string | null
+          compliance_frameworks?: string[] | null
           created_at?: string
           created_by?: string | null
+          deployment_phases?: string[] | null
           description?: string | null
           id?: string
+          industry_relevance?: string[] | null
           industry_specific?: Json | null
+          last_modified_by?: string | null
+          maturity_level?: string | null
+          quality_score?: number | null
           recommended_solutions?: Json | null
           severity?: string
           title: string
           updated_at?: string
+          validation_status?: string | null
+          version?: string | null
         }
         Update: {
           category?: string
+          complexity_level?: string | null
+          compliance_frameworks?: string[] | null
           created_at?: string
           created_by?: string | null
+          deployment_phases?: string[] | null
           description?: string | null
           id?: string
+          industry_relevance?: string[] | null
           industry_specific?: Json | null
+          last_modified_by?: string | null
+          maturity_level?: string | null
+          quality_score?: number | null
           recommended_solutions?: Json | null
           severity?: string
           title?: string
           updated_at?: string
+          validation_status?: string | null
+          version?: string | null
         }
         Relationships: []
       }
@@ -2212,6 +2759,101 @@ export type Database = {
           token?: string
           used_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      permission_usage_log: {
+        Row: {
+          action_performed: string | null
+          error_message: string | null
+          execution_time_ms: number | null
+          id: string
+          ip_address: unknown | null
+          permission_id: string
+          resource_id: string | null
+          resource_type: string | null
+          success: boolean | null
+          timestamp: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action_performed?: string | null
+          error_message?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          ip_address?: unknown | null
+          permission_id: string
+          resource_id?: string | null
+          resource_type?: string | null
+          success?: boolean | null
+          timestamp?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action_performed?: string | null
+          error_message?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          ip_address?: unknown | null
+          permission_id?: string
+          resource_id?: string | null
+          resource_type?: string | null
+          success?: boolean | null
+          timestamp?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "permission_usage_log_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      permissions: {
+        Row: {
+          action: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_customer_portal_permission: boolean | null
+          is_system_permission: boolean | null
+          name: string
+          resource: string
+          scope: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_customer_portal_permission?: boolean | null
+          is_system_permission?: boolean | null
+          name: string
+          resource: string
+          scope?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_customer_portal_permission?: boolean | null
+          is_system_permission?: boolean | null
+          name?: string
+          resource?: string
+          scope?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -2423,6 +3065,69 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      prerequisites: {
+        Row: {
+          alternatives: string[] | null
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string
+          documentation_url: string | null
+          enterprise_specification: string | null
+          id: string
+          is_mandatory: boolean
+          minimum_specification: string | null
+          product: string | null
+          recommended_specification: string | null
+          requirement: string
+          source_document_id: string | null
+          updated_at: string
+          vendor: string | null
+          verification_steps: string[] | null
+          version: string | null
+        }
+        Insert: {
+          alternatives?: string[] | null
+          category: string
+          created_at?: string
+          created_by?: string | null
+          description: string
+          documentation_url?: string | null
+          enterprise_specification?: string | null
+          id?: string
+          is_mandatory?: boolean
+          minimum_specification?: string | null
+          product?: string | null
+          recommended_specification?: string | null
+          requirement: string
+          source_document_id?: string | null
+          updated_at?: string
+          vendor?: string | null
+          verification_steps?: string[] | null
+          version?: string | null
+        }
+        Update: {
+          alternatives?: string[] | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          documentation_url?: string | null
+          enterprise_specification?: string | null
+          id?: string
+          is_mandatory?: boolean
+          minimum_specification?: string | null
+          product?: string | null
+          recommended_specification?: string | null
+          requirement?: string
+          source_document_id?: string | null
+          updated_at?: string
+          vendor?: string | null
+          verification_steps?: string[] | null
+          version?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -2793,6 +3498,47 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_permissions: {
+        Row: {
+          conditions: Json | null
+          expires_at: string | null
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          permission_id: string
+          project_id: string
+          user_id: string
+        }
+        Insert: {
+          conditions?: Json | null
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permission_id: string
+          project_id: string
+          user_id: string
+        }
+        Update: {
+          conditions?: Json | null
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permission_id?: string
+          project_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
             referencedColumns: ["id"]
           },
         ]
@@ -3803,6 +4549,78 @@ export type Database = {
           },
         ]
       }
+      report_generation_queue: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          generated_report_id: string | null
+          id: string
+          max_retries: number
+          priority: number
+          processing_time_ms: number | null
+          project_id: string | null
+          report_type: string
+          request_data: Json
+          requested_by: string | null
+          retry_count: number
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          generated_report_id?: string | null
+          id?: string
+          max_retries?: number
+          priority?: number
+          processing_time_ms?: number | null
+          project_id?: string | null
+          report_type: string
+          request_data?: Json
+          requested_by?: string | null
+          retry_count?: number
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          generated_report_id?: string | null
+          id?: string
+          max_retries?: number
+          priority?: number
+          processing_time_ms?: number | null
+          project_id?: string | null
+          report_type?: string
+          request_data?: Json
+          requested_by?: string | null
+          retry_count?: number
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_generation_queue_generated_report_id_fkey"
+            columns: ["generated_report_id"]
+            isOneToOne: false
+            referencedRelation: "enterprise_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_generation_queue_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       report_templates: {
         Row: {
           ai_prompt_template: string | null
@@ -3815,7 +4633,9 @@ export type Database = {
           estimated_time_minutes: number | null
           formatting_rules: Json | null
           id: string
+          industry: string | null
           is_active: boolean | null
+          is_default: boolean
           is_public: boolean | null
           name: string
           rating: number | null
@@ -3836,7 +4656,9 @@ export type Database = {
           estimated_time_minutes?: number | null
           formatting_rules?: Json | null
           id?: string
+          industry?: string | null
           is_active?: boolean | null
+          is_default?: boolean
           is_public?: boolean | null
           name: string
           rating?: number | null
@@ -3857,7 +4679,9 @@ export type Database = {
           estimated_time_minutes?: number | null
           formatting_rules?: Json | null
           id?: string
+          industry?: string | null
           is_active?: boolean | null
+          is_default?: boolean
           is_public?: boolean | null
           name?: string
           rating?: number | null
@@ -3969,17 +4793,23 @@ export type Database = {
           associated_sites: Json | null
           assumptions: Json | null
           category: string
+          complexity_level: string | null
           compliance_frameworks: string[] | null
           constraints: Json | null
           created_at: string
           created_by: string | null
           custom_categories: Json | null
           dependencies: Json | null
+          deployment_phases: string[] | null
           description: string | null
           documentation_references: Json | null
           id: string
+          industry_relevance: string[] | null
+          last_modified_by: string | null
+          maturity_level: string | null
           portnox_features: Json | null
           priority: string
+          quality_score: number | null
           rationale: string | null
           related_use_cases: Json | null
           requirement_type: string
@@ -3989,8 +4819,10 @@ export type Database = {
           test_cases: Json | null
           title: string
           updated_at: string
+          validation_status: string | null
           vendor_requirements: Json | null
           verification_methods: Json | null
+          version: string | null
         }
         Insert: {
           acceptance_criteria?: Json | null
@@ -3998,17 +4830,23 @@ export type Database = {
           associated_sites?: Json | null
           assumptions?: Json | null
           category: string
+          complexity_level?: string | null
           compliance_frameworks?: string[] | null
           constraints?: Json | null
           created_at?: string
           created_by?: string | null
           custom_categories?: Json | null
           dependencies?: Json | null
+          deployment_phases?: string[] | null
           description?: string | null
           documentation_references?: Json | null
           id?: string
+          industry_relevance?: string[] | null
+          last_modified_by?: string | null
+          maturity_level?: string | null
           portnox_features?: Json | null
           priority: string
+          quality_score?: number | null
           rationale?: string | null
           related_use_cases?: Json | null
           requirement_type: string
@@ -4018,8 +4856,10 @@ export type Database = {
           test_cases?: Json | null
           title: string
           updated_at?: string
+          validation_status?: string | null
           vendor_requirements?: Json | null
           verification_methods?: Json | null
+          version?: string | null
         }
         Update: {
           acceptance_criteria?: Json | null
@@ -4027,17 +4867,23 @@ export type Database = {
           associated_sites?: Json | null
           assumptions?: Json | null
           category?: string
+          complexity_level?: string | null
           compliance_frameworks?: string[] | null
           constraints?: Json | null
           created_at?: string
           created_by?: string | null
           custom_categories?: Json | null
           dependencies?: Json | null
+          deployment_phases?: string[] | null
           description?: string | null
           documentation_references?: Json | null
           id?: string
+          industry_relevance?: string[] | null
+          last_modified_by?: string | null
+          maturity_level?: string | null
           portnox_features?: Json | null
           priority?: string
+          quality_score?: number | null
           rationale?: string | null
           related_use_cases?: Json | null
           requirement_type?: string
@@ -4047,8 +4893,10 @@ export type Database = {
           test_cases?: Json | null
           title?: string
           updated_at?: string
+          validation_status?: string | null
           vendor_requirements?: Json | null
           verification_methods?: Json | null
+          version?: string | null
         }
         Relationships: []
       }
@@ -4151,6 +4999,125 @@ export type Database = {
         }
         Relationships: []
       }
+      resource_labels: {
+        Row: {
+          applies_to: string[]
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_system_label: boolean
+          name: string
+          type: string
+          value: string
+        }
+        Insert: {
+          applies_to?: string[]
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_system_label?: boolean
+          name: string
+          type: string
+          value: string
+        }
+        Update: {
+          applies_to?: string[]
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_system_label?: boolean
+          name?: string
+          type?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      resource_labels_mapping: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          label_id: string
+          resource_id: string
+          resource_type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label_id: string
+          resource_id: string
+          resource_type: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label_id?: string
+          resource_id?: string
+          resource_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_labels_mapping_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "resource_labels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_relationships: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          is_bidirectional: boolean
+          relationship_type: string
+          source_resource_id: string
+          source_resource_type: string
+          strength: number
+          target_resource_id: string
+          target_resource_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_bidirectional?: boolean
+          relationship_type: string
+          source_resource_id: string
+          source_resource_type: string
+          strength?: number
+          target_resource_id: string
+          target_resource_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_bidirectional?: boolean
+          relationship_type?: string
+          source_resource_id?: string
+          source_resource_type?: string
+          strength?: number
+          target_resource_id?: string
+          target_resource_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       resource_sharing_settings: {
         Row: {
           created_at: string
@@ -4189,31 +5156,43 @@ export type Database = {
       }
       resource_tags: {
         Row: {
+          category: string | null
+          color: string
           color_code: string | null
           created_at: string | null
           created_by: string | null
           description: string | null
           id: string
+          is_system_tag: boolean
           name: string
           updated_at: string | null
+          usage_count: number
         }
         Insert: {
+          category?: string | null
+          color?: string
           color_code?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           id?: string
+          is_system_tag?: boolean
           name: string
           updated_at?: string | null
+          usage_count?: number
         }
         Update: {
+          category?: string | null
+          color?: string
           color_code?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           id?: string
+          is_system_tag?: boolean
           name?: string
           updated_at?: string | null
+          usage_count?: number
         }
         Relationships: [
           {
@@ -4224,6 +5203,268 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      resource_tags_mapping: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          resource_id: string
+          resource_type: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          resource_id: string
+          resource_type: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          resource_id?: string
+          resource_type?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_tags_mapping_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "resource_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_usage_statistics: {
+        Row: {
+          average_implementation_time_hours: number | null
+          complexity_rating: number | null
+          created_at: string
+          failure_count: number
+          id: string
+          last_used: string | null
+          project_usage_count: number
+          resource_id: string
+          resource_type: string
+          satisfaction_rating: number | null
+          selection_count: number
+          success_count: number
+          success_rate: number | null
+          updated_at: string
+        }
+        Insert: {
+          average_implementation_time_hours?: number | null
+          complexity_rating?: number | null
+          created_at?: string
+          failure_count?: number
+          id?: string
+          last_used?: string | null
+          project_usage_count?: number
+          resource_id: string
+          resource_type: string
+          satisfaction_rating?: number | null
+          selection_count?: number
+          success_count?: number
+          success_rate?: number | null
+          updated_at?: string
+        }
+        Update: {
+          average_implementation_time_hours?: number | null
+          complexity_rating?: number | null
+          created_at?: string
+          failure_count?: number
+          id?: string
+          last_used?: string | null
+          project_usage_count?: number
+          resource_id?: string
+          resource_type?: string
+          satisfaction_rating?: number | null
+          selection_count?: number
+          success_count?: number
+          success_rate?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      role_audit_log: {
+        Row: {
+          action: string
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          new_values: Json | null
+          old_values: Json | null
+          performed_at: string | null
+          performed_by: string | null
+          role_id: string | null
+          session_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          new_values?: Json | null
+          old_values?: Json | null
+          performed_at?: string | null
+          performed_by?: string | null
+          role_id?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          new_values?: Json | null
+          old_values?: Json | null
+          performed_at?: string | null
+          performed_by?: string | null
+          role_id?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_audit_log_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      role_hierarchy: {
+        Row: {
+          child_role_id: string
+          conditions: Json | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          inheritance_type: string | null
+          parent_role_id: string
+        }
+        Insert: {
+          child_role_id: string
+          conditions?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          inheritance_type?: string | null
+          parent_role_id: string
+        }
+        Update: {
+          child_role_id?: string
+          conditions?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          inheritance_type?: string | null
+          parent_role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_hierarchy_child_role_id_fkey"
+            columns: ["child_role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "role_hierarchy_parent_role_id_fkey"
+            columns: ["parent_role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      role_permissions: {
+        Row: {
+          conditions: Json | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          permission_id: string
+          role_id: string
+        }
+        Insert: {
+          conditions?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          permission_id: string
+          role_id: string
+        }
+        Update: {
+          conditions?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          permission_id?: string
+          role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "role_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roles: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_customer_portal_role: boolean | null
+          is_system_role: boolean | null
+          name: string
+          priority: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_customer_portal_role?: boolean | null
+          is_system_role?: boolean | null
+          name: string
+          priority?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_customer_portal_role?: boolean | null
+          is_system_role?: boolean | null
+          name?: string
+          priority?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       scoping_questionnaires: {
         Row: {
@@ -4634,6 +5875,47 @@ export type Database = {
           },
         ]
       }
+      site_permissions: {
+        Row: {
+          conditions: Json | null
+          expires_at: string | null
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          permission_id: string
+          site_id: string
+          user_id: string
+        }
+        Insert: {
+          conditions?: Json | null
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permission_id: string
+          site_id: string
+          user_id: string
+        }
+        Update: {
+          conditions?: Json | null
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permission_id?: string
+          site_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_requirements: {
         Row: {
           assigned_to: string | null
@@ -4947,6 +6229,63 @@ export type Database = {
           user_id?: string
           user_rating?: number | null
           vendor_compatibility_score?: number | null
+        }
+        Relationships: []
+      }
+      social_providers: {
+        Row: {
+          access_token: string | null
+          created_at: string | null
+          id: string
+          is_primary: boolean | null
+          is_verified: boolean | null
+          last_sync: string | null
+          linked_at: string | null
+          provider: string
+          provider_data: Json | null
+          provider_email: string | null
+          provider_user_id: string
+          provider_username: string | null
+          refresh_token: string | null
+          token_expires_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          created_at?: string | null
+          id?: string
+          is_primary?: boolean | null
+          is_verified?: boolean | null
+          last_sync?: string | null
+          linked_at?: string | null
+          provider: string
+          provider_data?: Json | null
+          provider_email?: string | null
+          provider_user_id: string
+          provider_username?: string | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          created_at?: string | null
+          id?: string
+          is_primary?: boolean | null
+          is_verified?: boolean | null
+          last_sync?: string | null
+          linked_at?: string | null
+          provider?: string
+          provider_data?: Json | null
+          provider_email?: string | null
+          provider_user_id?: string
+          provider_username?: string | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -5561,13 +6900,18 @@ export type Database = {
           created_by: string | null
           custom_categories: Json | null
           dependencies: Json | null
+          deployment_phases: string[] | null
           deployment_scenarios: Json | null
           description: string | null
           estimated_effort_weeks: number | null
           id: string
+          industry_relevance: string[] | null
+          last_modified_by: string | null
+          maturity_level: string | null
           name: string
           portnox_features: Json | null
           prerequisites: Json | null
+          quality_score: number | null
           status: string | null
           subcategory: string | null
           supported_vendors: Json | null
@@ -5575,6 +6919,8 @@ export type Database = {
           technical_requirements: Json | null
           test_scenarios: Json | null
           updated_at: string
+          validation_status: string | null
+          version: string | null
         }
         Insert: {
           associated_projects?: Json | null
@@ -5588,13 +6934,18 @@ export type Database = {
           created_by?: string | null
           custom_categories?: Json | null
           dependencies?: Json | null
+          deployment_phases?: string[] | null
           deployment_scenarios?: Json | null
           description?: string | null
           estimated_effort_weeks?: number | null
           id?: string
+          industry_relevance?: string[] | null
+          last_modified_by?: string | null
+          maturity_level?: string | null
           name: string
           portnox_features?: Json | null
           prerequisites?: Json | null
+          quality_score?: number | null
           status?: string | null
           subcategory?: string | null
           supported_vendors?: Json | null
@@ -5602,6 +6953,8 @@ export type Database = {
           technical_requirements?: Json | null
           test_scenarios?: Json | null
           updated_at?: string
+          validation_status?: string | null
+          version?: string | null
         }
         Update: {
           associated_projects?: Json | null
@@ -5615,13 +6968,18 @@ export type Database = {
           created_by?: string | null
           custom_categories?: Json | null
           dependencies?: Json | null
+          deployment_phases?: string[] | null
           deployment_scenarios?: Json | null
           description?: string | null
           estimated_effort_weeks?: number | null
           id?: string
+          industry_relevance?: string[] | null
+          last_modified_by?: string | null
+          maturity_level?: string | null
           name?: string
           portnox_features?: Json | null
           prerequisites?: Json | null
+          quality_score?: number | null
           status?: string | null
           subcategory?: string | null
           supported_vendors?: Json | null
@@ -5629,6 +6987,8 @@ export type Database = {
           technical_requirements?: Json | null
           test_scenarios?: Json | null
           updated_at?: string
+          validation_status?: string | null
+          version?: string | null
         }
         Relationships: []
       }
@@ -5925,56 +7285,156 @@ export type Database = {
           },
         ]
       }
-      user_roles: {
+      user_permissions_cache: {
         Row: {
-          assigned_at: string
-          assigned_by: string | null
-          created_at: string
-          custom_role_id: string | null
+          cached_at: string | null
+          expires_at: string | null
           id: string
-          role: Database["public"]["Enums"]["app_role"]
+          permission_id: string
           scope_id: string | null
-          scope_type: string
-          updated_at: string
+          scope_type: string | null
           user_id: string
         }
         Insert: {
-          assigned_at?: string
-          assigned_by?: string | null
-          created_at?: string
-          custom_role_id?: string | null
+          cached_at?: string | null
+          expires_at?: string | null
           id?: string
-          role: Database["public"]["Enums"]["app_role"]
+          permission_id: string
           scope_id?: string | null
-          scope_type?: string
-          updated_at?: string
+          scope_type?: string | null
           user_id: string
         }
         Update: {
-          assigned_at?: string
-          assigned_by?: string | null
-          created_at?: string
-          custom_role_id?: string | null
+          cached_at?: string | null
+          expires_at?: string | null
           id?: string
-          role?: Database["public"]["Enums"]["app_role"]
+          permission_id?: string
           scope_id?: string | null
-          scope_type?: string
-          updated_at?: string
+          scope_type?: string | null
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "user_roles_custom_role_id_fkey"
-            columns: ["custom_role_id"]
+            foreignKeyName: "user_permissions_cache_permission_id_fkey"
+            columns: ["permission_id"]
             isOneToOne: false
-            referencedRelation: "custom_roles"
+            referencedRelation: "permissions"
             referencedColumns: ["id"]
           },
+        ]
+      }
+      user_profiles: {
+        Row: {
+          avatar_url: string | null
+          company: string | null
+          created_at: string | null
+          created_by: string | null
+          department: string | null
+          display_name: string | null
+          first_name: string | null
+          id: string
+          is_active: boolean | null
+          is_verified: boolean | null
+          job_title: string | null
+          language: string | null
+          last_login: string | null
+          last_name: string | null
+          location: string | null
+          phone: string | null
+          preferences: Json | null
+          timezone: string | null
+          updated_at: string | null
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          company?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          department?: string | null
+          display_name?: string | null
+          first_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          job_title?: string | null
+          language?: string | null
+          last_login?: string | null
+          last_name?: string | null
+          location?: string | null
+          phone?: string | null
+          preferences?: Json | null
+          timezone?: string | null
+          updated_at?: string | null
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          company?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          department?: string | null
+          display_name?: string | null
+          first_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          job_title?: string | null
+          language?: string | null
+          last_login?: string | null
+          last_name?: string | null
+          location?: string | null
+          phone?: string | null
+          preferences?: Json | null
+          timezone?: string | null
+          updated_at?: string | null
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          role_id: string
+          scope_data: Json | null
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          role_id: string
+          scope_data?: Json | null
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          role_id?: string
+          scope_data?: Json | null
+          user_id?: string
+        }
+        Relationships: [
           {
-            foreignKeyName: "user_roles_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "user_roles_role_id_fkey"
+            columns: ["role_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "roles"
             referencedColumns: ["id"]
           },
         ]
@@ -6087,30 +7547,39 @@ export type Database = {
           associated_sites: Json | null
           category: string
           certifications: Json | null
+          complexity_level: string | null
+          compliance_frameworks: string[] | null
           configuration_templates: Json | null
           created_at: string
           created_by: string | null
           custom_categories: Json | null
+          deployment_phases: string[] | null
           description: string | null
           documentation_links: Json | null
           firmware_requirements: Json | null
           id: string
+          industry_relevance: string[] | null
           integration_methods: Json | null
           is_nac_vendor: boolean
           known_limitations: Json | null
+          last_modified_by: string | null
           last_tested_date: string | null
+          maturity_level: string | null
           models: Json | null
           portnox_compatibility: Json | null
           portnox_documentation: Json | null
           portnox_integration_level: string | null
+          quality_score: number | null
           status: string | null
           support_contact: Json | null
           support_level: string | null
           supported_protocols: Json | null
           tags: Json | null
           updated_at: string
+          validation_status: string | null
           vendor_name: string
           vendor_type: string
+          version: string | null
           website_url: string | null
         }
         Insert: {
@@ -6118,30 +7587,39 @@ export type Database = {
           associated_sites?: Json | null
           category: string
           certifications?: Json | null
+          complexity_level?: string | null
+          compliance_frameworks?: string[] | null
           configuration_templates?: Json | null
           created_at?: string
           created_by?: string | null
           custom_categories?: Json | null
+          deployment_phases?: string[] | null
           description?: string | null
           documentation_links?: Json | null
           firmware_requirements?: Json | null
           id?: string
+          industry_relevance?: string[] | null
           integration_methods?: Json | null
           is_nac_vendor?: boolean
           known_limitations?: Json | null
+          last_modified_by?: string | null
           last_tested_date?: string | null
+          maturity_level?: string | null
           models?: Json | null
           portnox_compatibility?: Json | null
           portnox_documentation?: Json | null
           portnox_integration_level?: string | null
+          quality_score?: number | null
           status?: string | null
           support_contact?: Json | null
           support_level?: string | null
           supported_protocols?: Json | null
           tags?: Json | null
           updated_at?: string
+          validation_status?: string | null
           vendor_name: string
           vendor_type: string
+          version?: string | null
           website_url?: string | null
         }
         Update: {
@@ -6149,30 +7627,39 @@ export type Database = {
           associated_sites?: Json | null
           category?: string
           certifications?: Json | null
+          complexity_level?: string | null
+          compliance_frameworks?: string[] | null
           configuration_templates?: Json | null
           created_at?: string
           created_by?: string | null
           custom_categories?: Json | null
+          deployment_phases?: string[] | null
           description?: string | null
           documentation_links?: Json | null
           firmware_requirements?: Json | null
           id?: string
+          industry_relevance?: string[] | null
           integration_methods?: Json | null
           is_nac_vendor?: boolean
           known_limitations?: Json | null
+          last_modified_by?: string | null
           last_tested_date?: string | null
+          maturity_level?: string | null
           models?: Json | null
           portnox_compatibility?: Json | null
           portnox_documentation?: Json | null
           portnox_integration_level?: string | null
+          quality_score?: number | null
           status?: string | null
           support_contact?: Json | null
           support_level?: string | null
           supported_protocols?: Json | null
           tags?: Json | null
           updated_at?: string
+          validation_status?: string | null
           vendor_name?: string
           vendor_type?: string
+          version?: string | null
           website_url?: string | null
         }
         Relationships: []
@@ -6238,6 +7725,47 @@ export type Database = {
             columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "vendor_library"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_permissions: {
+        Row: {
+          conditions: Json | null
+          expires_at: string | null
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          permission_id: string
+          user_id: string
+          vendor_id: string
+        }
+        Insert: {
+          conditions?: Json | null
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permission_id: string
+          user_id: string
+          vendor_id: string
+        }
+        Update: {
+          conditions?: Json | null
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          permission_id?: string
+          user_id?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
             referencedColumns: ["id"]
           },
         ]
@@ -6488,6 +8016,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_role_to_user: {
+        Args: {
+          p_assigned_by?: string
+          p_expires_at?: string
+          p_notes?: string
+          p_role_name: string
+          p_scope_data?: Json
+          p_user_id: string
+        }
+        Returns: string
+      }
       authenticate_customer_user: {
         Args: { p_email: string; p_password: string }
         Returns: {
@@ -6500,6 +8039,15 @@ export type Database = {
       }
       can_manage_roles: {
         Args: { _scope_id?: string; _scope_type?: string; _user_id: string }
+        Returns: boolean
+      }
+      check_permission: {
+        Args: {
+          p_permission_name: string
+          p_scope?: string
+          p_scope_id?: string
+          p_user_id: string
+        }
         Returns: boolean
       }
       cleanup_expired_sessions: {
@@ -6522,6 +8070,10 @@ export type Database = {
           p_send_invitation?: boolean
         }
         Returns: Json
+      }
+      decrement_tag_usage: {
+        Args: { tag_id: string }
+        Returns: undefined
       }
       delete_user_safely: {
         Args: { p_user_id: string }
@@ -6568,6 +8120,12 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string[]
       }
+      get_user_roles: {
+        Args: { p_user_id: string }
+        Returns: {
+          role_id: string
+        }[]
+      }
       has_permission: {
         Args: {
           permission: Database["public"]["Enums"]["permission_type"]
@@ -6587,6 +8145,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_tag_usage: {
+        Args: { tag_id: string }
+        Returns: undefined
+      }
       log_security_event: {
         Args: { _event_details?: Json; _event_type: string; _user_id?: string }
         Returns: undefined
@@ -6597,6 +8159,10 @@ export type Database = {
       }
       reset_user_2fa: {
         Args: { p_user_id: string }
+        Returns: boolean
+      }
+      revoke_role_from_user: {
+        Args: { p_revoked_by?: string; p_role_name: string; p_user_id: string }
         Returns: boolean
       }
       soft_delete_user: {
@@ -6610,6 +8176,14 @@ export type Database = {
       update_2fa_enforcement: {
         Args: { p_settings: Json }
         Returns: boolean
+      }
+      update_resource_usage: {
+        Args: {
+          p_action: string
+          p_resource_id: string
+          p_resource_type: string
+        }
+        Returns: undefined
       }
       user_owns_project: {
         Args: { project_uuid: string }
