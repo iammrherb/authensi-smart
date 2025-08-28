@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Project {
@@ -49,5 +49,28 @@ export const useProject = (projectId: string) => {
     },
     enabled: !!projectId,
     staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+export const useCreateProject = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (projectData: Omit<Project, 'id' | 'created_at' | 'updated_at'>) => {
+      const { data, error } = await supabase
+        .from('projects')
+        .insert(projectData)
+        .select()
+        .single();
+
+      if (error) {
+        throw new Error(`Failed to create project: ${error.message}`);
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    },
   });
 };
