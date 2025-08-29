@@ -31,7 +31,7 @@ import {
   Filter
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import UnifiedCreationWizard from '@/components/unified/UnifiedCreationWizard';
+// Removed broken import
 import { PROJECT_TEMPLATES } from '@/services/UnifiedProjectCreationService';
 import TaxonomySeederPanel from '@/components/admin/TaxonomySeederPanel';
 import ComprehensiveTaxonomyManager from '@/components/taxonomy/ComprehensiveTaxonomyManager';
