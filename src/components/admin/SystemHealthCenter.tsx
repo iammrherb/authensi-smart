@@ -8,7 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { 
   Database, Server, Globe, Shield, Settings, Zap, 
-  CheckCircle, AlertTriangle, RefreshCw, Play, Stop,
+  CheckCircle, AlertTriangle, RefreshCw, Play, Square,
   Download, Upload, Activity, BarChart3, Tag,
   FileText, Network, Bot, Key, Link, Clock
 } from 'lucide-react';

@@ -15,6 +15,10 @@ export interface UserRole {
   expires_at?: string;
   notes?: string;
   role_name?: string; // For display purposes
+  // Legacy compatibility fields
+  role: string;
+  scope_type: string;
+  scope_id?: string;
   user_profile?: {
     id: string;
     email: string;
@@ -31,9 +35,13 @@ export interface UserRole {
 
 export interface AssignRoleData {
   user_id: string;
-  role_id: string;
+  role_id?: string; // Optional - can be derived from role name
   expires_at?: string;
   notes?: string;
+  // Legacy compatibility
+  role?: string;
+  scope_type?: string;
+  scope_id?: string;
 }
 
 // Fetch user roles with role names for display
@@ -83,10 +91,14 @@ export const useUserRoles = () => {
       // Create a map for quick lookup
       const profileMap = new Map(profiles.map(p => [p.id, p]));
 
-      // Combine roles with profile data and role names
+      // Combine roles with profile data and role names + legacy compatibility
       return roles.map(role => ({
         ...role,
         role_name: role.roles.name,
+        // Legacy compatibility fields
+        role: role.roles.name,
+        scope_type: 'global',
+        scope_id: null,
         user_profile: profileMap.get(role.user_id) || null,
         assigned_by_profile: role.assigned_by ? profileMap.get(role.assigned_by) || null : null
       }));
@@ -150,10 +162,34 @@ export const useAssignRole = () => {
         throw new Error('User must be authenticated to assign roles');
       }
 
+      // Convert legacy role to role_id if needed
+      let finalRoleData = { ...roleData };
+      if (roleData.role && !roleData.role_id) {
+        // Look up role_id from role name
+        const { data: roleRecord, error: roleError } = await supabase
+          .from('roles')
+          .select('id')
+          .eq('name', roleData.role)
+          .single();
+        
+        if (roleError || !roleRecord) {
+          throw new Error(`Role '${roleData.role}' not found`);
+        }
+        
+        finalRoleData.role_id = roleRecord.id;
+      }
+      
+      if (!finalRoleData.role_id) {
+        throw new Error('Either role_id or role name must be provided');
+      }
+
       const { data, error } = await supabase
         .from('user_roles')
         .insert([{
-          ...roleData,
+          user_id: finalRoleData.user_id,
+          role_id: finalRoleData.role_id,
+          expires_at: finalRoleData.expires_at,
+          notes: finalRoleData.notes,
           assigned_by: user.id,
         }])
         .select()
