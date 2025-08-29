@@ -63,8 +63,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const { data, error } = await supabase
         .from('user_roles')
-        .select('role, scope_type, scope_id')
-        .eq('user_id', userId);
+        .select(`
+          role_id,
+          is_active,
+          roles!inner(name, priority)
+        `)
+        .eq('user_id', userId)
+        .eq('is_active', true);
 
       if (error) {
         console.error('Error fetching user roles:', error);
@@ -72,8 +77,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const roleData = data || [];
-      const roles = roleData.map(r => r.role);
-      setUserRoleData(roleData);
+      const roles = roleData.map(r => r.roles.name);
+      // Convert RBAC roles to simplified format for backward compatibility
+      const simplifiedRoleData = roleData.map(r => ({
+        role: r.roles.name,
+        scope_type: 'global', // Default for RBAC system
+        scope_id: null
+      }));
+      
+      setUserRoleData(simplifiedRoleData);
       setUserRoles(roles);
     } catch (error) {
       console.error('Error fetching user roles:', error);
@@ -109,7 +121,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [userRoleData]);
 
-  const isAdmin = useMemo(() => hasRole('project_owner', 'global'), [hasRole]);
+  const isAdmin = useMemo(() => hasRole('super_admin', 'global') || hasRole('admin', 'global'), [hasRole]);
   const isProjectManager = useMemo(() => hasRole('project_manager', 'global') || isAdmin, [hasRole, isAdmin]);
 
   useEffect(() => {

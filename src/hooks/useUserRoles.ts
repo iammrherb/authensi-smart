@@ -8,13 +8,13 @@ export type ScopeType = 'global' | 'project' | 'site';
 export interface UserRole {
   id: string;
   user_id: string;
-  role: AppRole;
-  scope_type: ScopeType;
-  scope_id?: string;
+  role_id: string;
+  is_active: boolean;
   assigned_by?: string;
   assigned_at: string;
-  created_at: string;
-  updated_at: string;
+  expires_at?: string;
+  notes?: string;
+  role_name?: string; // For display purposes
   user_profile?: {
     id: string;
     email: string;
@@ -31,30 +31,24 @@ export interface UserRole {
 
 export interface AssignRoleData {
   user_id: string;
-  role: AppRole;
-  scope_type: ScopeType;
-  scope_id?: string;
+  role_id: string;
+  expires_at?: string;
+  notes?: string;
 }
 
-// Fetch user roles for a specific scope with user email information
-export const useUserRoles = (scopeType?: ScopeType, scopeId?: string) => {
+// Fetch user roles with role names for display
+export const useUserRoles = () => {
   return useQuery({
-    queryKey: ['user-roles', scopeType, scopeId],
+    queryKey: ['user-roles'],
     queryFn: async () => {
-      // First get the user roles
-      let query = supabase
+      const { data: roles, error } = await supabase
         .from('user_roles')
-        .select('*');
-      
-      if (scopeType) {
-        query = query.eq('scope_type', scopeType);
-      }
-      
-      if (scopeId) {
-        query = query.eq('scope_id', scopeId);
-      }
-      
-      const { data: roles, error } = await query.order('created_at', { ascending: false });
+        .select(`
+          *,
+          roles!inner(name, priority)
+        `)
+        .eq('is_active', true)
+        .order('assigned_at', { ascending: false });
       
       if (error) throw error;
       
@@ -89,9 +83,10 @@ export const useUserRoles = (scopeType?: ScopeType, scopeId?: string) => {
       // Create a map for quick lookup
       const profileMap = new Map(profiles.map(p => [p.id, p]));
 
-      // Combine roles with profile data (null when not permitted by RLS)
+      // Combine roles with profile data and role names
       return roles.map(role => ({
         ...role,
+        role_name: role.roles.name,
         user_profile: profileMap.get(role.user_id) || null,
         assigned_by_profile: role.assigned_by ? profileMap.get(role.assigned_by) || null : null
       }));
