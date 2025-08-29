@@ -14,21 +14,22 @@ export interface AssignRoleData extends AssignLegacyRoleData {
   role_id?: string; // For RBAC compatibility
 }
 
-// Fetch user roles with role names for display
-export const useUserRoles = () => {
+// Overload for legacy compatibility 
+export function useUserRoles(): ReturnType<typeof useQuery<UserRole[]>>;
+export function useUserRoles(scopeType: ScopeType, scopeId?: string): ReturnType<typeof useQuery<UserRole[]>>;
+export function useUserRoles(scopeType?: ScopeType, scopeId?: string) {
   return useQuery({
-    queryKey: ['user-roles'],
+    queryKey: ['user-roles', scopeType, scopeId],
     queryFn: async () => {
       const roles = await RBACService.getUserRoles();
-      // Add role_name and role_id for compatibility
       return roles.map(role => ({
         ...role,
         role_name: role.role,
-        role_id: 'legacy-' + role.role, // Placeholder for RBAC compatibility
+        role_id: 'legacy-' + role.role,
       }));
     },
   });
-};
+}
 
 // Check if current user has a specific role
 export const useHasRole = (role: AppRole, scopeType: ScopeType = 'global', scopeId?: string) => {

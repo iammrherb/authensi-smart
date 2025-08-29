@@ -1027,7 +1027,7 @@ const UserManagementCenter: React.FC = () => {
                         </TableCell>
                         <TableCell>
                           <div className="text-xs text-muted-foreground">
-                            {log.notes || 'No additional details'}
+                            {(log as any).notes || 'No additional details'}
                           </div>
                         </TableCell>
                       </TableRow>

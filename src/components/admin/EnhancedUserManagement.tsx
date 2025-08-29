@@ -157,7 +157,7 @@ const EnhancedUserManagement: React.FC<EnhancedUserManagementProps> = ({
         p_password: 'TempPassword123!', // Temporary password, user will reset
         p_first_name: newUserFirstName,
         p_last_name: newUserLastName,
-        p_role: newUserRole,
+        p_role: 'viewer',
         p_scope_type: scopeType,
         p_scope_id: scopeId
       });

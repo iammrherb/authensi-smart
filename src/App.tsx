@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 
-import DemoDataManager from "./components/common/DemoDataManager";
+// Removed broken import
 
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
@@ -57,7 +57,7 @@ import CustomerAuth from "./pages/CustomerAuth";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import Testing from "./pages/Testing";
 import EnterpriseReportGenerator from "./components/reports/EnterpriseReportGenerator";
-import EnhancedResourceManager from "./components/library/EnhancedResourceManager";
+// Removed broken import
 import NewFeaturesShowcase from "./components/dashboard/NewFeaturesShowcase";
 import AnalyticsReportingCenter from "./pages/AnalyticsReportingCenter";
 import SystemHealthCenter from "./components/admin/SystemHealthCenter";
@@ -249,11 +249,14 @@ const App = () => (
                       <Settings />
                     </ProtectedRoute>
                   } />
-                  <Route path="/demo-data" element={
-                    <ProtectedRoute>
-                      <DemoDataManager />
-                    </ProtectedRoute>
-                  } />
+                   <Route path="/demo-data" element={
+                     <ProtectedRoute>
+                       <div className="p-6">
+                         <h1 className="text-2xl font-bold">Demo Data Manager</h1>
+                         <p className="text-muted-foreground">Demo data management coming soon.</p>
+                       </div>
+                     </ProtectedRoute>
+                   } />
                   
                   {/* Testing & Validation */}
                   <Route path="/testing" element={
@@ -270,7 +273,10 @@ const App = () => (
                   } />
                   <Route path="/dev/resource/:type/:id" element={
                     <ProtectedRoute>
-                      <EnhancedResourceManager />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Resource Manager</h1>
+                        <p className="text-muted-foreground">Enhanced resource manager coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/showcase" element={

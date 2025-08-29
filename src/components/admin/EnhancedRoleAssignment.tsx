@@ -65,6 +65,13 @@ const EnhancedRoleAssignment: React.FC<EnhancedRoleAssignmentProps> = ({
 
   const roleLabels: Record<AppRole, string> = {
     super_admin: 'Super Admin',
+    admin: 'Admin',
+    manager: 'Manager', 
+    analyst: 'Analyst',
+    customer_admin: 'Customer Admin',
+    customer_user: 'Customer User',
+    vendor_admin: 'Vendor Admin',
+    vendor_user: 'Vendor User',
     project_creator: 'Project Creator',
     project_viewer: 'Project Viewer',
     product_manager: 'Product Manager',

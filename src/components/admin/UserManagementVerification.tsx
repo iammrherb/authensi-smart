@@ -55,7 +55,12 @@ const UserManagementVerification: React.FC = () => {
         .select('*')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return data as UserRole[];
+      return (data as any[]).map(item => ({
+        ...item,
+        role: item.role || 'viewer',
+        scope_type: item.scope_type || 'global',
+        scope_id: item.scope_id || null
+      })) as UserRole[];
     }
   });
 
