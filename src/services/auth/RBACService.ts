@@ -112,7 +112,7 @@ export class RBACService {
     const { data, error } = await supabase
       .rpc('has_role', {
         _user_id: user.id,
-        _role: role,
+        _role: role as any,
         _scope_type: scopeType,
         _scope_id: scopeId
       });

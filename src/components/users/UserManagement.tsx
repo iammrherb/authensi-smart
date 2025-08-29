@@ -60,6 +60,13 @@ const UserManagement = ({ scopeType = 'global', scopeId, scopeName }: UserManage
 
   const roleDescriptions: Record<AppRole, string> = {
     super_admin: 'Full access to all project/site functionality and user management',
+    admin: 'Administrative access with management capabilities',
+    manager: 'Project management and team oversight',
+    analyst: 'Data analysis and reporting capabilities',
+    customer_admin: 'Customer organization administrative access',
+    customer_user: 'Standard customer user access',
+    vendor_admin: 'Vendor administrative capabilities',
+    vendor_user: 'Standard vendor user access',
     project_creator: 'Can create and manage projects they create',
     project_viewer: 'Read-only access to assigned projects',
     product_manager: 'Full project lifecycle management with scoping and tracking',

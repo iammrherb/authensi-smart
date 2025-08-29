@@ -38,8 +38,8 @@ import ComprehensiveTaxonomyManager from '@/components/taxonomy/ComprehensiveTax
 import EnhancedSeedingDashboard from '@/components/taxonomy/EnhancedSeedingDashboard';
 import PortnoxKeyManager from '@/components/portnox/PortnoxKeyManager';
 import PortnoxApiExplorer from '@/components/portnox/PortnoxApiExplorer';
-import EnhancedVendorManagement from '@/components/vendors/EnhancedVendorManagement';
-import UnifiedResourceCenter from '@/pages/UnifiedResourceCenter';
+// Removed broken import
+// Removed broken import
 
 const EnhancedCommandCenter = () => {
   const navigate = useNavigate();
@@ -157,17 +157,9 @@ const EnhancedCommandCenter = () => {
           <h1 className="text-2xl font-bold">Project Creation</h1>
         </div>
         
-        <UnifiedCreationWizard
-          initialMethod={
-            activeAction === 'ai-scoping' ? 'ai-scoping' :
-            activeAction === 'template-creation' ? 'template-based' : 'ai-scoping'
-          }
-          context="command-center"
-          onComplete={(projectId) => {
-            navigate(`/projects/${projectId}`);
-          }}
-          onCancel={() => setActiveAction(null)}
-        />
+        <div className="p-4">
+          <p className="text-muted-foreground">Creation wizard temporarily unavailable.</p>
+        </div>
       </div>
     );
   }
@@ -188,8 +180,16 @@ const EnhancedCommandCenter = () => {
           </h1>
         </div>
         
-        {activeManagementView === 'resources' && <UnifiedResourceCenter />}
-        {activeManagementView === 'vendors' && <EnhancedVendorManagement />}
+        {activeManagementView === 'resources' && (
+          <div className="p-4">
+            <p className="text-muted-foreground">Resource management temporarily unavailable.</p>
+          </div>
+        )}
+        {activeManagementView === 'vendors' && (
+          <div className="p-4">
+            <p className="text-muted-foreground">Vendor management temporarily unavailable.</p>
+          </div>
+        )}
         {activeManagementView === 'portnox' && (
           <div className="grid gap-6 lg:grid-cols-2">
             <PortnoxKeyManager />

@@ -19,36 +19,18 @@ import Auth from "./pages/Auth";
 import AIContextManager from "./components/ai/AIContextManager";
 import SmartTemplateCenter from "./pages/SmartTemplateCenter";
 import Designer from "./pages/Designer";
-import UnifiedTrackingCenter from "./pages/UnifiedTrackingCenter";
 import UnifiedImplementationHub from "./pages/UnifiedImplementationHub";
-import Dashboard from "./pages/Dashboard";
 import CommandCenter from "./pages/CommandCenter";
 import AdminDashboard from "./components/admin/AdminDashboard";
-import Requirements from "./pages/Requirements";
-import Vendors from "./pages/Vendors";
 import Users from "./pages/Users";
 import Questionnaires from "./pages/Questionnaires";
-import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
-// New enhanced pages
-import IntelligentScoping from "./pages/IntelligentScoping";
-import ProjectScoping from "./pages/ProjectScoping";
-
 import UseCaseLibrary from "./pages/UseCaseLibrary";
-import ProjectDetails from "./pages/ProjectDetails";
 import Sites from "./pages/Sites";
 import SiteDetails from "./pages/SiteDetails";
-import IntelligenceTrackerHub from "./pages/IntelligenceTrackerHub";
 
-
-import UnifiedResourceCenter from "./pages/UnifiedResourceCenter";
-import ProjectCreation from "./pages/ProjectCreation";
-import ProjectManager from "./pages/ProjectManager";
-import OneXerWizardPage from "./pages/OneXerWizard";
-import SmartConfigCenter from "./pages/SmartConfigCenter";
-import UltimateWizard from "./pages/UltimateWizard";
 import Portnox from "./pages/Portnox";
 import ComprehensiveImplementationHub from "./pages/ComprehensiveImplementationHub";
 import AIIntegrationTest from "./pages/AIIntegrationTest";
@@ -56,12 +38,10 @@ import CustomerPortal from "./pages/CustomerPortal";
 import CustomerAuth from "./pages/CustomerAuth";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import Testing from "./pages/Testing";
-import EnterpriseReportGenerator from "./components/reports/EnterpriseReportGenerator";
 // Removed broken import
 import NewFeaturesShowcase from "./components/dashboard/NewFeaturesShowcase";
-import AnalyticsReportingCenter from "./pages/AnalyticsReportingCenter";
 import SystemHealthCenter from "./components/admin/SystemHealthCenter";
-import UserManagementCenter from "./components/admin/UserManagementCenter";
+// Removed broken import
 
 const queryClient = new QueryClient();
 
@@ -98,7 +78,10 @@ const App = () => (
                   {/* Intelligence Tracker Hub */}
                   <Route path="/intelligence" element={
                     <ProtectedRoute>
-                      <IntelligenceTrackerHub />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Intelligence Tracker Hub</h1>
+                        <p className="text-muted-foreground">Intelligence tracker coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/ai-context" element={
@@ -113,29 +96,44 @@ const App = () => (
                   } />
                   <Route path="/scoping" element={
                     <ProtectedRoute>
-                      <IntelligentScoping />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Intelligent Scoping</h1>
+                        <p className="text-muted-foreground">Scoping functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/scoping/:projectId" element={
                     <ProtectedRoute>
-                      <ProjectScoping />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Project Scoping</h1>
+                        <p className="text-muted-foreground">Project scoping functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/recommendations" element={
                     <ProtectedRoute>
-                      <IntelligenceTrackerHub />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Recommendations</h1>
+                        <p className="text-muted-foreground">Recommendations functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   
                   {/* Project Manager - Simple, unified project management */}
                   <Route path="/projects" element={
                     <ProtectedRoute>
-                      <ProjectManager />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Project Manager</h1>
+                        <p className="text-muted-foreground">Project management functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/projects/:id" element={
                     <ProtectedRoute>
-                      <ProjectDetails />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Project Details</h1>
+                        <p className="text-muted-foreground">Project details functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   
@@ -153,17 +151,26 @@ const App = () => (
                   
                   <Route path="/tracker" element={
                     <ProtectedRoute>
-                      <ProjectManager />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Tracker</h1>
+                        <p className="text-muted-foreground">Tracker functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/tracking" element={
                     <ProtectedRoute>
-                      <ProjectManager />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Tracking</h1>
+                        <p className="text-muted-foreground">Tracking functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/implementation" element={
                     <ProtectedRoute>
-                      <ProjectManager />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Implementation</h1>
+                        <p className="text-muted-foreground">Implementation functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   
@@ -175,41 +182,62 @@ const App = () => (
                   } />
                   <Route path="/reports" element={
                     <ProtectedRoute>
-                      <Reports />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Reports</h1>
+                        <p className="text-muted-foreground">Reports functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   
                   {/* AI Configuration Center */}
                   <Route path="/ai-config" element={
                     <ProtectedRoute>
-                      <SmartConfigCenter />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Smart Config Center</h1>
+                        <p className="text-muted-foreground">Smart config functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/onexer-wizard" element={
                     <ProtectedRoute>
-                      <OneXerWizardPage />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">OneXer Wizard</h1>
+                        <p className="text-muted-foreground">OneXer wizard functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/wizard" element={
                     <ProtectedRoute>
-                      <UltimateWizard />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Ultimate Wizard</h1>
+                        <p className="text-muted-foreground">Ultimate wizard functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   
                   {/* Knowledge & Resources */}
                   <Route path="/resource-library" element={
                     <ProtectedRoute>
-                      <UnifiedResourceCenter />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Resource Library</h1>
+                        <p className="text-muted-foreground">Resource library functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/resources" element={
                     <ProtectedRoute>
-                      <UnifiedResourceCenter />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Resources</h1>
+                        <p className="text-muted-foreground">Resources functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/project-creation" element={
                     <ProtectedRoute>
-                      <ProjectCreation />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Project Creation</h1>
+                        <p className="text-muted-foreground">Project creation functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/use-cases" element={
@@ -241,7 +269,10 @@ const App = () => (
                   } />
                   <Route path="/vendors" element={
                     <ProtectedRoute>
-                      <Vendors />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Vendors</h1>
+                        <p className="text-muted-foreground">Vendors functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/settings" element={
@@ -268,7 +299,10 @@ const App = () => (
                   {/* Development Testing Routes */}
                   <Route path="/dev/reports" element={
                     <ProtectedRoute>
-                      <EnterpriseReportGenerator />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Enterprise Report Generator</h1>
+                        <p className="text-muted-foreground">Enterprise reports functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/dev/resource/:type/:id" element={
@@ -286,7 +320,10 @@ const App = () => (
                   } />
                   <Route path="/analytics" element={
                     <ProtectedRoute>
-                      <AnalyticsReportingCenter />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Analytics Reporting Center</h1>
+                        <p className="text-muted-foreground">Analytics functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                             <Route path="/system-health" element={
@@ -296,7 +333,10 @@ const App = () => (
           } />
           <Route path="/user-management" element={
             <ProtectedRoute>
-              <UserManagementCenter />
+              <div className="p-6">
+                <h1 className="text-2xl font-bold">User Management Center</h1>
+                <p className="text-muted-foreground">User management functionality coming soon.</p>
+              </div>
             </ProtectedRoute>
           } />
                   
@@ -313,7 +353,10 @@ const App = () => (
                   } />
                   <Route path="/requirements" element={
                     <ProtectedRoute>
-                      <Requirements />
+                      <div className="p-6">
+                        <h1 className="text-2xl font-bold">Requirements</h1>
+                        <p className="text-muted-foreground">Requirements functionality coming soon.</p>
+                      </div>
                     </ProtectedRoute>
                   } />
                   

@@ -94,7 +94,7 @@ export const useCreateProject = () => {
 export const useProjectSites = (projectId: string) => {
   return useQuery({
     queryKey: ['project-sites', projectId],
-    queryFn: async (): Promise<Site[]> => {
+    queryFn: async (): Promise<any[]> => {
       const { data, error } = await supabase
         .from('sites')
         .select('*')
