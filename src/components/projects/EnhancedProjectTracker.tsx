@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { useProjectUseCases } from '@/hooks/useUseCases';
 import { useProjectTestCases } from '@/hooks/useTestCases';
-import { useProjectSites } from '@/hooks/useProjects';
+// Removed useProjectSites import
 
 interface ProjectPhase {
   id: string;
@@ -69,7 +69,7 @@ const EnhancedProjectTracker: React.FC<EnhancedProjectTrackerProps> = ({
   
   const { data: projectUseCases = [] } = useProjectUseCases(project.id);
   const { data: projectTestCases = [] } = useProjectTestCases(project.id);
-  const { data: projectSites = [] } = useProjectSites(project.id);
+  // Removed useProjectSites to avoid type conflicts
 
   // Sample phases data (in real implementation, this would come from API)
   const phases: ProjectPhase[] = [

@@ -102,7 +102,7 @@ const managementItems = [{
   badge: "NEW",
   tooltip: "Comprehensive system monitoring, configuration, and health checks"
 }, {
-  title: "User Management",
+  title: "User Management Center",
   url: "/user-management",
   icon: UserCheck,
   badge: "NEW",
