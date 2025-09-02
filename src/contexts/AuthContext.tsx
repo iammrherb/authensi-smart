@@ -64,8 +64,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { data, error } = await supabase
         .from('user_roles')
         .select(`
+          id,
           role_id,
           is_active,
+          assigned_at,
+          expires_at,
+          notes,
           roles!inner(name, priority)
         `)
         .eq('user_id', userId)
@@ -100,24 +104,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const hasRole = useMemo(() => {
     return (role: string, scope?: string, scopeId?: string): boolean => {
-      // Check for global roles first (highest privilege)
-      const hasGlobalRole = userRoleData.some(r => 
-        r.role === role && r.scope_type === 'global'
-      );
-      
-      if (hasGlobalRole) return true;
-      
-      // If no scope specified, only check for global roles
-      if (!scope) return false;
-      
-      // Check for scoped roles
-      const hasScopedRole = userRoleData.some(r => 
-        r.role === role && 
-        r.scope_type === scope && 
-        (scopeId ? r.scope_id === scopeId : true)
-      );
-      
-      return hasScopedRole;
+      try {
+        // Check for global roles first (highest privilege)
+        const hasGlobalRole = userRoleData.some(r => 
+          r.role === role && r.scope_type === 'global'
+        );
+        
+        if (hasGlobalRole) return true;
+        
+        // If no scope specified, only check for global roles
+        if (!scope) return false;
+        
+        // Check for scoped roles
+        const hasScopedRole = userRoleData.some(r => 
+          r.role === role && 
+          r.scope_type === scope && 
+          (scopeId ? r.scope_id === scopeId : true)
+        );
+        
+        return hasScopedRole;
+      } catch (error) {
+        console.warn('Error in hasRole:', error);
+        return false;
+      }
     };
   }, [userRoleData]);
 
