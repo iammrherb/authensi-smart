@@ -8137,12 +8137,19 @@ export type Database = {
         Returns: boolean
       }
       has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _scope_id?: string
-          _scope_type?: string
-          _user_id: string
-        }
+        Args:
+          | {
+              _role: Database["public"]["Enums"]["app_role"]
+              _scope_id?: string
+              _scope_type?: string
+              _user_id: string
+            }
+          | {
+              _role: string
+              _scope_id?: string
+              _scope_type?: string
+              _user_id: string
+            }
         Returns: boolean
       }
       increment_tag_usage: {
