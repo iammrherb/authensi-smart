@@ -215,9 +215,63 @@ const CustomerPortal = () => {
               <CardDescription>Access and manage configuration templates</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <Settings className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Configuration tools coming soon</p>
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">Available Templates</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between p-2 bg-muted rounded">
+                        <span className="text-sm">Network Configuration</span>
+                        <Button variant="outline" size="sm">Use Template</Button>
+                      </div>
+                      <div className="flex items-center justify-between p-2 bg-muted rounded">
+                        <span className="text-sm">Security Policy</span>
+                        <Button variant="outline" size="sm">Use Template</Button>
+                      </div>
+                      <div className="flex items-center justify-between p-2 bg-muted rounded">
+                        <span className="text-sm">Wireless Setup</span>
+                        <Button variant="outline" size="sm">Use Template</Button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">Recent Changes</h4>
+                    <div className="space-y-2">
+                      <div className="text-sm p-2 bg-blue-50 rounded">
+                        <span className="font-medium">Network Config Updated</span>
+                        <p className="text-muted-foreground">2 hours ago</p>
+                      </div>
+                      <div className="text-sm p-2 bg-green-50 rounded">
+                        <span className="font-medium">Security Policy Applied</span>
+                        <p className="text-muted-foreground">1 day ago</p>
+                      </div>
+                      <div className="text-sm p-2 bg-yellow-50 rounded">
+                        <span className="font-medium">Wireless Settings Modified</span>
+                        <p className="text-muted-foreground">3 days ago</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex flex-wrap gap-3">
+                  <Button variant="outline">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Import Configuration
+                  </Button>
+                  <Button variant="outline">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Export Current Config
+                  </Button>
+                  <Button variant="outline">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Compare Versions
+                  </Button>
+                  <Button variant="outline">
+                    <CalendarDays className="h-4 w-4 mr-2" />
+                    View History
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

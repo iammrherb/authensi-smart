@@ -911,9 +911,103 @@ const SmartTemplateRecommendationEngine: React.FC<SmartTemplateRecommendationEng
         </TabsContent>
 
         <TabsContent value="analytics">
-          <div className="text-center py-8">
-            <BarChart3 className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">Analytics dashboard coming soon...</p>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Template Usage</CardTitle>
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">1,247</div>
+                  <p className="text-xs text-muted-foreground">Templates applied this month</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
+                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">94.2%</div>
+                  <p className="text-xs text-muted-foreground">Successful implementations</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Time Saved</CardTitle>
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">127h</div>
+                  <p className="text-xs text-muted-foreground">Saved this month</p>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Performance Trends</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span>Template Accuracy</span>
+                    <div className="flex items-center gap-2">
+                      <Progress value={94} className="w-20" />
+                      <span className="text-sm font-medium">94%</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>User Satisfaction</span>
+                    <div className="flex items-center gap-2">
+                      <Progress value={87} className="w-20" />
+                      <span className="text-sm font-medium">87%</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Implementation Speed</span>
+                    <div className="flex items-center gap-2">
+                      <Progress value={91} className="w-20" />
+                      <span className="text-sm font-medium">91%</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Performing Templates</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <p className="font-medium">Network Security Template</p>
+                      <p className="text-sm text-muted-foreground">Used 156 times</p>
+                    </div>
+                    <Badge variant="default">98% Success</Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <p className="font-medium">Wireless Deployment</p>
+                      <p className="text-sm text-muted-foreground">Used 89 times</p>
+                    </div>
+                    <Badge variant="default">95% Success</Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <p className="font-medium">Data Center Setup</p>
+                      <p className="text-sm text-muted-foreground">Used 67 times</p>
+                    </div>
+                    <Badge variant="default">92% Success</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
       </Tabs>

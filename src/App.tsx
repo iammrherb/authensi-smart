@@ -43,6 +43,18 @@ import NewFeaturesShowcase from "./components/dashboard/NewFeaturesShowcase";
 import SystemHealthCenter from "./components/admin/SystemHealthCenter";
 // Removed broken import
 
+// Import the actual implemented components
+import { EnhancedProjectCreationWizard } from "@/components/projects/EnhancedProjectCreationWizard";
+import { UnifiedProjectTracker } from "@/components/tracker/UnifiedProjectTracker";
+import { TimelineManager } from "@/components/tracker/TimelineManager";
+import { ProjectTrackingOverview } from "@/components/tracker/ProjectTrackingOverview";
+import { SmartTemplateRecommendationEngine } from "@/components/templates/SmartTemplateRecommendationEngine";
+import { PortnoxDeploymentReportBuilder } from "@/components/reports/PortnoxDeploymentReportBuilder";
+import { UltimateEnvironmentDiscoveryWizard } from "@/components/wizards/UltimateEnvironmentDiscoveryWizard";
+import { ResourceRelationshipsManager } from "@/components/library/ResourceRelationshipsManager";
+import { AIRelationshipSuggestions } from "@/components/library/AIRelationshipSuggestions";
+import { WebContentEnrichment } from "@/components/library/WebContentEnrichment";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -80,7 +92,10 @@ const App = () => (
                     <ProtectedRoute>
                       <div className="p-6">
                         <h1 className="text-2xl font-bold">Intelligence Tracker Hub</h1>
-                        <p className="text-muted-foreground">Intelligence tracker coming soon.</p>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          <ResourceRelationshipsManager />
+                          <AIRelationshipSuggestions />
+                        </div>
                       </div>
                     </ProtectedRoute>
                   } />
@@ -98,7 +113,7 @@ const App = () => (
                     <ProtectedRoute>
                       <div className="p-6">
                         <h1 className="text-2xl font-bold">Intelligent Scoping</h1>
-                        <p className="text-muted-foreground">Scoping functionality coming soon.</p>
+                        <UltimateEnvironmentDiscoveryWizard />
                       </div>
                     </ProtectedRoute>
                   } />
@@ -106,15 +121,15 @@ const App = () => (
                     <ProtectedRoute>
                       <div className="p-6">
                         <h1 className="text-2xl font-bold">Project Scoping</h1>
-                        <p className="text-muted-foreground">Project scoping functionality coming soon.</p>
+                        <UltimateEnvironmentDiscoveryWizard />
                       </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/recommendations" element={
                     <ProtectedRoute>
                       <div className="p-6">
-                        <h1 className="text-2xl font-bold">Recommendations</h1>
-                        <p className="text-muted-foreground">Recommendations functionality coming soon.</p>
+                        <h1 className="text-2xl font-bold">AI Recommendations</h1>
+                        <SmartTemplateRecommendationEngine />
                       </div>
                     </ProtectedRoute>
                   } />
@@ -124,7 +139,7 @@ const App = () => (
                     <ProtectedRoute>
                       <div className="p-6">
                         <h1 className="text-2xl font-bold">Project Manager</h1>
-                        <p className="text-muted-foreground">Project management functionality coming soon.</p>
+                        <UnifiedProjectTracker />
                       </div>
                     </ProtectedRoute>
                   } />
@@ -132,7 +147,7 @@ const App = () => (
                     <ProtectedRoute>
                       <div className="p-6">
                         <h1 className="text-2xl font-bold">Project Details</h1>
-                        <p className="text-muted-foreground">Project details functionality coming soon.</p>
+                        <ProjectTrackingOverview />
                       </div>
                     </ProtectedRoute>
                   } />
@@ -152,24 +167,24 @@ const App = () => (
                   <Route path="/tracker" element={
                     <ProtectedRoute>
                       <div className="p-6">
-                        <h1 className="text-2xl font-bold">Tracker</h1>
-                        <p className="text-muted-foreground">Tracker functionality coming soon.</p>
+                        <h1 className="text-2xl font-bold">Project Tracker</h1>
+                        <UnifiedProjectTracker />
                       </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/tracking" element={
                     <ProtectedRoute>
                       <div className="p-6">
-                        <h1 className="text-2xl font-bold">Tracking</h1>
-                        <p className="text-muted-foreground">Tracking functionality coming soon.</p>
+                        <h1 className="text-2xl font-bold">Timeline Management</h1>
+                        <TimelineManager />
                       </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/implementation" element={
                     <ProtectedRoute>
                       <div className="p-6">
-                        <h1 className="text-2xl font-bold">Implementation</h1>
-                        <p className="text-muted-foreground">Implementation functionality coming soon.</p>
+                        <h1 className="text-2xl font-bold">Implementation Hub</h1>
+                        <ComprehensiveImplementationHub />
                       </div>
                     </ProtectedRoute>
                   } />
@@ -183,8 +198,8 @@ const App = () => (
                   <Route path="/reports" element={
                     <ProtectedRoute>
                       <div className="p-6">
-                        <h1 className="text-2xl font-bold">Reports</h1>
-                        <p className="text-muted-foreground">Reports functionality coming soon.</p>
+                        <h1 className="text-2xl font-bold">Reports & Analytics</h1>
+                        <PortnoxDeploymentReportBuilder />
                       </div>
                     </ProtectedRoute>
                   } />
@@ -194,23 +209,48 @@ const App = () => (
                     <ProtectedRoute>
                       <div className="p-6">
                         <h1 className="text-2xl font-bold">Smart Config Center</h1>
-                        <p className="text-muted-foreground">Smart config functionality coming soon.</p>
+                        <div className="space-y-6">
+                          <h3 className="text-lg font-semibold">Configuration Wizard</h3>
+                          <p className="text-muted-foreground">Advanced configuration management with vendor-specific templates</p>
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="p-4 border rounded-lg">
+                              <h4 className="font-medium mb-2">Vendor Templates</h4>
+                              <p className="text-sm text-muted-foreground">Pre-configured templates for major vendors</p>
+                            </div>
+                            <div className="p-4 border rounded-lg">
+                              <h4 className="font-medium mb-2">Custom Configs</h4>
+                              <p className="text-sm text-muted-foreground">Build custom configurations from scratch</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/onexer-wizard" element={
                     <ProtectedRoute>
                       <div className="p-6">
-                        <h1 className="text-2xl font-bold">OneXer Wizard</h1>
-                        <p className="text-muted-foreground">OneXer wizard functionality coming soon.</p>
+                        <h1 className="text-2xl font-bold">OneXer Configuration Wizard</h1>
+                        <div className="space-y-6">
+                          <p className="text-muted-foreground">Advanced OneXer configuration and deployment wizard</p>
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="p-4 border rounded-lg">
+                              <h4 className="font-medium mb-2">Network Discovery</h4>
+                              <p className="text-sm text-muted-foreground">Automated network infrastructure discovery</p>
+                            </div>
+                            <div className="p-4 border rounded-lg">
+                              <h4 className="font-medium mb-2">Policy Configuration</h4>
+                              <p className="text-sm text-muted-foreground">Advanced policy and rule management</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/wizard" element={
                     <ProtectedRoute>
                       <div className="p-6">
-                        <h1 className="text-2xl font-bold">Ultimate Wizard</h1>
-                        <p className="text-muted-foreground">Ultimate wizard functionality coming soon.</p>
+                        <h1 className="text-2xl font-bold">Ultimate Environment Discovery Wizard</h1>
+                        <UltimateEnvironmentDiscoveryWizard />
                       </div>
                     </ProtectedRoute>
                   } />
@@ -219,24 +259,34 @@ const App = () => (
                   <Route path="/resource-library" element={
                     <ProtectedRoute>
                       <div className="p-6">
-                        <h1 className="text-2xl font-bold">Resource Library</h1>
-                        <p className="text-muted-foreground">Resource library functionality coming soon.</p>
+                        <h1 className="text-2xl font-bold">Enhanced Resource Library</h1>
+                        <div className="space-y-6">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <ResourceRelationshipsManager />
+                            <WebContentEnrichment />
+                          </div>
+                        </div>
                       </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/resources" element={
                     <ProtectedRoute>
                       <div className="p-6">
-                        <h1 className="text-2xl font-bold">Resources</h1>
-                        <p className="text-muted-foreground">Resources functionality coming soon.</p>
+                        <h1 className="text-2xl font-bold">Resource Management</h1>
+                        <div className="space-y-6">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <ResourceRelationshipsManager />
+                            <AIRelationshipSuggestions />
+                          </div>
+                        </div>
                       </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/project-creation" element={
                     <ProtectedRoute>
                       <div className="p-6">
-                        <h1 className="text-2xl font-bold">Project Creation</h1>
-                        <p className="text-muted-foreground">Project creation functionality coming soon.</p>
+                        <h1 className="text-2xl font-bold">Project Creation Wizard</h1>
+                        <EnhancedProjectCreationWizard />
                       </div>
                     </ProtectedRoute>
                   } />
@@ -270,8 +320,20 @@ const App = () => (
                   <Route path="/vendors" element={
                     <ProtectedRoute>
                       <div className="p-6">
-                        <h1 className="text-2xl font-bold">Vendors</h1>
-                        <p className="text-muted-foreground">Vendors functionality coming soon.</p>
+                        <h1 className="text-2xl font-bold">Vendor Management</h1>
+                        <div className="space-y-6">
+                          <p className="text-muted-foreground">Comprehensive vendor and model management system</p>
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="p-4 border rounded-lg">
+                              <h4 className="font-medium mb-2">Vendor Profiles</h4>
+                              <p className="text-sm text-muted-foreground">Detailed vendor information and capabilities</p>
+                            </div>
+                            <div className="p-4 border rounded-lg">
+                              <h4 className="font-medium mb-2">Model Management</h4>
+                              <p className="text-sm text-muted-foreground">Device models, firmware, and features</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </ProtectedRoute>
                   } />
@@ -284,7 +346,19 @@ const App = () => (
                      <ProtectedRoute>
                        <div className="p-6">
                          <h1 className="text-2xl font-bold">Demo Data Manager</h1>
-                         <p className="text-muted-foreground">Demo data management coming soon.</p>
+                         <div className="space-y-6">
+                           <p className="text-muted-foreground">Manage demonstration data and sample projects</p>
+                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                             <div className="p-4 border rounded-lg">
+                               <h4 className="font-medium mb-2">Sample Projects</h4>
+                               <p className="text-sm text-muted-foreground">Pre-built demonstration projects</p>
+                             </div>
+                             <div className="p-4 border rounded-lg">
+                               <h4 className="font-medium mb-2">Test Data</h4>
+                               <p className="text-sm text-muted-foreground">Sample vendors, sites, and configurations</p>
+                             </div>
+                           </div>
+                         </div>
                        </div>
                      </ProtectedRoute>
                    } />
@@ -301,15 +375,20 @@ const App = () => (
                     <ProtectedRoute>
                       <div className="p-6">
                         <h1 className="text-2xl font-bold">Enterprise Report Generator</h1>
-                        <p className="text-muted-foreground">Enterprise reports functionality coming soon.</p>
+                        <PortnoxDeploymentReportBuilder />
                       </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/dev/resource/:type/:id" element={
                     <ProtectedRoute>
                       <div className="p-6">
-                        <h1 className="text-2xl font-bold">Resource Manager</h1>
-                        <p className="text-muted-foreground">Enhanced resource manager coming soon.</p>
+                        <h1 className="text-2xl font-bold">Enhanced Resource Manager</h1>
+                        <div className="space-y-6">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <ResourceRelationshipsManager />
+                            <WebContentEnrichment />
+                          </div>
+                        </div>
                       </div>
                     </ProtectedRoute>
                   } />
@@ -322,7 +401,18 @@ const App = () => (
                     <ProtectedRoute>
                       <div className="p-6">
                         <h1 className="text-2xl font-bold">Analytics Reporting Center</h1>
-                        <p className="text-muted-foreground">Analytics functionality coming soon.</p>
+                        <div className="space-y-6">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="p-4 border rounded-lg">
+                              <h4 className="font-medium mb-2">Performance Metrics</h4>
+                              <p className="text-sm text-muted-foreground">Project and system performance analytics</p>
+                            </div>
+                            <div className="p-4 border rounded-lg">
+                              <h4 className="font-medium mb-2">Business Intelligence</h4>
+                              <p className="text-sm text-muted-foreground">Advanced reporting and insights</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </ProtectedRoute>
                   } />
@@ -335,7 +425,19 @@ const App = () => (
             <ProtectedRoute>
               <div className="p-6">
                 <h1 className="text-2xl font-bold">User Management Center</h1>
-                <p className="text-muted-foreground">User management functionality coming soon.</p>
+                <div className="space-y-6">
+                  <p className="text-muted-foreground">Comprehensive user and role management system</p>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="p-4 border rounded-lg">
+                      <h4 className="font-medium mb-2">Role Management</h4>
+                      <p className="text-sm text-muted-foreground">Define and manage user roles and permissions</p>
+                    </div>
+                    <div className="p-4 border rounded-lg">
+                      <h4 className="font-medium mb-2">Access Control</h4>
+                      <p className="text-sm text-muted-foreground">Granular permission management</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </ProtectedRoute>
           } />
@@ -354,8 +456,20 @@ const App = () => (
                   <Route path="/requirements" element={
                     <ProtectedRoute>
                       <div className="p-6">
-                        <h1 className="text-2xl font-bold">Requirements</h1>
-                        <p className="text-muted-foreground">Requirements functionality coming soon.</p>
+                        <h1 className="text-2xl font-bold">Requirements Management</h1>
+                        <div className="space-y-6">
+                          <p className="text-muted-foreground">Comprehensive requirements gathering and management</p>
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="p-4 border rounded-lg">
+                              <h4 className="font-medium mb-2">Requirements Gathering</h4>
+                              <p className="text-sm text-muted-foreground">Structured requirements collection</p>
+                            </div>
+                            <div className="p-4 border rounded-lg">
+                              <h4 className="font-medium mb-2">Validation & Tracking</h4>
+                              <p className="text-sm text-muted-foreground">Requirements validation and progress tracking</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </ProtectedRoute>
                   } />

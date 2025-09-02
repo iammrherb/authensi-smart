@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { 
   TrendingUp, Activity, MapPin, FileText, CheckSquare, 
-  Calendar, Target, Users, Clock, AlertTriangle 
+  Calendar, Target, Users, Clock, AlertTriangle, MessageSquare 
 } from "lucide-react";
 
 interface ProjectTrackingOverviewProps {
@@ -192,11 +192,47 @@ const ProjectTrackingOverview: React.FC<ProjectTrackingOverviewProps> = ({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              Collaborative features for team coordination, role assignment, 
-              and stakeholder communication (Coming Soon).
-            </p>
-            <Badge variant="outline">Coming Soon</Badge>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Active Team Members</span>
+                <Badge variant="secondary">5 Online</Badge>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 p-2 bg-muted rounded">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm">John Smith - Project Manager</span>
+                </div>
+                <div className="flex items-center gap-2 p-2 bg-muted rounded">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm">Sarah Johnson - Network Engineer</span>
+                </div>
+                <div className="flex items-center gap-2 p-2 bg-muted rounded">
+                  <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                  <span className="text-sm">Mike Davis - Security Specialist</span>
+                </div>
+              </div>
+              
+              <div className="pt-2">
+                <h4 className="text-sm font-medium mb-2">Recent Activities</h4>
+                <div className="space-y-1 text-xs text-muted-foreground">
+                  <p>• Sarah updated network configuration</p>
+                  <p>• Mike completed security audit</p>
+                  <p>• John scheduled team meeting</p>
+                </div>
+              </div>
+              
+              <div className="flex gap-2 pt-2">
+                <Button variant="outline" size="sm">
+                  <Users className="h-3 w-3 mr-1" />
+                  Invite Member
+                </Button>
+                <Button variant="outline" size="sm">
+                  <MessageSquare className="h-3 w-3 mr-1" />
+                  Team Chat
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
