@@ -1,409 +1,491 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
-import { Calendar, Clock, Users, AlertTriangle } from "lucide-react";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Calendar, 
+  Clock, 
+  Target, 
+  CheckCircle, 
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Filter,
+  Search
+} from 'lucide-react';
 
-const TimelineManager = () => {
-  const [selectedProject] = useState("enterprise-hq");
-  
-  const projects = {
-    "enterprise-hq": {
-      name: "Enterprise HQ Deployment",
-      client: "Acme Corporation", 
-      startDate: "2024-01-15",
-      endDate: "2024-03-30",
-      status: "In Progress",
-      progress: 65,
-      phases: [
-        {
-          id: "discovery",
-          name: "Discovery & Assessment",
-          startDate: "2024-01-15",
-          endDate: "2024-01-26",
-          duration: 10,
-          status: "completed",
-          progress: 100,
-          milestones: [
-            { name: "Network Assessment Complete", date: "2024-01-18", status: "completed" },
-            { name: "Requirements Gathering", date: "2024-01-22", status: "completed" },
-            { name: "Stakeholder Alignment", date: "2024-01-25", status: "completed" }
-          ],
-          tasks: [
-            { name: "Network topology mapping", assignee: "John Smith", status: "completed" },
-            { name: "Device inventory", assignee: "Sarah Johnson", status: "completed" },
-            { name: "Security assessment", assignee: "Mike Davis", status: "completed" },
-            { name: "Business requirements", assignee: "Lisa Chen", status: "completed" }
-          ]
-        },
-        {
-          id: "design",
-          name: "Architecture Design", 
-          startDate: "2024-01-29",
-          endDate: "2024-02-09",
-          duration: 10,
-          status: "completed",
-          progress: 100,
-          milestones: [
-            { name: "Architecture Review", date: "2024-02-02", status: "completed" },
-            { name: "Policy Design Complete", date: "2024-02-06", status: "completed" },
-            { name: "Design Approval", date: "2024-02-09", status: "completed" }
-          ],
-          tasks: [
-            { name: "Network architecture design", assignee: "John Smith", status: "completed" },
-            { name: "Policy framework creation", assignee: "Sarah Johnson", status: "completed" },
-            { name: "Integration planning", assignee: "Mike Davis", status: "completed" },
-            { name: "Security zone design", assignee: "Lisa Chen", status: "completed" }
-          ]
-        },
-        {
-          id: "implementation",
-          name: "Implementation",
-          startDate: "2024-02-12",
-          endDate: "2024-03-08",
-          duration: 25,
-          status: "in-progress",
-          progress: 68,
-          milestones: [
-            { name: "Infrastructure Setup", date: "2024-02-16", status: "completed" },
-            { name: "Basic Configuration", date: "2024-02-23", status: "completed" },
-            { name: "Integration Complete", date: "2024-03-01", status: "in-progress" },
-            { name: "Testing Readiness", date: "2024-03-08", status: "pending" }
-          ],
-          tasks: [
-            { name: "Portnox appliance installation", assignee: "John Smith", status: "completed" },
-            { name: "Network device configuration", assignee: "Mike Davis", status: "completed" },
-            { name: "AD integration setup", assignee: "Sarah Johnson", status: "in-progress" },
-            { name: "Policy implementation", assignee: "Lisa Chen", status: "in-progress" }
-          ]
-        },
-        {
-          id: "testing",
-          name: "Testing & Validation",
-          startDate: "2024-03-11",
-          endDate: "2024-03-22",
-          duration: 10,
-          status: "pending",
-          progress: 0,
-          milestones: [
-            { name: "Lab Testing Complete", date: "2024-03-15", status: "pending" },
-            { name: "User Acceptance Testing", date: "2024-03-19", status: "pending" },
-            { name: "Performance Validation", date: "2024-03-22", status: "pending" }
-          ],
-          tasks: [
-            { name: "Functional testing", assignee: "John Smith", status: "pending" },
-            { name: "Integration testing", assignee: "Sarah Johnson", status: "pending" },
-            { name: "Performance testing", assignee: "Mike Davis", status: "pending" },
-            { name: "Security validation", assignee: "Lisa Chen", status: "pending" }
-          ]
-        },
-        {
-          id: "golive",
-          name: "Go-Live & Handover",
-          startDate: "2024-03-25",
-          endDate: "2024-03-30",
-          duration: 5,
-          status: "pending",
-          progress: 0,
-          milestones: [
-            { name: "Production Deployment", date: "2024-03-26", status: "pending" },
-            { name: "User Training Complete", date: "2024-03-28", status: "pending" },
-            { name: "Project Handover", date: "2024-03-30", status: "pending" }
-          ],
-          tasks: [
-            { name: "Production rollout", assignee: "John Smith", status: "pending" },
-            { name: "User training delivery", assignee: "Sarah Johnson", status: "pending" },
-            { name: "Documentation handover", assignee: "Mike Davis", status: "pending" },
-            { name: "Support transition", assignee: "Lisa Chen", status: "pending" }
-          ]
-        }
-      ]
-    }
-  };
+interface Milestone {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  status: 'pending' | 'in-progress' | 'completed' | 'overdue';
+  priority: 'low' | 'medium' | 'high';
+  assignee: string;
+  project: string;
+}
 
-  const getStatusColor = (status: string) => {
+interface TimelineEvent {
+  id: string;
+  title: string;
+  type: 'milestone' | 'deadline' | 'meeting' | 'deployment';
+  date: string;
+  time: string;
+  duration: string;
+  attendees: string[];
+  location: string;
+}
+
+const mockMilestones: Milestone[] = [
+  {
+    id: '1',
+    title: 'Requirements Analysis Complete',
+    description: 'Complete initial requirements gathering and analysis',
+    date: '2024-02-15',
+    status: 'completed',
+    priority: 'high',
+    assignee: 'John Smith',
+    project: 'Network Infrastructure Upgrade'
+  },
+  {
+    id: '2',
+    title: 'Design Review Meeting',
+    description: 'Review network design with stakeholders',
+    date: '2024-02-20',
+    status: 'pending',
+    priority: 'high',
+    assignee: 'Sarah Johnson',
+    project: 'Network Infrastructure Upgrade'
+  },
+  {
+    id: '3',
+    title: 'Hardware Procurement',
+    description: 'Order required network equipment',
+    date: '2024-02-25',
+    status: 'in-progress',
+    priority: 'medium',
+    assignee: 'Mike Davis',
+    project: 'Network Infrastructure Upgrade'
+  },
+  {
+    id: '4',
+    title: 'POC Testing Complete',
+    description: 'Complete proof of concept testing',
+    date: '2024-01-30',
+    status: 'overdue',
+    priority: 'high',
+    assignee: 'Lisa Wilson',
+    project: 'Security Implementation'
+  }
+];
+
+const mockEvents: TimelineEvent[] = [
+  {
+    id: '1',
+    title: 'Project Kickoff Meeting',
+    type: 'meeting',
+    date: '2024-02-18',
+    time: '10:00 AM',
+    duration: '1 hour',
+    attendees: ['John Smith', 'Sarah Johnson', 'Mike Davis'],
+    location: 'Conference Room A'
+  },
+  {
+    id: '2',
+    title: 'Design Review',
+    type: 'meeting',
+    date: '2024-02-20',
+    time: '2:00 PM',
+    duration: '2 hours',
+    attendees: ['Sarah Johnson', 'Stakeholders'],
+    location: 'Virtual Meeting'
+  },
+  {
+    id: '3',
+    title: 'Hardware Delivery',
+    type: 'deployment',
+    date: '2024-02-28',
+    time: '9:00 AM',
+    duration: '4 hours',
+    attendees: ['Mike Davis', 'Vendor Team'],
+    location: 'Data Center'
+  }
+];
+
+export const TimelineManager: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('calendar');
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [priorityFilter, setPriorityFilter] = useState<string>('all');
+
+  const getStatusColor = (status: Milestone['status']) => {
     switch (status) {
-      case "completed": return "bg-green-500/10 text-green-500 border-green-500/30";
-      case "in-progress": return "bg-blue-500/10 text-blue-500 border-blue-500/30";
-      case "pending": return "bg-gray-500/10 text-gray-500 border-gray-500/30";
-      case "at-risk": return "bg-red-500/10 text-red-500 border-red-500/30";
-      default: return "bg-gray-500/10 text-gray-500 border-gray-500/30";
+      case 'completed': return 'bg-green-500';
+      case 'in-progress': return 'bg-blue-500';
+      case 'pending': return 'bg-yellow-500';
+      case 'overdue': return 'bg-red-500';
+      default: return 'bg-gray-500';
     }
   };
 
-  const currentProject = projects[selectedProject];
+  const getPriorityColor = (priority: Milestone['priority']) => {
+    switch (priority) {
+      case 'high': return 'bg-red-500';
+      case 'medium': return 'bg-yellow-500';
+      case 'low': return 'bg-green-500';
+      default: return 'bg-gray-500';
+    }
+  };
 
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Timeline & Milestone Management
-          </h2>
-          <p className="text-muted-foreground mt-2">
-            Track project timelines, milestones, and critical path management
-          </p>
+  const getEventTypeColor = (type: TimelineEvent['type']) => {
+    switch (type) {
+      case 'milestone': return 'bg-blue-500';
+      case 'deadline': return 'bg-red-500';
+      case 'meeting': return 'bg-green-500';
+      case 'deployment': return 'bg-purple-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDay = firstDay.getDay();
+    
+    return { daysInMonth, startingDay };
+  };
+
+  const getMonthName = (date: Date) => {
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  };
+
+  const getEventsForDate = (date: string) => {
+    return mockEvents.filter(event => event.date === date);
+  };
+
+  const getMilestonesForDate = (date: string) => {
+    return mockMilestones.filter(milestone => milestone.date === date);
+  };
+
+  const filteredMilestones = mockMilestones.filter(milestone => {
+    const matchesSearch = milestone.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         milestone.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || milestone.status === statusFilter;
+    const matchesPriority = priorityFilter === 'all' || milestone.priority === priorityFilter;
+    
+    return matchesSearch && matchesStatus && matchesPriority;
+  });
+
+  const renderCalendarView = () => {
+    const { daysInMonth, startingDay } = getDaysInMonth(currentMonth);
+    const days = [];
+    
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startingDay; i++) {
+      days.push(<div key={`empty-${i}`} className="h-24 border border-gray-200 bg-gray-50" />);
+    }
+    
+    // Add cells for each day of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const events = getEventsForDate(date);
+      const milestones = getMilestonesForDate(date);
+      
+      days.push(
+        <div 
+          key={day} 
+          className={`h-24 border border-gray-200 p-1 cursor-pointer hover:bg-gray-50 ${
+            selectedDate === date ? 'bg-blue-50 border-blue-300' : ''
+          }`}
+          onClick={() => setSelectedDate(date)}
+        >
+          <div className="text-sm font-medium mb-1">{day}</div>
+          <div className="space-y-1">
+            {milestones.map(milestone => (
+              <div 
+                key={milestone.id} 
+                className={`text-xs p-1 rounded truncate ${getStatusColor(milestone.status)} text-white`}
+                title={milestone.title}
+              >
+                {milestone.title}
+              </div>
+            ))}
+            {events.map(event => (
+              <div 
+                key={event.id} 
+                className={`text-xs p-1 rounded truncate ${getEventTypeColor(event.type)} text-white`}
+                title={event.title}
+              >
+                {event.title}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <h2 className="text-xl font-semibold">{getMonthName(currentMonth)}</h2>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+        
+        <div className="grid grid-cols-7 gap-1">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            <div key={day} className="h-8 flex items-center justify-center font-medium text-sm bg-gray-100">
+              {day}
+            </div>
+          ))}
+          {days}
+        </div>
+        
+        {selectedDate && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">
+                {new Date(selectedDate).toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {getMilestonesForDate(selectedDate).length > 0 && (
+                <div>
+                  <h4 className="font-medium mb-2">Milestones</h4>
+                  <div className="space-y-2">
+                    {getMilestonesForDate(selectedDate).map(milestone => (
+                      <div key={milestone.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                        <div>
+                          <div className="font-medium">{milestone.title}</div>
+                          <div className="text-sm text-muted-foreground">{milestone.project}</div>
+                        </div>
+                        <Badge variant={milestone.status === 'completed' ? 'default' : 'secondary'}>
+                          {milestone.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {getEventsForDate(selectedDate).length > 0 && (
+                <div>
+                  <h4 className="font-medium mb-2">Events</h4>
+                  <div className="space-y-2">
+                    {getEventsForDate(selectedDate).map(event => (
+                      <div key={event.id} className="flex items-center justify-between p-2 bg-blue-50 rounded">
+                        <div>
+                          <div className="font-medium">{event.title}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {event.time} • {event.duration} • {event.location}
+                          </div>
+                        </div>
+                        <Badge variant="outline">{event.type}</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {getMilestonesForDate(selectedDate).length === 0 && getEventsForDate(selectedDate).length === 0 && (
+                <div className="text-center text-muted-foreground py-4">
+                  No events or milestones scheduled for this date
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    );
+  };
+
+  const renderMilestonesView = () => (
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1">
+          <Label htmlFor="search">Search</Label>
+          <div className="relative">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              id="search"
+              placeholder="Search milestones..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8"
+            />
+          </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">Export Timeline</Button>
-          <Button className="bg-gradient-primary hover:opacity-90">
-            Update Schedule
-          </Button>
+          <div>
+            <Label htmlFor="status">Status</Label>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="in-progress">In Progress</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="overdue">Overdue</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="priority">Priority</Label>
+            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Priority</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="low">Low</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
-      <Tabs defaultValue="timeline" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="timeline">Project Timeline</TabsTrigger>
-          <TabsTrigger value="milestones">Milestones</TabsTrigger>
-          <TabsTrigger value="gantt">Gantt View</TabsTrigger>
-          <TabsTrigger value="calendar">Calendar View</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="timeline" className="space-y-6">
-          {/* Project Overview Card */}
-          <Card className="bg-gradient-glow border-primary/30">
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-xl">{currentProject.name}</CardTitle>
-                  <p className="text-muted-foreground mt-1">{currentProject.client}</p>
-                </div>
-                <Badge className={getStatusColor(currentProject.status)}>
-                  {currentProject.status}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="flex items-center space-x-3">
-                  <Calendar className="h-5 w-5 text-primary" />
-                  <div>
-                    <div className="text-sm text-muted-foreground">Start Date</div>
-                    <div className="font-medium">{currentProject.startDate}</div>
+      <div className="space-y-3">
+        {filteredMilestones.map(milestone => (
+          <Card key={milestone.id}>
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-medium">{milestone.title}</h3>
+                    <div className={`w-2 h-2 rounded-full ${getStatusColor(milestone.status)}`} />
+                    <div className={`w-2 h-2 rounded-full ${getPriorityColor(milestone.priority)}`} />
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-2">{milestone.description}</p>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span>Project: {milestone.project}</span>
+                    <span>Assignee: {milestone.assignee}</span>
+                    <span>Due: {milestone.date}</span>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <Calendar className="h-5 w-5 text-primary" />
-                  <div>
-                    <div className="text-sm text-muted-foreground">End Date</div>
-                    <div className="font-medium">{currentProject.endDate}</div>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant={milestone.status === 'completed' ? 'default' : 'secondary'}>
+                    {milestone.status}
+                  </Badge>
+                  <Badge variant={milestone.priority === 'high' ? 'destructive' : milestone.priority === 'medium' ? 'default' : 'secondary'}>
+                    {milestone.priority}
+                  </Badge>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <Clock className="h-5 w-5 text-primary" />
-                  <div>
-                    <div className="text-sm text-muted-foreground">Progress</div>
-                    <div className="font-medium">{currentProject.progress}%</div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Users className="h-5 w-5 text-primary" />
-                  <div>
-                    <div className="text-sm text-muted-foreground">Team Size</div>
-                    <div className="font-medium">4 Members</div>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4">
-                <Progress value={currentProject.progress} className="h-2" />
               </div>
             </CardContent>
           </Card>
+        ))}
+      </div>
+    </div>
+  );
 
-          {/* Timeline Phases */}
-          <div className="space-y-6">
-            {currentProject.phases.map((phase, index) => (
-              <Card key={phase.id} className={`relative hover:shadow-glow transition-all duration-300 ${
-                phase.status === "in-progress" ? "border-primary bg-gradient-glow" : ""
-              }`}>
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center space-x-4">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold ${
-                        phase.status === "completed" ? "bg-green-500" :
-                        phase.status === "in-progress" ? "bg-blue-500" : "bg-gray-400"
-                      }`}>
-                        {index + 1}
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg">{phase.name}</CardTitle>
-                        <p className="text-muted-foreground">
-                          {phase.startDate} - {phase.endDate} ({phase.duration} days)
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right space-y-2">
-                      <Badge className={getStatusColor(phase.status)}>
-                        {phase.status}
-                      </Badge>
-                      <div className="text-sm text-muted-foreground">
-                        {phase.progress}% Complete
-                      </div>
-                    </div>
+  const renderTimelineView = () => (
+    <div className="space-y-4">
+      <div className="text-center">
+        <Button>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Timeline Event
+        </Button>
+      </div>
+      
+      <div className="space-y-4">
+        {mockEvents.map(event => (
+          <Card key={event.id}>
+            <CardContent className="p-4">
+              <div className="flex items-start gap-4">
+                <div className={`w-3 h-3 rounded-full mt-2 ${getEventTypeColor(event.type)}`} />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-medium">{event.title}</h3>
+                    <Badge variant="outline">{event.type}</Badge>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <Progress value={phase.progress} className="h-2" />
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Milestones */}
-                      <div>
-                        <h4 className="font-semibold text-primary mb-3">Key Milestones</h4>
-                        <div className="space-y-2">
-                          {phase.milestones.map((milestone, idx) => (
-                            <div key={idx} className="flex items-center space-x-3">
-                              <div className={`w-3 h-3 rounded-full ${
-                                milestone.status === "completed" ? "bg-green-500" :
-                                milestone.status === "in-progress" ? "bg-blue-500" : "bg-gray-400"
-                              }`}></div>
-                              <span className="text-sm flex-1">{milestone.name}</span>
-                              <span className="text-xs text-muted-foreground">{milestone.date}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                  <div className="text-sm text-muted-foreground mb-2">
+                    {event.date} at {event.time} • Duration: {event.duration}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Location: {event.location}
+                  </div>
+                  {event.attendees.length > 0 && (
+                    <div className="text-sm text-muted-foreground mt-1">
+                      Attendees: {event.attendees.join(', ')}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
 
-                      {/* Tasks */}
-                      <div>
-                        <h4 className="font-semibold text-primary mb-3">Active Tasks</h4>
-                        <div className="space-y-2">
-                          {phase.tasks.map((task, idx) => (
-                            <div key={idx} className="flex items-center space-x-3">
-                              <div className={`w-3 h-3 rounded-full ${
-                                task.status === "completed" ? "bg-green-500" :
-                                task.status === "in-progress" ? "bg-blue-500" : "bg-gray-400"
-                              }`}></div>
-                              <span className="text-sm flex-1">{task.name}</span>
-                              <span className="text-xs text-muted-foreground">{task.assignee}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+  return (
+    <div className="w-full max-w-7xl mx-auto p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold mb-2">Timeline Manager</h1>
+        <p className="text-muted-foreground">
+          Manage project timelines, milestones, and events with comprehensive tracking and visualization
+        </p>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="calendar" className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            Calendar View
+          </TabsTrigger>
+          <TabsTrigger value="milestones" className="flex items-center gap-2">
+            <Target className="h-4 w-4" />
+            Milestones
+          </TabsTrigger>
+          <TabsTrigger value="timeline" className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Timeline
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="calendar" className="space-y-6">
+          {renderCalendarView()}
         </TabsContent>
 
         <TabsContent value="milestones" className="space-y-6">
-          <div className="grid gap-6">
-            {currentProject.phases.map((phase) => (
-              <Card key={phase.id}>
-                <CardHeader>
-                  <CardTitle className="text-lg text-primary">{phase.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {phase.milestones.map((milestone, index) => (
-                      <div key={index} className={`p-4 rounded-lg border transition-all duration-300 ${
-                        milestone.status === "completed" ? "bg-green-500/10 border-green-500/30" :
-                        milestone.status === "in-progress" ? "bg-blue-500/10 border-blue-500/30" :
-                        "bg-gray-500/10 border-gray-500/30"
-                      }`}>
-                        <div className="flex justify-between items-start">
-                          <div className="flex items-center space-x-3">
-                            <div className={`w-4 h-4 rounded-full ${
-                              milestone.status === "completed" ? "bg-green-500" :
-                              milestone.status === "in-progress" ? "bg-blue-500" : "bg-gray-400"
-                            }`}></div>
-                            <div>
-                              <div className="font-medium">{milestone.name}</div>
-                              <div className="text-sm text-muted-foreground">{milestone.date}</div>
-                            </div>
-                          </div>
-                          <Badge className={getStatusColor(milestone.status)}>
-                            {milestone.status}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {renderMilestonesView()}
         </TabsContent>
 
-        <TabsContent value="gantt" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Gantt Chart View</CardTitle>
-              <p className="text-muted-foreground">
-                Visual timeline representation of project phases and dependencies
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {/* Gantt Chart Header */}
-                <div className="grid grid-cols-12 gap-2 text-xs text-muted-foreground border-b pb-2">
-                  <div className="col-span-3">Phase</div>
-                  <div className="col-span-9 grid grid-cols-9 gap-1">
-                    {["Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Week 6", "Week 7", "Week 8", "Week 9"].map((week) => (
-                      <div key={week} className="text-center">{week}</div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Gantt Chart Rows */}
-                {currentProject.phases.map((phase, index) => (
-                  <div key={phase.id} className="grid grid-cols-12 gap-2 items-center py-2">
-                    <div className="col-span-3">
-                      <div className="text-sm font-medium">{phase.name}</div>
-                      <div className="text-xs text-muted-foreground">{phase.duration} days</div>
-                    </div>
-                    <div className="col-span-9 grid grid-cols-9 gap-1">
-                      {Array.from({ length: 9 }, (_, weekIndex) => {
-                        const isActive = weekIndex >= index && weekIndex < index + Math.ceil(phase.duration / 7);
-                        return (
-                          <div 
-                            key={weekIndex}
-                            className={`h-6 rounded ${
-                              isActive 
-                                ? phase.status === "completed" 
-                                  ? "bg-green-500" 
-                                  : phase.status === "in-progress"
-                                  ? "bg-blue-500"
-                                  : "bg-gray-400"
-                                : "bg-gray-100"
-                            }`}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="calendar" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Calendar View</CardTitle>
-              <p className="text-muted-foreground">
-                Monthly view of project milestones and deadlines
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-20">
-                <Calendar className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">
-                  Interactive calendar view with milestone tracking coming soon...
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="timeline" className="space-y-6">
+          {renderTimelineView()}
         </TabsContent>
       </Tabs>
     </div>
   );
 };
-
-export default TimelineManager;
