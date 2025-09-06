@@ -12,8 +12,8 @@ const UnifiedLayout: React.FC<UnifiedLayoutProps> = ({ children }) => {
   const location = useLocation();
   
   // Pages that should not show the unified layout
-  const noLayoutRoutes = ['/auth'];
-  const shouldShowLayout = !noLayoutRoutes.includes(location.pathname);
+  const noLayoutRoutes = ['/auth', '/customer-auth', '/customer-portal'];
+  const shouldShowLayout = !noLayoutRoutes.some(route => location.pathname.startsWith(route));
 
   if (!shouldShowLayout) {
     return (
@@ -24,16 +24,18 @@ const UnifiedLayout: React.FC<UnifiedLayoutProps> = ({ children }) => {
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
         
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-w-0">
           <UnifiedHeader />
           
-          <main className="flex-1 overflow-hidden bg-background">
-            <div className="h-full overflow-auto">
-              {children}
+          <main className="flex-1 overflow-hidden bg-gradient-to-br from-background via-background to-primary/2">
+            <div className="h-full overflow-auto scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
+              <div className="p-6">
+                {children}
+              </div>
             </div>
           </main>
         </div>

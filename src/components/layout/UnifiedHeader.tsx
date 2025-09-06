@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Link, useLocation } from 'react-router-dom';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { PortnoxMiniLogo } from '@/components/common/PortnoxBranding';
 
 export function UnifiedHeader() {
   const { user, signOut } = useAuth();
@@ -51,19 +52,25 @@ export function UnifiedHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-40 h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 h-20 border-b border-border bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80 shadow-sm">
       <div className="flex h-full items-center justify-between px-6">
-        {/* Left side */}
+        {/* Left side - Enhanced with Portnox branding */}
         <div className="flex items-center space-x-6">
-          <SidebarTrigger className="h-8 w-8" />
+          <SidebarTrigger className="h-10 w-10 hover:bg-primary/10 rounded-lg transition-colors duration-200" />
           
-          <div className="flex flex-col">
-            <h1 className="text-lg font-semibold text-foreground">
-              {getPageTitle()}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {getPageDescription()}
-            </p>
+          <div className="flex items-center space-x-4">
+            {/* Mini Portnox logo in header */}
+            <div className="flex items-center space-x-3">
+              <PortnoxMiniLogo />
+              <div className="hidden sm:block">
+                <h1 className="text-xl font-bold text-foreground">
+                  {getPageTitle()}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  {getPageDescription()}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -78,14 +85,14 @@ export function UnifiedHeader() {
           </div>
         </div>
 
-        {/* Right side */}
+        {/* Right side - Enhanced with Portnox branding */}
         <div className="flex items-center space-x-4">
-          {/* AI Status Indicator */}
-          <div className="hidden lg:flex items-center space-x-3 px-3 py-1.5 bg-card/50 border border-border rounded-lg">
-            <div className="w-2 h-2 bg-neon-green rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-foreground">AI Active</span>
-            <Badge variant="glow" className="text-xs">
-              v2.0
+          {/* Enhanced AI Status Indicator */}
+          <div className="hidden lg:flex items-center space-x-3 px-4 py-2 bg-gradient-to-r from-card to-primary/5 border border-primary/20 rounded-xl shadow-sm">
+            <div className="w-2 h-2 bg-neon-green rounded-full animate-pulse shadow-[0_0_5px_hsl(var(--neon-green))]"></div>
+            <span className="text-sm font-bold text-foreground">Portnox AI</span>
+            <Badge variant="secondary" className="text-xs bg-neon-green/20 text-neon-green border-neon-green/30">
+              Intelligence v3.0
             </Badge>
           </div>
 

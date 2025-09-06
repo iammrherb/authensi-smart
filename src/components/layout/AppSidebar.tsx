@@ -5,7 +5,7 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGrou
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/contexts/AuthContext';
-import portnoxLogo from '@/assets/portnox-logo.png';
+import { PortnoxBranding } from '@/components/common/PortnoxBranding';
 const primaryNavItems = [{
   title: "Command Center",
   url: "/",
@@ -130,49 +130,26 @@ const managementItems = [{
   tooltip: "System configuration and preferences"
 }];
 export function AppSidebar() {
-  const {
-    state
-  } = useSidebar();
+  const { state, open, setOpen } = useSidebar();
   const { isAdmin } = useAuth();
   const collapsed = state === 'collapsed';
   const location = useLocation();
   const currentPath = location.pathname;
+  
   const isActive = (path: string) => {
     if (path === "/") return currentPath === "/";
     return currentPath.startsWith(path);
   };
-  const getNavCls = (isActive: boolean) => isActive ? "bg-gradient-primary text-primary-foreground shadow-glow" : "hover:bg-sidebar-accent text-sidebar-foreground/80";
+  
+  const getNavCls = (isActive: boolean) => 
+    isActive 
+      ? "bg-gradient-primary text-primary-foreground shadow-glow border border-primary/30" 
+      : "hover:bg-sidebar-accent text-sidebar-foreground/80 hover:text-sidebar-foreground border border-transparent hover:border-sidebar-border/30";
   return <TooltipProvider delayDuration={300}>
-      <Sidebar className={`${collapsed ? "w-18" : "w-72"} border-r border-sidebar-border bg-sidebar-background transition-all duration-300`} collapsible="icon">
+      <Sidebar className={`${collapsed ? "w-20" : "w-80"} border-r border-sidebar-border bg-sidebar transition-all duration-300 ease-in-out`} collapsible="icon">
         <SidebarContent className="overflow-y-auto">
-          {/* Persistent Portnox Branding - Always Visible */}
-          <div className={`${collapsed ? "p-2" : "p-4"} border-b border-sidebar-border bg-gradient-to-br from-primary/5 to-primary/10`}>
-            <NavLink to="/" className="flex items-center space-x-3 group">
-              <div className="relative flex-shrink-0">
-                <div className="relative rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 p-2 transition-all duration-300 hover:from-primary/20 hover:to-primary/10 hover:scale-105 hover:shadow-lg">
-                  <img 
-                    src={portnoxLogo} 
-                    alt="Portnox" 
-                    className={`${collapsed ? "h-12 w-12" : "h-14 w-14"} object-contain transition-all duration-300 hover:scale-110`} 
-                  />
-                </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-primary rounded-full animate-pulse shadow-glow"></div>
-              </div>
-              {!collapsed && <div className="min-w-0 flex-1">
-                  
-                  <h2 className="text-lg font-bold text-sidebar-foreground leading-tight">
-                    Intelligence Hub
-                  </h2>
-                  <p className="text-xs text-sidebar-foreground/70 font-medium">AI-Powered NAC Track Master</p>
-                </div>}
-            </NavLink>
-            
-            {/* Persistent AI Status Indicator */}
-            <div className={`${collapsed ? "mt-2" : "mt-3"} flex items-center ${collapsed ? "justify-center" : "justify-start"} space-x-2`}>
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              {!collapsed && <span className="text-xs font-semibold text-green-700">AI ENGINE ACTIVE</span>}
-            </div>
-          </div>
+          {/* Enhanced Portnox Branding - Always Visible */}
+          <PortnoxBranding collapsed={collapsed} />
 
         {/* Primary Navigation */}
         <SidebarGroup>
@@ -300,16 +277,23 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Sidebar Toggle */}
-        <div className="mt-auto p-4 border-t border-sidebar-border">
+        {/* Enhanced Sidebar Toggle */}
+        <div className="mt-auto p-4 border-t border-sidebar-border bg-gradient-to-t from-primary/5 to-transparent">
           <Tooltip>
             <TooltipTrigger asChild>
-              <SidebarTrigger className="w-full justify-center hover-scale transition-all duration-200" />
+              <SidebarTrigger className="w-full justify-center hover-scale transition-all duration-200 bg-card/50 hover:bg-primary/10 border border-sidebar-border hover:border-primary/30 rounded-lg p-3" />
             </TooltipTrigger>
-            <TooltipContent side={collapsed ? "right" : "top"} className="bg-popover border border-border">
-              <span className="text-sm">{collapsed ? "Expand Sidebar" : "Collapse Sidebar"}</span>
+            <TooltipContent side={collapsed ? "right" : "top"} className="bg-popover border border-border shadow-lg">
+              <span className="text-sm font-medium">{collapsed ? "Expand Navigation" : "Collapse Navigation"}</span>
             </TooltipContent>
           </Tooltip>
+          
+          {!collapsed && (
+            <div className="mt-3 text-center">
+              <p className="text-xs text-sidebar-foreground/60">© 2024 Portnox Ltd.</p>
+              <p className="text-xs text-sidebar-foreground/40">Enterprise NAC Platform</p>
+            </div>
+          )}
         </div>
       </SidebarContent>
     </Sidebar>

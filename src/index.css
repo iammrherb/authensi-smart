@@ -145,14 +145,15 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
-    --sidebar-background: 218 45% 8%;
-    --sidebar-foreground: 210 40% 95%;
-    --sidebar-primary: 195 100% 55%;
-    --sidebar-primary-foreground: 218 35% 3%;
-    --sidebar-accent: 195 100% 15%;
-    --sidebar-accent-foreground: 195 100% 85%;
-    --sidebar-border: 195 100% 25%;
-    --sidebar-ring: 195 100% 55%;
+    /* Enhanced Sidebar with Portnox branding */
+    --sidebar-background: 218 45% 4%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 187 20% 31%;
+    --sidebar-primary-foreground: 218 35% 96%;
+    --sidebar-accent: 187 20% 15%;
+    --sidebar-accent-foreground: 187 30% 85%;
+    --sidebar-border: 187 20% 20%;
+    --sidebar-ring: 187 20% 31%;
   }
 
   .dark {
@@ -183,14 +184,15 @@ All colors MUST be HSL.
     --border: 180 30% 15%;
     --input: 218 35% 5%;
     --ring: 180 100% 65%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    /* Dark mode sidebar with Portnox theme */
+    --sidebar-background: 218 45% 3%;
+    --sidebar-foreground: 210 40% 97%;
+    --sidebar-primary: 187 20% 35%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 187 20% 12%;
+    --sidebar-accent-foreground: 187 30% 88%;
+    --sidebar-border: 187 20% 18%;
+    --sidebar-ring: 187 20% 35%;
   }
 }
 
@@ -319,4 +321,41 @@ All colors MUST be HSL.
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Custom scrollbar styles */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thumb-primary\/20::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--primary) / 0.2);
+  border-radius: 9999px;
+}
+
+.scrollbar-track-transparent::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* Enhanced hover effects for navigation */
+.hover-scale {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Portnox brand colors and gradients */
+.portnox-gradient {
+  background: linear-gradient(135deg, hsl(187 20% 31%), hsl(187 30% 45%));
+}
+
+.portnox-gradient-subtle {
+  background: linear-gradient(135deg, hsl(187 20% 31% / 0.1), hsl(187 30% 45% / 0.05));
 }
