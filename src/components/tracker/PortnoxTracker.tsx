@@ -7,7 +7,7 @@ import ScopingWorkflow from "./ScopingWorkflow";
 import TestManagement from "./TestManagement";
 import ChecklistManager from "./ChecklistManager";
 import ReportingDashboard from "./ReportingDashboard";
-import TimelineManager from "./TimelineManager";
+import { TimelineManager } from "./TimelineManager";
 import PostSalesHandoff from "./PostSalesHandoff";
 import ResourceTracking from "./ResourceTracking";
 import AnalyticsDashboard from "./AnalyticsDashboard";

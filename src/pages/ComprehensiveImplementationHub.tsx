@@ -10,7 +10,7 @@ import {
 import ComprehensiveImplementationTracker from "@/components/tracker/ComprehensiveImplementationTracker";
 import ProfessionalDeploymentReportGenerator from "@/components/tracker/ProfessionalDeploymentReportGenerator";
 import ChecklistManager from "@/components/tracker/ChecklistManager";
-import TimelineManager from "@/components/tracker/TimelineManager";
+import { TimelineManager } from "@/components/tracker/TimelineManager";
 
 const ComprehensiveImplementationHub: React.FC = () => {
   const [activeTab, setActiveTab] = useState('tracker');

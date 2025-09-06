@@ -47,13 +47,13 @@ import SystemHealthCenter from "./components/admin/SystemHealthCenter";
 import { EnhancedProjectCreationWizard } from "@/components/projects/EnhancedProjectCreationWizard";
 import { UnifiedProjectTracker } from "@/components/tracker/UnifiedProjectTracker";
 import { TimelineManager } from "@/components/tracker/TimelineManager";
-import { ProjectTrackingOverview } from "@/components/tracker/ProjectTrackingOverview";
-import { SmartTemplateRecommendationEngine } from "@/components/templates/SmartTemplateRecommendationEngine";
-import { PortnoxDeploymentReportBuilder } from "@/components/reports/PortnoxDeploymentReportBuilder";
-import { UltimateEnvironmentDiscoveryWizard } from "@/components/wizards/UltimateEnvironmentDiscoveryWizard";
-import { ResourceRelationshipsManager } from "@/components/library/ResourceRelationshipsManager";
-import { AIRelationshipSuggestions } from "@/components/library/AIRelationshipSuggestions";
-import { WebContentEnrichment } from "@/components/library/WebContentEnrichment";
+import ProjectTrackingOverview from "@/components/tracker/ProjectTrackingOverview";
+import SmartTemplateRecommendationEngine from "@/components/templates/SmartTemplateRecommendationEngine";
+import ProfessionalDeploymentReportGenerator from "@/components/tracker/ProfessionalDeploymentReportGenerator";
+import IntelligentProjectCreationWizard from "@/components/comprehensive/IntelligentProjectCreationWizard";
+import { EnhancedResourceManager } from "@/components/resources/EnhancedResourceManager";
+import SmartProjectInsights from "@/components/ai/SmartProjectInsights";
+import { GlobalDocsEnrichmentPanel } from "@/components/docs/GlobalDocsEnrichmentPanel";
 
 const queryClient = new QueryClient();
 
@@ -92,10 +92,23 @@ const App = () => (
                     <ProtectedRoute>
                       <div className="p-6">
                         <h1 className="text-2xl font-bold">Intelligence Tracker Hub</h1>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                          <ResourceRelationshipsManager />
-                          <AIRelationshipSuggestions />
-                        </div>
+                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                           <EnhancedResourceManager />
+                           <SmartProjectInsights projectData={{
+                             id: 'sample',
+                             name: 'Sample Project',
+                             client_name: 'Sample Client',
+                             industry: 'Technology',
+                             deployment_type: 'hybrid',
+                             security_level: 'high',
+                             total_sites: 5,
+                             total_endpoints: 250,
+                             progress_percentage: 65,
+                             current_phase: 'deployment',
+                             success_criteria: ['High availability', 'Security compliance'],
+                             pain_points: ['Network latency', 'Legacy systems']
+                           }} />
+                         </div>
                       </div>
                     </ProtectedRoute>
                   } />
@@ -111,18 +124,18 @@ const App = () => (
                   } />
                   <Route path="/scoping" element={
                     <ProtectedRoute>
-                      <div className="p-6">
-                        <h1 className="text-2xl font-bold">Intelligent Scoping</h1>
-                        <UltimateEnvironmentDiscoveryWizard />
-                      </div>
+                       <div className="p-6">
+                         <h1 className="text-2xl font-bold">Intelligent Scoping</h1>
+                         <IntelligentProjectCreationWizard />
+                       </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/scoping/:projectId" element={
                     <ProtectedRoute>
-                      <div className="p-6">
-                        <h1 className="text-2xl font-bold">Project Scoping</h1>
-                        <UltimateEnvironmentDiscoveryWizard />
-                      </div>
+                       <div className="p-6">
+                         <h1 className="text-2xl font-bold">Project Scoping</h1>
+                         <IntelligentProjectCreationWizard />
+                       </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/recommendations" element={
@@ -145,10 +158,19 @@ const App = () => (
                   } />
                   <Route path="/projects/:id" element={
                     <ProtectedRoute>
-                      <div className="p-6">
-                        <h1 className="text-2xl font-bold">Project Details</h1>
-                        <ProjectTrackingOverview />
-                      </div>
+                       <div className="p-6">
+                         <h1 className="text-2xl font-bold">Project Details</h1>
+                         <ProjectTrackingOverview 
+                           stats={{
+                             totalProjects: 12,
+                             activeSites: 8,
+                             completedSites: 4,
+                             overallProgress: 75,
+                             atRiskProjects: 3
+                           }}
+                           onNavigateToTab={(tab: string) => console.log('Navigate to:', tab)}
+                         />
+                       </div>
                     </ProtectedRoute>
                   } />
                   
@@ -197,10 +219,10 @@ const App = () => (
                   } />
                   <Route path="/reports" element={
                     <ProtectedRoute>
-                      <div className="p-6">
-                        <h1 className="text-2xl font-bold">Reports & Analytics</h1>
-                        <PortnoxDeploymentReportBuilder />
-                      </div>
+                       <div className="p-6">
+                         <h1 className="text-2xl font-bold">Reports & Analytics</h1>
+                         <ProfessionalDeploymentReportGenerator />
+                       </div>
                     </ProtectedRoute>
                   } />
                   
@@ -248,10 +270,10 @@ const App = () => (
                   } />
                   <Route path="/wizard" element={
                     <ProtectedRoute>
-                      <div className="p-6">
-                        <h1 className="text-2xl font-bold">Ultimate Environment Discovery Wizard</h1>
-                        <UltimateEnvironmentDiscoveryWizard />
-                      </div>
+                       <div className="p-6">
+                         <h1 className="text-2xl font-bold">Ultimate Environment Discovery Wizard</h1>
+                         <IntelligentProjectCreationWizard />
+                       </div>
                     </ProtectedRoute>
                   } />
                   
@@ -260,12 +282,12 @@ const App = () => (
                     <ProtectedRoute>
                       <div className="p-6">
                         <h1 className="text-2xl font-bold">Enhanced Resource Library</h1>
-                        <div className="space-y-6">
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <ResourceRelationshipsManager />
-                            <WebContentEnrichment />
-                          </div>
-                        </div>
+                         <div className="space-y-6">
+                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                             <EnhancedResourceManager />
+                             <GlobalDocsEnrichmentPanel />
+                           </div>
+                         </div>
                       </div>
                     </ProtectedRoute>
                   } />
@@ -273,12 +295,25 @@ const App = () => (
                     <ProtectedRoute>
                       <div className="p-6">
                         <h1 className="text-2xl font-bold">Resource Management</h1>
-                        <div className="space-y-6">
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <ResourceRelationshipsManager />
-                            <AIRelationshipSuggestions />
-                          </div>
-                        </div>
+                         <div className="space-y-6">
+                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                             <EnhancedResourceManager />
+                             <SmartProjectInsights projectData={{
+                               id: 'sample',
+                               name: 'Sample Project',
+                               client_name: 'Sample Client',
+                               industry: 'Technology',
+                               deployment_type: 'hybrid',
+                               security_level: 'high',
+                               total_sites: 5,
+                               total_endpoints: 250,
+                               progress_percentage: 65,
+                               current_phase: 'deployment',
+                               success_criteria: ['High availability', 'Security compliance'],
+                               pain_points: ['Network latency', 'Legacy systems']
+                             }} />
+                           </div>
+                         </div>
                       </div>
                     </ProtectedRoute>
                   } />
@@ -373,22 +408,22 @@ const App = () => (
                   {/* Development Testing Routes */}
                   <Route path="/dev/reports" element={
                     <ProtectedRoute>
-                      <div className="p-6">
-                        <h1 className="text-2xl font-bold">Enterprise Report Generator</h1>
-                        <PortnoxDeploymentReportBuilder />
-                      </div>
+                       <div className="p-6">
+                         <h1 className="text-2xl font-bold">Enterprise Report Generator</h1>
+                         <ProfessionalDeploymentReportGenerator />
+                       </div>
                     </ProtectedRoute>
                   } />
                   <Route path="/dev/resource/:type/:id" element={
                     <ProtectedRoute>
                       <div className="p-6">
                         <h1 className="text-2xl font-bold">Enhanced Resource Manager</h1>
-                        <div className="space-y-6">
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <ResourceRelationshipsManager />
-                            <WebContentEnrichment />
-                          </div>
-                        </div>
+                         <div className="space-y-6">
+                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                             <EnhancedResourceManager />
+                             <GlobalDocsEnrichmentPanel />
+                           </div>
+                         </div>
                       </div>
                     </ProtectedRoute>
                   } />
