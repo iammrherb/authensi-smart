@@ -52,21 +52,21 @@ export function UnifiedHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 h-20 border-b border-border bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80 shadow-sm">
+    <header className="fixed top-0 left-0 right-0 z-50 h-20 border-b border-border bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80 shadow-sm">
       <div className="flex h-full items-center justify-between px-6">
-        {/* Left side - Enhanced with Portnox branding */}
-        <div className="flex items-center space-x-6">
-          <SidebarTrigger className="h-10 w-10 hover:bg-primary/10 rounded-lg transition-colors duration-200" />
+        {/* Left side - Fixed Portnox branding that never collapses */}
+        <div className="flex items-center space-x-6 min-w-0 flex-1">
+          <SidebarTrigger className="h-10 w-10 hover:bg-primary/10 rounded-lg transition-colors duration-200 flex-shrink-0" />
           
-          <div className="flex items-center space-x-4">
-            {/* Mini Portnox logo in header */}
-            <div className="flex items-center space-x-3">
+          {/* Fixed Portnox Logo and Branding */}
+          <div className="flex items-center space-x-4 min-w-0">
+            <div className="flex items-center space-x-3 flex-shrink-0">
               <PortnoxMiniLogo />
-              <div className="hidden sm:block">
-                <h1 className="text-xl font-bold text-foreground">
+              <div className="hidden sm:block min-w-0">
+                <h1 className="text-xl font-bold text-foreground truncate">
                   {getPageTitle()}
                 </h1>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground truncate">
                   {getPageDescription()}
                 </p>
               </div>

@@ -18,6 +18,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AIContextManager from "./components/ai/AIContextManager";
 import SmartTemplateCenter from "./pages/SmartTemplateCenter";
+import ResourceLibrary from "./pages/ResourceLibrary";
 import Designer from "./pages/Designer";
 import UnifiedImplementationHub from "./pages/UnifiedImplementationHub";
 import CommandCenter from "./pages/CommandCenter";
@@ -278,19 +279,11 @@ const App = () => (
                   } />
                   
                   {/* Knowledge & Resources */}
-                  <Route path="/resource-library" element={
-                    <ProtectedRoute>
-                      <div className="p-6">
-                        <h1 className="text-2xl font-bold">Enhanced Resource Library</h1>
-                         <div className="space-y-6">
-                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                             <EnhancedResourceManager />
-                             <GlobalDocsEnrichmentPanel />
-                           </div>
-                         </div>
-                      </div>
-                    </ProtectedRoute>
-                  } />
+                   <Route path="/resource-library" element={
+                     <ProtectedRoute>
+                       <ResourceLibrary />
+                     </ProtectedRoute>
+                   } />
                   <Route path="/resources" element={
                     <ProtectedRoute>
                       <div className="p-6">

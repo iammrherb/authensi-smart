@@ -93,8 +93,9 @@ const managementItems = [{
 }, {
   title: "Resource Library",
   url: "/resource-library",
-  icon: FolderOpen,
-  tooltip: "Centralized templates, use cases, and vendor resources"
+  icon: Database,
+  badge: "600+",
+  tooltip: "Comprehensive resource library with taxonomies for all wizards"
 }, {
   title: "System Health",
   url: "/system-health",
